@@ -25,6 +25,10 @@ You are implementing a multi-tenant salon platform in this repository. Follow th
 5. Keep changes modular by domain: auth, tenants, locations, staff, services, bookings.
 6. Update documentation after each completed task.
 7. Do not modify unrelated files.
+8. Marketplace guardrail: never inject competitor recommendations in active salon booking context.
+9. Onboarding guardrail: all onboarding flows must support draft-save and resume where specified.
+10. Payment guardrail: Stripe webhook handlers must be signature-verified and idempotent.
+11. AI guardrail: AI features must include safety fallback, confidence controls, and tenant-safe context loading.
 Return:
 - exact files changed
 - what was implemented
@@ -141,21 +145,42 @@ Return:
 Review prompt:
 Review tenant model and repository methods for future extensibility and migration safety.
 
-## Task 2.2 - Tenant User Role Mapping
+## Task 2.2 - Tenant User Role Mapping (with Subscription Foundation)
 Prompt:
-Implement tenantUsers collection access layer.
+Implement tenantUsers collection access layer with subscription metadata foundation.
 Requirements:
-1. Add model for tenantUsers with role and permissions.
+1. Add model for tenantUsers with role, permissions, AND subscription fields (tier, status, dates).
 2. Add repository methods: assignUserToTenant, updateTenantUserRole, listTenantUsers, getUserTenantRoles.
 3. Include role enum: tenant_owner, tenant_admin, location_manager, technician, client.
-4. Add guards that prevent invalid role transitions.
-5. Add unit tests for role transition rules.
+4. Include subscription metadata fields: tier (starter|professional|enterprise), status (trialing|active|past_due|suspended|cancelled), billingCycle (monthly|annual), startDate, trialEndsAt, nextBillingDate, suspendedAt, suspensionReason.
+5. Add guards that prevent invalid role transitions.
+6. Validate subscription status field but do NOT enforce feature gating yet (Stripe integration comes later).
+7. Add unit tests for role transition rules and subscription field shape validation.
 Return:
 - files changed
 - role transition matrix used
+- subscription state diagram
 
 Review prompt:
-Review role mapping logic for privilege escalation risks and missing invariants.
+Review role mapping logic for privilege escalation risks and missing invariants. Check subscription field validation and compatibility with future Stripe integration.
+
+## Task 2.2.5 - User Tenant Access Index (Multi-Salon Support)
+Prompt:
+Implement userTenantAccess denormalized index collection for fast multi-salon queries.
+Requirements:
+1. Create userTenantAccess collection (document id: userId_tenantId) to track which users can access which tenants.
+2. Add fields: userId, tenantId, accessLevel, subscriptionStatus, subscribedAt, unreadMessageCount, lastMessageAt, lastAccessedAt.
+3. Add repository methods: createUserTenantAccess, updateUnreadMessageCount, getUserTenants, getTenantUsers, deactivateUserTenantAccess.
+4. This collection is a denormalized mirror of critical fields from tenantUsers and will enable fast "list all tenants for user" queries and badge count lookup for multi-salon dashboard.
+5. Add tests for synchronization between tenantUsers and userTenantAccess (critical for data consistency).
+6. Document the synchronization requirements so all future code keeps these in sync.
+Return:
+- files changed
+- userTenantAccess repository methods
+- sync test coverage
+
+Review prompt:
+Review userTenantAccess design for data consistency risks. Identify all places where tenantUsers/subscriptions changes must also update userTenantAccess.
 
 ## Task 2.3 - Location Domain
 Prompt:
@@ -210,6 +235,24 @@ Return:
 
 Review prompt:
 Review discovery scaffold for future extensibility, performance risk in list rendering, and migration readiness from mocked data to Firestore/API.
+
+## Task 2.6 - Salon Onboarding and Client Onboarding Route Stubs
+Prompt:
+Create onboarding route and state scaffolding so development can plug in detailed onboarding flows later without route churn.
+Requirements:
+1. Add route groups for `SalonOnboarding` and `ClientOnboarding` with placeholder step screens.
+2. Salon onboarding steps to scaffold: Account, Business Profile, Payment Setup, Services, Staff, Policies, Availability, Marketplace, Verification.
+3. Client onboarding steps to scaffold: Account/Guest, Phone Verify, Profile, Payment Method, Preferences, Notifications, Loyalty.
+4. Add minimal onboarding state machine contracts and progress persistence interface (`saveDraft`, `resumeDraft`).
+5. Do not build final UI yet; build navigation and contracts only.
+6. Add docs in Documentation/new-platform/ONBOARDING_ROUTE_SCAFFOLD.md.
+Return:
+- files changed
+- route map summary
+- onboarding state contract summary
+
+Review prompt:
+Review onboarding route scaffolding for dead-end navigation risk, resumability gaps, and future compatibility with Stripe Connect and guest-to-full-account upgrades.
 
 ---
 

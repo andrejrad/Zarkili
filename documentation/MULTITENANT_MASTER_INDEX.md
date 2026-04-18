@@ -8,20 +8,54 @@ It links all generated strategy and execution documents and gives an exact run o
 
 ## Document Set
 
+0. Program tracking board (Kanban)
+- [PROGRAM_TRACKING_BOARD.md](PROGRAM_TRACKING_BOARD.md)
+
+0.1 Project Gantt plan (Agile + parallel streams)
+- [PROJECT_GANTT_AGILE_PLAN.md](PROJECT_GANTT_AGILE_PLAN.md)
+
 1. Strategic feature and architecture audit
 - [MULTITENANT_STRATEGY_AND_FEATURE_AUDIT.md](MULTITENANT_STRATEGY_AND_FEATURE_AUDIT.md)
 
 2. Companion blueprint (schema + roadmap + migration map)
 - [MULTITENANT_COMPANION_EXECUTION_BLUEPRINT.md](MULTITENANT_COMPANION_EXECUTION_BLUEPRINT.md)
 
-3. Copilot prompts for Weeks 1-4
+3. Marketplace specification
+- [MARKETPLACE_SPECS.md](MARKETPLACE_SPECS.md)
+
+4. Salon onboarding specification
+- [SALON_ONBOARDING_SPECS.md](SALON_ONBOARDING_SPECS.md)
+
+5. Client onboarding specification
+- [CLIENT_ONBOARDING.md](CLIENT_ONBOARDING.md)
+
+6. Free trial specification
+- [FREE_TRIAL_SPECS.md](FREE_TRIAL_SPECS.md)
+
+7. Payment specification
+- [PAYMENT_FEATURE_SPECS.md](PAYMENT_FEATURE_SPECS.md)
+
+8. AI features specification
+- [AI_FEATURES_SPECS.md](AI_FEATURES_SPECS.md)
+
+9. Monetization & multi-salon integration summary
+- [MONETIZATION_AND_MULTISALON_INTEGRATION_SUMMARY.md](MONETIZATION_AND_MULTISALON_INTEGRATION_SUMMARY.md)
+- Reference this for multi-salon user access model and subscription context.
+
+10. Copilot prompts for Weeks 1-4
 - [MULTITENANT_WEEKS_1_TO_4_COPILOT_PROMPTS.md](MULTITENANT_WEEKS_1_TO_4_COPILOT_PROMPTS.md)
 
-4. Copilot prompts for Weeks 5-8
+11. Copilot prompts for Weeks 5-8
 - [MULTITENANT_WEEKS_5_TO_8_COPILOT_PROMPTS.md](MULTITENANT_WEEKS_5_TO_8_COPILOT_PROMPTS.md)
 
-5. Copilot prompts for Weeks 9-12
+12. Copilot prompts for Weeks 9-12
 - [MULTITENANT_WEEKS_9_TO_12_COPILOT_PROMPTS.md](MULTITENANT_WEEKS_9_TO_12_COPILOT_PROMPTS.md)
+
+13. Copilot prompts for Weeks 13-20 (new)
+- [MULTITENANT_WEEKS_13_TO_20_COPILOT_PROMPTS.md](MULTITENANT_WEEKS_13_TO_20_COPILOT_PROMPTS.md)
+
+14. AI-first Gen-Z design playbook (new)
+- [AI_FIRST_GENZ_DESIGN_PLAYBOOK.md](AI_FIRST_GENZ_DESIGN_PLAYBOOK.md)
 
 ---
 
@@ -29,11 +63,23 @@ It links all generated strategy and execution documents and gives an exact run o
 
 1. Read: [MULTITENANT_STRATEGY_AND_FEATURE_AUDIT.md](MULTITENANT_STRATEGY_AND_FEATURE_AUDIT.md)
 - Goal: align on product scope and technical direction.
+  - **NEW**: Includes multi-salon user access and subscription/billing models
 
 2. Read: [MULTITENANT_COMPANION_EXECUTION_BLUEPRINT.md](MULTITENANT_COMPANION_EXECUTION_BLUEPRINT.md)
 - Goal: lock schema, roadmap, and migration strategy.
+  - **NEW**: Extended schema for subscriptions, userTenantAccess, and Week 5.5 multi-salon dashboard
+  - **NEW**: Extended Weeks 13-20 roadmap for payments, onboarding, marketplace, and AI
 
-3. Execute: [MULTITENANT_WEEKS_1_TO_4_COPILOT_PROMPTS.md](MULTITENANT_WEEKS_1_TO_4_COPILOT_PROMPTS.md)
+3. Read: feature specifications in this order:
+- [SALON_ONBOARDING_SPECS.md](SALON_ONBOARDING_SPECS.md)
+- [CLIENT_ONBOARDING.md](CLIENT_ONBOARDING.md)
+- [MARKETPLACE_SPECS.md](MARKETPLACE_SPECS.md)
+- [FREE_TRIAL_SPECS.md](FREE_TRIAL_SPECS.md)
+- [PAYMENT_FEATURE_SPECS.md](PAYMENT_FEATURE_SPECS.md)
+- [AI_FEATURES_SPECS.md](AI_FEATURES_SPECS.md)
+- Goal: lock detailed product behavior before implementation.
+
+4. Execute: [MULTITENANT_WEEKS_1_TO_4_COPILOT_PROMPTS.md](MULTITENANT_WEEKS_1_TO_4_COPILOT_PROMPTS.md)
 - Goal: start implementation in correct order.
 
 ---
@@ -72,13 +118,16 @@ Use prompts from Weeks 1-4 document in this order:
 1. Tenant isolation
 - Every business write includes tenantId.
 - Every query includes tenant filter.
+- Multi-tenant user access (`userTenantAccess`) stays in sync with `tenantUsers`.
 
 2. Authorization
 - Role checks for all privileged actions.
+- Subscription and trial status validated in guarded flows.
 
 3. Data integrity
 - State transitions validated.
 - Race-sensitive flows protected.
+- Unread message aggregation accurate per tenant.
 
 4. Verification
 - Tests added and passing.

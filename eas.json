@@ -1,0 +1,22 @@
+{
+  "cli": {
+    "version": ">= 11.0.0"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_APP_VARIANT": "development"
+      }
+    },
+    "preview": {
+      "distribution": "internal"
+    },
+    "production": {
+      "env": {
+        "EXPO_PUBLIC_APP_VARIANT": "production"
+      }
+    }
+  }
+}

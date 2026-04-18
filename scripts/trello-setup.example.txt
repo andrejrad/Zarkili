@@ -1,0 +1,8 @@
+TRELLO_API_KEY=replace_me
+TRELLO_API_TOKEN=replace_me
+TRELLO_WORKSPACE_ID=optional_workspace_id
+
+How to find values:
+- API key: https://trello.com/power-ups/admin
+- API token: https://trello.com/1/authorize?expiration=never&name=ZarkiliBoardSetup&scope=read,write&response_type=token&key=<YOUR_API_KEY>
+- Workspace ID: open workspace page and copy id from URL or use Trello API /members/me/organizations

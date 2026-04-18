@@ -11,6 +11,15 @@ Assumptions:
 - You are prompt engineer and final reviewer
 - Stack is React Native + Expo + Firebase
 
+### Important Note: Subscription-Aware Features (New in v1.1)
+These weeks (9-12) build advanced features that will later be gated by subscription tier in Week 13+. At this point:
+- **Do NOT enforce subscription gating** (that comes in Week 14)
+- **Do build subscription context awareness** into these features so Week 14 gating is trivial:
+  - Week 10 (Campaigns): Add `subscriptionTierRequired` field to campaigns (e.g., only "professional" tier can create bulk campaigns)
+  - Week 11 (Analytics/Reports): Add current subscription tier in report context (so later we can show/hide reports per tier)
+  - Track which features are used per subscription tier for future upsell recommendations
+- This forward compatibility saves major refactoring later
+
 ---
 
 ## Week 9 - Reviews Module
@@ -102,19 +111,23 @@ Review segmentation logic for incorrect cohort boundaries and consent handling g
 
 ## Task 10.2 - Campaign Domain and Scheduler
 Prompt:
-Implement campaign domain v1 with scheduled execution.
+Implement campaign domain v1 with scheduled execution and subscription tier awareness.
 Requirements:
 1. Campaign fields: tenantId, name, channel, segmentId, templateId, status, scheduledAt, metrics, createdBy.
-2. Status enum: draft, scheduled, sending, completed, paused, cancelled.
-3. Add scheduler to execute due campaigns.
-4. Add send logs per recipient for traceability.
-5. Add integration tests for schedule-to-send pipeline.
+2. **NEW (for subscription gating in Week 14)**: Add field `requiredSubscriptionTier` (starter|professional|enterprise).
+   - This field will determine if a tenant can create/run this campaign type during Week 14 gating
+   - For now, allow all tenants to create campaigns; just store the tier requirement
+3. Status enum: draft, scheduled, sending, completed, paused, cancelled.
+4. Add scheduler to execute due campaigns.
+5. Add send logs per recipient for traceability.
+6. Add integration tests for schedule-to-send pipeline.
 Return:
 - files changed
 - scheduler strategy
+- tier field implementation
 
 Review prompt:
-Review campaign scheduler for retry loops, idempotency, and partial-failure handling.
+Review campaign scheduler for retry loops, idempotency, partial-failure handling, and verify requiredSubscriptionTier field is persisted correctly.
 
 ## Task 10.3 - Template System and Variable Rendering
 Prompt:
@@ -148,25 +161,47 @@ Return:
 Review prompt:
 Review challenge module for reward abuse and duplicate-completion vulnerabilities.
 
+## Task 10.5 - Marketplace Domain Foundation (Profiles, Posts, Visibility)
+Prompt:
+Implement marketplace data/domain foundation aligned with anti-client-theft product rules.
+Requirements:
+1. Add marketplace entities: salonPublicProfile, marketplacePost, marketplaceSettings.
+2. Include settings for opt-in modes: full_profile, posts_only, hidden_search_direct_link.
+3. Add post fields for service tags, style tags, optional "book this look" reference.
+4. Enforce rule in booking context: no competitor recommendation payloads when tenant context is active.
+5. Add tests for visibility modes and booking-context recommendation suppression.
+6. Add docs in Documentation/new-platform/MARKETPLACE_DOMAIN.md.
+Return:
+- files changed
+- schema summary
+- anti-client-theft guard summary
+
+Review prompt:
+Review marketplace foundation for visibility leakage, weak moderation assumptions, and any competitor-injection path during booking.
+
 ---
 
 ## Week 11 - Analytics and Reporting
 
 ## Task 11.1 - Analytics Query Layer
 Prompt:
-Implement analytics query layer for tenant reporting.
+Implement analytics query layer for tenant reporting with subscription tier context.
 Requirements:
 1. Build metrics services for retention, rebooking, at-risk, avg visit interval.
 2. Add location-level and staff-level drilldowns.
-3. Ensure all calculations use tenant-scoped, status-filtered data.
-4. Add test fixtures and expected metric snapshots.
-5. Add docs in Documentation/new-platform/ANALYTICS_QUERIES.md.
+3. **NEW (for subscription gating in Week 14)**: Include current tenant subscription tier in all report context.
+   - Add method: getTenantAnalyticsContext() returning {tenantId, subscriptionTier, accessibleReports: [...]}
+   - This allows Week 14 to easily filter which reports are visible per tier
+4. Ensure all calculations use tenant-scoped, status-filtered data.
+5. Add test fixtures and expected metric snapshots.
+6. Add docs in Documentation/new-platform/ANALYTICS_QUERIES.md.
 Return:
 - files changed
 - metric formulas implemented
+- subscription tier context integration
 
 Review prompt:
-Review analytics layer for formula drift, wrong status filters, and expensive query patterns.
+Review analytics layer for formula drift, wrong status filters, expensive query patterns, and subscription tier context correctness.
 
 ## Task 11.2 - Reporting Screens v1
 Prompt:
@@ -200,7 +235,24 @@ Return:
 Review prompt:
 Review campaign/challenge analytics for attribution ambiguity and double-count risk.
 
-## Task 11.4 - Data Export Endpoints (CSV/JSON)
+## Task 11.4 - AI Data Readiness and Feature Store Contracts
+Prompt:
+Prepare AI-ready data contracts without releasing models yet.
+Requirements:
+1. Define feature tables/contracts for scheduling, retention, no-show risk, and marketplace personalization.
+2. Include explainability fields (`reasonCodes`, `confidence`, `sourceSignals`) in contract design.
+3. Add data quality checks for missing/late events.
+4. Define opt-out and consent-safe filtering contract for AI messaging use cases.
+5. Add docs in Documentation/new-platform/AI_DATA_CONTRACTS.md.
+Return:
+- files changed
+- feature contract summary
+- quality/consent safeguards
+
+Review prompt:
+Review AI data contracts for privacy violations, explainability gaps, and weak fallback behavior when features are missing.
+
+## Task 11.5 - Data Export Endpoints (CSV/JSON)
 Prompt:
 Implement secure export endpoints for reports.
 Requirements:
@@ -325,12 +377,12 @@ Return concise executive summary.
 
 ---
 
-## Final Program Completion Prompt (After Week 12)
+## Phase Completion Prompt (After Week 12)
 Prompt:
-Produce a 12-week completion report from repository state and docs.
+Produce a core-phase completion report (Weeks 1-12) from repository state and docs.
 Include:
 1. Delivered capabilities by domain
 2. Migration readiness for Zara Tenant 1
 3. Outstanding gaps for scale to tenant 2+
-4. Recommended next 6-week hardening backlog
+4. Recommended next 8-week backlog (Weeks 13-20)
 Return structured markdown suitable for stakeholder review.

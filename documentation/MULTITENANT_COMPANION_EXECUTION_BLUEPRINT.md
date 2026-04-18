@@ -3,7 +3,7 @@
 ## Scope of This Companion
 This document adds three implementation-grade artifacts to the first strategy report:
 1. Firestore schema v1 for multi-tenant operations
-2. 12-week delivery roadmap with milestones, ownership, and quality gates
+2. 20-week delivery roadmap with milestones, ownership, and quality gates
 3. Migration map from current Zara modules into the new multi-tenant system
 
 Assumptions for delivery model:
@@ -61,7 +61,7 @@ Document shape:
 ```
 
 ### tenantUsers
-Purpose: many-to-many mapping between users and tenant roles
+Purpose: many-to-many mapping between users and tenant roles (extended for subscription tracking)
 
 Document id recommendation: tenantId_userId
 
@@ -73,6 +73,16 @@ Document id recommendation: tenantId_userId
   "status": "active",
   "permissions": ["bookings.read", "bookings.write", "campaigns.write"],
   "locationIds": ["loc_1", "loc_2"],
+  "subscription": {
+    "tier": "professional",
+    "status": "active",
+    "billingCycle": "monthly",
+    "startDate": "2026-04-01",
+    "trialEndsAt": null,
+    "nextBillingDate": "2026-05-01",
+    "suspendedAt": null,
+    "suspensionReason": null
+  },
   "createdAt": "serverTimestamp",
   "updatedAt": "serverTimestamp"
 }
@@ -85,6 +95,19 @@ Roles recommended:
 - location_manager
 - technician
 - client
+
+Subscription tiers:
+- free_trial (14 days, limited features)
+- starter (basic features)
+- professional (most features)
+- enterprise (all features + custom support)
+
+Subscription statuses:
+- trialing (14-day free trial active)
+- active (paid subscription active)
+- past_due (payment failed, grace period active)
+- suspended (no payment, features locked)
+- cancelled (user cancelled)
 
 ### locations
 Purpose: physical salon branches under a tenant
@@ -357,6 +380,70 @@ Purpose: daily/weekly engagement activities and challenges
 }
 ```
 
+### subscriptions (Platform-Level Collection)
+Purpose: subscription lifecycle tracking for tenant business accounts
+
+Document id recommendation: auto-generated subscription ID
+
+```json
+{
+  "subscriptionId": "sub_stripe_123abc",
+  "tenantId": "tenant_abc",
+  "customerId": "cust_stripe_xyz",
+  "tier": "professional",
+  "status": "active",
+  "billingCycle": "monthly",
+  "billingCycleAnnual": false,
+  "currentPeriodStart": "2026-04-01",
+  "currentPeriodEnd": "2026-05-01",
+  "trialEndsAt": null,
+  "nextBillingDate": "2026-05-01",
+  "cancelledAt": null,
+  "cancellationReason": null,
+  "payment": {
+    "method": "stripe",
+    "last4": "4242",
+    "brand": "visa"
+  },
+  "pricing": {
+    "monthlyUSD": 29,
+    "annualUSD": 290,
+    "currency": "USD"
+  },
+  "failureCount": 0,
+  "lastFailureAt": null,
+  "gracePeriodEndsAt": null,
+  "createdAt": "serverTimestamp",
+  "updatedAt": "serverTimestamp"
+}
+```
+
+### userTenantAccess (Multi-Salon User Subscriptions)
+Purpose: track which users have access to which tenants and keep unread message counts
+
+Document id recommendation: userId_tenantId
+
+```json
+{
+  "userId": "uid_client_1",
+  "tenantId": "tenant_abc",
+  "accessLevel": "client",
+  "subscriptionStatus": "active",
+  "subscribedAt": "2026-03-15",
+  "unreadMessageCount": 3,
+  "lastMessageAt": "2026-04-16T14:32:00Z",
+  "lastAccessedAt": "2026-04-16T10:00:00Z",
+  "createdAt": "serverTimestamp",
+  "updatedAt": "serverTimestamp"
+}
+```
+
+Note on `userTenantAccess`:
+- This is a denormalized index to enable fast queries like "list all tenants for user" and "get unread counts per tenant for dashboard"
+- Mirrors subset of data from `tenantUsers` and `subscriptions` for performance
+- MUST be kept in sync during all subscription/user updates
+```
+
 ## 1.3 Suggested Indexes (Minimum)
 - bookings: tenantId + locationId + date + startTime
 - bookings: tenantId + customerId + status + date
@@ -367,6 +454,12 @@ Purpose: daily/weekly engagement activities and challenges
 - waitlist: tenantId + locationId + status + startDate + endDate
 - campaigns: tenantId + status + scheduledAt
 - reviews: tenantId + locationId + staffId + createdAt
+- subscriptions: tenantId + status
+- subscriptions: status + nextBillingDate
+- subscriptions: status + gracePeriodEndsAt (for payment failure grace period queries)
+- userTenantAccess: userId + accessLevel
+- userTenantAccess: userId + subscriptionStatus + lastAccessedAt (for dashboard multi-salon listing)
+- userTenantAccess: tenantId + subscriptionStatus (for tenant's active user count)
 
 ## 1.4 Security Rule Guidance (High-Level)
 - Enforce request.auth != null globally except public assets
@@ -377,7 +470,7 @@ Purpose: daily/weekly engagement activities and challenges
 
 ---
 
-## 2) 12-Week Execution Roadmap (Copilot-Driven Delivery)
+## 2) 20-Week Execution Roadmap (Copilot-Driven Delivery)
 
 ## Team Operating Model
 - Prompt Engineer (you): writes feature specs, acceptance criteria, and review prompts
@@ -390,6 +483,16 @@ Purpose: daily/weekly engagement activities and challenges
 - Documentation updated
 - Manual acceptance checklist passed
 - No high-severity regression in smoke tests
+
+## Scope Reality and Phasing Decision
+Approved scope now includes: marketplace, salon onboarding, client onboarding integration, configurable free trial, Stripe Billing + Stripe Connect, and broad AI feature delivery.
+
+Recommended sequence:
+1. Build core platform reliability first (Weeks 1-12)
+2. Add monetization and onboarding hardening (Weeks 13-16)
+3. Launch marketplace + AI layer in controlled phases (Weeks 17-20)
+
+This is the lowest-risk path that preserves tenant isolation and release quality.
 
 ## Week-by-Week Plan
 
@@ -415,17 +518,20 @@ Quality gates:
 Objectives:
 - Tenant onboarding data model
 - Location CRUD and listing
-- Role model + tenant user mapping
+- Role model + tenant user mapping **with subscription metadata** (for future multi-salon + billing)
 - Marketplace-ready discovery entry scaffold
+- Build userTenantAccess denormalized index for multi-salon user support
 
 Deliverables:
-- tenants, tenantUsers, locations modules
+- tenants, tenantUsers (extended with subscription fields), locations modules
+- userTenantAccess index collection and repository
 - Admin screens for tenant/location setup
 - Role-aware navigation skeleton
 - DiscoverBusinesses screen scaffold using mocked data contracts
 
 Quality gates:
 - Cross-tenant access denied by security rules
+- Subscription fields in tenantUsers properly structured but not enforced yet (enforcement after Stripe integration)
 - Public discover flow works without auth while protected app remains guarded
 
 ### Week 3: Service and Staff Modules
@@ -466,6 +572,29 @@ Deliverables:
 
 Quality gates:
 - Lifecycle transitions only via authorized roles
+
+### Week 5.5: Multi-Salon Home Dashboard and Context Switcher (NEW)
+Objectives:
+- Build user home screen showing all subscribed salons
+- Real-time badge counts for unread messages per salon
+- Quick context switching and deep-linking into each salon
+- Marketplace discovery integration if user has no subscriptions
+
+Note: This is distinct from the single-salon app context. After authentication, users land on this dashboard to *choose* which salon to enter. Once inside a salon context, the app behaves as single-tenant.
+
+Deliverables:
+- MultiSalonDashboardScreen component with salon cards
+- Unread message count aggregation service across all user's tenants
+- Context switcher (select salon → navigate into protected app with tenantId set)
+- Salon card UI showing: logo, name, next appointment, unread count, quick actions (Book, Message, Profile)
+- Loyalty points balance per salon (from userTenantAccess denormalized data)
+- Integration into auth flow: after login, go to dashboard if user has multiple tenants, or direct to first salon if only one
+
+Quality gates:
+- Unread message aggregation tested and matches individual salon counts
+- Context switch preserves user session without re-authenticating
+- Deep links work (e.g., direct link to "Salon B's messages" from push notification)
+- Empty state and error states properly handled
 
 ### Week 6: Hardened Backend Automations
 Objectives:
@@ -557,6 +686,134 @@ Deliverables:
 Quality gates:
 - Pilot acceptance signoff
 - No P0/P1 open defects
+
+### Week 13: Stripe Foundation (Billing + Connect)
+Objectives:
+- Integrate Stripe Billing for SaaS subscription charging
+- Integrate Stripe Connect for salon-side client payments and payouts
+- Establish webhook reliability and idempotency
+
+Deliverables:
+- Billing customer/subscription lifecycle (monthly + annual)
+- Connect onboarding state tracking and account health checks
+- Webhooks for invoice/subscription/payment intent/account updates
+- Payment audit table and event replay safeguards
+
+Quality gates:
+- No duplicate billing events
+- All webhook handlers idempotent and tested
+- Secrets management and PCI-safe logging confirmed
+
+### Week 14: Free Trial and Subscription Gating
+Objectives:
+- Implement configurable free trial lifecycle
+- Enforce subscription/trial states on privileged features
+- Add grace-period and suspension behavior
+
+Deliverables:
+- Trial states: not_started, active, expiring_soon, expired, upgraded
+- Trial activation trigger tied to onboarding completion + launch trigger
+- Feature gate middleware by tier + trial status
+- Trial countdown and upgrade flows in tenant UI
+
+Quality gates:
+- Trial expiry jobs are idempotent
+- Booking and marketplace access obey subscription state rules
+- Reactivation flow tested end-to-end
+
+### Week 15: Salon Onboarding Wizard v1
+Objectives:
+- Deliver complete salon onboarding from account creation to launch readiness
+- Support resumable, mobile-first steps
+
+Deliverables:
+- Step flow: Account, Business Profile, Payment Setup, Services, Staff, Policies, Availability, Marketplace Visibility, Verification & Launch
+- Onboarding completion score + blockers list
+- Draft-save and resume capability
+
+Quality gates:
+- Median onboarding completion time tracked
+- Mandatory launch blockers correctly enforced
+- All onboarding transitions tested
+
+### Week 16: Client Onboarding Integration v1
+Objectives:
+- Merge client onboarding with booking/discovery actions
+- Keep low-friction guest flow while enabling account upgrade
+
+Deliverables:
+- Unified onboarding entry points (booking, save, follow, message)
+- Guest-to-full account upgrade path
+- Payment method and notification preference setup hooks
+
+Quality gates:
+- Conversion from guest to full account measured
+- No data loss when upgrading account type
+
+### Week 17: Marketplace Core Launch
+Objectives:
+- Ship production marketplace browsing and salon profiles
+- Enforce anti-client-theft product rules
+
+Deliverables:
+- Feed mode, search mode, profile pages, post view
+- Marketplace visibility controls per salon
+- "Book this look" deep-linking into booking flow
+- No competitor suggestions in active salon booking context
+
+Quality gates:
+- Marketplace-to-booking funnel tracked
+- Anti-competitor-injection rules validated in UX and API
+
+### Week 18: Marketplace Analytics and Growth Controls
+Objectives:
+- Provide salon insight into marketplace performance
+- Add governance around discovery quality and moderation
+
+Deliverables:
+- Metrics: profile views, post engagement, booking conversions, revenue sourced
+- Post performance analytics and style-tag reporting
+- Abuse detection and content moderation controls
+
+Quality gates:
+- Attribution metrics consistent with booking data
+- Moderation actions audited and reversible
+
+### Week 19: AI Assistance Release v1
+Objectives:
+- Release AI features with highest immediate value
+- Keep outputs explainable and controllable by salon
+
+Deliverables:
+- AI chat assistance
+- AI scheduling suggestions
+- AI retention risk suggestions
+- AI marketing assistant and content generation tools
+
+Quality gates:
+- Human override available for all AI actions
+- Consent and quiet-hour rules enforced in AI messaging flows
+
+### Week 20: AI Risk Models and Marketplace Personalization
+Objectives:
+- Add no-show/fraud prediction and discovery personalization
+- Harden safety, explainability, and observability
+
+Deliverables:
+- No-show/fraud risk scoring with reasons
+- Marketplace personalization model using behavior/preferences
+- AI observability dashboard (quality, error, fallback rate)
+
+Quality gates:
+- Model decisions traceable and reviewable
+- No sensitive attribute inference in production models
+
+---
+
+## Summary Timeline
+- **Weeks 1-12**: Core multi-tenant platform and pilot hardening
+- **Weeks 13-16**: Payments, free trial, salon onboarding, client onboarding integration
+- **Weeks 17-20**: Marketplace rollout and AI feature layers
 
 ## Prompt Engineering Protocol by Phase
 For each feature, use this prompt packet structure:

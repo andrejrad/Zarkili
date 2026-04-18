@@ -6,7 +6,7 @@
 **Author:** Architecture session with GitHub Copilot  
 **Related documents:**
 - [`MULTITENANT_MASTER_INDEX.md`](MULTITENANT_MASTER_INDEX.md) — program overview and week-by-week roadmap
-- [`MULTITENANT_COMPANION_EXECUTION_BLUEPRINT.md`](MULTITENANT_COMPANION_EXECUTION_BLUEPRINT.md) — Firestore schema v1, 12-week roadmap
+- [`MULTITENANT_COMPANION_EXECUTION_BLUEPRINT.md`](MULTITENANT_COMPANION_EXECUTION_BLUEPRINT.md) — Firestore schema v1, 20-week roadmap
 - [`MULTITENANT_WEEKS_1_TO_4_COPILOT_PROMPTS.md`](MULTITENANT_WEEKS_1_TO_4_COPILOT_PROMPTS.md) — public landing shell and discovery scaffold prerequisites
 - [`MULTITENANT_WEEKS_5_TO_8_COPILOT_PROMPTS.md`](MULTITENANT_WEEKS_5_TO_8_COPILOT_PROMPTS.md) — build prompts for Weeks 5–8 (support skeleton)
 - [`MULTITENANT_WEEKS_9_TO_12_COPILOT_PROMPTS.md`](MULTITENANT_WEEKS_9_TO_12_COPILOT_PROMPTS.md) — build prompts for Weeks 9–12 (AI layer)
@@ -445,11 +445,27 @@ The Cloud Function only loads context for the `userId` and `tenantId` from the t
 - Never exposed to the client app
 - Rotated if compromised — key rotation does not require app update
 
+### Subscription context (for feature gating, added in v1.1)
+
+When AI support field tickets, Cloud Function will also load:
+- Current tenant subscription tier (from tenantUsers.subscription.tier)
+- Current subscription status (active, past_due, suspended, etc.)
+
+This context allows AI to:
+- Recommend tier upgrades based on requested features ("This feature is available in Professional tier")
+- Acknowledge billing issues for past_due/suspended accounts ("We see your account is currently suspended due to payment")
+- Route billing-related escalations to appropriate queue
+
+Importantly:
+- Subscription context is included in AI system prompt **only for information**
+- Subscription gating for actual feature access is enforced in the app layer (Week 14+), not by support system
+- Support system never blocks communication based on subscription status
+
 ---
 
 ## 10. Implementation Phases & Roadmap Cross-Reference
 
-The support system is built in **three phases** spread across the existing 12-week roadmap.
+The support system is built in **three phases** across the expanded 20-week roadmap.
 
 Prerequisites in Weeks 1-2:
 - Week 1 Task 1.5 establishes Public vs Protected route groups and landing-first navigation.

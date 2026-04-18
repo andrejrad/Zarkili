@@ -84,6 +84,67 @@ Review admin queue implementation for operational usability and accidental actio
 
 ---
 
+## Week 5.5 - Multi-Salon Home Dashboard and Context Switcher (NEW)
+
+## Task 5.5.1 - Multi-Salon Dashboard Screen
+
+Prompt:
+Implement user home dashboard screen showing all subscribed salons with unread message badges.
+Requirements:
+1. After login, users land on dashboard (if subscribed to 1+ salons) instead of direct app entry.
+2. Display salon cards with: logo, name, next upcoming appointment date/time, unread message count badge, quick action buttons.
+3. Unread count aggregates from userTenantAccess.unreadMessageCount for each salon.
+4. Quick action buttons: "Book", "Messages", "Loyalty", "Profile" → each deep-links into that salon context.
+5. Empty state: if user has no salon subscriptions, show marketplace discovery CTA.
+6. Error state: if unread count query fails, show "?" badge with retry.
+7. Add tests for badge aggregation and nav deep-links.
+Return:
+- files changed
+- dashboard UI structure
+- nav deep-link tests
+
+Review prompt:
+Review multi-salon dashboard for UI clarity, badge accuracy, and deep-link reliability. Identify any tenant context leakage.
+
+## Task 5.5.2 - Unread Message Aggregation Service
+
+Prompt:
+Implement service to aggregate unread message counts across all user's tenant subscriptions.
+Requirements:
+1. Query userTenantAccess WHERE userId = currentUser AND subscriptionStatus = 'active', SELECT unreadMessageCount, tenantId.
+2. Create aggregation utility that sums across tenants and returns by-tenant breakdown.
+3. Add real-time listener that updates dashboard when unread counts change in any tenant.
+4. Ensure counts stay in sync: every message write in messages collection must update userTenantAccess.unreadMessageCount.
+5. Add integration tests with multiple tenant scenarios.
+Return:
+- files changed
+- aggregation service API
+- sync test coverage
+
+Review prompt:
+Review unread aggregation for accuracy, real-time responsiveness, and sync reliability between messages and userTenantAccess.
+
+## Task 5.5.3 - Context Switcher and Navigation Logic
+
+Prompt:
+Implement context switching between salon contexts from dashboard.
+Requirements:
+1. Tapping a salon card → sets selectedTenantId in app context, updates all queries to filter by that tenant.
+2. Single login session persists across multiple tenant contexts (no re-authentication on switch).
+3. Deep-link support: URL like /salon/{tenantId}/messages should auto-select that tenant and navigate there.
+4. Add back-nav to return to dashboard from within any salon context (accessible from header/tab bar).
+5. Verify no data leakage: confirm customer sees ONLY their salon's data when in that context.
+6. Add tests for context isolation and deep-link routing.
+Return:
+- files changed
+- context-switch flow summary
+- isolation test results
+
+Review prompt:
+Review context switching for auth/session integrity, tenant data isolation, and navigation edge cases (deep links, back nav, etc.).
+
+---
+
 ## Week 6 - Backend Automations and Notification Pipeline
 
 ## Task 6.1 - Notification Event Contract
@@ -157,19 +218,24 @@ Review template rendering and preference resolution logic for missing fallback o
 
 ## Task 7.1 - Messaging Domain v1
 Prompt:
-Implement tenant-scoped messaging domain with attachments.
+Implement tenant-scoped messaging domain with attachments and unread aggregation support for multi-salon dashboard.
 Requirements:
 1. Add message repository with methods: sendMessage, listThreadMessages, markRead, listUnreadCounts.
 2. Enforce sender/receiver tenant match.
 3. Add attachment metadata model (name, size, type, url).
-4. Add tests for access control and unread counters.
-5. Add docs in Documentation/new-platform/MESSAGING.md.
+4. **CRITICAL for Dashboard (Week 5.5)**: On every message write, update userTenantAccess.unreadMessageCount for the receiver's tenant.
+   - When new message sent to user in this tenant: increment userTenantAccess[userId_tenantId].unreadMessageCount
+   - When user reads message in this tenant: decrement userTenantAccess[userId_tenantId].unreadMessageCount
+   - Provide method: updateTenantUnreadCount(userId, tenantId, delta) for easy aggregation updates
+5. Add tests for access control, unread counters, and userTenantAccess sync accuracy.
+6. Add docs in Documentation/new-platform/MESSAGING.md.
 Return:
 - files changed
 - API summary
+- userTenantAccess sync test coverage
 
 Review prompt:
-Review messaging domain for thread consistency, attachment safety, and read-state accuracy.
+Review messaging domain for thread consistency, attachment safety, read-state accuracy, and userTenantAccess synchronization. Identify any message writes that don't update unread badges.
 
 ## Task 7.2 - Admin Messaging Console v1
 Prompt:
@@ -286,6 +352,40 @@ Return:
 
 Review prompt:
 Review loyalty UI for transparency, trust signals, and admin misuse prevention.
+
+## Task 8.5 - Salon Onboarding Wizard v1 (Implementation Start)
+Prompt:
+Implement salon onboarding wizard v1 with resumable step progression.
+Requirements:
+1. Build wizard steps: Account, Business Profile, Payment Setup (Connect status), Services, Staff, Policies, Availability, Marketplace Visibility, Verification.
+2. Persist draft state per tenant and support resume across devices.
+3. Add completion score and launch blockers list.
+4. Enforce blockers for go-live: business profile, at least one service, availability configured.
+5. Add smoke tests for step progression, skip/resume behavior, and blocker enforcement.
+Return:
+- files changed
+- state model summary
+- blocker rules summary
+
+Review prompt:
+Review salon onboarding wizard for abandonment risk, poor validation UX, and invalid launch-state paths.
+
+## Task 8.6 - Client Onboarding Integration v1 (Guest + Full)
+Prompt:
+Implement integrated client onboarding entry from booking/discovery actions.
+Requirements:
+1. Preserve guest booking path (email + phone) and full account path (email/password or social).
+2. Implement post-booking guest-upgrade flow to full account without losing booking/payment context.
+3. Add optional onboarding modules: profile, payment method, preferences, notifications, loyalty enrollment.
+4. Ensure all onboarding entry points route into one shared orchestration layer.
+5. Add tests for guest-to-full conversion and data continuity.
+Return:
+- files changed
+- orchestration flow summary
+- conversion test results
+
+Review prompt:
+Review client onboarding integration for friction points, account-merge edge cases, and booking flow regressions.
 
 ---
 

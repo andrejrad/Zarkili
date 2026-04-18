@@ -1,0 +1,7 @@
+{
+  "projects": {
+    "default": "zarkili-dev-a1b1c",
+    "dev": "zarkili-dev-a1b1c",
+    "prod": "zarkili-production"
+  }
+}

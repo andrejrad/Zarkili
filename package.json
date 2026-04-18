@@ -1,0 +1,60 @@
+{
+  "name": "zarkili",
+  "version": "0.1.0",
+  "private": true,
+  "main": "node_modules/expo/AppEntry.js",
+  "scripts": {
+    "start": "npm run start:dev",
+    "start:dev": "dotenv -e .env.development -- expo start --clear",
+    "start:prod": "dotenv -e .env.production -- expo start --clear",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
+    "web": "expo start --web",
+    "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
+    "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix",
+    "typecheck": "tsc --noEmit",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "check": "npm run lint && npm run typecheck && npm run test -- --watch=false",
+    "firebase:emulators": "firebase emulators:start --project zarkili-dev",
+    "firebase:deploy:dev": "firebase deploy --project zarkili-dev",
+    "firebase:deploy:prod": "firebase deploy --project zarkili-production",
+    "functions:serve": "npm --prefix functions run serve",
+    "functions:build": "npm --prefix functions run build"
+  },
+  "dependencies": {
+    "babel-preset-expo": "~54.0.10",
+    "expo": "^54.0.0",
+    "expo-constants": "~18.0.13",
+    "expo-status-bar": "~3.0.9",
+    "firebase": "^11.2.0",
+    "react": "19.1.0",
+    "react-native": "0.81.5",
+    "react-native-safe-area-context": "~5.6.0",
+    "react-native-screens": "~4.16.0"
+  },
+  "devDependencies": {
+    "@testing-library/jest-native": "^5.4.3",
+    "@testing-library/react-native": "^13.2.0",
+    "@types/jest": "^29.5.14",
+    "@types/node": "^22.10.2",
+    "@types/react": "~19.1.10",
+    "@types/react-test-renderer": "^19.1.0",
+    "@typescript-eslint/eslint-plugin": "^8.19.1",
+    "@typescript-eslint/parser": "^8.19.1",
+    "eslint": "^9.17.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-react": "^7.37.3",
+    "eslint-plugin-react-hooks": "^5.1.0",
+    "dotenv-cli": "^8.0.0",
+    "jest": "^29.7.0",
+    "jest-expo": "~54.0.17",
+    "prettier": "^3.4.2",
+    "react-test-renderer": "19.1.0",
+    "typescript": "~5.9.2"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

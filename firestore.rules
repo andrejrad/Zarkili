@@ -1,0 +1,16 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function belongsToTenant(tenantId) {
+      return isSignedIn() && request.auth.token.tenant_id == tenantId;
+    }
+
+    match /tenants/{tenantId}/{document=**} {
+      allow read, write: if belongsToTenant(tenantId);
+    }
+  }
+}

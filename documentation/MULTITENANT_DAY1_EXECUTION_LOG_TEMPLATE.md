@@ -10,21 +10,39 @@
 - Branch name:
 - Goal for this session:
 
+## Pre-Session Read Checklist (Recommended)
+- [ ] Read [SALON_ONBOARDING_SPECS.md](SALON_ONBOARDING_SPECS.md)
+- [ ] Read [CLIENT_ONBOARDING.md](CLIENT_ONBOARDING.md)
+- [ ] Read [MARKETPLACE_SPECS.md](MARKETPLACE_SPECS.md)
+- [ ] Read [FREE_TRIAL_SPECS.md](FREE_TRIAL_SPECS.md)
+- [ ] Read [PAYMENT_FEATURE_SPECS.md](PAYMENT_FEATURE_SPECS.md)
+- [ ] Read [AI_FEATURES_SPECS.md](AI_FEATURES_SPECS.md)
+
 ---
 
 ## Planned Prompt Sequence
 Mark each item before starting and after completion.
 
+### Week 1 (Day 1 Essential)
 - [ ] Global Guardrails Prompt
-- [ ] Week 1 Task 1.1 Build Prompt
+- [ ] Week 1 Task 1.1 Build Prompt (Folder Architecture)
 - [ ] Week 1 Task 1.1 Review Prompt
-- [ ] Week 1 Task 1.2 Build Prompt
+- [ ] Week 1 Task 1.2 Build Prompt (App Provider Shell)
 - [ ] Week 1 Task 1.2 Review Prompt
-- [ ] Week 1 Task 1.3 Build Prompt (optional Day 1)
+- [ ] Week 1 Task 1.3 Build Prompt (Environment & Firebase) (optional Day 1)
 - [ ] Week 1 Task 1.3 Review Prompt (optional Day 1)
+
+### Week 2 (Updated for Multi-Salon Support)
+- [ ] Week 2 Task 2.1 Build Prompt (Tenant Domain)
+- [ ] Week 2 Task 2.1 Review Prompt
+- [ ] Week 2 Task 2.2 Build Prompt (Tenant User Role Mapping WITH subscription fields)
+- [ ] Week 2 Task 2.2 Review Prompt
+- [ ] **Week 2 Task 2.2.5 Build Prompt (User Tenant Access Index - NEW)**
+- [ ] **Week 2 Task 2.2.5 Review Prompt (NEW - for multi-salon dashboard support)**
 
 Source prompt pack:
 - [MULTITENANT_WEEKS_1_TO_4_COPILOT_PROMPTS.md](MULTITENANT_WEEKS_1_TO_4_COPILOT_PROMPTS.md)
+- For background on multi-salon: [MONETIZATION_AND_MULTISALON_INTEGRATION_SUMMARY.md](MONETIZATION_AND_MULTISALON_INTEGRATION_SUMMARY.md)
 
 ---
 

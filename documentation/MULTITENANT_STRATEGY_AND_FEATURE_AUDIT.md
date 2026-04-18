@@ -226,12 +226,19 @@ Below is the practical carry-forward set for your broader platform.
 - Reviews and ratings model with moderation and anti-abuse controls.
 - Marketing engine (segments, campaigns, templates, automations).
 - Daily/weekly activities/challenges and gamified engagement loops.
+- Marketplace discovery feed, salon public profiles, and social-style posts with "Book this look".
+- Salon onboarding wizard (account, profile, services, staff, policies, availability, launch verification).
+- Client onboarding aligned with existing flow (guest path + full account upgrade path).
+- Free trial lifecycle (activation triggers, countdown, expiry behavior, reactivation flow).
+- **Multi-Salon User Access Model**: Single user account can subscribe to multiple salons; unified home dashboard with salon context switching and per-salon unread message badges.
+- **Subscription and Billing**: Tiered subscription model (monthly/annual billing), Stripe integration, feature gating per subscription level, 14-day free trial, payment failure handling with grace period and suspension indicator.
+- AI feature set: scheduling optimization, marketing automation, retention predictions, content generation, chat assistance, no-show/fraud prediction, marketplace personalization.
 - Tenant billing/subscriptions, onboarding wizard, and admin portal.
 - Fine-grained RBAC (platform admin, tenant owner, location manager, technician).
 
 ---
 
-## 3) High-Level Multi-Tenant Project Plan
+## 3) High-Level Multi-Tenant Project Plan (Expanded)
 
 ## Phase 0: Product and Domain Foundation
 - Define domain entities: Tenant, Location, Staff, Service, Customer, Booking, Campaign, Review, Challenge.
@@ -269,7 +276,20 @@ Below is the practical carry-forward set for your broader platform.
 
 ## Phase 6: Platform Operations and Monetization
 - Tenant onboarding wizard and sample data seeding.
-- Subscription/billing and feature gating.
+- **Subscription Management and Billing**:
+  - Multi-tier subscription model (Starter, Professional, Enterprise)
+  - Monthly and annual billing (annual with discount)
+  - Stripe payment processing and webhook handling
+  - 14-day free trial for new tenants
+  - Feature gating based on subscription tier
+  - Payment failure handling with grace period and suspension indicator
+  - Invoice and receipt generation
+- **Multi-Salon User Access** (for end-users):
+  - User home dashboard listing all subscribed salons
+  - Unread message badge aggregation per salon
+  - Quick context switching between salons
+  - Next appointment preview per salon
+  - Loyalty points balance visibility per salon
 - Audit logs, admin console, incident tooling.
 - Analytics warehouse/export and business intelligence views.
 
@@ -278,6 +298,24 @@ Below is the practical carry-forward set for your broader platform.
 - Add 2-3 additional pilot salons.
 - Load test and optimize hot paths.
 - Rollout playbook and migration guide for future tenants.
+
+## Phase 8: Marketplace and Onboarding Expansion
+- Full marketplace launch (feed, profiles, search filters, post interactions).
+- Anti-client-theft guarantees in booking flow (no competitor injection during booking).
+- Salon onboarding wizard v1 with completion score and resumable steps.
+- Client onboarding v1 merged into booking and discovery touchpoints.
+
+## Phase 9: AI Differentiation Layer
+- AI chat assistance rollout for salon/admin/client contexts.
+- AI scheduling and no-show prediction models with explainability constraints.
+- AI marketing and content generation with consent and policy safeguards.
+- AI marketplace personalization using behavior and preference signals.
+
+## Delivery Horizon Update
+- The original 12-week plan is no longer sufficient for approved scope.
+- Recommended delivery horizon: **20 weeks**.
+- Weeks 1-12 remain core foundation and pilot readiness.
+- Weeks 13-20 cover payment hardening, onboarding expansion, marketplace, and AI delivery.
 
 ---
 
