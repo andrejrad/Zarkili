@@ -26,6 +26,7 @@ This baseline scaffolding establishes a modular multi-tenant app structure under
 - UI primitives may be shared via React Native, but interaction parity (touch vs pointer/keyboard) must be validated per platform.
 - Public/protected route behavior must remain deterministic for deep links, refresh, and browser back/forward on web.
 - Tenant isolation is enforced server-side via Firestore rules; client checks are defense-in-depth only.
+- Language fallback is English; tenant-level defaults with per-user tenant overrides must resolve deterministically.
 
 ## Current State
 - `auth`, `tenants`, and `locations` domains contain initial model/repository implementations.
@@ -36,3 +37,4 @@ This baseline scaffolding establishes a modular multi-tenant app structure under
 - `auth` domain now includes onboarding draft contracts and service layer with step validation and schema-versioned migration behavior.
 - Current onboarding draft schema version is `v2`, with explicit `v1 -> v2` step payload migration transforms for `business-profile` and `profile`.
 - `app/navigation` shell supports path-based route resolution and now includes web pathname synchronization (`location.pathname` + `history` + `popstate`).
+- `app/providers` now includes multilingual runtime foundation (`en`, `hr`, `es`) with tenant-default language resolution and per-tenant user override persistence.

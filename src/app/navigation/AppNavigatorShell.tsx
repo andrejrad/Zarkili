@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import { useAuth } from "../providers/AuthProvider";
+import { useLanguage } from "../providers/LanguageProvider";
 import { useTenant } from "../providers/TenantProvider";
 import type { TenantMembership } from "../../domains/auth";
 import { featureFlags } from "../../shared/config/featureFlags";
@@ -15,7 +16,6 @@ import {
 } from "./routes";
 import {
   getNextOnboardingStep,
-  onboardingStepLabels,
   type OnboardingFlow,
   type OnboardingProgressPersistence,
   type OnboardingStep,
@@ -68,11 +68,48 @@ function stepToRouteName(flow: OnboardingFlow, step: OnboardingStep): string {
     .join("")}`;
 }
 
+function toOnboardingStepLabelKey(step: OnboardingStep):
+  | "onboarding.step.account"
+  | "onboarding.step.business-profile"
+  | "onboarding.step.payment-setup"
+  | "onboarding.step.services"
+  | "onboarding.step.staff"
+  | "onboarding.step.policies"
+  | "onboarding.step.availability"
+  | "onboarding.step.marketplace"
+  | "onboarding.step.verification"
+  | "onboarding.step.account-guest"
+  | "onboarding.step.phone-verify"
+  | "onboarding.step.profile"
+  | "onboarding.step.payment-method"
+  | "onboarding.step.preferences"
+  | "onboarding.step.notifications"
+  | "onboarding.step.loyalty" {
+  return `onboarding.step.${step}` as
+    | "onboarding.step.account"
+    | "onboarding.step.business-profile"
+    | "onboarding.step.payment-setup"
+    | "onboarding.step.services"
+    | "onboarding.step.staff"
+    | "onboarding.step.policies"
+    | "onboarding.step.availability"
+    | "onboarding.step.marketplace"
+    | "onboarding.step.verification"
+    | "onboarding.step.account-guest"
+    | "onboarding.step.phone-verify"
+    | "onboarding.step.profile"
+    | "onboarding.step.payment-method"
+    | "onboarding.step.preferences"
+    | "onboarding.step.notifications"
+    | "onboarding.step.loyalty";
+}
+
 export function AppNavigatorShell({
   onboardingProgressPersistence,
   listTenantMemberships,
 }: AppNavigatorShellProps) {
   const { userId, signInAsDev, signOut } = useAuth();
+  const { t } = useLanguage();
   const { tenantId, setTenantId } = useTenant();
   const [activeRouteName, setActiveRouteName] = useState("Landing");
   const [completedStepsByFlow, setCompletedStepsByFlow] = useState<
@@ -191,9 +228,9 @@ export function AppNavigatorShell({
     const isOnboardingRoute = segments.length === 3 && segments[0] === "onboarding";
     if (isOnboardingRoute && !tenantId) {
       setActiveRouteName("AppShell");
-      setOnboardingGuardMessage("Select tenant context before onboarding.");
+      setOnboardingGuardMessage(t("onboarding.guard.selectTenant"));
     }
-  }, [activeRoute, tenantId]);
+  }, [activeRoute, t, tenantId]);
 
   function navigate(routeName: string) {
     const candidate = appRoutes.find((route) => route.name === routeName);
@@ -216,14 +253,14 @@ export function AppNavigatorShell({
 
   function getOnboardingGuardMessage(): string {
     if (membershipsLoading) {
-      return "Loading tenant memberships.";
+      return t("membership.loading");
     }
 
     if (availableMemberships.length === 0) {
-      return "No active tenant memberships found for this user.";
+      return t("onboarding.guard.noMemberships");
     }
 
-    return "Select tenant context before onboarding.";
+    return t("onboarding.guard.selectTenant");
   }
 
   function selectTenantContext(nextTenantId: string) {
@@ -238,7 +275,7 @@ export function AppNavigatorShell({
     }
 
     if (!availableMemberships.some((membership) => membership.tenantId === tenantId)) {
-      setOnboardingGuardMessage("Selected tenant is not available in active memberships.");
+      setOnboardingGuardMessage(t("onboarding.guard.selectedTenantInvalid"));
       return;
     }
 
@@ -333,20 +370,20 @@ export function AppNavigatorShell({
     if (activeRoute.name === "Landing") {
       return (
         <>
-          <Text style={styles.screenTitle}>Welcome to Zarkili</Text>
-          <Text style={styles.screenBody}>Choose how you want to continue.</Text>
+          <Text style={styles.screenTitle}>{t("landing.welcome")}</Text>
+          <Text style={styles.screenBody}>{t("landing.chooseAction")}</Text>
           <TouchableOpacity accessibilityRole="button" onPress={() => navigate("Login")} style={styles.button}>
-            <Text style={styles.buttonText}>Login</Text>
+            <Text style={styles.buttonText}>{t("action.login")}</Text>
           </TouchableOpacity>
           <TouchableOpacity accessibilityRole="button" onPress={() => navigate("Register")} style={styles.buttonSecondary}>
-            <Text style={styles.buttonText}>Create account</Text>
+            <Text style={styles.buttonText}>{t("action.createAccount")}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             accessibilityRole="button"
             onPress={() => navigate("DiscoverBusinesses")}
             style={styles.buttonSecondary}
           >
-            <Text style={styles.buttonText}>Discover businesses</Text>
+            <Text style={styles.buttonText}>{t("action.discoverBusinesses")}</Text>
           </TouchableOpacity>
         </>
       );
@@ -355,13 +392,13 @@ export function AppNavigatorShell({
     if (activeRoute.name === "Login") {
       return (
         <>
-          <Text style={styles.screenTitle}>Login</Text>
-          <Text style={styles.screenBody}>Auth placeholder flow for Week 1.</Text>
+          <Text style={styles.screenTitle}>{t("auth.login.title")}</Text>
+          <Text style={styles.screenBody}>{t("auth.login.placeholder")}</Text>
           <TouchableOpacity accessibilityRole="button" onPress={completeDevSignIn} style={styles.button}>
-            <Text style={styles.buttonText}>Sign in as dev user</Text>
+            <Text style={styles.buttonText}>{t("auth.signInAsDev")}</Text>
           </TouchableOpacity>
           <TouchableOpacity accessibilityRole="button" onPress={() => navigate("Landing")} style={styles.buttonSecondary}>
-            <Text style={styles.buttonText}>Back</Text>
+            <Text style={styles.buttonText}>{t("action.back")}</Text>
           </TouchableOpacity>
         </>
       );
@@ -370,13 +407,13 @@ export function AppNavigatorShell({
     if (activeRoute.name === "Register") {
       return (
         <>
-          <Text style={styles.screenTitle}>Register</Text>
-          <Text style={styles.screenBody}>Registration placeholder flow for Week 1.</Text>
+          <Text style={styles.screenTitle}>{t("auth.register.title")}</Text>
+          <Text style={styles.screenBody}>{t("auth.register.placeholder")}</Text>
           <TouchableOpacity accessibilityRole="button" onPress={completeDevSignIn} style={styles.button}>
-            <Text style={styles.buttonText}>Create account (dev)</Text>
+            <Text style={styles.buttonText}>{t("auth.createAccountDev")}</Text>
           </TouchableOpacity>
           <TouchableOpacity accessibilityRole="button" onPress={() => navigate("Landing")} style={styles.buttonSecondary}>
-            <Text style={styles.buttonText}>Back</Text>
+            <Text style={styles.buttonText}>{t("action.back")}</Text>
           </TouchableOpacity>
         </>
       );
@@ -385,14 +422,14 @@ export function AppNavigatorShell({
     if (activeRoute.name === "DiscoverBusinesses") {
       return (
         <>
-          <Text style={styles.screenTitle}>Discover businesses</Text>
+          <Text style={styles.screenTitle}>{t("discover.title")}</Text>
           {featureFlags.marketplaceEnabled ? (
-            <Text style={styles.screenBody}>Marketplace placeholder route is enabled.</Text>
+            <Text style={styles.screenBody}>{t("discover.enabled")}</Text>
           ) : (
-            <Text style={styles.screenBody}>Coming soon. Marketplace is currently disabled by feature flag.</Text>
+            <Text style={styles.screenBody}>{t("discover.comingSoon")}</Text>
           )}
           <TouchableOpacity accessibilityRole="button" onPress={() => navigate("Landing")} style={styles.buttonSecondary}>
-            <Text style={styles.buttonText}>Back</Text>
+            <Text style={styles.buttonText}>{t("action.back")}</Text>
           </TouchableOpacity>
         </>
       );
@@ -400,18 +437,20 @@ export function AppNavigatorShell({
 
     const onboardingRoute = parseOnboardingRoute();
     if (onboardingRoute) {
-      const flowLabel = onboardingRoute.flow === "salon" ? "Salon" : "Client";
+      const flowLabel = onboardingRoute.flow === "salon" ? t("onboarding.salon") : t("onboarding.client");
       return (
         <>
-          <Text style={styles.screenTitle}>{flowLabel} onboarding</Text>
+          <Text style={styles.screenTitle}>{`${flowLabel} onboarding`}</Text>
           <Text style={styles.screenBody}>
-            Placeholder step: {onboardingStepLabels[onboardingRoute.step]}
+            {t("onboarding.placeholderStep", {
+              step: t(toOnboardingStepLabelKey(onboardingRoute.step)),
+            })}
           </Text>
           <TouchableOpacity accessibilityRole="button" onPress={() => void goToNextOnboardingStep()} style={styles.button}>
-            <Text style={styles.buttonText}>Next step</Text>
+            <Text style={styles.buttonText}>{t("action.nextStep")}</Text>
           </TouchableOpacity>
           <TouchableOpacity accessibilityRole="button" onPress={() => navigate("AppShell")} style={styles.buttonSecondary}>
-            <Text style={styles.buttonText}>Exit onboarding</Text>
+            <Text style={styles.buttonText}>{t("action.exitOnboarding")}</Text>
           </TouchableOpacity>
         </>
       );
@@ -419,12 +458,12 @@ export function AppNavigatorShell({
 
     return (
       <>
-        <Text style={styles.screenTitle}>App shell</Text>
-        <Text style={styles.screenBody}>Protected area placeholder for authenticated users.</Text>
-        <Text style={styles.screenBody}>Tenant context: {tenantId ?? "none"}</Text>
-        {membershipsLoading ? <Text style={styles.screenBody}>Loading memberships...</Text> : null}
+        <Text style={styles.screenTitle}>{t("appShell.title")}</Text>
+        <Text style={styles.screenBody}>{t("appShell.protectedPlaceholder")}</Text>
+        <Text style={styles.screenBody}>{t("appShell.tenantContext", { tenantId: tenantId ?? "none" })}</Text>
+        {membershipsLoading ? <Text style={styles.screenBody}>{t("membership.loading")}</Text> : null}
         {!membershipsLoading && availableMemberships.length === 0 ? (
-          <Text style={styles.screenBody}>No active memberships available.</Text>
+          <Text style={styles.screenBody}>{t("membership.none")}</Text>
         ) : null}
         {!membershipsLoading && availableMemberships.length > 1
           ? availableMemberships.map((membership) => (
@@ -434,7 +473,7 @@ export function AppNavigatorShell({
                 onPress={() => selectTenantContext(membership.tenantId)}
                 style={styles.buttonSecondary}
               >
-                <Text style={styles.buttonText}>Select tenant {membership.tenantId}</Text>
+                <Text style={styles.buttonText}>{t("membership.selectTenant", { tenantId: membership.tenantId })}</Text>
               </TouchableOpacity>
             ))
           : null}
@@ -442,13 +481,13 @@ export function AppNavigatorShell({
           <Text style={styles.guardText}>{onboardingGuardMessage}</Text>
         ) : null}
         <TouchableOpacity accessibilityRole="button" onPress={() => void navigateToOnboardingFlow("salon")} style={styles.button}>
-          <Text style={styles.buttonText}>Start salon onboarding</Text>
+          <Text style={styles.buttonText}>{t("onboarding.startSalon")}</Text>
         </TouchableOpacity>
         <TouchableOpacity accessibilityRole="button" onPress={() => void navigateToOnboardingFlow("client")} style={styles.buttonSecondary}>
-          <Text style={styles.buttonText}>Start client onboarding</Text>
+          <Text style={styles.buttonText}>{t("onboarding.startClient")}</Text>
         </TouchableOpacity>
         <TouchableOpacity accessibilityRole="button" onPress={signOut} style={styles.buttonSecondary}>
-          <Text style={styles.buttonText}>Sign out</Text>
+          <Text style={styles.buttonText}>{t("auth.signOut")}</Text>
         </TouchableOpacity>
       </>
     );
@@ -457,9 +496,9 @@ export function AppNavigatorShell({
   return (
     <View style={styles.root}>
       <View style={styles.container}>
-        <Text style={styles.title}>Zarkili</Text>
-        <Text style={styles.subtitle}>Current route: {activeRoute.name}</Text>
-        <Text style={styles.caption}>Accessible routes: {accessibleRoutes.map((route) => route.name).join(", ")}</Text>
+        <Text style={styles.title}>{t("app.title")}</Text>
+        <Text style={styles.subtitle}>{t("app.currentRoute", { route: activeRoute.name })}</Text>
+        <Text style={styles.caption}>{t("app.accessibleRoutes", { routes: accessibleRoutes.map((route) => route.name).join(", ") })}</Text>
         {renderRouteContent()}
       </View>
     </View>
