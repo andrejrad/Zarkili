@@ -11,6 +11,19 @@ Prompting assumptions:
 - You are prompt engineer and reviewer
 - Target stack is React Native + Expo + Firebase
 
+## Mandatory Cross-Platform Gates (Week 2 onward)
+Apply these gates to every implementation and review prompt from Week 2 onward in this document.
+
+Required checks before completing a task:
+1. Run web smoke checks: npm run test:smoke:web
+2. Run native smoke checks: npm run test:smoke:native
+3. Run full quality checks: npm run check
+
+Required documentation and scope rules:
+1. Declare platform scope in each task summary: web, ios, android, or platform-limited.
+2. If platform-limited behavior is introduced, document capability guard and fallback in documentation/new-platform/CROSS_PLATFORM_CAPABILITY_MATRIX.md.
+3. For navigation/auth/tenant/onboarding changes, treat web and native parity as release-critical.
+
 ---
 
 ## Global Guardrails Prompt (Run Once First)

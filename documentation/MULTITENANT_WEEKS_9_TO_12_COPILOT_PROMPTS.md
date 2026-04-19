@@ -11,6 +11,19 @@ Assumptions:
 - You are prompt engineer and final reviewer
 - Stack is React Native + Expo + Firebase
 
+## Mandatory Cross-Platform Gates
+Apply these gates to every implementation and review prompt in this document.
+
+Required checks before completing a task:
+1. Run web smoke checks: npm run test:smoke:web
+2. Run native smoke checks: npm run test:smoke:native
+3. Run full quality checks: npm run check
+
+Required documentation and scope rules:
+1. Declare platform scope in each task summary: web, ios, android, or platform-limited.
+2. If platform-limited behavior is introduced, document capability guard and fallback in documentation/new-platform/CROSS_PLATFORM_CAPABILITY_MATRIX.md.
+3. For route/auth/tenant-sensitive tasks, treat web and native parity as release-critical.
+
 ### Important Note: Subscription-Aware Features (New in v1.1)
 These weeks (9-12) build advanced features that will later be gated by subscription tier in Week 13+. At this point:
 - **Do NOT enforce subscription gating** (that comes in Week 14)
