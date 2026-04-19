@@ -250,6 +250,23 @@ Review moderation controls for abuse vectors, missing auditability, and over-agg
 
 ## Week 19 - AI Assistance v1
 
+### Mandatory Runtime Cost and Guard Checklist (Applies to all Week 19 and Week 20 AI tasks)
+
+Every AI task below must implement and prove all checklist items:
+1. Add feature-tagged AI request logging (feature key, tenantId, model tier, token usage, cost estimate, latency).
+2. Enforce per-feature monthly cap checks and global monthly cap check before model call.
+3. Enforce state thresholds: Healthy (<70%), Warning (70-90%), Protection (>90%), Exhausted (>=100%).
+4. In Protection state, disable premium escalation model paths for that feature.
+5. In Exhausted state, bypass model call and return deterministic fallback path.
+6. Keep core booking and operational user actions available even when AI is degraded.
+7. Add tests for cap-hit behavior, fallback path correctness, and no-blocking UX behavior.
+8. Document implementation decisions in `documentation/new-platform/AI_RUNTIME_AND_COST_POLICY.md` alignment notes.
+
+Return addendum required for every Week 19/20 AI task:
+- budget guard implementation summary
+- fallback behavior summary on cap-hit and provider-error paths
+- test evidence for warning/protection/exhausted states
+
 ## Task 19.1 - AI Chat Assistance
 Prompt:
 Implement AI chat assistance for FAQ, service info, and booking guidance.
@@ -259,6 +276,7 @@ Requirements:
 3. Add safety filters and logging.
 4. Add tests for fallback and escalation behavior.
 5. Document AI response policy.
+6. Apply runtime budget guards and cap-state behavior from the mandatory checklist.
 Return:
 - files changed
 - escalation policy summary
@@ -275,6 +293,7 @@ Requirements:
 3. Marketing/content generation assistant with tone controls.
 4. Human approval mode for outbound AI-generated campaigns.
 5. Add tests for rule compliance and explainability output.
+6. Apply runtime budget guards and per-assistant feature-cap enforcement.
 Return:
 - files changed
 - assistant capability summary
@@ -292,6 +311,7 @@ Requirements:
 4. Add salon-side recommendation insights for upsell/package suggestions.
 5. Enforce safeguards: no unavailable services, no out-of-price-policy suggestions, no inappropriate category output.
 6. Add tests for relevance fallback, unavailable-service filtering, and safeguard policy enforcement.
+7. Apply runtime budget guards and deterministic fallback recommender when feature cap is exhausted.
 Return:
 - files changed
 - recommendation contract summary
@@ -310,6 +330,7 @@ Requirements:
 4. Enforce consent and opt-out checks before every dispatch attempt.
 5. Add suppression rules for quiet hours and duplicate-trigger dedupe/idempotency behavior.
 6. Add tests for trigger eligibility, opt-out safety, quiet-hour suppression, and approval-mode enforcement.
+7. Apply runtime budget guards and degrade to rules-only campaign eligibility logic on cap exhaustion.
 Return:
 - files changed
 - orchestration flow summary
@@ -328,6 +349,7 @@ Requirements:
 4. Add fairness safeguards: no sensitive-attribute inference, no protected-group targeting logic.
 5. Add tests for explainability presence, fallback behavior when signals are weak, and policy-safe action generation.
 6. Document in `documentation/new-platform/AI_RETENTION_INSIGHTS.md`.
+7. Apply runtime budget guards and degrade to metrics-only insights when narrative generation is capped.
 Return:
 - files changed
 - scoring and insights contract
@@ -346,6 +368,7 @@ Requirements:
 4. Enforce hard constraints: business hours, staff availability, service duration rules, and no double-booking.
 5. Add non-functional targets and instrumentation: recommendation latency target, fallback behavior, and observability counters.
 6. Add tests for constraint safety, double-book prevention, and rescheduling recommendation validity.
+7. Apply runtime budget guards and degrade to slot-engine heuristic ranking when AI budget is constrained.
 Return:
 - files changed
 - optimization strategy summary
@@ -367,6 +390,7 @@ Requirements:
 3. Add thresholds configurable by tenant policy.
 4. Add monitoring for model drift and false positives.
 5. Add tests for threshold actions and fallback behavior.
+6. Apply runtime budget guards and degrade to rules-only risk flags with mandatory human review.
 Return:
 - files changed
 - risk model contract
@@ -383,6 +407,7 @@ Requirements:
 3. Add fallback ranking for cold-start users.
 4. Add observability metrics for click-through and booking conversion lift.
 5. Document in Documentation/new-platform/MARKETPLACE_PERSONALIZATION.md.
+6. Apply runtime budget guards and degrade to deterministic ranking without generated rationale when capped.
 Return:
 - files changed
 - ranking strategy
