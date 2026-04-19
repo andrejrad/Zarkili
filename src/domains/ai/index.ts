@@ -8,3 +8,9 @@ export {
   type SupportTriageModelTier,
   type SupportTriageResult,
 } from "./supportTriageService";
+
+export {
+  createAiBudgetConfigRepository,
+  type AiBudgetConfigRepository,
+  type UpdateAiBudgetConfigInput,
+} from "./budgetConfigRepository";
