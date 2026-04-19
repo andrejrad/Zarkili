@@ -14,3 +14,10 @@ export {
   type AiBudgetConfigRepository,
   type UpdateAiBudgetConfigInput,
 } from "./budgetConfigRepository";
+
+export {
+  createAiBudgetAdminService,
+  type AiBudgetAdminActor,
+  type AiBudgetAdminDependencies,
+  type AiBudgetAdminService,
+} from "./budgetAdminService";
