@@ -116,6 +116,52 @@ When budgets or provider health are constrained:
 - rule + model hybrid with explicit reason codes
 - stricter review thresholds and human override
 
+### 7.1 Model and Budget Matrix (Starter Baseline)
+
+The table below is the initial production baseline for v1.
+Caps are monthly and should be reviewed weekly during pilot.
+
+| Feature | Primary Model Tier | Escalation Model Tier | Max Input Tokens | Max Output Tokens | Monthly Cap (USD) | Fallback on Cap Hit |
+| --- | --- | --- | --- | --- | --- | --- |
+| AI content creation (captions, descriptions, hashtags) | low-cost | none | 1200 | 400 | 120 | deterministic template generator + manual edit |
+| AI marketing draft orchestration | low-cost | medium | 1500 | 500 | 180 | policy-safe rule campaigns only |
+| AI service recommendations | low-cost | medium | 1400 | 350 | 140 | deterministic popularity + history-based recommender |
+| AI scheduling optimization suggestions | low-cost | medium | 1800 | 450 | 180 | slot-engine heuristic ranking only |
+| AI retention and insight narratives | low-cost | medium | 1600 | 500 | 150 | show metrics without narrative text |
+| AI support chat triage | low-cost | high | 1800 | 500 | 120 | auto-escalate to human support queue |
+| AI no-show/fraud risk explanation | medium | high | 2000 | 450 | 110 | rules-only risk flags + mandatory human review |
+| AI marketplace personalization copy/ranking rationale | low-cost | medium | 1400 | 350 | 90 | deterministic ranking strategy without generated rationale |
+
+Global starter cap (sum of rows): 1090 USD/month.
+
+### 7.2 Enforcement Thresholds
+
+Each feature cap has three runtime states:
+1. Healthy (< 70% of monthly cap): run normally.
+2. Warning (70-90%): reduce optional retries and use stricter token ceilings.
+3. Protection (> 90%): disable premium escalation for that feature; use fallback path.
+4. Exhausted (>= 100%): AI path for that feature is paused until monthly reset or manual budget increase.
+
+Required runtime checks:
+1. Cost guard runs before each AI request.
+2. Feature-specific cap check runs before global cap check.
+3. On guard failure, system must return fallback behavior in < 300 ms without blocking user workflows.
+
+### 7.3 Budget Formula and Review Rule
+
+Monthly cap by feature should be reviewed with:
+
+$$
+FeatureCap = ActiveTenantsUsingFeature \times AvgRequestsPerTenant \times AvgCostPerRequest \times SafetyFactor
+$$
+
+Where safety factor starts at 1.25 during pilot and can be reduced to 1.15 after two stable months.
+
+Review cadence:
+1. Weekly during pilot (Phase A and Phase B).
+2. Biweekly for first two months after general availability.
+3. Monthly once variance remains within $\pm$10% for three consecutive cycles.
+
 ## 8. Observability and Acceptance KPIs
 
 Track per-feature:
