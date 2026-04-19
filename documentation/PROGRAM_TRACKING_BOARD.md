@@ -33,6 +33,10 @@ Card format:
 - [ ] B-005 | AI marketing automation orchestrator v1 | TBD | [MULTITENANT_WEEKS_13_TO_20_COPILOT_PROMPTS.md](MULTITENANT_WEEKS_13_TO_20_COPILOT_PROMPTS.md) | Week 19 | Updated 2026-04-19
 - [ ] B-006 | AI retention and insights copilot v1 | TBD | [MULTITENANT_WEEKS_13_TO_20_COPILOT_PROMPTS.md](MULTITENANT_WEEKS_13_TO_20_COPILOT_PROMPTS.md) | Week 19 | Updated 2026-04-19
 - [ ] B-007 | AI scheduling optimization engine v1 | TBD | [MULTITENANT_WEEKS_13_TO_20_COPILOT_PROMPTS.md](MULTITENANT_WEEKS_13_TO_20_COPILOT_PROMPTS.md) | Week 19 | Updated 2026-04-19
+- [ ] B-008 | Shared AI budget guard service v1 | TBD | [new-platform/AI_RUNTIME_AND_COST_POLICY.md](new-platform/AI_RUNTIME_AND_COST_POLICY.md) | Week 19 | Updated 2026-04-19
+- [ ] B-009 | AI cap-state integration test suite (healthy/warning/protection/exhausted) | TBD | [new-platform/AI_RUNTIME_AND_COST_POLICY.md](new-platform/AI_RUNTIME_AND_COST_POLICY.md) | Week 19-20 | Updated 2026-04-19
+- [ ] B-010 | AI per-feature cost telemetry and alerting baseline | TBD | [new-platform/AI_RUNTIME_AND_COST_POLICY.md](new-platform/AI_RUNTIME_AND_COST_POLICY.md) | Week 19-20 | Updated 2026-04-19
+- [ ] B-011 | AI budget config and admin override controls | TBD | [new-platform/AI_RUNTIME_AND_COST_POLICY.md](new-platform/AI_RUNTIME_AND_COST_POLICY.md) | Week 20 | Updated 2026-04-19
 
 ## Ready
 - [ ] R-004 | Salon onboarding flow v1 | TBD | [SALON_ONBOARDING_SPECS.md](SALON_ONBOARDING_SPECS.md) | Week 6-8 | Updated 2026-04-17
