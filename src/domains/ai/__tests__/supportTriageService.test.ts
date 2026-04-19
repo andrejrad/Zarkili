@@ -137,4 +137,60 @@ describe("support triage service budget guard integration", () => {
     expect(result.mode).toBe("human-escalation");
     expect(result.message).toBe(SUPPORT_TRIAGE_FALLBACK_MESSAGE);
   });
+
+  it("emits telemetry on each triage call", async () => {
+    const logTelemetryEvent = jest.fn();
+    const service = createSupportTriageService({
+      getUsageSnapshot: async () => createUsage(20, 200),
+      callModel: async () => ({
+        answer: "Here is your answer",
+        confidence: 0.92,
+        escalate: false,
+      }),
+      logTelemetryEvent,
+    });
+
+    await service.triage({
+      tenantId: "tenantA",
+      monthKey: "2026-04",
+      message: "Can you help me?",
+    });
+
+    expect(logTelemetryEvent).toHaveBeenCalledTimes(1);
+    expect(logTelemetryEvent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        feature: "support-triage",
+        tenantId: "tenantA",
+        providerCalled: true,
+        alertLevel: "none",
+      })
+    );
+  });
+
+  it("emits alert callback when feature utilization enters warning", async () => {
+    const logAlert = jest.fn();
+    const service = createSupportTriageService({
+      getUsageSnapshot: async () => createUsage(84, 200),
+      callModel: async () => ({
+        answer: "Warning response",
+        confidence: 0.8,
+        escalate: false,
+      }),
+      logAlert,
+    });
+
+    await service.triage({
+      tenantId: "tenantA",
+      monthKey: "2026-04",
+      message: "Need support",
+    });
+
+    expect(logAlert).toHaveBeenCalledTimes(1);
+    expect(logAlert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        level: "warning",
+        feature: "support-triage",
+      })
+    );
+  });
 });

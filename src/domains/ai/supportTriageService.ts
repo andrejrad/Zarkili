@@ -1,8 +1,11 @@
 import {
+  buildAiCostTelemetryEvent,
   defaultAiBudgetGuardConfig,
   evaluateAiBudgetGuard,
+  type AiAlertLevel,
   type AiBudgetGuardConfig,
   type AiBudgetGuardDecision,
+  type AiCostTelemetryEvent,
   type AiBudgetUsageSnapshot,
 } from "../../shared/ai";
 
@@ -43,6 +46,14 @@ export type SupportTriageDependencies = {
     monthKey: string;
     decision: AiBudgetGuardDecision;
   }) => void;
+  logTelemetryEvent?: (event: AiCostTelemetryEvent) => void;
+  logAlert?: (input: {
+    level: AiAlertLevel;
+    feature: "support-triage";
+    tenantId: string;
+    monthKey: string;
+    event: AiCostTelemetryEvent;
+  }) => void;
   budgetConfig?: AiBudgetGuardConfig;
 };
 
@@ -51,6 +62,36 @@ export const SUPPORT_TRIAGE_FALLBACK_MESSAGE =
 
 export function createSupportTriageService(deps: SupportTriageDependencies) {
   const budgetConfig = deps.budgetConfig ?? defaultAiBudgetGuardConfig;
+
+  function emitObservability(input: {
+    tenantId: string;
+    usage: AiBudgetUsageSnapshot;
+    guard: AiBudgetGuardDecision;
+    providerCalled: boolean;
+    modelTierUsed: SupportTriageModelTier | null;
+  }): void {
+    const event = buildAiCostTelemetryEvent({
+      feature: "support-triage",
+      tenantId: input.tenantId,
+      usage: input.usage,
+      config: budgetConfig,
+      guard: input.guard,
+      providerCalled: input.providerCalled,
+      modelTierUsed: input.modelTierUsed,
+    });
+
+    deps.logTelemetryEvent?.(event);
+
+    if (event.alertLevel !== "none") {
+      deps.logAlert?.({
+        level: event.alertLevel,
+        feature: "support-triage",
+        tenantId: input.tenantId,
+        monthKey: event.monthKey,
+        event,
+      });
+    }
+  }
 
   async function triage(input: SupportTriageInput): Promise<SupportTriageResult> {
     const usage = await deps.getUsageSnapshot(input.monthKey);
@@ -68,6 +109,14 @@ export function createSupportTriageService(deps: SupportTriageDependencies) {
     });
 
     if (!guard.allowed) {
+      emitObservability({
+        tenantId: input.tenantId,
+        usage,
+        guard,
+        providerCalled: false,
+        modelTierUsed: null,
+      });
+
       return {
         mode: "human-escalation",
         message: SUPPORT_TRIAGE_FALLBACK_MESSAGE,
@@ -87,6 +136,14 @@ export function createSupportTriageService(deps: SupportTriageDependencies) {
       });
 
       if (modelResult.escalate) {
+        emitObservability({
+          tenantId: input.tenantId,
+          usage,
+          guard,
+          providerCalled: true,
+          modelTierUsed: modelTier,
+        });
+
         return {
           mode: "human-escalation",
           message: SUPPORT_TRIAGE_FALLBACK_MESSAGE,
@@ -96,6 +153,14 @@ export function createSupportTriageService(deps: SupportTriageDependencies) {
         };
       }
 
+      emitObservability({
+        tenantId: input.tenantId,
+        usage,
+        guard,
+        providerCalled: true,
+        modelTierUsed: modelTier,
+      });
+
       return {
         mode: "ai-response",
         message: modelResult.answer,
@@ -104,6 +169,14 @@ export function createSupportTriageService(deps: SupportTriageDependencies) {
         providerCalled: true,
       };
     } catch {
+      emitObservability({
+        tenantId: input.tenantId,
+        usage,
+        guard,
+        providerCalled: true,
+        modelTierUsed: modelTier,
+      });
+
       return {
         mode: "human-escalation",
         message: SUPPORT_TRIAGE_FALLBACK_MESSAGE,

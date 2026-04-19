@@ -6,6 +6,7 @@ export {
   defaultAiBudgetGuardConfig,
   evaluateAiBudgetGuard,
 } from "./budgetGuard";
+export { buildAiCostTelemetryEvent } from "./telemetry";
 
 export type {
   AiBudgetGuardConfig,
@@ -17,3 +18,4 @@ export type {
   AiFeatureKey,
   EvaluateAiBudgetGuardInput,
 } from "./budgetGuard";
+export type { AiAlertLevel, AiCostTelemetryEvent, BuildAiCostTelemetryEventInput } from "./telemetry";
