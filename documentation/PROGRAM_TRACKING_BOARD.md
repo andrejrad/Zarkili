@@ -73,6 +73,7 @@ Card format:
 - [x] D-020 | AI per-feature telemetry and alert baseline wired into support triage | Copilot plus Andre | [new-platform/AI_RUNTIME_AND_COST_POLICY.md](new-platform/AI_RUNTIME_AND_COST_POLICY.md) | Completed | Updated 2026-04-19
 - [x] D-021 | AI budget config repository and validated admin override controls | Copilot plus Andre | [new-platform/AI_RUNTIME_AND_COST_POLICY.md](new-platform/AI_RUNTIME_AND_COST_POLICY.md) | Completed | Updated 2026-04-19
 - [x] D-022 | Owner-only AI budget management service guard layer | Copilot plus Andre | [new-platform/AI_RUNTIME_AND_COST_POLICY.md](new-platform/AI_RUNTIME_AND_COST_POLICY.md) | Completed | Updated 2026-04-19
+- [x] D-023 | Owner AI budget settings route and screen-level hook contract | Copilot plus Andre | [new-platform/AI_RUNTIME_AND_COST_POLICY.md](new-platform/AI_RUNTIME_AND_COST_POLICY.md) | Completed | Updated 2026-04-19
 
 ---
 

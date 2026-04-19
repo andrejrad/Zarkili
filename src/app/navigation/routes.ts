@@ -6,10 +6,11 @@ import {
 export type AppRouteGroup =
   | "public"
   | "protected"
+  | "owner"
   | "salonOnboarding"
   | "clientOnboarding";
 
-export type AppRouteGuard = "none" | "authenticated";
+export type AppRouteGuard = "none" | "authenticated" | "platform-admin";
 
 export type AppRouteDefinition = {
   name: string;
@@ -20,6 +21,7 @@ export type AppRouteDefinition = {
 
 export type RouteAccessContext = {
   userId: string | null;
+  isPlatformAdmin?: boolean;
 };
 
 export type RouteResolutionReason = "direct" | "redirect-unauthorized" | "redirect-not-found";
@@ -67,6 +69,12 @@ export const appRoutes: AppRouteDefinition[] = [
     path: "/app",
     guard: "authenticated",
   },
+  {
+    name: "OwnerAiBudgetSettings",
+    group: "owner",
+    path: "/owner/ai-budget",
+    guard: "platform-admin",
+  },
   ...salonOnboardingRoutes,
   ...clientOnboardingRoutes,
 ];
@@ -78,6 +86,10 @@ export function canAccessRoute(route: AppRouteDefinition, context: RouteAccessCo
 
   if (route.guard === "authenticated") {
     return Boolean(context.userId);
+  }
+
+  if (route.guard === "platform-admin") {
+    return Boolean(context.userId) && Boolean(context.isPlatformAdmin);
   }
 
   return false;

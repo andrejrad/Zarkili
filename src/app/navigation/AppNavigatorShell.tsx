@@ -1,11 +1,16 @@
 import { useEffect, useMemo, useState } from "react";
 import { Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
+import type {
+  AiBudgetAdminService,
+  UpdateAiBudgetConfigInput,
+} from "../../domains/ai";
 import { useAuth } from "../providers/AuthProvider";
 import { useLanguage } from "../providers/LanguageProvider";
 import { useTenant } from "../providers/TenantProvider";
 import type { TenantMembership } from "../../domains/auth";
 import { featureFlags } from "../../shared/config/featureFlags";
+import { useAiBudgetAdminSettings } from "../settings/useAiBudgetAdminSettings";
 
 import {
   appRoutes,
@@ -26,6 +31,8 @@ import { listActiveTenantMembershipsForUser } from "./tenantMemberships";
 type AppNavigatorShellProps = {
   onboardingProgressPersistence?: OnboardingProgressPersistence;
   listTenantMemberships?: (userId: string) => Promise<TenantMembership[]>;
+  aiBudgetAdminService?: AiBudgetAdminService | null;
+  isPlatformAdminUser?: (userId: string) => Promise<boolean>;
 };
 
 function isWebRuntime(): boolean {
@@ -107,6 +114,8 @@ function toOnboardingStepLabelKey(step: OnboardingStep):
 export function AppNavigatorShell({
   onboardingProgressPersistence,
   listTenantMemberships,
+  aiBudgetAdminService,
+  isPlatformAdminUser,
 }: AppNavigatorShellProps) {
   const { userId, signInAsDev, signOut } = useAuth();
   const { t } = useLanguage();
@@ -118,6 +127,31 @@ export function AppNavigatorShell({
   const [onboardingGuardMessage, setOnboardingGuardMessage] = useState<string | null>(null);
   const [availableMemberships, setAvailableMemberships] = useState<TenantMembership[]>([]);
   const [membershipsLoading, setMembershipsLoading] = useState(false);
+  const [isPlatformAdmin, setIsPlatformAdmin] = useState(false);
+
+  const settingsService = useMemo(
+    () =>
+      aiBudgetAdminService
+        ? {
+            getBudgetConfigForAdmin: (actor: { userId: string }) =>
+              aiBudgetAdminService.getBudgetConfigForAdmin(actor),
+            updateBudgetConfigForAdmin: (
+              actor: { userId: string },
+              input: UpdateAiBudgetConfigInput
+            ) => aiBudgetAdminService.updateBudgetConfigForAdmin(actor, input),
+          }
+        : null,
+    [aiBudgetAdminService]
+  );
+
+  const {
+    config: ownerAiBudgetConfig,
+    loading: ownerAiBudgetLoading,
+    updating: ownerAiBudgetUpdating,
+    error: ownerAiBudgetError,
+    refresh: refreshOwnerAiBudget,
+    updateConfig: updateOwnerAiBudget,
+  } = useAiBudgetAdminSettings(userId, settingsService);
 
   const persistence = useMemo(
     () => onboardingProgressPersistence ?? createFirestoreOnboardingProgressPersistence(),
@@ -128,8 +162,16 @@ export function AppNavigatorShell({
     [listTenantMemberships]
   );
 
-  const preferredRoute = resolvePreferredRoute({ userId });
-  const accessibleRoutes = getAccessibleRoutes({ userId });
+  const routeContext = useMemo(
+    () => ({
+      userId,
+      isPlatformAdmin,
+    }),
+    [isPlatformAdmin, userId]
+  );
+
+  const preferredRoute = resolvePreferredRoute(routeContext);
+  const accessibleRoutes = getAccessibleRoutes(routeContext);
 
   const activeRoute = useMemo(
     () => appRoutes.find((route) => route.name === activeRouteName) ?? preferredRoute,
@@ -141,14 +183,14 @@ export function AppNavigatorShell({
       return;
     }
 
-    const resolution = resolveRouteFromPath(getWebPathname(), { userId });
+    const resolution = resolveRouteFromPath(getWebPathname(), routeContext);
     setActiveRouteName(resolution.resolvedRoute.name);
     if (resolution.requestedPath !== resolution.resolvedRoute.path) {
       replaceWebHistoryPath(resolution.resolvedRoute.path);
     }
 
     const onPopState = () => {
-      const popResolution = resolveRouteFromPath(getWebPathname(), { userId });
+      const popResolution = resolveRouteFromPath(getWebPathname(), routeContext);
       setActiveRouteName(popResolution.resolvedRoute.name);
       if (popResolution.requestedPath !== popResolution.resolvedRoute.path) {
         replaceWebHistoryPath(popResolution.resolvedRoute.path);
@@ -159,7 +201,7 @@ export function AppNavigatorShell({
     return () => {
       window.removeEventListener("popstate", onPopState);
     };
-  }, [userId]);
+  }, [routeContext]);
 
   useEffect(() => {
     if (!isWebRuntime()) {
@@ -173,10 +215,41 @@ export function AppNavigatorShell({
   }, [activeRoute.path]);
 
   useEffect(() => {
-    if (!canAccessRoute(activeRoute, { userId })) {
+    if (!canAccessRoute(activeRoute, routeContext)) {
       setActiveRouteName(preferredRoute.name);
     }
-  }, [activeRoute, preferredRoute, userId]);
+  }, [activeRoute, preferredRoute, routeContext]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function resolvePlatformAdmin() {
+      if (!userId) {
+        setIsPlatformAdmin(false);
+        return;
+      }
+
+      try {
+        const resolver =
+          isPlatformAdminUser ??
+          (async (candidateUserId: string) => candidateUserId === "dev-user");
+        const nextValue = await resolver(userId);
+        if (!cancelled) {
+          setIsPlatformAdmin(nextValue);
+        }
+      } catch {
+        if (!cancelled) {
+          setIsPlatformAdmin(false);
+        }
+      }
+    }
+
+    void resolvePlatformAdmin();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isPlatformAdminUser, userId]);
 
   useEffect(() => {
     let cancelled = false;
@@ -238,12 +311,30 @@ export function AppNavigatorShell({
       return;
     }
 
-    if (!canAccessRoute(candidate, { userId })) {
+    if (!canAccessRoute(candidate, routeContext)) {
       setActiveRouteName(preferredRoute.name);
       return;
     }
 
     setActiveRouteName(candidate.name);
+  }
+
+  function openOwnerAiBudgetSettings() {
+    navigate("OwnerAiBudgetSettings");
+  }
+
+  async function increaseSupportTriageCapByTen() {
+    if (!ownerAiBudgetConfig) {
+      return;
+    }
+
+    await updateOwnerAiBudget({
+      featureCaps: {
+        "support-triage": {
+          monthlyCapUsd: ownerAiBudgetConfig.featureCaps["support-triage"].monthlyCapUsd + 10,
+        },
+      },
+    });
   }
 
   function completeDevSignIn() {
@@ -456,6 +547,50 @@ export function AppNavigatorShell({
       );
     }
 
+    if (activeRoute.name === "OwnerAiBudgetSettings") {
+      return (
+        <>
+          <Text style={styles.screenTitle}>AI budget settings</Text>
+          <Text style={styles.screenBody}>
+            Owner-only controls for AI monthly caps and budget thresholds.
+          </Text>
+          {ownerAiBudgetLoading ? (
+            <Text style={styles.screenBody}>Loading AI budget config...</Text>
+          ) : null}
+          {ownerAiBudgetError ? <Text style={styles.guardText}>{ownerAiBudgetError}</Text> : null}
+          {ownerAiBudgetConfig ? (
+            <>
+              <Text style={styles.screenBody}>
+                Global cap USD: {ownerAiBudgetConfig.globalMonthlyCapUsd}
+              </Text>
+              <Text style={styles.screenBody}>
+                Support triage cap USD: {ownerAiBudgetConfig.featureCaps["support-triage"].monthlyCapUsd}
+              </Text>
+            </>
+          ) : null}
+          <TouchableOpacity
+            accessibilityRole="button"
+            onPress={() => void refreshOwnerAiBudget()}
+            style={styles.button}
+          >
+            <Text style={styles.buttonText}>Refresh budget config</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            accessibilityRole="button"
+            onPress={() => void increaseSupportTriageCapByTen()}
+            style={styles.buttonSecondary}
+          >
+            <Text style={styles.buttonText}>
+              {ownerAiBudgetUpdating ? "Updating..." : "Increase support triage cap (+10)"}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity accessibilityRole="button" onPress={() => navigate("AppShell")} style={styles.buttonSecondary}>
+            <Text style={styles.buttonText}>{t("action.back")}</Text>
+          </TouchableOpacity>
+        </>
+      );
+    }
+
     return (
       <>
         <Text style={styles.screenTitle}>{t("appShell.title")}</Text>
@@ -486,6 +621,11 @@ export function AppNavigatorShell({
         <TouchableOpacity accessibilityRole="button" onPress={() => void navigateToOnboardingFlow("client")} style={styles.buttonSecondary}>
           <Text style={styles.buttonText}>{t("onboarding.startClient")}</Text>
         </TouchableOpacity>
+        {isPlatformAdmin ? (
+          <TouchableOpacity accessibilityRole="button" onPress={openOwnerAiBudgetSettings} style={styles.buttonSecondary}>
+            <Text style={styles.buttonText}>Owner AI budget settings</Text>
+          </TouchableOpacity>
+        ) : null}
         <TouchableOpacity accessibilityRole="button" onPress={signOut} style={styles.buttonSecondary}>
           <Text style={styles.buttonText}>{t("auth.signOut")}</Text>
         </TouchableOpacity>

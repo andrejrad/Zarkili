@@ -5,6 +5,7 @@ import { AppNavigatorShell } from "../AppNavigatorShell";
 import type { OnboardingProgressPersistence } from "../onboarding/contracts";
 import type { OnboardingStep } from "../onboarding/contracts";
 import type { TenantMembership } from "../../../domains/auth";
+import type { AiBudgetAdminService } from "../../../domains/ai";
 
 jest.mock("../onboarding/createPersistence", () => ({
   createFirestoreOnboardingProgressPersistence: () => ({
@@ -191,6 +192,65 @@ describe("AppNavigatorShell", () => {
       expect(persistence.resumeDraft).toHaveBeenCalledWith(
         expect.objectContaining({ tenantId: "tenantB" })
       );
+    });
+  });
+
+  it("shows owner AI budget settings only for platform admin user", async () => {
+    const aiBudgetAdminService: AiBudgetAdminService = {
+      getBudgetConfigForAdmin: jest.fn(async () => ({
+        globalMonthlyCapUsd: 1090,
+        warningThreshold: 0.7,
+        protectionThreshold: 0.9,
+        featureCaps: {
+          "content-creation": { monthlyCapUsd: 120 },
+          "marketing-orchestration": { monthlyCapUsd: 180 },
+          "service-recommendations": { monthlyCapUsd: 140 },
+          "scheduling-optimization": { monthlyCapUsd: 180 },
+          "retention-insights": { monthlyCapUsd: 150 },
+          "support-triage": { monthlyCapUsd: 120 },
+          "no-show-fraud": { monthlyCapUsd: 110 },
+          "marketplace-personalization": { monthlyCapUsd: 90 },
+        },
+      })),
+      updateBudgetConfigForAdmin: jest.fn(async () => ({
+        globalMonthlyCapUsd: 1090,
+        warningThreshold: 0.7,
+        protectionThreshold: 0.9,
+        featureCaps: {
+          "content-creation": { monthlyCapUsd: 120 },
+          "marketing-orchestration": { monthlyCapUsd: 180 },
+          "service-recommendations": { monthlyCapUsd: 140 },
+          "scheduling-optimization": { monthlyCapUsd: 180 },
+          "retention-insights": { monthlyCapUsd: 150 },
+          "support-triage": { monthlyCapUsd: 130 },
+          "no-show-fraud": { monthlyCapUsd: 110 },
+          "marketplace-personalization": { monthlyCapUsd: 90 },
+        },
+      })),
+    };
+
+    render(
+      <AppProviders>
+        <AppNavigatorShell
+          listTenantMemberships={async () => defaultMemberships}
+          aiBudgetAdminService={aiBudgetAdminService}
+          isPlatformAdminUser={async () => true}
+        />
+      </AppProviders>
+    );
+
+    fireEvent.press(screen.getByText("Login"));
+    fireEvent.press(screen.getByText("Sign in as dev user"));
+    fireEvent.press(await screen.findByText("Owner AI budget settings"));
+    fireEvent.press(await screen.findByText("Refresh budget config"));
+
+    await waitFor(() => {
+      expect(screen.getByText("Current route: OwnerAiBudgetSettings")).toBeTruthy();
+      expect(screen.getByText("Global cap USD: 1090")).toBeTruthy();
+    });
+
+    expect(aiBudgetAdminService.getBudgetConfigForAdmin).toHaveBeenCalledWith({
+      userId: "dev-user",
     });
   });
 });

@@ -31,6 +31,15 @@ describe("navigation route guards", () => {
     expect(routes.map((route) => route.name)).toContain("AppShell");
     expect(routes.map((route) => route.name)).toContain("SalonOnboardingAccount");
     expect(routes.map((route) => route.name)).toContain("ClientOnboardingAccountGuest");
+    expect(routes.map((route) => route.name)).not.toContain("OwnerAiBudgetSettings");
+  });
+
+  it("adds owner route only for platform admin users", () => {
+    const nonAdminRoutes = getAccessibleRoutes({ userId: "u1", isPlatformAdmin: false });
+    const adminRoutes = getAccessibleRoutes({ userId: "u1", isPlatformAdmin: true });
+
+    expect(nonAdminRoutes.map((route) => route.name)).not.toContain("OwnerAiBudgetSettings");
+    expect(adminRoutes.map((route) => route.name)).toContain("OwnerAiBudgetSettings");
   });
 
   it("returns app shell as preferred route when only authenticated", () => {
@@ -64,6 +73,8 @@ describe("navigation route guards", () => {
     expect(canAccessPath("/app", { userId: "u1" })).toBe(true);
     expect(canAccessPath("/onboarding/salon/account", { userId: null })).toBe(false);
     expect(canAccessPath("/onboarding/salon/account", { userId: "u1" })).toBe(true);
+    expect(canAccessPath("/owner/ai-budget", { userId: "u1", isPlatformAdmin: false })).toBe(false);
+    expect(canAccessPath("/owner/ai-budget", { userId: "u1", isPlatformAdmin: true })).toBe(true);
     expect(canAccessPath("/missing", { userId: "u1" })).toBe(false);
   });
 
