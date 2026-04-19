@@ -31,9 +31,6 @@ Card format:
 - [ ] B-003 | Advanced loyalty campaigns and multipliers | TBD | [LOYALTY_FUNCTIONAL_SPEC_V1.md](LOYALTY_FUNCTIONAL_SPEC_V1.md) | Post Week 8 | Updated 2026-04-17
 
 ## Ready
-- [ ] R-001 | Week 1 vertical slice kickoff | TBD | [MULTITENANT_WEEKS_1_TO_4_COPILOT_PROMPTS.md](MULTITENANT_WEEKS_1_TO_4_COPILOT_PROMPTS.md) | Week 1 | Updated 2026-04-17
-- [ ] R-002 | Auth plus tenant context implementation | TBD | [DAY1_DEVELOPMENT_CHECKLIST.md](DAY1_DEVELOPMENT_CHECKLIST.md) | Week 1 | Updated 2026-04-17
-- [ ] R-003 | Firestore rules tenant isolation pass v1 | TBD | [MULTITENANT_COMPANION_EXECUTION_BLUEPRINT.md](MULTITENANT_COMPANION_EXECUTION_BLUEPRINT.md) | Week 1 | Updated 2026-04-17
 - [ ] R-004 | Salon onboarding flow v1 | TBD | [SALON_ONBOARDING_SPECS.md](SALON_ONBOARDING_SPECS.md) | Week 6-8 | Updated 2026-04-17
 - [ ] R-005 | Client onboarding flow v1 | TBD | [CLIENT_ONBOARDING.md](CLIENT_ONBOARDING.md) | Week 6-8 | Updated 2026-04-17
 - [ ] R-006 | Free trial gating flow | TBD | [FREE_TRIAL_SPECS.md](FREE_TRIAL_SPECS.md) | Week 13 | Updated 2026-04-17
@@ -41,7 +38,7 @@ Card format:
 - [ ] R-008 | Loyalty implementation v1 | TBD | [LOYALTY_FUNCTIONAL_SPEC_V1.md](LOYALTY_FUNCTIONAL_SPEC_V1.md) | Week 8 | Updated 2026-04-17
 
 ## In Progress
-- [ ] P-001 | No active card yet | TBD | [MULTITENANT_MASTER_INDEX.md](MULTITENANT_MASTER_INDEX.md) | Current | Updated 2026-04-17
+- [ ] P-001 | No active card yet | TBD | [MULTITENANT_MASTER_INDEX.md](MULTITENANT_MASTER_INDEX.md) | Current | Updated 2026-04-19
 
 ## Blocked
 - [ ] X-001 | No blocked card yet | TBD | [MULTITENANT_MASTER_INDEX.md](MULTITENANT_MASTER_INDEX.md) | Current | Updated 2026-04-17
@@ -53,6 +50,20 @@ Card format:
 - [x] D-001 | Day 0 project bootstrap complete | Copilot plus Andre | [DAY1_DEVELOPMENT_CHECKLIST.md](DAY1_DEVELOPMENT_CHECKLIST.md) | Completed | Updated 2026-04-16
 - [x] D-002 | Development and production Firebase environments configured | Copilot plus Andre | [MULTITENANT_DAY1_EXECUTION_LOG_TEMPLATE.md](MULTITENANT_DAY1_EXECUTION_LOG_TEMPLATE.md) | Completed | Updated 2026-04-16
 - [x] D-003 | Expo SDK upgraded to 54 and startup scripts stabilized | Copilot plus Andre | [MULTITENANT_DAY1_EXECUTION_LOG_TEMPLATE.md](MULTITENANT_DAY1_EXECUTION_LOG_TEMPLATE.md) | Completed | Updated 2026-04-17
+- [x] D-004 | Firestore tenant isolation pass v1 (rules + tests + indexes) | Copilot plus Andre | [MULTITENANT_COMPANION_EXECUTION_BLUEPRINT.md](MULTITENANT_COMPANION_EXECUTION_BLUEPRINT.md) | Completed | Updated 2026-04-18
+- [x] D-005 | Tenant and Location domain models and repositories (with tests) | Copilot plus Andre | [MULTITENANT_WEEKS_1_TO_4_COPILOT_PROMPTS.md](MULTITENANT_WEEKS_1_TO_4_COPILOT_PROMPTS.md) | Completed | Updated 2026-04-18
+- [x] D-011 | Auth plus tenant context implementation | Copilot plus Andre | [DAY1_DEVELOPMENT_CHECKLIST.md](DAY1_DEVELOPMENT_CHECKLIST.md) | Completed | Updated 2026-04-19
+- [x] D-006 | Auth domain v1 plus navigation route guard contracts | Copilot plus Andre | [MULTITENANT_WEEKS_1_TO_4_COPILOT_PROMPTS.md](MULTITENANT_WEEKS_1_TO_4_COPILOT_PROMPTS.md) | Completed | Updated 2026-04-19
+- [x] D-007 | Runtime public/protected route composition with tenant-aware guards | Copilot plus Andre | [MULTITENANT_WEEKS_1_TO_4_COPILOT_PROMPTS.md](MULTITENANT_WEEKS_1_TO_4_COPILOT_PROMPTS.md) | Completed | Updated 2026-04-19
+- [x] D-008 | Auth onboarding draft-save/resume foundation (rules + index + tests) | Copilot plus Andre | [CLIENT_ONBOARDING.md](CLIENT_ONBOARDING.md) | Completed | Updated 2026-04-19
+- [x] D-009 | Onboarding draft contracts + schema-versioned service layer | Copilot plus Andre | [CLIENT_ONBOARDING.md](CLIENT_ONBOARDING.md) | Completed | Updated 2026-04-19
+- [x] D-010 | Onboarding draft v1-to-v2 step payload migration strategy | Copilot plus Andre | [CLIENT_ONBOARDING.md](CLIENT_ONBOARDING.md) | Completed | Updated 2026-04-19
+- [x] D-012 | Week 1 Task 1.3 complete (ENV setup docs + config parsing tests) | Copilot plus Andre | [MULTITENANT_WEEKS_1_TO_4_COPILOT_PROMPTS.md](MULTITENANT_WEEKS_1_TO_4_COPILOT_PROMPTS.md) | Completed | Updated 2026-04-19
+- [x] D-013 | Week 1 Task 1.4 complete (local pre-PR contributor checklist) | Copilot plus Andre | [MULTITENANT_WEEKS_1_TO_4_COPILOT_PROMPTS.md](MULTITENANT_WEEKS_1_TO_4_COPILOT_PROMPTS.md) | Completed | Updated 2026-04-19
+- [x] D-014 | Week 1 Task 1.5 complete (public plus protected placeholders and marketplace flag) | Copilot plus Andre | [MULTITENANT_WEEKS_1_TO_4_COPILOT_PROMPTS.md](MULTITENANT_WEEKS_1_TO_4_COPILOT_PROMPTS.md) | Completed | Updated 2026-04-19
+- [x] D-015 | Week 1 vertical slice board closure (kickoff and in-progress cleanup) | Copilot plus Andre | [MULTITENANT_WEEKS_1_TO_4_COPILOT_PROMPTS.md](MULTITENANT_WEEKS_1_TO_4_COPILOT_PROMPTS.md) | Completed | Updated 2026-04-19
+- [x] D-016 | Week 1 detailed review report documented | Copilot plus Andre | [MULTITENANT_WEEKS_1_TO_4_COPILOT_PROMPTS.md](MULTITENANT_WEEKS_1_TO_4_COPILOT_PROMPTS.md) | Completed | Updated 2026-04-19
+- [x] D-017 | Week 1 hardening pass complete (CI rules tests + deep-link route guards + auth-tenant reset) | Copilot plus Andre | [MULTITENANT_WEEKS_1_TO_4_COPILOT_PROMPTS.md](MULTITENANT_WEEKS_1_TO_4_COPILOT_PROMPTS.md) | Completed | Updated 2026-04-19
 
 ---
 
@@ -67,6 +78,6 @@ Use this cadence every week:
 ---
 
 ## Recommended Next Moves
-1. Move R-001 to In Progress when coding starts.
-2. Split R-001 into sub-cards after first implementation pass.
-3. Keep no more than 2 cards in In Progress at once.
+1. Promote one Week 2-ready card into In Progress and assign owner.
+2. Keep no more than 2 cards in In Progress at once.
+3. Start Week 2.2 role-mapping and Week 2.3 location-admin UI planning after Week 2.1 handoff.

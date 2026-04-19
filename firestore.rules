@@ -5,12 +5,139 @@ service cloud.firestore {
       return request.auth != null;
     }
 
-    function belongsToTenant(tenantId) {
-      return isSignedIn() && request.auth.token.tenant_id == tenantId;
+    function isPlatformAdmin() {
+      return isSignedIn() && request.auth.token.role == 'platform_admin';
     }
 
-    match /tenants/{tenantId}/{document=**} {
-      allow read, write: if belongsToTenant(tenantId);
+    function tenantUserDocPath(tenantId, userId) {
+      return /databases/$(database)/documents/tenantUsers/$(tenantId + '_' + userId);
+    }
+
+    function isTenantMember(tenantId) {
+      return isSignedIn() && exists(tenantUserDocPath(tenantId, request.auth.uid));
+    }
+
+    function tenantRole(tenantId) {
+      return get(tenantUserDocPath(tenantId, request.auth.uid)).data.role;
+    }
+
+    function hasTenantRole(tenantId, allowedRoles) {
+      return isTenantMember(tenantId) && (tenantRole(tenantId) in allowedRoles);
+    }
+
+    function isTenantAdmin(tenantId) {
+      return hasTenantRole(tenantId, ['tenant_owner', 'tenant_admin', 'location_manager']);
+    }
+
+    function isSameTenantWriteOnCreate() {
+      return request.resource.data.tenantId is string;
+    }
+
+    function isSameTenantWriteOnUpdate() {
+      return request.resource.data.tenantId == resource.data.tenantId;
+    }
+
+    function tenantScopedReadFromResource() {
+      return resource.data.tenantId is string && (isPlatformAdmin() || isTenantMember(resource.data.tenantId));
+    }
+
+    function tenantScopedCreateWrite() {
+      return isSameTenantWriteOnCreate() && (isPlatformAdmin() || isTenantMember(request.resource.data.tenantId));
+    }
+
+    function tenantScopedUpdateWrite() {
+      return isSameTenantWriteOnUpdate() && (isPlatformAdmin() || isTenantMember(resource.data.tenantId));
+    }
+
+    match /tenants/{tenantId} {
+      allow read: if isPlatformAdmin() || isTenantMember(tenantId);
+      allow create: if isPlatformAdmin();
+      allow update, delete: if isPlatformAdmin() || hasTenantRole(tenantId, ['tenant_owner']);
+    }
+
+    match /tenantUsers/{tenantUserId} {
+      allow read: if isPlatformAdmin()
+        || (isSignedIn() && resource.data.userId == request.auth.uid)
+        || (resource.data.tenantId is string && isTenantAdmin(resource.data.tenantId));
+
+      allow create: if isPlatformAdmin()
+        || (
+          request.resource.data.tenantId is string
+          && request.resource.data.userId is string
+          && isTenantAdmin(request.resource.data.tenantId)
+        );
+
+      allow update, delete: if isPlatformAdmin()
+        || (
+          resource.data.tenantId is string
+          && request.resource.data.tenantId == resource.data.tenantId
+          && isTenantAdmin(resource.data.tenantId)
+        );
+    }
+
+    match /locations/{locationId} {
+      allow read: if tenantScopedReadFromResource();
+      allow create: if tenantScopedCreateWrite() && isTenantAdmin(request.resource.data.tenantId);
+      allow update, delete: if tenantScopedUpdateWrite() && isTenantAdmin(resource.data.tenantId);
+    }
+
+    match /staff/{staffId} {
+      allow read: if tenantScopedReadFromResource();
+      allow create: if tenantScopedCreateWrite() && isTenantAdmin(request.resource.data.tenantId);
+      allow update, delete: if tenantScopedUpdateWrite() && isTenantAdmin(resource.data.tenantId);
+    }
+
+    match /services/{serviceId} {
+      allow read: if tenantScopedReadFromResource();
+      allow create: if tenantScopedCreateWrite() && isTenantAdmin(request.resource.data.tenantId);
+      allow update, delete: if tenantScopedUpdateWrite() && isTenantAdmin(resource.data.tenantId);
+    }
+
+    match /bookings/{bookingId} {
+      allow read: if tenantScopedReadFromResource();
+
+      allow create: if tenantScopedCreateWrite() && (
+        isTenantAdmin(request.resource.data.tenantId)
+        || (
+          hasTenantRole(request.resource.data.tenantId, ['client'])
+          && request.resource.data.customerUserId == request.auth.uid
+        )
+      );
+
+      allow update, delete: if tenantScopedUpdateWrite() && isTenantAdmin(resource.data.tenantId);
+    }
+
+    match /onboardingDrafts/{draftId} {
+      allow read: if tenantScopedReadFromResource() && (
+        resource.data.userId == request.auth.uid
+        || isTenantAdmin(resource.data.tenantId)
+      );
+
+      allow create: if tenantScopedCreateWrite()
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.flowType in ['salon', 'client']
+        && request.resource.data.schemaVersion is int
+        && request.resource.data.schemaVersion > 0
+        && request.resource.data.status == 'draft';
+
+      allow update: if tenantScopedUpdateWrite()
+        && request.resource.data.userId == resource.data.userId
+        && request.resource.data.flowType == resource.data.flowType
+        && request.resource.data.schemaVersion is int
+        && request.resource.data.schemaVersion >= resource.data.schemaVersion
+        && (
+          resource.data.userId == request.auth.uid
+          || isTenantAdmin(resource.data.tenantId)
+        );
+
+      allow delete: if tenantScopedUpdateWrite() && (
+        resource.data.userId == request.auth.uid
+        || isTenantAdmin(resource.data.tenantId)
+      );
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }

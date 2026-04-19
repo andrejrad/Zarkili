@@ -15,6 +15,7 @@
     "typecheck": "tsc --noEmit",
     "test": "jest",
     "test:watch": "jest --watch",
+    "test:rules": "firebase emulators:exec --only firestore \"jest --config jest.rules.config.js --runInBand --runTestsByPath __tests__/firestore.rules.test.ts\"",
     "check": "npm run lint && npm run typecheck && npm run test -- --watch=false",
     "firebase:emulators": "firebase emulators:start --project zarkili-dev",
     "firebase:deploy:dev": "firebase deploy --project zarkili-dev",
@@ -34,6 +35,7 @@
     "react-native-screens": "~4.16.0"
   },
   "devDependencies": {
+    "@firebase/rules-unit-testing": "^4.0.1",
     "@testing-library/jest-native": "^5.4.3",
     "@testing-library/react-native": "^13.2.0",
     "@types/jest": "^29.5.14",

@@ -1,4 +1,4 @@
-import { createContext, PropsWithChildren, useContext, useMemo, useState } from "react";
+import { createContext, PropsWithChildren, useContext, useEffect, useMemo, useRef, useState } from "react";
 
 type TenantContextValue = {
   tenantId: string | null;
@@ -7,8 +7,21 @@ type TenantContextValue = {
 
 const TenantContext = createContext<TenantContextValue | undefined>(undefined);
 
-export function TenantProvider({ children }: PropsWithChildren) {
+type TenantProviderProps = PropsWithChildren<{
+  authUserId?: string | null;
+}>;
+
+export function TenantProvider({ children, authUserId }: TenantProviderProps) {
   const [tenantId, setTenantId] = useState<string | null>(null);
+  const previousAuthUserIdRef = useRef<string | null | undefined>(authUserId);
+
+  useEffect(() => {
+    const previousAuthUserId = previousAuthUserIdRef.current;
+    if (previousAuthUserId !== authUserId) {
+      setTenantId(null);
+    }
+    previousAuthUserIdRef.current = authUserId;
+  }, [authUserId]);
 
   const value = useMemo<TenantContextValue>(() => ({ tenantId, setTenantId }), [tenantId]);
 

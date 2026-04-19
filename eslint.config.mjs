@@ -14,7 +14,9 @@ export default [
       "functions/**",
       "app.config.ts",
       "babel.config.js",
-      "jest.config.js"
+      "jest.config.js",
+      "jest.rules.config.js",
+      "__tests__/**"
     ]
   },
   js.configs.recommended,

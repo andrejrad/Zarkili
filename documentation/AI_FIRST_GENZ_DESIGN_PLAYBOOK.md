@@ -561,6 +561,122 @@ For each feature slice, hand off:
 
 ---
 
+## Blueprint-to-Build Mapping (Use After Task 1)
+Use this table immediately after you complete Task 1 (implementation-ready UX blueprint).
+It tells you exactly where each blueprint output is used next.
+
+| Blueprint Output | Used In Figma | Used In Copilot/Code | Acceptance/Test Gate | Evidence to Save |
+| --- | --- | --- | --- | --- |
+| UX principles (6) | Validate visual direction and hierarchy choices across all frames. | Enforce via tokens, spacing, component behavior decisions. | QA prompt: flag any screen violating principles. | One-page checklist of principle pass/fail per flow. |
+| IA map (tabs + subflows) | Create top-level navigation, route groups, and screen sequence. | Map to route files and navigation config (Expo Router). | Navigation smoke test: all primary paths reachable. | IA-to-route mapping sheet. |
+| Journey spec: onboarding | Build frame sequence from first open to first successful booking. | Implement onboarding screens, states, and transitions. | Tap-count check + empty/error/no-access states covered. | Journey screenshot strip with state frames. |
+| Journey spec: discovery | Create search/filter/list/detail frames and edge-state frames. | Implement discovery list/detail components and filters UI. | Query/loading/empty/error behavior test. | Before/after QA notes for discovery flow. |
+| Journey spec: booking | Build date/time, confirmation, and trust-signal screens. | Implement booking UI states using existing booking logic hooks. | Happy path under 6 taps where feasible. | Booking flow test cases and pass status. |
+| Journey spec: loyalty | Build rewards balance/progress/redemption frames. | Implement loyalty widgets/cards with reusable components. | State coverage: no data, partial data, unavailable. | Loyalty acceptance checklist. |
+| Journey spec: profile/account | Build profile, settings, and account history frames. | Implement profile modules with existing provider data. | Accessibility check: labels, touch targets, contrast. | Profile QA report. |
+| Component inventory + states | Build components page with all variants and states. | Create shared UI primitives in src/shared/ui and wire tokens. | Component tests: render/state snapshots. | Component inventory parity list (spec vs code). |
+| Open product decisions | Mark unresolved items in Figma notes and handoff doc. | Create TODO list; do not hardcode unresolved behavior. | Product owner sign-off before merge. | Decisions log with owner and due date. |
+
+### Slice Execution Loop (Repeat Weekly)
+1. Select one journey row from the table.
+2. Build Figma frames and all required states.
+3. Run Design QA prompt and fix critical/high issues.
+4. Freeze handoff package for that slice.
+5. Implement via Copilot prompt using frozen specs only.
+6. Run tests and acceptance checklist.
+7. Log output and key prompts in diary.
+
+### Definition of Ready (Before Developers Start)
+1. Journey has happy path + edge cases documented.
+2. Figma includes loading/empty/error/no-access states.
+3. Components are mapped to existing or new shared primitives.
+4. Open decisions are either resolved or explicitly blocked.
+5. Acceptance checklist exists for this slice.
+
+---
+
+## Strict 10-Minute Figma QA Checklist (Per Batch)
+Run this immediately after each Figma batch and before developer handoff.
+
+### QA Prompt (Copy/Paste)
+```text
+Run a strict QA on this Figma flow for Zarkili (Gen-Z beauty booking app).
+
+Review scope:
+- Flow under review: [Onboarding / Discovery / Booking / Loyalty / Profile]
+- Platform: iOS mobile
+- Design system: token-based
+- Required states: loading, empty, error, no-access
+
+Return output in this exact format:
+
+1) Critical Failures (must fix before handoff)
+- [Screen]
+   - Issue:
+   - Why critical:
+   - Exact fix:
+
+2) High Issues (fix this iteration)
+- [Screen]
+   - Issue:
+   - Exact fix:
+
+3) Medium Improvements (next iteration)
+- [Screen]
+   - Improvement:
+   - Suggested enhancement:
+
+4) Checklist Scorecard (Pass/Fail per item)
+A. Visual Consistency
+- Uses existing components only
+- No new ad-hoc styles
+- Spacing follows 4/8 scale
+- Radius and elevation consistent
+- Typography hierarchy consistent
+
+B. UX Clarity
+- One primary CTA per screen
+- Secondary actions de-emphasized
+- Screen intent understood in < 1 second
+- No unnecessary decision points
+
+C. Conversion Friction
+- Happy path tap count: [number]
+- Any redundant step? [yes/no + where]
+- Any avoidable modal/dialog? [yes/no + where]
+
+D. State Coverage
+- Loading present
+- Empty present
+- Error present
+- No-access present
+
+E. Accessibility
+- Contrast meets WCAG AA
+- All touch targets >= 44px
+- Icon-only actions have labels
+- No color-only meaning
+
+5) Final Decision
+- Status: PASS / PASS WITH FIXES / FAIL
+- Ship-readiness score: X/10
+- Top 3 required actions before developer handoff
+```
+
+### Fast Accept Rule
+1. `FAIL` if any critical issue exists.
+2. `PASS WITH FIXES` if only high/medium issues exist and none block core flow.
+3. `PASS` only if all critical/high issues are resolved, all required states exist, accessibility checks are green, and happy-path friction target is met.
+
+### Suggested Targets by Flow
+1. Onboarding: first meaningful completion in <= 5 taps.
+2. Discovery: filter-to-result refinement in <= 3 interactions.
+3. Booking: service detail to confirmation in <= 6 taps.
+4. Loyalty: points understanding in <= 2 seconds visual scan.
+5. Profile: key action access (history/settings/support) in <= 2 taps.
+
+---
+
 ## Next Actions (Start Today)
 1. Run the GPT-5.3-Codex Product and UX Direction prompt
 2. Run the research prompt and capture references

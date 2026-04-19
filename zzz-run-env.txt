@@ -1,2 +1,23 @@
 Development: npm run start:dev
 Production: npm run start:prod
+
+--------------------------------------------------
+Daily Diary prompt
+
+Use this exact prompt at the end of each chat:
+
+End-of-day diary update for this chat.
+
+End-of-day diary update for this chat.
+
+Use the template at DAILY_WORK_DIARY_TEMPLATE.md.
+Save to documentation/diary/YYYY-MM-DD-CHATNAME.md.
+If the file exists, append only. Never overwrite existing content.
+Summarize only work completed today in this chat.
+Fill all sections from the template.
+At the very end, add:
+Key Prompts Used Today
+For each key prompt include: Tool, Purpose, Prompt summary (1 line each).
+Keep it concise, concrete, and decision-focused.
+If CHATNAME is missing, ask me before writing.
+--------------------------------------------------
