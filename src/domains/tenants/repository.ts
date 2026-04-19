@@ -11,15 +11,80 @@ import {
   type Firestore,
 } from "firebase/firestore";
 
+import { fallbackLanguage, type SupportedLanguage } from "../../shared/i18n";
+
 import type { CreateTenantInput, Tenant, UpdateTenantInput } from "./model";
 
 const COLLECTION = "tenants";
+
+const croatianMarkets = new Set(["HR"]);
+const spanishMarkets = new Set([
+  "ES",
+  "AR",
+  "MX",
+  "CO",
+  "PE",
+  "CL",
+  "UY",
+  "PY",
+  "BO",
+  "VE",
+  "EC",
+  "CR",
+  "PA",
+  "DO",
+  "GT",
+  "HN",
+  "NI",
+  "SV",
+  "CU",
+]);
+
+function normalizeCountryCode(country: string): string {
+  return country.trim().toUpperCase();
+}
+
+function getTimezoneLanguageSeed(timezone: string): SupportedLanguage | null {
+  const normalizedTimezone = timezone.trim().toLowerCase();
+  if (normalizedTimezone.includes("zagreb")) {
+    return "hr";
+  }
+
+  if (normalizedTimezone.includes("madrid") || normalizedTimezone.includes("buenos_aires")) {
+    return "es";
+  }
+
+  return null;
+}
+
+export function resolveTenantDefaultLanguage(input: Pick<CreateTenantInput, "country" | "timezone" | "defaultLanguage">): SupportedLanguage {
+  if (input.defaultLanguage) {
+    return input.defaultLanguage;
+  }
+
+  const countryCode = normalizeCountryCode(input.country);
+  if (croatianMarkets.has(countryCode)) {
+    return "hr";
+  }
+
+  if (spanishMarkets.has(countryCode)) {
+    return "es";
+  }
+
+  const timezoneSeed = getTimezoneLanguageSeed(input.timezone);
+  if (timezoneSeed) {
+    return timezoneSeed;
+  }
+
+  return fallbackLanguage;
+}
 
 function validateCreateInput(input: CreateTenantInput): void {
   if (!input.name?.trim()) throw new Error("Tenant name is required");
   if (!input.slug?.trim()) throw new Error("Tenant slug is required");
   if (!input.ownerUserId?.trim()) throw new Error("Tenant ownerUserId is required");
   if (!input.timezone?.trim()) throw new Error("Tenant timezone is required");
+  if (!input.country?.trim()) throw new Error("Tenant country is required");
 }
 
 function validateUpdateInput(input: UpdateTenantInput): void {
@@ -46,6 +111,7 @@ export function createTenantRepository(db: Firestore) {
 
     const data = {
       ...input,
+      defaultLanguage: resolveTenantDefaultLanguage(input),
       tenantId,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),

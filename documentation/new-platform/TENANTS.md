@@ -13,6 +13,8 @@ Core fields:
 - `status` (`active | suspended | inactive`)
 - `ownerUserId`
 - `plan` (`free_trial | starter | professional | enterprise`)
+- `country`
+- `defaultLanguage` (`en | hr | es`)
 - `timezone`
 - `branding`
 - `settings`
@@ -24,6 +26,8 @@ Implemented in `src/domains/tenants/repository.ts`.
 
 - `createTenant(tenantId, input)`
   - Validates required input fields.
+  - Auto-seeds `defaultLanguage` from market/region (`country`, then `timezone`) when missing.
+  - Falls back to English (`en`) when no market/region mapping matches.
   - Fails if tenant document already exists.
 - `getTenantById(tenantId)`
   - Returns tenant or `null`.
@@ -39,6 +43,7 @@ Implemented in `src/domains/tenants/repository.ts`.
 - Create/update input is validated before persistence.
 - Repository surface is deterministic and test-covered with mocked Firestore.
 - Tenant-level access control still depends on Firestore rules and caller-level role checks.
+- Market/region language seeding currently maps Croatia -> `hr`, Spanish-speaking markets -> `es`, and unknown markets -> `en`.
 
 ## Tests
 - `src/domains/tenants/__tests__/repository.test.ts`

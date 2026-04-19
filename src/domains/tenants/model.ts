@@ -1,5 +1,7 @@
 import { Timestamp } from "firebase/firestore";
 
+import type { SupportedLanguage } from "../../shared/i18n";
+
 export type TenantStatus = "active" | "suspended" | "inactive";
 
 export type TenantPlan = "free_trial" | "starter" | "professional" | "enterprise";
@@ -30,7 +32,7 @@ export type Tenant = {
   ownerUserId: string;
   plan: TenantPlan;
   country: string;
-  defaultLanguage: string;
+  defaultLanguage: SupportedLanguage;
   defaultCurrency: string;
   timezone: string;
   branding: TenantBranding;
@@ -39,7 +41,9 @@ export type Tenant = {
   updatedAt: Timestamp;
 };
 
-export type CreateTenantInput = Omit<Tenant, "tenantId" | "createdAt" | "updatedAt">;
+export type CreateTenantInput = Omit<Tenant, "tenantId" | "createdAt" | "updatedAt" | "defaultLanguage"> & {
+  defaultLanguage?: SupportedLanguage;
+};
 
 export type UpdateTenantInput = Partial<
   Pick<Tenant, "name" | "slug" | "status" | "plan" | "country" | "defaultLanguage" | "defaultCurrency" | "timezone" | "branding" | "settings">

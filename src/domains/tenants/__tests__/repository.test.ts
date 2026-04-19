@@ -1,4 +1,4 @@
-import { createTenantRepository } from "../repository";
+import { createTenantRepository, resolveTenantDefaultLanguage } from "../repository";
 import type { CreateTenantInput } from "../model";
 
 // ---------------------------------------------------------------------------
@@ -169,6 +169,55 @@ describe("TenantRepository", () => {
       await expect(repo.createTenant("tenantA", makeInput())).rejects.toThrow(
         "Tenant with id tenantA already exists"
       );
+    });
+
+    it("auto-seeds Croatian default language from country market when missing", async () => {
+      const tenant = await repo.createTenant(
+        "tenantA",
+        makeInput({ country: "HR", defaultLanguage: undefined })
+      );
+
+      expect(tenant.defaultLanguage).toBe("hr");
+    });
+
+    it("auto-seeds Spanish default language from country market when missing", async () => {
+      const tenant = await repo.createTenant(
+        "tenantA",
+        makeInput({ country: "ES", defaultLanguage: undefined })
+      );
+
+      expect(tenant.defaultLanguage).toBe("es");
+    });
+
+    it("falls back to English for unknown market when language is missing", async () => {
+      const tenant = await repo.createTenant(
+        "tenantA",
+        makeInput({ country: "DE", timezone: "Europe/Berlin", defaultLanguage: undefined })
+      );
+
+      expect(tenant.defaultLanguage).toBe("en");
+    });
+  });
+
+  describe("resolveTenantDefaultLanguage", () => {
+    it("prefers explicit language override", () => {
+      const language = resolveTenantDefaultLanguage({
+        country: "HR",
+        timezone: "Europe/Zagreb",
+        defaultLanguage: "es",
+      });
+
+      expect(language).toBe("es");
+    });
+
+    it("uses timezone seed when market code is unknown", () => {
+      const language = resolveTenantDefaultLanguage({
+        country: "XX",
+        timezone: "Europe/Madrid",
+        defaultLanguage: undefined,
+      });
+
+      expect(language).toBe("es");
     });
   });
 
