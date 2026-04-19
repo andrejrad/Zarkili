@@ -26,6 +26,16 @@ AI features must be:
 - Non-predatory  
 - Designed to increase revenue and reduce admin work  
 
+### 1.1 Implementation Approach (Platform Decision)
+
+1. AI is operated as a **platform backend service**; salons and clients do not need their own ChatGPT/Claude subscriptions.
+2. The platform uses provider API keys (starting with OpenAI) from secure server-side infrastructure only.
+3. v1 uses prompt + rules + retrieval + explainability contracts; we do **not** train foundation models from scratch.
+4. Fine-tuning is optional and only considered later if prompt/rules/retrieval tuning cannot close measurable quality gaps.
+5. All AI features must include human-override paths for high-risk or low-confidence outcomes.
+
+Reference policy: `documentation/new-platform/AI_RUNTIME_AND_COST_POLICY.md`
+
 ---
 
 ## 2. AI Feature Categories

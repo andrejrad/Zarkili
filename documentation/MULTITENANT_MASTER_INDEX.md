@@ -63,6 +63,9 @@ It links all generated strategy and execution documents and gives an exact run o
 16. AI implementation coverage matrix (new)
 - [new-platform/AI_FEATURES_IMPLEMENTATION_COVERAGE_MATRIX.md](new-platform/AI_FEATURES_IMPLEMENTATION_COVERAGE_MATRIX.md)
 
+17. AI runtime and cost policy (new)
+- [new-platform/AI_RUNTIME_AND_COST_POLICY.md](new-platform/AI_RUNTIME_AND_COST_POLICY.md)
+
 ---
 
 ## Recommended Reading Order (First Session)
