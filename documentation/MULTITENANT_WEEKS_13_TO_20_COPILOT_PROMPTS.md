@@ -282,6 +282,78 @@ Return:
 Review prompt:
 Review AI assistants for policy violations, weak explainability, and unauthorized auto-send behavior.
 
+## Task 19.3 - AI Service Recommendations Engine v1
+Prompt:
+Implement AI service recommendation engine for booking, salon profile, and marketplace surfaces.
+Requirements:
+1. Add recommendation service using tenant-safe signals: booking history, service affinity, style tags, and saved interactions.
+2. Return explainable outputs per recommendation: `reasonCodes`, `confidence`, `sourceSignals`.
+3. Add client-side integration points for booking flow and salon profile upsell/add-on suggestions.
+4. Add salon-side recommendation insights for upsell/package suggestions.
+5. Enforce safeguards: no unavailable services, no out-of-price-policy suggestions, no inappropriate category output.
+6. Add tests for relevance fallback, unavailable-service filtering, and safeguard policy enforcement.
+Return:
+- files changed
+- recommendation contract summary
+- explainability output example
+
+Review prompt:
+Review service recommendation engine for unsafe suggestions, weak explainability, and cross-tenant context leakage.
+
+## Task 19.4 - AI Marketing Automation Orchestrator v1
+Prompt:
+Implement AI-driven marketing orchestration for retention and rebooking automation.
+Requirements:
+1. Add trigger orchestration for time-based, behavior-based, booking-based, no-show-based, and loyalty-based triggers.
+2. Add channel orchestration for push/email/sms/in-app with send-window constraints and anti-spam frequency caps.
+3. Support tone/profile controls and human approval mode with optional auto-send configuration per campaign type.
+4. Enforce consent and opt-out checks before every dispatch attempt.
+5. Add suppression rules for quiet hours and duplicate-trigger dedupe/idempotency behavior.
+6. Add tests for trigger eligibility, opt-out safety, quiet-hour suppression, and approval-mode enforcement.
+Return:
+- files changed
+- orchestration flow summary
+- policy safeguards implemented
+
+Review prompt:
+Review marketing automation for spam risk, consent bypass, policy-unsafe sends, and missing human-override controls.
+
+## Task 19.5 - AI Retention and Insights Copilot v1
+Prompt:
+Implement AI retention scoring and action-oriented insight generation.
+Requirements:
+1. Add retention risk scoring outputs: at-risk probability, likely churn horizon, and suggested intervention actions.
+2. Add explainable insight cards for salon admins with `reasonCodes`, `confidence`, and recommended next actions.
+3. Add automated action queue generation (review/approve/send) rather than direct forced sends.
+4. Add fairness safeguards: no sensitive-attribute inference, no protected-group targeting logic.
+5. Add tests for explainability presence, fallback behavior when signals are weak, and policy-safe action generation.
+6. Document in `documentation/new-platform/AI_RETENTION_INSIGHTS.md`.
+Return:
+- files changed
+- scoring and insights contract
+- action queue summary
+
+Review prompt:
+Review retention and insights copilot for black-box behavior, policy violations, and non-actionable recommendations.
+
+## Task 19.6 - AI Scheduling Optimization Engine v1
+Prompt:
+Implement scheduling optimization engine for client suggestions and salon-side operational optimization.
+Requirements:
+1. Add client-side slot ranking that optimizes for calendar gaps, staff utilization, and client preference history.
+2. Add salon-side optimization suggestions for staff assignment, buffer management, and overbooking prevention flags.
+3. Add smart rescheduling recommendations on cancellation events with replacement-slot and candidate outreach hooks.
+4. Enforce hard constraints: business hours, staff availability, service duration rules, and no double-booking.
+5. Add non-functional targets and instrumentation: recommendation latency target, fallback behavior, and observability counters.
+6. Add tests for constraint safety, double-book prevention, and rescheduling recommendation validity.
+Return:
+- files changed
+- optimization strategy summary
+- latency/fallback instrumentation notes
+
+Review prompt:
+Review scheduling optimization for rule-override risk, unsafe slot recommendations, and poor fallback under sparse data.
+
 ---
 
 ## Week 20 - AI Risk Models and Personalization

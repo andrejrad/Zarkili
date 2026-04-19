@@ -60,6 +60,9 @@ It links all generated strategy and execution documents and gives an exact run o
 15. Cross-platform capability matrix (new)
 - [new-platform/CROSS_PLATFORM_CAPABILITY_MATRIX.md](new-platform/CROSS_PLATFORM_CAPABILITY_MATRIX.md)
 
+16. AI implementation coverage matrix (new)
+- [new-platform/AI_FEATURES_IMPLEMENTATION_COVERAGE_MATRIX.md](new-platform/AI_FEATURES_IMPLEMENTATION_COVERAGE_MATRIX.md)
+
 ---
 
 ## Recommended Reading Order (First Session)

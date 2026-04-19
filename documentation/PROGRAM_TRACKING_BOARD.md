@@ -29,6 +29,10 @@ Card format:
 - [ ] B-001 | Marketplace phase 2 hardening | TBD | [MARKETPLACE_SPECS.md](MARKETPLACE_SPECS.md) | Week 14-16 | Updated 2026-04-17
 - [ ] B-002 | AI copilot phase 2 expansions | TBD | [AI_FEATURES_SPECS.md](AI_FEATURES_SPECS.md) | Week 18-20 | Updated 2026-04-17
 - [ ] B-003 | Advanced loyalty campaigns and multipliers | TBD | [LOYALTY_FUNCTIONAL_SPEC_V1.md](LOYALTY_FUNCTIONAL_SPEC_V1.md) | Post Week 8 | Updated 2026-04-17
+- [ ] B-004 | AI service recommendations engine v1 | TBD | [MULTITENANT_WEEKS_13_TO_20_COPILOT_PROMPTS.md](MULTITENANT_WEEKS_13_TO_20_COPILOT_PROMPTS.md) | Week 19 | Updated 2026-04-19
+- [ ] B-005 | AI marketing automation orchestrator v1 | TBD | [MULTITENANT_WEEKS_13_TO_20_COPILOT_PROMPTS.md](MULTITENANT_WEEKS_13_TO_20_COPILOT_PROMPTS.md) | Week 19 | Updated 2026-04-19
+- [ ] B-006 | AI retention and insights copilot v1 | TBD | [MULTITENANT_WEEKS_13_TO_20_COPILOT_PROMPTS.md](MULTITENANT_WEEKS_13_TO_20_COPILOT_PROMPTS.md) | Week 19 | Updated 2026-04-19
+- [ ] B-007 | AI scheduling optimization engine v1 | TBD | [MULTITENANT_WEEKS_13_TO_20_COPILOT_PROMPTS.md](MULTITENANT_WEEKS_13_TO_20_COPILOT_PROMPTS.md) | Week 19 | Updated 2026-04-19
 
 ## Ready
 - [ ] R-004 | Salon onboarding flow v1 | TBD | [SALON_ONBOARDING_SPECS.md](SALON_ONBOARDING_SPECS.md) | Week 6-8 | Updated 2026-04-17
