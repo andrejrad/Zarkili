@@ -32,6 +32,12 @@ jobs:
       - name: Tests
         run: npm run test -- --watch=false
 
+      - name: Web routing smoke tests
+        run: npm run test:smoke:web
+
+      - name: Native shell smoke tests
+        run: npm run test:smoke:native
+
       - name: Install Firebase CLI
         run: npm install -g firebase-tools
 

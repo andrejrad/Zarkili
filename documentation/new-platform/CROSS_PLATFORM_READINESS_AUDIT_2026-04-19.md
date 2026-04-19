@@ -24,7 +24,7 @@ Scope: Runtime architecture, app shell/navigation, domain layering, and delivery
 ### Medium
 2. No explicit platform capability matrix documented (native-only vs web-supported features).
 - Risk: accidental feature implementation that works on one platform only.
-- Status: documented architecture rules in this pass.
+- Status: resolved in this pass via `CROSS_PLATFORM_CAPABILITY_MATRIX.md`.
 
 3. Navigation documentation described guard behavior but did not define web runtime URL ownership.
 - Risk: inconsistent behavior as web routes expand.
@@ -38,7 +38,7 @@ Scope: Runtime architecture, app shell/navigation, domain layering, and delivery
 ### Low
 5. No explicit platform-specific testing matrix yet (native smoke + web smoke).
 - Risk: regressions can ship on one target unnoticed.
-- Status: pending; add targeted platform checks in CI later.
+- Status: resolved in this pass via CI smoke checks (`test:smoke:web`, `test:smoke:native`).
 
 ## Gap-to-Action Plan
 1. Keep route contracts as source of truth and make shell own URL sync on web.
@@ -59,6 +59,6 @@ Scope: Runtime architecture, app shell/navigation, domain layering, and delivery
 3. Platform test matrix is not yet formalized in CI.
 
 ## Recommended Next Steps
-1. Add web routing smoke tests for path resolve, redirect, and popstate behavior.
-2. Introduce a cross-platform capability matrix document (camera, push, notifications, payments, deep links).
+1. Expand smoke checks to include keyboard/focus accessibility coverage on web.
+2. Introduce capability guards when implementing camera/push/biometric features.
 3. Start Week 2.4 UI with responsive tokens and platform interaction acceptance checks.

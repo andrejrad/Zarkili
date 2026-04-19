@@ -57,6 +57,9 @@ It links all generated strategy and execution documents and gives an exact run o
 14. AI-first Gen-Z design playbook (new)
 - [AI_FIRST_GENZ_DESIGN_PLAYBOOK.md](AI_FIRST_GENZ_DESIGN_PLAYBOOK.md)
 
+15. Cross-platform capability matrix (new)
+- [new-platform/CROSS_PLATFORM_CAPABILITY_MATRIX.md](new-platform/CROSS_PLATFORM_CAPABILITY_MATRIX.md)
+
 ---
 
 ## Recommended Reading Order (First Session)

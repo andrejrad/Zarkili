@@ -15,6 +15,8 @@
     "typecheck": "tsc --noEmit",
     "test": "jest",
     "test:watch": "jest --watch",
+    "test:smoke:web": "jest --watch=false --runInBand --runTestsByPath src/app/navigation/__tests__/AppNavigatorShell.webRouting.test.tsx",
+    "test:smoke:native": "jest --watch=false --runInBand --runTestsByPath src/app/navigation/__tests__/AppNavigatorShell.test.tsx",
     "test:rules": "firebase emulators:exec --only firestore \"jest --config jest.rules.config.js --runInBand --runTestsByPath __tests__/firestore.rules.test.ts\"",
     "check": "npm run lint && npm run typecheck && npm run test -- --watch=false",
     "firebase:emulators": "firebase emulators:start --project zarkili-dev",
