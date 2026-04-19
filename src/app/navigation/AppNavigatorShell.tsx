@@ -1,16 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-import type {
-  AiBudgetAdminService,
-  UpdateAiBudgetConfigInput,
-} from "../../domains/ai";
+import type { AiBudgetAdminService, UpdateAiBudgetConfigInput } from "../../domains/ai";
 import { useAuth } from "../providers/AuthProvider";
 import { useLanguage } from "../providers/LanguageProvider";
 import { useTenant } from "../providers/TenantProvider";
 import type { TenantMembership } from "../../domains/auth";
 import { featureFlags } from "../../shared/config/featureFlags";
-import { useAiBudgetAdminSettings } from "../settings/useAiBudgetAdminSettings";
+import { OwnerAiBudgetSettingsScreen } from "../settings/OwnerAiBudgetSettingsScreen";
 
 import {
   appRoutes,
@@ -144,15 +141,6 @@ export function AppNavigatorShell({
     [aiBudgetAdminService]
   );
 
-  const {
-    config: ownerAiBudgetConfig,
-    loading: ownerAiBudgetLoading,
-    updating: ownerAiBudgetUpdating,
-    error: ownerAiBudgetError,
-    refresh: refreshOwnerAiBudget,
-    updateConfig: updateOwnerAiBudget,
-  } = useAiBudgetAdminSettings(userId, settingsService);
-
   const persistence = useMemo(
     () => onboardingProgressPersistence ?? createFirestoreOnboardingProgressPersistence(),
     [onboardingProgressPersistence]
@@ -230,9 +218,14 @@ export function AppNavigatorShell({
       }
 
       try {
-        const resolver =
-          isPlatformAdminUser ??
-          (async (candidateUserId: string) => candidateUserId === "dev-user");
+        const resolver = isPlatformAdminUser;
+        if (!resolver) {
+          if (!cancelled) {
+            setIsPlatformAdmin(false);
+          }
+          return;
+        }
+
         const nextValue = await resolver(userId);
         if (!cancelled) {
           setIsPlatformAdmin(nextValue);
@@ -321,20 +314,6 @@ export function AppNavigatorShell({
 
   function openOwnerAiBudgetSettings() {
     navigate("OwnerAiBudgetSettings");
-  }
-
-  async function increaseSupportTriageCapByTen() {
-    if (!ownerAiBudgetConfig) {
-      return;
-    }
-
-    await updateOwnerAiBudget({
-      featureCaps: {
-        "support-triage": {
-          monthlyCapUsd: ownerAiBudgetConfig.featureCaps["support-triage"].monthlyCapUsd + 10,
-        },
-      },
-    });
   }
 
   function completeDevSignIn() {
@@ -549,45 +528,11 @@ export function AppNavigatorShell({
 
     if (activeRoute.name === "OwnerAiBudgetSettings") {
       return (
-        <>
-          <Text style={styles.screenTitle}>AI budget settings</Text>
-          <Text style={styles.screenBody}>
-            Owner-only controls for AI monthly caps and budget thresholds.
-          </Text>
-          {ownerAiBudgetLoading ? (
-            <Text style={styles.screenBody}>Loading AI budget config...</Text>
-          ) : null}
-          {ownerAiBudgetError ? <Text style={styles.guardText}>{ownerAiBudgetError}</Text> : null}
-          {ownerAiBudgetConfig ? (
-            <>
-              <Text style={styles.screenBody}>
-                Global cap USD: {ownerAiBudgetConfig.globalMonthlyCapUsd}
-              </Text>
-              <Text style={styles.screenBody}>
-                Support triage cap USD: {ownerAiBudgetConfig.featureCaps["support-triage"].monthlyCapUsd}
-              </Text>
-            </>
-          ) : null}
-          <TouchableOpacity
-            accessibilityRole="button"
-            onPress={() => void refreshOwnerAiBudget()}
-            style={styles.button}
-          >
-            <Text style={styles.buttonText}>Refresh budget config</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            accessibilityRole="button"
-            onPress={() => void increaseSupportTriageCapByTen()}
-            style={styles.buttonSecondary}
-          >
-            <Text style={styles.buttonText}>
-              {ownerAiBudgetUpdating ? "Updating..." : "Increase support triage cap (+10)"}
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity accessibilityRole="button" onPress={() => navigate("AppShell")} style={styles.buttonSecondary}>
-            <Text style={styles.buttonText}>{t("action.back")}</Text>
-          </TouchableOpacity>
-        </>
+        <OwnerAiBudgetSettingsScreen
+          userId={userId}
+          service={settingsService}
+          onBack={() => navigate("AppShell")}
+        />
       );
     }
 
