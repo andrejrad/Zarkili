@@ -134,6 +134,90 @@ describe("Firestore multi-tenant rules", () => {
     );
   });
 
+  it("blocks tenant_admin from creating tenant_owner membership", async () => {
+    await seedTenantMembership("tenantA", "adminA", "tenant_admin");
+
+    const db = testEnv.authenticatedContext("adminA").firestore();
+
+    await assertFails(
+      db.doc("tenantUsers/tenantA_ownerB").set({
+        tenantId: "tenantA",
+        userId: "ownerB",
+        role: "tenant_owner",
+        status: "active"
+      })
+    );
+  });
+
+  it("blocks tenant user membership create when document id does not match tenant and user", async () => {
+    await seedTenantMembership("tenantA", "ownerA", "tenant_owner");
+
+    const db = testEnv.authenticatedContext("ownerA").firestore();
+
+    await assertFails(
+      db.doc("tenantUsers/wrong_id").set({
+        tenantId: "tenantA",
+        userId: "staffA",
+        role: "technician",
+        status: "active"
+      })
+    );
+  });
+
+  it("blocks tenant_admin from promoting a membership to tenant_owner", async () => {
+    await seedTenantMembership("tenantA", "adminA", "tenant_admin");
+
+    await testEnv.withSecurityRulesDisabled(async (context) => {
+      await context.firestore().doc("tenantUsers/tenantA_staffA").set({
+        tenantId: "tenantA",
+        userId: "staffA",
+        role: "technician",
+        status: "active"
+      });
+    });
+
+    const db = testEnv.authenticatedContext("adminA").firestore();
+
+    await assertFails(
+      db.doc("tenantUsers/tenantA_staffA").set(
+        {
+          role: "tenant_owner",
+          status: "active",
+          tenantId: "tenantA",
+          userId: "staffA"
+        },
+        { merge: true }
+      )
+    );
+  });
+
+  it("allows tenant_owner to promote membership to tenant_owner", async () => {
+    await seedTenantMembership("tenantA", "ownerA", "tenant_owner");
+
+    await testEnv.withSecurityRulesDisabled(async (context) => {
+      await context.firestore().doc("tenantUsers/tenantA_adminA").set({
+        tenantId: "tenantA",
+        userId: "adminA",
+        role: "tenant_admin",
+        status: "active"
+      });
+    });
+
+    const db = testEnv.authenticatedContext("ownerA").firestore();
+
+    await assertSucceeds(
+      db.doc("tenantUsers/tenantA_adminA").set(
+        {
+          role: "tenant_owner",
+          status: "active",
+          tenantId: "tenantA",
+          userId: "adminA"
+        },
+        { merge: true }
+      )
+    );
+  });
+
   it("allows user to create and read own onboarding draft", async () => {
     await seedTenantMembership("tenantA", "clientA", "client");
 

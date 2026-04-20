@@ -29,6 +29,18 @@ service cloud.firestore {
       return hasTenantRole(tenantId, ['tenant_owner', 'tenant_admin', 'location_manager']);
     }
 
+    function isTenantOwnerOrAdmin(tenantId) {
+      return hasTenantRole(tenantId, ['tenant_owner', 'tenant_admin']);
+    }
+
+    function isValidTenantUserRole(role) {
+      return role in ['tenant_owner', 'tenant_admin', 'location_manager', 'technician', 'client'];
+    }
+
+    function isValidTenantUserStatus(status) {
+      return status in ['active', 'inactive'];
+    }
+
     function isSameTenantWriteOnCreate() {
       return request.resource.data.tenantId is string;
     }
@@ -64,14 +76,42 @@ service cloud.firestore {
         || (
           request.resource.data.tenantId is string
           && request.resource.data.userId is string
-          && isTenantAdmin(request.resource.data.tenantId)
+          && tenantUserId == request.resource.data.tenantId + '_' + request.resource.data.userId
+          && isValidTenantUserRole(request.resource.data.role)
+          && isValidTenantUserStatus(request.resource.data.status)
+          && isTenantOwnerOrAdmin(request.resource.data.tenantId)
+          && (
+            tenantRole(request.resource.data.tenantId) == 'tenant_owner'
+            || request.resource.data.role != 'tenant_owner'
+          )
         );
 
-      allow update, delete: if isPlatformAdmin()
+      allow update: if isPlatformAdmin()
         || (
           resource.data.tenantId is string
           && request.resource.data.tenantId == resource.data.tenantId
-          && isTenantAdmin(resource.data.tenantId)
+          && request.resource.data.userId == resource.data.userId
+          && tenantUserId == resource.data.tenantId + '_' + resource.data.userId
+          && isValidTenantUserRole(request.resource.data.role)
+          && isValidTenantUserStatus(request.resource.data.status)
+          && isTenantOwnerOrAdmin(resource.data.tenantId)
+          && (
+            tenantRole(resource.data.tenantId) == 'tenant_owner'
+            || (
+              resource.data.role != 'tenant_owner'
+              && request.resource.data.role != 'tenant_owner'
+            )
+          )
+        );
+
+      allow delete: if isPlatformAdmin()
+        || (
+          resource.data.tenantId is string
+          && isTenantOwnerOrAdmin(resource.data.tenantId)
+          && (
+            tenantRole(resource.data.tenantId) == 'tenant_owner'
+            || resource.data.role != 'tenant_owner'
+          )
         );
     }
 

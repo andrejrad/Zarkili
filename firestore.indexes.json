@@ -161,6 +161,20 @@
       ]
     },
     {
+      "collectionGroup": "tenantUsers",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "userId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
       "collectionGroup": "platformAuditLogs",
       "queryScope": "COLLECTION",
       "fields": [
@@ -178,6 +192,24 @@
       "collectionGroup": "platformAuditLogs",
       "queryScope": "COLLECTION",
       "fields": [
+        {
+          "fieldPath": "targetPath",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "platformAuditLogs",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "eventType",
+          "order": "ASCENDING"
+        },
         {
           "fieldPath": "targetPath",
           "order": "ASCENDING"
