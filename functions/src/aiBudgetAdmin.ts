@@ -49,6 +49,12 @@ type UpdateAiBudgetConfigInput = {
   reason?: string;
 };
 
+type ListAiBudgetAuditLogsInput = {
+  limit: number;
+  eventType?: string;
+  targetPath?: string;
+};
+
 const DEFAULT_AI_BUDGET_CONFIG: AiBudgetGuardConfig = {
   globalMonthlyCapUsd: 1090,
   warningThreshold: 0.7,
@@ -184,6 +190,54 @@ function parsePatch(data: unknown): UpdateAiBudgetConfigInput {
   return input;
 }
 
+function parseListAuditLogsInput(data: unknown): ListAiBudgetAuditLogsInput {
+  if (data === undefined || data === null) {
+    return { limit: 20 };
+  }
+
+  if (typeof data !== "object") {
+    throw new HttpsError("invalid-argument", "Payload must be an object");
+  }
+
+  const input = data as {
+    limit?: unknown;
+    eventType?: unknown;
+    targetPath?: unknown;
+  };
+
+  const parsed: ListAiBudgetAuditLogsInput = {
+    limit: 20,
+  };
+
+  if (input.limit !== undefined) {
+    if (
+      typeof input.limit !== "number" ||
+      !Number.isInteger(input.limit) ||
+      input.limit < 1 ||
+      input.limit > 100
+    ) {
+      throw new HttpsError("invalid-argument", "limit must be an integer within [1, 100]");
+    }
+    parsed.limit = input.limit;
+  }
+
+  if (input.eventType !== undefined) {
+    if (typeof input.eventType !== "string" || input.eventType.trim().length === 0) {
+      throw new HttpsError("invalid-argument", "eventType must be a non-empty string when provided");
+    }
+    parsed.eventType = input.eventType.trim();
+  }
+
+  if (input.targetPath !== undefined) {
+    if (typeof input.targetPath !== "string" || input.targetPath.trim().length === 0) {
+      throw new HttpsError("invalid-argument", "targetPath must be a non-empty string when provided");
+    }
+    parsed.targetPath = input.targetPath.trim();
+  }
+
+  return parsed;
+}
+
 function getCurrentConfigFromTxn(txn: Transaction, firestore: Firestore) {
   const configRef = firestore.doc(PLATFORM_CONFIG_PATH);
   return txn.get(configRef).then((snapshot) => {
@@ -265,4 +319,43 @@ export const updateAiBudgetConfigAdmin = onCall(async (request) => {
   });
 
   return result;
+});
+
+export const listAiBudgetAuditLogsAdmin = onCall(async (request) => {
+  assertPlatformAdmin(request);
+  const input = parseListAuditLogsInput(request.data);
+
+  let query = db.collection(PLATFORM_AUDIT_COLLECTION).orderBy("createdAt", "desc");
+
+  if (input.eventType) {
+    query = query.where("eventType", "==", input.eventType);
+  }
+
+  if (input.targetPath) {
+    query = query.where("targetPath", "==", input.targetPath);
+  }
+
+  const snapshot = await query.limit(input.limit).get();
+
+  const items = snapshot.docs.map((doc) => {
+    const data = doc.data() as DocumentData;
+    return {
+      id: doc.id,
+      eventType: data.eventType ?? null,
+      actorUserId: data.actorUserId ?? null,
+      targetPath: data.targetPath ?? null,
+      reason: data.reason ?? null,
+      createdAt: data.createdAt ?? null,
+    };
+  });
+
+  return {
+    items,
+    count: items.length,
+    limit: input.limit,
+    filters: {
+      eventType: input.eventType ?? null,
+      targetPath: input.targetPath ?? null,
+    },
+  };
 });

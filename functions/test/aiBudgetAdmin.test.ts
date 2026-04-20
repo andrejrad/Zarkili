@@ -33,6 +33,8 @@ type TestState = {
   txnSnapshot: ConfigSnapshot;
   txSetCalls: TxSetCall[];
   auditLogId: string;
+  auditQueryDocs: Array<{ id: string; data: Record<string, unknown> }>;
+  auditQueryCalls: Array<{ method: string; args: unknown[] }>;
 };
 
 const testState: TestState = {
@@ -47,7 +49,9 @@ const testState: TestState = {
     })
   },
   txSetCalls: [],
-  auditLogId: "audit-log-1"
+  auditLogId: "audit-log-1",
+  auditQueryDocs: [],
+  auditQueryCalls: []
 };
 
 const docGetMock = vi.fn(async () => testState.docSnapshot);
@@ -73,10 +77,52 @@ const collectionDocMock = vi.fn(() => ({
   path: `platformAuditLogs/${testState.auditLogId}`
 }));
 
-const collectionMock = vi.fn((path: string) => ({
-  path,
-  doc: collectionDocMock
-}));
+function createAuditQueryMock() {
+  const query = {
+    where: vi.fn((field: string, op: string, value: unknown) => {
+      testState.auditQueryCalls.push({
+        method: "where",
+        args: [field, op, value]
+      });
+      return query;
+    }),
+    orderBy: vi.fn((field: string, direction: string) => {
+      testState.auditQueryCalls.push({
+        method: "orderBy",
+        args: [field, direction]
+      });
+      return query;
+    }),
+    limit: vi.fn((value: number) => {
+      testState.auditQueryCalls.push({
+        method: "limit",
+        args: [value]
+      });
+      return query;
+    }),
+    get: vi.fn(async () => ({
+      docs: testState.auditQueryDocs.map((doc) => ({
+        id: doc.id,
+        data: () => doc.data
+      }))
+    }))
+  };
+
+  return query;
+}
+
+const collectionMock = vi.fn((path: string) => {
+  const auditQuery = createAuditQueryMock();
+
+  return {
+    path,
+    doc: collectionDocMock,
+    where: auditQuery.where,
+    orderBy: auditQuery.orderBy,
+    limit: auditQuery.limit,
+    get: auditQuery.get
+  };
+});
 
 const firestoreMock = {
   doc: docMock,
@@ -120,6 +166,10 @@ const getAiBudgetConfigAdmin = aiBudgetAdminModule.getAiBudgetConfigAdmin as (
 ) => Promise<Record<string, unknown>>;
 
 const updateAiBudgetConfigAdmin = aiBudgetAdminModule.updateAiBudgetConfigAdmin as (
+  request: Record<string, unknown>
+) => Promise<Record<string, unknown>>;
+
+const listAiBudgetAuditLogsAdmin = aiBudgetAdminModule.listAiBudgetAuditLogsAdmin as (
   request: Record<string, unknown>
 ) => Promise<Record<string, unknown>>;
 
@@ -169,6 +219,8 @@ describe("aiBudgetAdmin callable handlers", () => {
 
     testState.txSetCalls = [];
     testState.auditLogId = "audit-log-1";
+    testState.auditQueryDocs = [];
+    testState.auditQueryCalls = [];
 
     vi.clearAllMocks();
   });
@@ -191,6 +243,20 @@ describe("aiBudgetAdmin callable handlers", () => {
         data: {
           globalMonthlyCapUsd: 1200
         }
+      })
+    ).rejects.toMatchObject({ code: "permission-denied" });
+  });
+
+  it("rejects non-admin audit-log list requests", async () => {
+    await expect(
+      listAiBudgetAuditLogsAdmin({
+        auth: {
+          uid: "user-1",
+          token: {
+            role: "member"
+          }
+        },
+        data: {}
       })
     ).rejects.toMatchObject({ code: "permission-denied" });
   });
@@ -248,6 +314,76 @@ describe("aiBudgetAdmin callable handlers", () => {
         })
       )
     ).rejects.toMatchObject({ code: "invalid-argument" });
+  });
+
+  it("rejects audit-log list payloads with invalid limit", async () => {
+    await expect(
+      listAiBudgetAuditLogsAdmin(
+        adminRequest({
+          limit: 0
+        })
+      )
+    ).rejects.toMatchObject({ code: "invalid-argument" });
+  });
+
+  it("lists audit logs with filters and pagination", async () => {
+    testState.auditQueryDocs = [
+      {
+        id: "log-1",
+        data: {
+          eventType: "ai_budget_config_update",
+          actorUserId: "platform-admin-1",
+          targetPath: "platform/config",
+          reason: "manual adjustment",
+          createdAt: "ts-1"
+        }
+      },
+      {
+        id: "log-2",
+        data: {
+          eventType: "ai_budget_config_update",
+          actorUserId: "platform-admin-2",
+          targetPath: "platform/config",
+          reason: null,
+          createdAt: "ts-2"
+        }
+      }
+    ];
+
+    const result = await listAiBudgetAuditLogsAdmin(
+      adminRequest({
+        limit: 10,
+        eventType: "ai_budget_config_update",
+        targetPath: "platform/config"
+      })
+    );
+
+    expect(result.count).toBe(2);
+    expect(result.limit).toBe(10);
+    expect(result.items).toHaveLength(2);
+    expect(result.filters).toEqual({
+      eventType: "ai_budget_config_update",
+      targetPath: "platform/config"
+    });
+
+    expect(testState.auditQueryCalls).toEqual([
+      {
+        method: "orderBy",
+        args: ["createdAt", "desc"]
+      },
+      {
+        method: "where",
+        args: ["eventType", "==", "ai_budget_config_update"]
+      },
+      {
+        method: "where",
+        args: ["targetPath", "==", "platform/config"]
+      },
+      {
+        method: "limit",
+        args: [10]
+      }
+    ]);
   });
 
   it("writes updated config and audit log in one transaction", async () => {

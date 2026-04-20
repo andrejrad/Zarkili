@@ -1,7 +1,11 @@
 import { onRequest } from "firebase-functions/v2/https";
 import { setGlobalOptions } from "firebase-functions/v2";
 
-export { getAiBudgetConfigAdmin, updateAiBudgetConfigAdmin } from "./aiBudgetAdmin";
+export {
+  getAiBudgetConfigAdmin,
+  listAiBudgetAuditLogsAdmin,
+  updateAiBudgetConfigAdmin,
+} from "./aiBudgetAdmin";
 
 setGlobalOptions({ maxInstances: 10 });
 
