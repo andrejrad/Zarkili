@@ -14,6 +14,21 @@ type OwnerAiBudgetSettingsScreenProps = {
   onBack: () => void;
 };
 
+function formatAuditCreatedAt(value: unknown): string {
+  if (typeof value === "string" && value.trim().length > 0) {
+    return value;
+  }
+
+  if (value && typeof value === "object" && "toDate" in value) {
+    const dateMaybe = (value as { toDate?: () => Date }).toDate;
+    if (typeof dateMaybe === "function") {
+      return dateMaybe().toISOString();
+    }
+  }
+
+  return "n/a";
+}
+
 export function OwnerAiBudgetSettingsScreen({
   userId,
   service,
@@ -21,10 +36,14 @@ export function OwnerAiBudgetSettingsScreen({
 }: OwnerAiBudgetSettingsScreenProps) {
   const {
     config,
+    auditLogs,
+    auditLoadingMore,
+    auditHasMore,
     loading,
     updating,
     error,
     refresh,
+    loadMoreAuditLogs,
     updateConfig,
   } = useAiBudgetAdminSettings(userId, service);
 
@@ -64,6 +83,35 @@ export function OwnerAiBudgetSettingsScreen({
         </View>
       ) : null}
 
+      <View style={styles.auditSection}>
+        <Text style={styles.auditTitle}>Recent budget audit events</Text>
+        {loading ? <Text style={styles.auditItemMeta}>Loading audit history...</Text> : null}
+        {!loading && auditLogs.length === 0 ? (
+          <Text style={styles.auditItemMeta}>No audit events yet.</Text>
+        ) : null}
+        {auditLogs.map((item) => (
+          <View key={item.id} style={styles.auditItemCard}>
+            <Text style={styles.auditItemTitle}>{item.eventType ?? "unknown_event"}</Text>
+            <Text style={styles.auditItemMeta}>Target: {item.targetPath ?? "n/a"}</Text>
+            <Text style={styles.auditItemMeta}>Actor: {item.actorUserId ?? "n/a"}</Text>
+            <Text style={styles.auditItemMeta}>Reason: {item.reason ?? "n/a"}</Text>
+            <Text style={styles.auditItemMeta}>Created: {formatAuditCreatedAt(item.createdAt)}</Text>
+          </View>
+        ))}
+
+        {auditHasMore ? (
+          <TouchableOpacity
+            accessibilityRole="button"
+            onPress={() => void loadMoreAuditLogs()}
+            style={styles.buttonSecondary}
+          >
+            <Text style={styles.buttonText}>
+              {auditLoadingMore ? "Loading more..." : "Load more audit events"}
+            </Text>
+          </TouchableOpacity>
+        ) : null}
+      </View>
+
       <TouchableOpacity
         accessibilityRole="button"
         onPress={() => void refresh()}
@@ -101,6 +149,33 @@ const styles = StyleSheet.create({
     color: "#4b5563",
     textAlign: "center",
   },
+  auditSection: {
+    marginTop: 18,
+    width: "100%",
+  },
+  auditTitle: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#111827",
+    textAlign: "center",
+  },
+  auditItemCard: {
+    marginTop: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 8,
+    backgroundColor: "#f3f4f6",
+  },
+  auditItemTitle: {
+    fontSize: 14,
+    fontWeight: "700",
+    color: "#111827",
+  },
+  auditItemMeta: {
+    marginTop: 4,
+    fontSize: 12,
+    color: "#4b5563",
+  },
   button: {
     marginTop: 16,
     backgroundColor: "#111827",
@@ -118,6 +193,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "#f9fafb",
     fontWeight: "600",
+    textAlign: "center",
   },
   guardText: {
     marginTop: 10,

@@ -81,7 +81,8 @@ Card format:
 - [x] D-028 | Callable payload edge-case tests for feature caps, reason length, and threshold ordering | Copilot plus Andre | [new-platform/AI_RUNTIME_AND_COST_POLICY.md](new-platform/AI_RUNTIME_AND_COST_POLICY.md) | Completed | Updated 2026-04-20
 - [x] D-029 | Admin callable for paginated audit-log listing with filter validation and tests | Copilot plus Andre | [new-platform/AI_RUNTIME_AND_COST_POLICY.md](new-platform/AI_RUNTIME_AND_COST_POLICY.md) | Completed | Updated 2026-04-20
 - [x] D-030 | Cursor pagination for admin audit-log callable with nextPageToken validation and tests | Copilot plus Andre | [new-platform/AI_RUNTIME_AND_COST_POLICY.md](new-platform/AI_RUNTIME_AND_COST_POLICY.md) | Completed | Updated 2026-04-20
-- [x] D-031 | App-domain runtime wiring for paged audit-log admin retrieval via callable gateway | Copilot plus Andre | [new-platform/AI_RUNTIME_AND_COST_POLICY.md](new-platform/AI_RUNTIME_AND_COST_POLICY.md) | Completed | Updated 2026-04-20
+
+- [x] D-032 | Owner settings screen audit-history list with load-more pagination wiring | Copilot plus Andre | [new-platform/AI_RUNTIME_AND_COST_POLICY.md](new-platform/AI_RUNTIME_AND_COST_POLICY.md) | Completed | Updated 2026-04-20
 
 ---
 
