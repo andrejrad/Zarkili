@@ -83,7 +83,8 @@ Card format:
 - [x] D-030 | Cursor pagination for admin audit-log callable with nextPageToken validation and tests | Copilot plus Andre | [new-platform/AI_RUNTIME_AND_COST_POLICY.md](new-platform/AI_RUNTIME_AND_COST_POLICY.md) | Completed | Updated 2026-04-20
 
 
-- [x] D-033 | Owner settings test coverage for audit-history fetch and load-more behavior | Copilot plus Andre | [new-platform/AI_RUNTIME_AND_COST_POLICY.md](new-platform/AI_RUNTIME_AND_COST_POLICY.md) | Completed | Updated 2026-04-20
+
+- [x] D-034 | Hook-level error-path tests for owner audit-history refresh and load-more failures | Copilot plus Andre | [new-platform/AI_RUNTIME_AND_COST_POLICY.md](new-platform/AI_RUNTIME_AND_COST_POLICY.md) | Completed | Updated 2026-04-20
 
 ---
 
@@ -101,3 +102,4 @@ Use this cadence every week:
 1. Promote one Week 2-ready card into In Progress and assign owner.
 2. Keep no more than 2 cards in In Progress at once.
 3. Start Week 2.2 role-mapping and Week 2.3 location-admin UI planning after Week 2.1 handoff.
+
