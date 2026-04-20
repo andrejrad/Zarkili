@@ -263,6 +263,57 @@ Output as 6 representative UI tiles showing: home card layout, booking CTA butto
 
 ---
 
+## Route Selection Scorecard (A vs B vs C)
+Use this right after generating outputs for all three routes.
+
+### How to run (10 minutes)
+1. Generate 3-5 images per route.
+2. Pick the top 2 images from each route.
+3. Score each route against the criteria below (1 to 5 per criterion).
+4. Multiply score by weight.
+5. Select highest weighted total.
+6. If top two routes are within 5 points, run one tie-breaker round with 3 target users.
+
+### Scoring rubric
+| Criterion | Weight | What "1" means | What "5" means |
+| --- | --- | --- | --- |
+| Gen-Z resonance | 30 | Feels generic or dated | Feels current, expressive, and native to Gen-Z taste |
+| Booking clarity | 25 | Visual style reduces CTA clarity | Primary action is obvious in under 1 second |
+| Brand distinctiveness | 20 | Looks like any booking app | Instantly recognizable and ownable visual identity |
+| Accessibility readiness | 15 | Contrast and readability likely to fail | High readability and contrast across core screens |
+| Implementation feasibility | 10 | Requires heavy custom effort and risky UI | Easy to implement with reusable components/tokens |
+
+### Weighted score sheet (copy/paste)
+| Route | Gen-Z resonance (x30) | Booking clarity (x25) | Distinctiveness (x20) | Accessibility (x15) | Feasibility (x10) | Total |
+| --- | --- | --- | --- | --- | --- | --- |
+| Route A |  |  |  |  |  |  |
+| Route B |  |  |  |  |  |  |
+| Route C |  |  |  |  |  |  |
+
+### Hard fail gates (route is disqualified if any are true)
+1. Primary CTA is not visually dominant on sample screen compositions.
+2. Text contrast appears likely below WCAG AA for body text.
+3. Style depends on effects difficult to reproduce consistently in React Native.
+4. Team cannot define a stable token system from the route in one session.
+
+### Tie-breaker mini test (if needed)
+Show two top routes to 3 target users and ask:
+1. Which one would you trust to book and pay in right now?
+2. Which one feels more modern without feeling confusing?
+3. Which one is easier to scan quickly?
+
+Pick the route winning at least 2 of 3 questions in at least 2 of 3 participants.
+
+### Decision log template
+- Selected route:
+- Runner-up route:
+- Why selected (3 bullets):
+- Risks accepted:
+- Token implications:
+- Effective date:
+
+---
+
 ## 4) Figma AI — Screen Generation Prompt
 Goal: generate first-pass high-fidelity screens inside Figma using your chosen style route.
 Tool: Figma (with Figma AI / Make Designs feature, or via a plugin like Magician or Relume mobile).
