@@ -82,6 +82,20 @@ function createDeferredPromise<T>() {
 }
 
 describe("useAiBudgetAdminSettings", () => {
+  it("keeps empty state and reports unavailable service when userId or service is missing", async () => {
+    render(<HookProbe userId={null} service={null} />);
+
+    fireEvent.press(screen.getByText("refresh"));
+    fireEvent.press(screen.getByText("load-more"));
+
+    await waitFor(() => {
+      expect(screen.getByText("error:AI budget admin service is unavailable")).toBeTruthy();
+      expect(screen.getByText("loading:no")).toBeTruthy();
+      expect(screen.getByText("audit-count:0")).toBeTruthy();
+      expect(screen.getByText("audit-has-more:no")).toBeTruthy();
+    });
+  });
+
   it("surfaces refresh errors when first audit page fetch fails", async () => {
     const listBudgetAuditLogsForAdmin = jest.fn(async () => {
       throw new Error("audit list unavailable");
