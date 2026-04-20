@@ -2,6 +2,28 @@ import { createAiBudgetAdminService } from "../budgetAdminService";
 import type { AiBudgetConfigRepository } from "../budgetConfigRepository";
 
 describe("AiBudgetAdminService", () => {
+  function createAuditPageMock() {
+    return {
+      items: [
+        {
+          id: "log-1",
+          eventType: "ai_budget_config_update",
+          actorUserId: "owner1",
+          targetPath: "platform/config",
+          reason: "manual update",
+          createdAt: "ts-1",
+        },
+      ],
+      count: 1,
+      limit: 20,
+      nextPageToken: null,
+      filters: {
+        eventType: "ai_budget_config_update",
+        targetPath: "platform/config",
+      },
+    };
+  }
+
   function createRepositoryMock(): jest.Mocked<AiBudgetConfigRepository> {
     return {
       getBudgetConfig: jest.fn(async () => ({
@@ -41,9 +63,11 @@ describe("AiBudgetAdminService", () => {
 
   it("allows platform admin to read budget config", async () => {
     const repository = createRepositoryMock();
+    const listBudgetAuditLogs = jest.fn(async () => createAuditPageMock());
     const service = createAiBudgetAdminService({
       repository,
       isPlatformAdmin: async () => true,
+      listBudgetAuditLogs,
     });
 
     const result = await service.getBudgetConfigForAdmin({ userId: "owner1" });
@@ -54,9 +78,11 @@ describe("AiBudgetAdminService", () => {
 
   it("rejects non-admin actor for read", async () => {
     const repository = createRepositoryMock();
+    const listBudgetAuditLogs = jest.fn(async () => createAuditPageMock());
     const service = createAiBudgetAdminService({
       repository,
       isPlatformAdmin: async () => false,
+      listBudgetAuditLogs,
     });
 
     await expect(
@@ -68,9 +94,11 @@ describe("AiBudgetAdminService", () => {
 
   it("allows platform admin to update config", async () => {
     const repository = createRepositoryMock();
+    const listBudgetAuditLogs = jest.fn(async () => createAuditPageMock());
     const service = createAiBudgetAdminService({
       repository,
       isPlatformAdmin: async () => true,
+      listBudgetAuditLogs,
     });
 
     const result = await service.updateBudgetConfigForAdmin(
@@ -88,9 +116,11 @@ describe("AiBudgetAdminService", () => {
 
   it("rejects blank actor id", async () => {
     const repository = createRepositoryMock();
+    const listBudgetAuditLogs = jest.fn(async () => createAuditPageMock());
     const service = createAiBudgetAdminService({
       repository,
       isPlatformAdmin: async () => true,
+      listBudgetAuditLogs,
     });
 
     await expect(
@@ -98,5 +128,42 @@ describe("AiBudgetAdminService", () => {
     ).rejects.toThrow("actor.userId is required");
 
     expect(repository.updateBudgetConfig).not.toHaveBeenCalled();
+  });
+
+  it("allows platform admin to list audit logs", async () => {
+    const repository = createRepositoryMock();
+    const listBudgetAuditLogs = jest.fn(async () => createAuditPageMock());
+    const service = createAiBudgetAdminService({
+      repository,
+      isPlatformAdmin: async () => true,
+      listBudgetAuditLogs,
+    });
+
+    const result = await service.listBudgetAuditLogsForAdmin(
+      { userId: "owner1" },
+      { limit: 10, eventType: "ai_budget_config_update" }
+    );
+
+    expect(listBudgetAuditLogs).toHaveBeenCalledWith({
+      limit: 10,
+      eventType: "ai_budget_config_update",
+    });
+    expect(result.count).toBe(1);
+  });
+
+  it("rejects non-admin actor for audit log listing", async () => {
+    const repository = createRepositoryMock();
+    const listBudgetAuditLogs = jest.fn(async () => createAuditPageMock());
+    const service = createAiBudgetAdminService({
+      repository,
+      isPlatformAdmin: async () => false,
+      listBudgetAuditLogs,
+    });
+
+    await expect(
+      service.listBudgetAuditLogsForAdmin({ userId: "regular-user" }, { limit: 10 })
+    ).rejects.toThrow("Only platform admin can manage AI budget config");
+
+    expect(listBudgetAuditLogs).not.toHaveBeenCalled();
   });
 });

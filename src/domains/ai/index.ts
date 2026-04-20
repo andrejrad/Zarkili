@@ -16,8 +16,11 @@ export {
 } from "./budgetConfigRepository";
 
 export {
+  type AiBudgetAuditLogItem,
+  type AiBudgetAuditLogPage,
   createAiBudgetAdminService,
   type AiBudgetAdminActor,
   type AiBudgetAdminDependencies,
   type AiBudgetAdminService,
+  type ListAiBudgetAuditLogsInput,
 } from "./budgetAdminService";

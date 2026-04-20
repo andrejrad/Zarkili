@@ -212,6 +212,16 @@ describe("AppNavigatorShell", () => {
           "marketplace-personalization": { monthlyCapUsd: 90 },
         },
       })),
+      listBudgetAuditLogsForAdmin: jest.fn(async () => ({
+        items: [],
+        count: 0,
+        limit: 20,
+        nextPageToken: null,
+        filters: {
+          eventType: null,
+          targetPath: null,
+        },
+      })),
       updateBudgetConfigForAdmin: jest.fn(async () => ({
         globalMonthlyCapUsd: 1090,
         warningThreshold: 0.7,

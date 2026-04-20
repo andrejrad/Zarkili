@@ -1,5 +1,12 @@
-import { createAiBudgetAdminService, createAiBudgetConfigRepository } from "../../domains/ai";
-import { auth, db } from "../../shared/config";
+import { httpsCallable } from "firebase/functions";
+
+import {
+  createAiBudgetAdminService,
+  createAiBudgetConfigRepository,
+  type AiBudgetAuditLogPage,
+  type ListAiBudgetAuditLogsInput,
+} from "../../domains/ai";
+import { auth, db, functions } from "../../shared/config";
 
 export async function resolvePlatformAdminFromAuthClaims(userId: string): Promise<boolean> {
   if (!userId || userId.trim().length === 0) {
@@ -16,8 +23,16 @@ export async function resolvePlatformAdminFromAuthClaims(userId: string): Promis
 }
 
 const aiBudgetConfigRepository = createAiBudgetConfigRepository(db);
+const listAiBudgetAuditLogsAdminCallable = httpsCallable<ListAiBudgetAuditLogsInput, AiBudgetAuditLogPage>(
+  functions,
+  "listAiBudgetAuditLogsAdmin"
+);
 
 export const appAiBudgetAdminService = createAiBudgetAdminService({
   repository: aiBudgetConfigRepository,
   isPlatformAdmin: resolvePlatformAdminFromAuthClaims,
+  listBudgetAuditLogs: async (input) => {
+    const result = await listAiBudgetAuditLogsAdminCallable(input);
+    return result.data;
+  },
 });

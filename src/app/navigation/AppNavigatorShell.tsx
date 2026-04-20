@@ -132,6 +132,15 @@ export function AppNavigatorShell({
         ? {
             getBudgetConfigForAdmin: (actor: { userId: string }) =>
               aiBudgetAdminService.getBudgetConfigForAdmin(actor),
+            listBudgetAuditLogsForAdmin: (
+              actor: { userId: string },
+              input: {
+                limit?: number;
+                eventType?: string;
+                targetPath?: string;
+                nextPageToken?: string;
+              }
+            ) => aiBudgetAdminService.listBudgetAuditLogsForAdmin(actor, input),
             updateBudgetConfigForAdmin: (
               actor: { userId: string },
               input: UpdateAiBudgetConfigInput

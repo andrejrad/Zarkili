@@ -1,10 +1,18 @@
 import { useCallback, useState } from "react";
 
-import type { UpdateAiBudgetConfigInput } from "../../domains/ai";
+import type {
+  AiBudgetAuditLogPage,
+  ListAiBudgetAuditLogsInput,
+  UpdateAiBudgetConfigInput,
+} from "../../domains/ai";
 import type { AiBudgetGuardConfig } from "../../shared/ai";
 
 export type AiBudgetAdminSettingsService = {
   getBudgetConfigForAdmin: (actor: { userId: string }) => Promise<AiBudgetGuardConfig>;
+  listBudgetAuditLogsForAdmin: (
+    actor: { userId: string },
+    input: ListAiBudgetAuditLogsInput
+  ) => Promise<AiBudgetAuditLogPage>;
   updateBudgetConfigForAdmin: (
     actor: { userId: string },
     input: UpdateAiBudgetConfigInput

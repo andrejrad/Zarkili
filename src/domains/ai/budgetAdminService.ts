@@ -6,10 +6,38 @@ import type {
 export type AiBudgetAdminDependencies = {
   repository: AiBudgetConfigRepository;
   isPlatformAdmin: (userId: string) => Promise<boolean>;
+  listBudgetAuditLogs: (input: ListAiBudgetAuditLogsInput) => Promise<AiBudgetAuditLogPage>;
 };
 
 export type AiBudgetAdminActor = {
   userId: string;
+};
+
+export type ListAiBudgetAuditLogsInput = {
+  limit?: number;
+  eventType?: string;
+  targetPath?: string;
+  nextPageToken?: string;
+};
+
+export type AiBudgetAuditLogItem = {
+  id: string;
+  eventType: string | null;
+  actorUserId: string | null;
+  targetPath: string | null;
+  reason: string | null;
+  createdAt: unknown;
+};
+
+export type AiBudgetAuditLogPage = {
+  items: AiBudgetAuditLogItem[];
+  count: number;
+  limit: number;
+  nextPageToken: string | null;
+  filters: {
+    eventType: string | null;
+    targetPath: string | null;
+  };
 };
 
 function assertNonEmpty(value: string, field: string): void {
@@ -41,8 +69,17 @@ export function createAiBudgetAdminService(deps: AiBudgetAdminDependencies) {
     return deps.repository.updateBudgetConfig(input);
   }
 
+  async function listBudgetAuditLogsForAdmin(
+    actor: AiBudgetAdminActor,
+    input: ListAiBudgetAuditLogsInput = {}
+  ) {
+    await assertPlatformAdmin(actor);
+    return deps.listBudgetAuditLogs(input);
+  }
+
   return {
     getBudgetConfigForAdmin,
+    listBudgetAuditLogsForAdmin,
     updateBudgetConfigForAdmin,
   };
 }

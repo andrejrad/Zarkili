@@ -1,3 +1,3 @@
 export { env } from "./env";
-export { firebaseApp, auth, db, storage } from "./firebase";
+export { firebaseApp, auth, db, functions, storage } from "./firebase";
 export { featureFlags } from "./featureFlags";
