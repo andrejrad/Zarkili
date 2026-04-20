@@ -137,6 +137,25 @@ describe("TenantUsersRepository", () => {
     ).rejects.toThrow("subscription.trialEndsAt is required for trialing status");
   });
 
+  it("rejects invalid role in assign input", async () => {
+    const repo = createTenantUsersRepository(db as never);
+
+    await expect(
+      repo.assignUserToTenant(
+        "tenantA_userA",
+        makeAssignInput({ role: "superadmin" as never })
+      )
+    ).rejects.toThrow("role is invalid");
+  });
+
+  it("rejects blank tenantId in assign input", async () => {
+    const repo = createTenantUsersRepository(db as never);
+
+    await expect(
+      repo.assignUserToTenant("tenantA_userA", makeAssignInput({ tenantId: " " }))
+    ).rejects.toThrow("tenantId is required");
+  });
+
   it("blocks role change from non-admin actors", async () => {
     const repo = createTenantUsersRepository(db as never);
 

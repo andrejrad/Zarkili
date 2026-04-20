@@ -1,7 +1,3 @@
-export type ServicesDomainPlaceholder = {
-  initialized: false;
-};
+export type { Service, CreateServiceInput, UpdateServiceInput } from "./model";
+export { createServiceRepository } from "./repository";
 
-export const servicesDomainPlaceholder: ServicesDomainPlaceholder = {
-  initialized: false,
-};

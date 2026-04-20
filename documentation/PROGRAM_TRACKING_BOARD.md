@@ -45,7 +45,9 @@ Card format:
 - [ ] P-001 | No active card yet | TBD | [MULTITENANT_MASTER_INDEX.md](MULTITENANT_MASTER_INDEX.md) | Current | Updated 2026-04-19
 
 ## Blocked
-- [ ] X-001 | No blocked card yet | TBD | [MULTITENANT_MASTER_INDEX.md](MULTITENANT_MASTER_INDEX.md) | Current | Updated 2026-04-17
+- [ ] X-001 | Week 2.4 admin screens paused pending visual design handoff | Andre plus Copilot | [new-platform/WEEK2_TASK24_ADMIN_SCREENS_EXECUTION_PACK.md](new-platform/WEEK2_TASK24_ADMIN_SCREENS_EXECUTION_PACK.md) | Week 2.4 | Updated 2026-04-19
+- [ ] X-002 | Week 2.5 discovery scaffold paused pending visual design handoff | Andre plus Copilot | [new-platform/WEEK2_TASK25_DISCOVERY_SCAFFOLD_EXECUTION_PACK.md](new-platform/WEEK2_TASK25_DISCOVERY_SCAFFOLD_EXECUTION_PACK.md) | Week 2.5 | Updated 2026-04-19
+- [ ] X-003 | Week 3.4 staff and services admin screens paused pending visual design handoff | Andre plus Copilot | [new-platform/WEEK3_TASK34_ADMIN_SCREENS_EXECUTION_PACK.md](new-platform/WEEK3_TASK34_ADMIN_SCREENS_EXECUTION_PACK.md) | Week 3.4 | Updated 2026-04-19
 
 ## Review and QA
 - [ ] Q-001 | No review card yet | TBD | [MULTITENANT_MASTER_INDEX.md](MULTITENANT_MASTER_INDEX.md) | Current | Updated 2026-04-17
@@ -93,6 +95,11 @@ Card format:
 - [x] D-040 | Hook guard test for missing user/service refresh and load-more resilience path | Copilot plus Andre | [new-platform/AI_RUNTIME_AND_COST_POLICY.md](new-platform/AI_RUNTIME_AND_COST_POLICY.md) | Completed | Updated 2026-04-20
 - [x] D-041 | Owner settings audit event-type filter controls with reset and callable payload regression coverage | Copilot plus Andre | [new-platform/AI_RUNTIME_AND_COST_POLICY.md](new-platform/AI_RUNTIME_AND_COST_POLICY.md) | Completed | Updated 2026-04-20
 - [x] D-042 | Firestore rules hardening for tenantUsers escalation/id integrity plus rules-test and index coverage refresh | Copilot plus Andre | [MULTITENANT_WEEKS_1_TO_4_COPILOT_PROMPTS.md](MULTITENANT_WEEKS_1_TO_4_COPILOT_PROMPTS.md) | Completed | Updated 2026-04-20
+- [x] D-043 | Auth and role guard-path unit tests: non-admin update path in budgetAdminService, invalid role and blank tenantId in tenantUsersRepository | Copilot plus Andre | [MULTITENANT_WEEKS_1_TO_4_COPILOT_PROMPTS.md](MULTITENANT_WEEKS_1_TO_4_COPILOT_PROMPTS.md) | Completed | Updated 2026-04-19
+- [x] D-044 | Cross-platform smoke gates: web routing 4/4, native navigation 7/7 — all green | Copilot plus Andre | [MULTITENANT_WEEKS_1_TO_4_COPILOT_PROMPTS.md](MULTITENANT_WEEKS_1_TO_4_COPILOT_PROMPTS.md) | Completed | Updated 2026-04-19
+- [x] D-045 | Week 3 Task 3.1 services domain v1 implemented (model + repository + validation + tests + docs) | Copilot plus Andre | [MULTITENANT_WEEKS_1_TO_4_COPILOT_PROMPTS.md](MULTITENANT_WEEKS_1_TO_4_COPILOT_PROMPTS.md) | Completed | Updated 2026-04-19
+- [x] D-046 | Week 3 Task 3.2 staff domain v1 implemented (model + repository + service qualification filtering tests + docs) | Copilot plus Andre | [MULTITENANT_WEEKS_1_TO_4_COPILOT_PROMPTS.md](MULTITENANT_WEEKS_1_TO_4_COPILOT_PROMPTS.md) | Completed | Updated 2026-04-19
+- [x] D-047 | Week 3 Task 3.3 staff schedules templates implemented (model + repository + overlap validation + tests + docs) | Copilot plus Andre | [MULTITENANT_WEEKS_1_TO_4_COPILOT_PROMPTS.md](MULTITENANT_WEEKS_1_TO_4_COPILOT_PROMPTS.md) | Completed | Updated 2026-04-19
 
 ---
 

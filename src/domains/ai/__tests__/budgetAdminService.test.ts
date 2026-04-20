@@ -114,6 +114,22 @@ describe("AiBudgetAdminService", () => {
     expect(result.featureCaps["support-triage"].monthlyCapUsd).toBe(160);
   });
 
+  it("rejects non-admin actor for update", async () => {
+    const repository = createRepositoryMock();
+    const listBudgetAuditLogs = jest.fn(async () => createAuditPageMock());
+    const service = createAiBudgetAdminService({
+      repository,
+      isPlatformAdmin: async () => false,
+      listBudgetAuditLogs,
+    });
+
+    await expect(
+      service.updateBudgetConfigForAdmin({ userId: "regular-user" }, { globalMonthlyCapUsd: 1500 })
+    ).rejects.toThrow("Only platform admin can manage AI budget config");
+
+    expect(repository.updateBudgetConfig).not.toHaveBeenCalled();
+  });
+
   it("rejects blank actor id", async () => {
     const repository = createRepositoryMock();
     const listBudgetAuditLogs = jest.fn(async () => createAuditPageMock());
