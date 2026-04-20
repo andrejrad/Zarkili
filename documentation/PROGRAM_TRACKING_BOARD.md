@@ -77,6 +77,7 @@ Card format:
 - [x] D-024 | Real auth-claim admin resolver and dedicated owner budget screen wiring | Copilot plus Andre | [new-platform/AI_RUNTIME_AND_COST_POLICY.md](new-platform/AI_RUNTIME_AND_COST_POLICY.md) | Completed | Updated 2026-04-19
 - [x] D-025 | Backend audited AI budget admin callable path with role enforcement | Copilot plus Andre | [new-platform/AI_RUNTIME_AND_COST_POLICY.md](new-platform/AI_RUNTIME_AND_COST_POLICY.md) | Completed | Updated 2026-04-20
 - [x] D-026 | Functions callable test coverage for admin auth, validation, and audit writes | Copilot plus Andre | [new-platform/AI_RUNTIME_AND_COST_POLICY.md](new-platform/AI_RUNTIME_AND_COST_POLICY.md) | Completed | Updated 2026-04-20
+- [x] D-027 | Firestore composite indexes for platform audit-log admin filtering and recency sort | Copilot plus Andre | [new-platform/AI_RUNTIME_AND_COST_POLICY.md](new-platform/AI_RUNTIME_AND_COST_POLICY.md) | Completed | Updated 2026-04-20
 
 ---
 
