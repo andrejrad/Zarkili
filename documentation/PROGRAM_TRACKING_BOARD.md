@@ -85,6 +85,7 @@ Card format:
 
 
 - [x] D-034 | Hook-level error-path tests for owner audit-history refresh and load-more failures | Copilot plus Andre | [new-platform/AI_RUNTIME_AND_COST_POLICY.md](new-platform/AI_RUNTIME_AND_COST_POLICY.md) | Completed | Updated 2026-04-20
+- [x] D-035 | Owner settings empty-state regression test for zero audit-history first page | Copilot plus Andre | [new-platform/AI_RUNTIME_AND_COST_POLICY.md](new-platform/AI_RUNTIME_AND_COST_POLICY.md) | Completed | Updated 2026-04-20
 
 ---
 

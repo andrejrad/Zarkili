@@ -122,4 +122,65 @@ describe("OwnerAiBudgetSettingsScreen", () => {
       { limit: 10, nextPageToken: "log-1" }
     );
   });
+
+  it("shows empty audit history state when first page has no items", async () => {
+    const service: AiBudgetAdminService = {
+      getBudgetConfigForAdmin: jest.fn(async () => ({
+        globalMonthlyCapUsd: 1090,
+        warningThreshold: 0.7,
+        protectionThreshold: 0.9,
+        featureCaps: {
+          "content-creation": { monthlyCapUsd: 120 },
+          "marketing-orchestration": { monthlyCapUsd: 180 },
+          "service-recommendations": { monthlyCapUsd: 140 },
+          "scheduling-optimization": { monthlyCapUsd: 180 },
+          "retention-insights": { monthlyCapUsd: 150 },
+          "support-triage": { monthlyCapUsd: 120 },
+          "no-show-fraud": { monthlyCapUsd: 110 },
+          "marketplace-personalization": { monthlyCapUsd: 90 },
+        },
+      })),
+      listBudgetAuditLogsForAdmin: jest.fn(async () => ({
+        items: [],
+        count: 0,
+        limit: 10,
+        nextPageToken: null,
+        filters: {
+          eventType: null,
+          targetPath: null,
+        },
+      })),
+      updateBudgetConfigForAdmin: jest.fn(async (_actor: { userId: string }, input: UpdateAiBudgetConfigInput) => ({
+        globalMonthlyCapUsd: input.globalMonthlyCapUsd ?? 1090,
+        warningThreshold: input.warningThreshold ?? 0.7,
+        protectionThreshold: input.protectionThreshold ?? 0.9,
+        featureCaps: {
+          "content-creation": { monthlyCapUsd: 120 },
+          "marketing-orchestration": { monthlyCapUsd: 180 },
+          "service-recommendations": { monthlyCapUsd: 140 },
+          "scheduling-optimization": { monthlyCapUsd: 180 },
+          "retention-insights": { monthlyCapUsd: 150 },
+          "support-triage": {
+            monthlyCapUsd: input.featureCaps?.["support-triage"]?.monthlyCapUsd ?? 120,
+          },
+          "no-show-fraud": { monthlyCapUsd: 110 },
+          "marketplace-personalization": { monthlyCapUsd: 90 },
+        },
+      })),
+    };
+
+    render(
+      <OwnerAiBudgetSettingsScreen
+        userId="platform-admin-1"
+        service={service}
+        onBack={() => undefined}
+      />
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("No audit events yet.")).toBeTruthy();
+    });
+
+    expect(screen.queryByText("Load more audit events")).toBeNull();
+  });
 });
