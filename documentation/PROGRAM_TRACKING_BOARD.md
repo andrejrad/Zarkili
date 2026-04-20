@@ -88,6 +88,7 @@ Card format:
 - [x] D-035 | Owner settings empty-state regression test for zero audit-history first page | Copilot plus Andre | [new-platform/AI_RUNTIME_AND_COST_POLICY.md](new-platform/AI_RUNTIME_AND_COST_POLICY.md) | Completed | Updated 2026-04-20
 - [x] D-036 | Owner settings refresh regression test for config plus first-page audit reload | Copilot plus Andre | [new-platform/AI_RUNTIME_AND_COST_POLICY.md](new-platform/AI_RUNTIME_AND_COST_POLICY.md) | Completed | Updated 2026-04-20
 - [x] D-037 | Owner settings regression test ensuring refresh clears prior load-more audit error | Copilot plus Andre | [new-platform/AI_RUNTIME_AND_COST_POLICY.md](new-platform/AI_RUNTIME_AND_COST_POLICY.md) | Completed | Updated 2026-04-20
+- [x] D-038 | Hook regression test preventing duplicate pagination calls on rapid load-more taps | Copilot plus Andre | [new-platform/AI_RUNTIME_AND_COST_POLICY.md](new-platform/AI_RUNTIME_AND_COST_POLICY.md) | Completed | Updated 2026-04-20
 
 ---
 

@@ -69,6 +69,18 @@ function createBaseService(
   };
 }
 
+function createDeferredPromise<T>() {
+  let resolve!: (value: T) => void;
+  let reject!: (reason?: unknown) => void;
+
+  const promise = new Promise<T>((res, rej) => {
+    resolve = res;
+    reject = rej;
+  });
+
+  return { promise, resolve, reject };
+}
+
 describe("useAiBudgetAdminSettings", () => {
   it("surfaces refresh errors when first audit page fetch fails", async () => {
     const listBudgetAuditLogsForAdmin = jest.fn(async () => {
@@ -135,6 +147,106 @@ describe("useAiBudgetAdminSettings", () => {
       expect(screen.getByText("error:load-more failed")).toBeTruthy();
       expect(screen.getByText("audit-count:1")).toBeTruthy();
       expect(screen.getByText("audit-has-more:yes")).toBeTruthy();
+    });
+
+    expect(listBudgetAuditLogsForAdmin).toHaveBeenNthCalledWith(
+      1,
+      { userId: "platform-admin-1" },
+      { limit: 10 }
+    );
+    expect(listBudgetAuditLogsForAdmin).toHaveBeenNthCalledWith(
+      2,
+      { userId: "platform-admin-1" },
+      { limit: 10, nextPageToken: "log-1" }
+    );
+  });
+
+  it("ignores rapid second load-more tap while first pagination call is in flight", async () => {
+    const deferredLoadMore = createDeferredPromise<{
+      items: Array<{
+        id: string;
+        eventType: string | null;
+        actorUserId: string | null;
+        targetPath: string | null;
+        reason: string | null;
+        createdAt: string;
+      }>;
+      count: number;
+      limit: number;
+      nextPageToken: string | null;
+      filters: {
+        eventType: string | null;
+        targetPath: string | null;
+      };
+    }>();
+
+    const listBudgetAuditLogsForAdmin = jest
+      .fn()
+      .mockResolvedValueOnce({
+        items: [
+          {
+            id: "log-1",
+            eventType: "ai_budget_config_update",
+            actorUserId: "platform-admin-1",
+            targetPath: "platform/config",
+            reason: "initial setup",
+            createdAt: "2026-04-20T08:00:00.000Z",
+          },
+        ],
+        count: 1,
+        limit: 10,
+        nextPageToken: "log-1",
+        filters: {
+          eventType: null,
+          targetPath: null,
+        },
+      })
+      .mockImplementationOnce(() => deferredLoadMore.promise);
+
+    const service = createBaseService(listBudgetAuditLogsForAdmin);
+
+    render(<HookProbe userId="platform-admin-1" service={service} />);
+
+    fireEvent.press(screen.getByText("refresh"));
+
+    await waitFor(() => {
+      expect(screen.getByText("audit-count:1")).toBeTruthy();
+      expect(screen.getByText("audit-has-more:yes")).toBeTruthy();
+    });
+
+    fireEvent.press(screen.getByText("load-more"));
+
+    await waitFor(() => {
+      expect(listBudgetAuditLogsForAdmin).toHaveBeenCalledTimes(2);
+    });
+
+    fireEvent.press(screen.getByText("load-more"));
+
+    expect(listBudgetAuditLogsForAdmin).toHaveBeenCalledTimes(2);
+
+    deferredLoadMore.resolve({
+      items: [
+        {
+          id: "log-2",
+          eventType: "ai_budget_config_update",
+          actorUserId: "platform-admin-2",
+          targetPath: "platform/config",
+          reason: "batch update",
+          createdAt: "2026-04-20T09:00:00.000Z",
+        },
+      ],
+      count: 1,
+      limit: 10,
+      nextPageToken: null,
+      filters: {
+        eventType: null,
+        targetPath: null,
+      },
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText("audit-count:2")).toBeTruthy();
+      expect(screen.getByText("audit-has-more:no")).toBeTruthy();
     });
 
     expect(listBudgetAuditLogsForAdmin).toHaveBeenNthCalledWith(
