@@ -30,6 +30,7 @@ type TxSetCall = {
 
 type TestState = {
   docSnapshot: ConfigSnapshot;
+  cursorSnapshots: Record<string, ConfigSnapshot>;
   txnSnapshot: ConfigSnapshot;
   txSetCalls: TxSetCall[];
   auditLogId: string;
@@ -42,6 +43,7 @@ const testState: TestState = {
     exists: false,
     data: () => ({})
   },
+  cursorSnapshots: {},
   txnSnapshot: {
     exists: true,
     data: () => ({
@@ -54,7 +56,18 @@ const testState: TestState = {
   auditQueryCalls: []
 };
 
-const docGetMock = vi.fn(async () => testState.docSnapshot);
+const docGetByPathMock = vi.fn(async (path: string) => {
+  if (path === "platform/config") {
+    return testState.docSnapshot;
+  }
+
+  return (
+    testState.cursorSnapshots[path] ?? {
+      exists: false,
+      data: () => ({})
+    }
+  );
+});
 const txnGetMock = vi.fn(async () => testState.txnSnapshot);
 const txnSetMock = vi.fn((ref: { path: string }, data: Record<string, unknown>, options?: Record<string, unknown>) => {
   testState.txSetCalls.push({ ref, data, options });
@@ -69,13 +82,26 @@ const runTransactionMock = vi.fn(async (handler: (txn: { get: typeof txnGetMock;
 
 const docMock = vi.fn((path: string) => ({
   path,
-  get: docGetMock
+  get: vi.fn(async () => docGetByPathMock(path))
 }));
 
-const collectionDocMock = vi.fn(() => ({
-  id: testState.auditLogId,
-  path: `platformAuditLogs/${testState.auditLogId}`
-}));
+const collectionDocMock = vi.fn((id?: string) => {
+  const resolvedId = id ?? testState.auditLogId;
+  const path = `platformAuditLogs/${resolvedId}`;
+
+  return {
+    id: resolvedId,
+    path,
+    get: vi.fn(async () => {
+      return (
+        testState.cursorSnapshots[path] ?? {
+          exists: false,
+          data: () => ({})
+        }
+      );
+    })
+  };
+});
 
 function createAuditQueryMock() {
   const query = {
@@ -100,6 +126,13 @@ function createAuditQueryMock() {
       });
       return query;
     }),
+    startAfter: vi.fn((snapshot: unknown) => {
+      testState.auditQueryCalls.push({
+        method: "startAfter",
+        args: [snapshot]
+      });
+      return query;
+    }),
     get: vi.fn(async () => ({
       docs: testState.auditQueryDocs.map((doc) => ({
         id: doc.id,
@@ -120,6 +153,7 @@ const collectionMock = vi.fn((path: string) => {
     where: auditQuery.where,
     orderBy: auditQuery.orderBy,
     limit: auditQuery.limit,
+    startAfter: auditQuery.startAfter,
     get: auditQuery.get
   };
 });
@@ -209,6 +243,7 @@ describe("aiBudgetAdmin callable handlers", () => {
       exists: false,
       data: () => ({})
     };
+    testState.cursorSnapshots = {};
 
     testState.txnSnapshot = {
       exists: true,
@@ -326,6 +361,26 @@ describe("aiBudgetAdmin callable handlers", () => {
     ).rejects.toMatchObject({ code: "invalid-argument" });
   });
 
+  it("rejects audit-log list payloads with invalid nextPageToken", async () => {
+    await expect(
+      listAiBudgetAuditLogsAdmin(
+        adminRequest({
+          nextPageToken: 123
+        })
+      )
+    ).rejects.toMatchObject({ code: "invalid-argument" });
+  });
+
+  it("rejects audit-log list payloads when nextPageToken document does not exist", async () => {
+    await expect(
+      listAiBudgetAuditLogsAdmin(
+        adminRequest({
+          nextPageToken: "missing-token"
+        })
+      )
+    ).rejects.toMatchObject({ code: "invalid-argument" });
+  });
+
   it("lists audit logs with filters and pagination", async () => {
     testState.auditQueryDocs = [
       {
@@ -361,6 +416,7 @@ describe("aiBudgetAdmin callable handlers", () => {
     expect(result.count).toBe(2);
     expect(result.limit).toBe(10);
     expect(result.items).toHaveLength(2);
+    expect(result.nextPageToken).toBeNull();
     expect(result.filters).toEqual({
       eventType: "ai_budget_config_update",
       targetPath: "platform/config"
@@ -382,6 +438,54 @@ describe("aiBudgetAdmin callable handlers", () => {
       {
         method: "limit",
         args: [10]
+      }
+    ]);
+  });
+
+  it("applies startAfter cursor when nextPageToken is provided", async () => {
+    const cursorPath = "platformAuditLogs/log-1";
+    const cursorSnapshot: ConfigSnapshot = {
+      exists: true,
+      data: () => ({
+        createdAt: "ts-cursor"
+      })
+    };
+
+    testState.cursorSnapshots[cursorPath] = cursorSnapshot;
+    testState.auditQueryDocs = [
+      {
+        id: "log-2",
+        data: {
+          eventType: "ai_budget_config_update",
+          actorUserId: "platform-admin-1",
+          targetPath: "platform/config",
+          reason: null,
+          createdAt: "ts-2"
+        }
+      }
+    ];
+
+    const result = await listAiBudgetAuditLogsAdmin(
+      adminRequest({
+        limit: 1,
+        nextPageToken: "log-1"
+      })
+    );
+
+    expect(result.count).toBe(1);
+    expect(result.nextPageToken).toBe("log-2");
+    expect(testState.auditQueryCalls).toEqual([
+      {
+        method: "orderBy",
+        args: ["createdAt", "desc"]
+      },
+      {
+        method: "startAfter",
+        args: [cursorSnapshot]
+      },
+      {
+        method: "limit",
+        args: [1]
       }
     ]);
   });

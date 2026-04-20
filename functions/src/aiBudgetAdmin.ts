@@ -53,6 +53,7 @@ type ListAiBudgetAuditLogsInput = {
   limit: number;
   eventType?: string;
   targetPath?: string;
+  nextPageToken?: string;
 };
 
 const DEFAULT_AI_BUDGET_CONFIG: AiBudgetGuardConfig = {
@@ -203,6 +204,7 @@ function parseListAuditLogsInput(data: unknown): ListAiBudgetAuditLogsInput {
     limit?: unknown;
     eventType?: unknown;
     targetPath?: unknown;
+    nextPageToken?: unknown;
   };
 
   const parsed: ListAiBudgetAuditLogsInput = {
@@ -233,6 +235,13 @@ function parseListAuditLogsInput(data: unknown): ListAiBudgetAuditLogsInput {
       throw new HttpsError("invalid-argument", "targetPath must be a non-empty string when provided");
     }
     parsed.targetPath = input.targetPath.trim();
+  }
+
+  if (input.nextPageToken !== undefined) {
+    if (typeof input.nextPageToken !== "string" || input.nextPageToken.trim().length === 0) {
+      throw new HttpsError("invalid-argument", "nextPageToken must be a non-empty string when provided");
+    }
+    parsed.nextPageToken = input.nextPageToken.trim();
   }
 
   return parsed;
@@ -335,6 +344,15 @@ export const listAiBudgetAuditLogsAdmin = onCall(async (request) => {
     query = query.where("targetPath", "==", input.targetPath);
   }
 
+  if (input.nextPageToken) {
+    const cursorRef = db.collection(PLATFORM_AUDIT_COLLECTION).doc(input.nextPageToken);
+    const cursorSnapshot = await cursorRef.get();
+    if (!cursorSnapshot.exists) {
+      throw new HttpsError("invalid-argument", "nextPageToken does not reference an existing audit log");
+    }
+    query = query.startAfter(cursorSnapshot);
+  }
+
   const snapshot = await query.limit(input.limit).get();
 
   const items = snapshot.docs.map((doc) => {
@@ -353,6 +371,7 @@ export const listAiBudgetAuditLogsAdmin = onCall(async (request) => {
     items,
     count: items.length,
     limit: input.limit,
+    nextPageToken: items.length === input.limit ? items[items.length - 1].id : null,
     filters: {
       eventType: input.eventType ?? null,
       targetPath: input.targetPath ?? null,
