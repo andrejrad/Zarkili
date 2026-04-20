@@ -387,4 +387,99 @@ describe("OwnerAiBudgetSettingsScreen", () => {
       { limit: 10 }
     );
   });
+
+  it("updates support triage cap after increment action and keeps existing audit entries visible", async () => {
+    const getBudgetConfigForAdmin = jest.fn(async () => ({
+      globalMonthlyCapUsd: 1090,
+      warningThreshold: 0.7,
+      protectionThreshold: 0.9,
+      featureCaps: {
+        "content-creation": { monthlyCapUsd: 120 },
+        "marketing-orchestration": { monthlyCapUsd: 180 },
+        "service-recommendations": { monthlyCapUsd: 140 },
+        "scheduling-optimization": { monthlyCapUsd: 180 },
+        "retention-insights": { monthlyCapUsd: 150 },
+        "support-triage": { monthlyCapUsd: 120 },
+        "no-show-fraud": { monthlyCapUsd: 110 },
+        "marketplace-personalization": { monthlyCapUsd: 90 },
+      },
+    }));
+
+    const listBudgetAuditLogsForAdmin = jest.fn(async () => ({
+      items: [
+        {
+          id: "log-1",
+          eventType: "ai_budget_config_update",
+          actorUserId: "platform-admin-1",
+          targetPath: "platform/config",
+          reason: "initial setup",
+          createdAt: "2026-04-20T08:00:00.000Z",
+        },
+      ],
+      count: 1,
+      limit: 10,
+      nextPageToken: null,
+      filters: {
+        eventType: null,
+        targetPath: null,
+      },
+    }));
+
+    const updateBudgetConfigForAdmin = jest.fn(
+      async (_actor: { userId: string }, input: UpdateAiBudgetConfigInput) => ({
+        globalMonthlyCapUsd: input.globalMonthlyCapUsd ?? 1090,
+        warningThreshold: input.warningThreshold ?? 0.7,
+        protectionThreshold: input.protectionThreshold ?? 0.9,
+        featureCaps: {
+          "content-creation": { monthlyCapUsd: 120 },
+          "marketing-orchestration": { monthlyCapUsd: 180 },
+          "service-recommendations": { monthlyCapUsd: 140 },
+          "scheduling-optimization": { monthlyCapUsd: 180 },
+          "retention-insights": { monthlyCapUsd: 150 },
+          "support-triage": {
+            monthlyCapUsd: input.featureCaps?.["support-triage"]?.monthlyCapUsd ?? 120,
+          },
+          "no-show-fraud": { monthlyCapUsd: 110 },
+          "marketplace-personalization": { monthlyCapUsd: 90 },
+        },
+      })
+    );
+
+    const service: AiBudgetAdminService = {
+      getBudgetConfigForAdmin,
+      listBudgetAuditLogsForAdmin,
+      updateBudgetConfigForAdmin,
+    };
+
+    render(
+      <OwnerAiBudgetSettingsScreen
+        userId="platform-admin-1"
+        service={service}
+        onBack={() => undefined}
+      />
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("Support triage cap USD: 120")).toBeTruthy();
+      expect(screen.getByText("Reason: initial setup")).toBeTruthy();
+    });
+
+    fireEvent.press(screen.getByText("Increase support triage cap (+10)"));
+
+    await waitFor(() => {
+      expect(screen.getByText("Support triage cap USD: 130")).toBeTruthy();
+      expect(screen.getByText("Reason: initial setup")).toBeTruthy();
+    });
+
+    expect(updateBudgetConfigForAdmin).toHaveBeenCalledWith(
+      { userId: "platform-admin-1" },
+      {
+        featureCaps: {
+          "support-triage": {
+            monthlyCapUsd: 130,
+          },
+        },
+      }
+    );
+  });
 });
