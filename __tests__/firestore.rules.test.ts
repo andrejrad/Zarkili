@@ -171,4 +171,67 @@ describe("Firestore multi-tenant rules", () => {
       })
     );
   });
+
+  it("allows platform admin to read and write platform config", async () => {
+    await testEnv.withSecurityRulesDisabled(async (context) => {
+      await context.firestore().doc("platform/config").set({
+        aiBudgetConfig: {
+          globalMonthlyCapUsd: 1090,
+        },
+      });
+    });
+
+    const db = testEnv
+      .authenticatedContext("platformAdmin", { role: "platform_admin" })
+      .firestore();
+
+    await assertSucceeds(db.doc("platform/config").get());
+    await assertSucceeds(
+      db.doc("platform/config").set(
+        {
+          aiBudgetConfig: {
+            globalMonthlyCapUsd: 1200,
+          },
+        },
+        { merge: true }
+      )
+    );
+  });
+
+  it("blocks non-admin access to platform config", async () => {
+    await testEnv.withSecurityRulesDisabled(async (context) => {
+      await context.firestore().doc("platform/config").set({
+        aiBudgetConfig: {
+          globalMonthlyCapUsd: 1090,
+        },
+      });
+    });
+
+    const db = testEnv.authenticatedContext("tenantUser").firestore();
+
+    await assertFails(db.doc("platform/config").get());
+    await assertFails(
+      db.doc("platform/config").set(
+        {
+          aiBudgetConfig: {
+            globalMonthlyCapUsd: 1300,
+          },
+        },
+        { merge: true }
+      )
+    );
+  });
+
+  it("blocks unauthenticated access to platform config", async () => {
+    const db = testEnv.unauthenticatedContext().firestore();
+
+    await assertFails(db.doc("platform/config").get());
+    await assertFails(
+      db.doc("platform/config").set({
+        aiBudgetConfig: {
+          globalMonthlyCapUsd: 1400,
+        },
+      })
+    );
+  });
 });
