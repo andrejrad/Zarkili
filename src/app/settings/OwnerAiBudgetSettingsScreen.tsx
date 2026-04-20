@@ -37,12 +37,15 @@ export function OwnerAiBudgetSettingsScreen({
   const {
     config,
     auditLogs,
+    auditEventTypeFilter,
     auditLoadingMore,
     auditHasMore,
     loading,
     updating,
     error,
     refresh,
+    applyAuditEventTypeFilter,
+    resetAuditFilters,
     loadMoreAuditLogs,
     updateConfig,
   } = useAiBudgetAdminSettings(userId, service);
@@ -85,6 +88,25 @@ export function OwnerAiBudgetSettingsScreen({
 
       <View style={styles.auditSection}>
         <Text style={styles.auditTitle}>Recent budget audit events</Text>
+        <Text style={styles.auditFilterMeta}>
+          Active filter: {auditEventTypeFilter ?? "all events"}
+        </Text>
+        <View style={styles.auditFilterRow}>
+          <TouchableOpacity
+            accessibilityRole="button"
+            onPress={() => void applyAuditEventTypeFilter("ai_budget_config_update")}
+            style={styles.buttonSecondary}
+          >
+            <Text style={styles.buttonText}>Show config updates only</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            accessibilityRole="button"
+            onPress={() => void resetAuditFilters()}
+            style={styles.buttonSecondary}
+          >
+            <Text style={styles.buttonText}>Reset audit filters</Text>
+          </TouchableOpacity>
+        </View>
         {loading ? <Text style={styles.auditItemMeta}>Loading audit history...</Text> : null}
         {!loading && auditLogs.length === 0 ? (
           <Text style={styles.auditItemMeta}>No audit events yet.</Text>
@@ -158,6 +180,16 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: "#111827",
     textAlign: "center",
+  },
+  auditFilterMeta: {
+    marginTop: 8,
+    fontSize: 12,
+    color: "#4b5563",
+    textAlign: "center",
+  },
+  auditFilterRow: {
+    marginTop: 8,
+    width: "100%",
   },
   auditItemCard: {
     marginTop: 8,

@@ -482,4 +482,95 @@ describe("OwnerAiBudgetSettingsScreen", () => {
       }
     );
   });
+
+  it("applies audit event-type filter and resets it back to all events", async () => {
+    const getBudgetConfigForAdmin = jest.fn(async () => ({
+      globalMonthlyCapUsd: 1090,
+      warningThreshold: 0.7,
+      protectionThreshold: 0.9,
+      featureCaps: {
+        "content-creation": { monthlyCapUsd: 120 },
+        "marketing-orchestration": { monthlyCapUsd: 180 },
+        "service-recommendations": { monthlyCapUsd: 140 },
+        "scheduling-optimization": { monthlyCapUsd: 180 },
+        "retention-insights": { monthlyCapUsd: 150 },
+        "support-triage": { monthlyCapUsd: 120 },
+        "no-show-fraud": { monthlyCapUsd: 110 },
+        "marketplace-personalization": { monthlyCapUsd: 90 },
+      },
+    }));
+
+    const listBudgetAuditLogsForAdmin = jest.fn(async () => ({
+      items: [],
+      count: 0,
+      limit: 10,
+      nextPageToken: null,
+      filters: {
+        eventType: null,
+        targetPath: null,
+      },
+    }));
+
+    const service: AiBudgetAdminService = {
+      getBudgetConfigForAdmin,
+      listBudgetAuditLogsForAdmin,
+      updateBudgetConfigForAdmin: jest.fn(async (_actor: { userId: string }, input: UpdateAiBudgetConfigInput) => ({
+        globalMonthlyCapUsd: input.globalMonthlyCapUsd ?? 1090,
+        warningThreshold: input.warningThreshold ?? 0.7,
+        protectionThreshold: input.protectionThreshold ?? 0.9,
+        featureCaps: {
+          "content-creation": { monthlyCapUsd: 120 },
+          "marketing-orchestration": { monthlyCapUsd: 180 },
+          "service-recommendations": { monthlyCapUsd: 140 },
+          "scheduling-optimization": { monthlyCapUsd: 180 },
+          "retention-insights": { monthlyCapUsd: 150 },
+          "support-triage": {
+            monthlyCapUsd: input.featureCaps?.["support-triage"]?.monthlyCapUsd ?? 120,
+          },
+          "no-show-fraud": { monthlyCapUsd: 110 },
+          "marketplace-personalization": { monthlyCapUsd: 90 },
+        },
+      })),
+    };
+
+    render(
+      <OwnerAiBudgetSettingsScreen
+        userId="platform-admin-1"
+        service={service}
+        onBack={() => undefined}
+      />
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("Active filter: all events")).toBeTruthy();
+    });
+
+    fireEvent.press(screen.getByText("Show config updates only"));
+
+    await waitFor(() => {
+      expect(screen.getByText("Active filter: ai_budget_config_update")).toBeTruthy();
+    });
+
+    fireEvent.press(screen.getByText("Reset audit filters"));
+
+    await waitFor(() => {
+      expect(screen.getByText("Active filter: all events")).toBeTruthy();
+    });
+
+    expect(listBudgetAuditLogsForAdmin).toHaveBeenNthCalledWith(
+      1,
+      { userId: "platform-admin-1" },
+      { limit: 10 }
+    );
+    expect(listBudgetAuditLogsForAdmin).toHaveBeenNthCalledWith(
+      2,
+      { userId: "platform-admin-1" },
+      { limit: 10, eventType: "ai_budget_config_update" }
+    );
+    expect(listBudgetAuditLogsForAdmin).toHaveBeenNthCalledWith(
+      3,
+      { userId: "platform-admin-1" },
+      { limit: 10 }
+    );
+  });
 });
