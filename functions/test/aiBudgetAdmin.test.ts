@@ -214,6 +214,42 @@ describe("aiBudgetAdmin callable handlers", () => {
     ).rejects.toMatchObject({ code: "invalid-argument" });
   });
 
+  it("rejects update payloads with invalid feature monthly caps", async () => {
+    await expect(
+      updateAiBudgetConfigAdmin(
+        adminRequest({
+          featureCaps: {
+            "support-triage": {
+              monthlyCapUsd: 0
+            }
+          }
+        })
+      )
+    ).rejects.toMatchObject({ code: "invalid-argument" });
+  });
+
+  it("rejects update payloads with overly long reason text", async () => {
+    await expect(
+      updateAiBudgetConfigAdmin(
+        adminRequest({
+          globalMonthlyCapUsd: 1250,
+          reason: "x".repeat(501)
+        })
+      )
+    ).rejects.toMatchObject({ code: "invalid-argument" });
+  });
+
+  it("rejects update payloads where protectionThreshold is not above warningThreshold", async () => {
+    await expect(
+      updateAiBudgetConfigAdmin(
+        adminRequest({
+          warningThreshold: 0.8,
+          protectionThreshold: 0.8
+        })
+      )
+    ).rejects.toMatchObject({ code: "invalid-argument" });
+  });
+
   it("writes updated config and audit log in one transaction", async () => {
     const result = await updateAiBudgetConfigAdmin(
       adminRequest({

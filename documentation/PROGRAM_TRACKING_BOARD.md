@@ -78,6 +78,7 @@ Card format:
 - [x] D-025 | Backend audited AI budget admin callable path with role enforcement | Copilot plus Andre | [new-platform/AI_RUNTIME_AND_COST_POLICY.md](new-platform/AI_RUNTIME_AND_COST_POLICY.md) | Completed | Updated 2026-04-20
 - [x] D-026 | Functions callable test coverage for admin auth, validation, and audit writes | Copilot plus Andre | [new-platform/AI_RUNTIME_AND_COST_POLICY.md](new-platform/AI_RUNTIME_AND_COST_POLICY.md) | Completed | Updated 2026-04-20
 - [x] D-027 | Firestore composite indexes for platform audit-log admin filtering and recency sort | Copilot plus Andre | [new-platform/AI_RUNTIME_AND_COST_POLICY.md](new-platform/AI_RUNTIME_AND_COST_POLICY.md) | Completed | Updated 2026-04-20
+- [x] D-028 | Callable payload edge-case tests for feature caps, reason length, and threshold ordering | Copilot plus Andre | [new-platform/AI_RUNTIME_AND_COST_POLICY.md](new-platform/AI_RUNTIME_AND_COST_POLICY.md) | Completed | Updated 2026-04-20
 
 ---
 
