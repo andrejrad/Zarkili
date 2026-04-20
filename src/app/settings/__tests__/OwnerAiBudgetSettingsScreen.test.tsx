@@ -265,4 +265,126 @@ describe("OwnerAiBudgetSettingsScreen", () => {
       { limit: 10 }
     );
   });
+
+  it("clears load-more error after refresh succeeds", async () => {
+    const getBudgetConfigForAdmin = jest.fn(async () => ({
+      globalMonthlyCapUsd: 1090,
+      warningThreshold: 0.7,
+      protectionThreshold: 0.9,
+      featureCaps: {
+        "content-creation": { monthlyCapUsd: 120 },
+        "marketing-orchestration": { monthlyCapUsd: 180 },
+        "service-recommendations": { monthlyCapUsd: 140 },
+        "scheduling-optimization": { monthlyCapUsd: 180 },
+        "retention-insights": { monthlyCapUsd: 150 },
+        "support-triage": { monthlyCapUsd: 120 },
+        "no-show-fraud": { monthlyCapUsd: 110 },
+        "marketplace-personalization": { monthlyCapUsd: 90 },
+      },
+    }));
+
+    const listBudgetAuditLogsForAdmin = jest
+      .fn()
+      .mockResolvedValueOnce({
+        items: [
+          {
+            id: "log-1",
+            eventType: "ai_budget_config_update",
+            actorUserId: "platform-admin-1",
+            targetPath: "platform/config",
+            reason: "initial setup",
+            createdAt: "2026-04-20T08:00:00.000Z",
+          },
+        ],
+        count: 1,
+        limit: 10,
+        nextPageToken: "log-1",
+        filters: {
+          eventType: null,
+          targetPath: null,
+        },
+      })
+      .mockRejectedValueOnce(new Error("load-more failed"))
+      .mockResolvedValueOnce({
+        items: [
+          {
+            id: "log-1",
+            eventType: "ai_budget_config_update",
+            actorUserId: "platform-admin-1",
+            targetPath: "platform/config",
+            reason: "initial setup",
+            createdAt: "2026-04-20T08:00:00.000Z",
+          },
+        ],
+        count: 1,
+        limit: 10,
+        nextPageToken: null,
+        filters: {
+          eventType: null,
+          targetPath: null,
+        },
+      });
+
+    const service: AiBudgetAdminService = {
+      getBudgetConfigForAdmin,
+      listBudgetAuditLogsForAdmin,
+      updateBudgetConfigForAdmin: jest.fn(async (_actor: { userId: string }, input: UpdateAiBudgetConfigInput) => ({
+        globalMonthlyCapUsd: input.globalMonthlyCapUsd ?? 1090,
+        warningThreshold: input.warningThreshold ?? 0.7,
+        protectionThreshold: input.protectionThreshold ?? 0.9,
+        featureCaps: {
+          "content-creation": { monthlyCapUsd: 120 },
+          "marketing-orchestration": { monthlyCapUsd: 180 },
+          "service-recommendations": { monthlyCapUsd: 140 },
+          "scheduling-optimization": { monthlyCapUsd: 180 },
+          "retention-insights": { monthlyCapUsd: 150 },
+          "support-triage": {
+            monthlyCapUsd: input.featureCaps?.["support-triage"]?.monthlyCapUsd ?? 120,
+          },
+          "no-show-fraud": { monthlyCapUsd: 110 },
+          "marketplace-personalization": { monthlyCapUsd: 90 },
+        },
+      })),
+    };
+
+    render(
+      <OwnerAiBudgetSettingsScreen
+        userId="platform-admin-1"
+        service={service}
+        onBack={() => undefined}
+      />
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("Reason: initial setup")).toBeTruthy();
+    });
+
+    fireEvent.press(screen.getByText("Load more audit events"));
+
+    await waitFor(() => {
+      expect(screen.getByText("load-more failed")).toBeTruthy();
+    });
+
+    fireEvent.press(screen.getByText("Refresh budget config"));
+
+    await waitFor(() => {
+      expect(screen.queryByText("load-more failed")).toBeNull();
+    });
+
+    expect(listBudgetAuditLogsForAdmin).toHaveBeenNthCalledWith(
+      1,
+      { userId: "platform-admin-1" },
+      { limit: 10 }
+    );
+    expect(listBudgetAuditLogsForAdmin).toHaveBeenNthCalledWith(
+      2,
+      { userId: "platform-admin-1" },
+      { limit: 10, nextPageToken: "log-1" }
+    );
+    expect(listBudgetAuditLogsForAdmin).toHaveBeenNthCalledWith(
+      3,
+      { userId: "platform-admin-1" },
+      { limit: 10 }
+    );
+  });
 });
