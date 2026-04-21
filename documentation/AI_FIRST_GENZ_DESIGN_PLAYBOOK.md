@@ -8,6 +8,7 @@ This playbook gives you:
 - A specific AI tool stack
 - Detailed prompts for each tool
 - Handoff guidance for developers
+- Related handoff runbook: `documentation/FIGMA_HANDOFF_TO_DEVELOPMENT_PLAYBOOK.md`
 
 ---
 
