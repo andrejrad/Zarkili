@@ -8,6 +8,9 @@ It links all generated strategy and execution documents and gives an exact run o
 
 ## Document Set
 
+0. Documentation command center (start here)
+- [DOCUMENTATION_COMMAND_CENTER.md](DOCUMENTATION_COMMAND_CENTER.md)
+
 0. Program tracking board (Kanban)
 - [PROGRAM_TRACKING_BOARD.md](PROGRAM_TRACKING_BOARD.md)
 
