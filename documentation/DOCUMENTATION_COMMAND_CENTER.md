@@ -36,6 +36,59 @@ If you only open one file first, open this one.
 
 ---
 
+## Status Tags (Read This Before Opening Docs)
+
+Status legend:
+- ACTIVE: used in current or near-term execution.
+- REFERENCE: stable background context, open when needed.
+- ARCHIVE: historical logs and snapshots, not for primary planning.
+
+### ACTIVE (default docs for most sessions)
+- DOCUMENTATION_COMMAND_CENTER.md
+- PROGRAM_TRACKING_BOARD.md
+- MULTITENANT_MASTER_INDEX.md
+- MULTITENANT_WEEKS_1_TO_4_COPILOT_PROMPTS.md
+- MULTITENANT_WEEKS_5_TO_8_COPILOT_PROMPTS.md
+- MULTITENANT_WEEKS_9_TO_12_COPILOT_PROMPTS.md
+- MULTITENANT_WEEKS_13_TO_20_COPILOT_PROMPTS.md
+- MULTITENANT_COMPANION_EXECUTION_BLUEPRINT.md
+- MULTITENANT_STRATEGY_AND_FEATURE_AUDIT.md
+- AI_FIRST_GENZ_DESIGN_PLAYBOOK.md
+- FIGMA_HANDOFF_TO_DEVELOPMENT_PLAYBOOK.md
+- Relevant feature spec currently in implementation scope
+- Relevant new-platform execution pack currently in implementation scope
+
+### REFERENCE (open on demand)
+- PROJECT_GANTT_AGILE_PLAN.md
+- AI_SUPPORT_SYSTEM_ARCHITECTURE.md
+- MONETIZATION_AND_MULTISALON_INTEGRATION_SUMMARY.md
+- DAY1_DEVELOPMENT_CHECKLIST.md
+- MULTITENANT_DAY1_EXECUTION_LOG_TEMPLATE.md
+- VALIDATION_CYCLE_SLICE1_MOCK.md
+- new-platform/ARCHITECTURE_OVERVIEW.md
+- new-platform/CROSS_PLATFORM_CAPABILITY_MATRIX.md
+- new-platform/CROSS_PLATFORM_READINESS_AUDIT_2026-04-19.md
+- new-platform/AI_FEATURES_IMPLEMENTATION_COVERAGE_MATRIX.md
+- new-platform/AI_RUNTIME_AND_COST_POLICY.md
+- new-platform/ENV_SETUP.md
+- new-platform/NAVIGATION_PUBLIC_PROTECTED.md
+- new-platform/ONBOARDING_ROUTE_SCAFFOLD.md
+- new-platform/TENANTS.md
+- new-platform/TENANT_USERS.md
+- new-platform/USER_TENANT_ACCESS.md
+- new-platform/LOCATIONS.md
+- new-platform/STAFF.md
+- new-platform/STAFF_SCHEDULES.md
+- new-platform/SERVICES.md
+- new-platform/WEEK1_REVIEW_REPORT.md
+
+### ARCHIVE (history and audit trail)
+- DAILY_WORK_DIARY_TEMPLATE.md
+- DIARY_90_SECOND_CHECKLIST.md
+- documentation/diary/*.md
+
+---
+
 ## Document System Map
 
 ### Layer 1: Program Control (What are we doing now?)
