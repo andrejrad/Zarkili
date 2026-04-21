@@ -66,6 +66,9 @@ It links all generated strategy and execution documents and gives an exact run o
 17. AI runtime and cost policy (new)
 - [new-platform/AI_RUNTIME_AND_COST_POLICY.md](new-platform/AI_RUNTIME_AND_COST_POLICY.md)
 
+18. Figma-to-development handoff playbook (new)
+- [FIGMA_HANDOFF_TO_DEVELOPMENT_PLAYBOOK.md](FIGMA_HANDOFF_TO_DEVELOPMENT_PLAYBOOK.md)
+
 ---
 
 ## Recommended Reading Order (First Session)
