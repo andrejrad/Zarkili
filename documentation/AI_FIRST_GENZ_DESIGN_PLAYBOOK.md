@@ -395,12 +395,14 @@ Target: <= 6 taps from detail to confirmation
 
 Loyalty:
 [INSERT LOYALTY PATTERNS]
+Tip: use the compact blocks in "4E) Paste-Ready Interaction Patterns Block (Final Merged)" and "4F) Paste-Ready Do/Don't Table (Final Merged)" below if your Step 2 output is too long.
 
 === DO/DON'T RULES (from Step 2) ===
 [INSERT FULL DO/DON'T TABLE]
 
 === COMPONENT INVENTORY (from Step 1) ===
 [INSERT FULL COMPONENT LIST WITH VARIANTS + STATES]
+Tip: use the compact block in "4A) Paste-Ready Component Inventory Block (SET 2 Optimized)" below if your source output is too long.
 
 === SCREENS TO BUILD (Baseline, Not a Hard Limit) ===
 Create baseline frames in one page named v1-flow (390x844):
@@ -422,6 +424,7 @@ Use Step 1 journey specs and ensure these journeys are fully represented:
 3. Service and salon discovery
 4. Loyalty points earning and redemption
 5. Profile and account management
+Tip: use the compact block in "4D) Paste-Ready User Journeys Block (SET B Optimized + Critical Extras)" below if your source output is too long.
 
 If the baseline 10 screens are not enough to cover all required happy paths and edge cases,
 add supporting screens in a second page named v1-flow-extended.
@@ -459,6 +462,7 @@ In the same initial run, add placeholder frames for these non-core features:
 - Referral
 - Language Switcher
 - Booking Image Attachments
+- Payment and Checkout Reliability
 - Staff Operations
 - Owner/Admin Dashboard
 - Multi-Tenant Platform Admin
@@ -469,7 +473,7 @@ Requirements for each placeholder frame:
 - include one-line expected outcome
 - include role visibility note (client/staff/owner-admin/platform-admin)
 - include note linking to expansion prompt section:
-   - 4B Prompt A-F for client expansion features
+   - 4B Prompt A-G for client expansion features
    - 4C Prompt A-C for staff/admin features
 
 Place these placeholders in page: v1-flow-placeholders
@@ -494,6 +498,7 @@ Rule:
 | Referral | Placeholder referral hub entry frame | Low-Mid | Section 4B Prompt D |
 | Language Switcher | Placeholder settings entry + switch modal | Low-Mid | Section 4B Prompt E |
 | Booking Attachments | Placeholder upload entry in booking detail | Low-Mid | Section 4B Prompt F |
+| Payment and Checkout Reliability | Placeholder checkout recovery entry frame | Low-Mid | Section 4B Prompt G |
 | Staff Operations | Placeholder staff home + agenda entry | Low-Mid | Section 4C Prompt A |
 | Owner/Admin Dashboard | Placeholder KPI dashboard shell | Low-Mid | Section 4C Prompt B |
 | Multi-Tenant Platform Admin | Placeholder tenant directory shell | Low-Mid | Section 4C Prompt C |
@@ -542,6 +547,221 @@ Screens:
 
 Output as numbered sections and tables.
 ```
+
+### 4A) Paste-Ready Component Inventory Block (SET 2 Optimized)
+Use this block when your full Step 1 component output is too verbose for one Figma run.
+Copy/paste this into the `=== COMPONENT INVENTORY ===` section of Option A.
+
+```text
+INPUTS
+- TextInput: default, password, search, otp-digit, multiline | states: default, focused, error, disabled, loading
+- PhoneInput: with country code, standalone | states: default, focused, error, disabled
+- OTPInput: 4-digit, 6-digit | states: empty, partial, complete, error
+- TagPicker: single, multi-select (max N), image tag card | states: default, selected, disabled, loading
+- DateTimePicker: slot grid, 5-day strip, full calendar | states: available, selected, unavailable, waitlist-eligible, loading
+- SearchBar: header embedded, standalone, with suggestions | states: idle, focused, has-query, loading, no-results
+- Toggle / ConsentCheckbox: with labels and policy links | states: on/off/disabled; unchecked/checked/error
+
+BUTTONS
+- PrimaryButton: full-width, compact, icon-left/right | states: default, pressed, loading, disabled, success
+- SecondaryButton: outlined, ghost, destructive outlined | states: default, pressed, disabled
+- IconButton: filled, ghost, round, square, badged | states: default, pressed, disabled
+- StickyFooterCTA: single action, dual action, with price summary | states: default, loading, disabled
+- ChipButton: filter/category/removable | states: default, selected, disabled
+
+NAVIGATION
+- TabBar (5 tabs): icon + label + badge | states: active, inactive, badged
+- NavigationHeader: back+title, title+action, transparent, search, salon-scoped | states: default, scrolled, loading
+- SalonContextChip + SalonSwitcherSheet | states: default, pressed, loading, empty, error
+- BottomSheet + Modal + ProgressStepper + SegmentedControl | states: open/hidden/loading/error + active/complete/upcoming
+
+DATA DISPLAY
+- ServiceCard: grid/list/horizontal/rebook/fully-booked | states: default, loading, unavailable, bookmarked, fully-booked
+- SalonCard: full/compact/map pin | states: default, loading, closed, featured
+- BookingCard: upcoming/past/cancelled/cross-salon | states: confirmed, pending, cancelled, completed, no-show
+- RewardCard + PointsBalance + TierProgress | states: redeemable/locked/expired/loading + animating/zero
+- StylistCard + AnyAvailableRow (fixed first option)
+- WaitlistCard: active, slot-found (hold countdown), expired
+- ConversationListItem + MessageBubble | states: unread/read/muted + sent/delivered/read/failed
+- ReviewRow + StarRating + UGC Photo Tile + Before/After
+
+FEEDBACK
+- Toast + InlineBanner + Snackbar | states: entering/visible/exiting + dismissible + with-action
+- EmptyState: no results, no bookings, no rewards, no registered salons
+- SkeletonLoader: card/row/header/full-page
+- CancellationPolicyBlock + FeeAcknowledgementCheckbox + PreAuthNotice
+- ErrorState + SuccessAnimation + Pull-to-refresh indicator
+
+LAYOUT
+- ScreenWrapper: scroll/static/sticky footer/header | states: default, loading, error
+- SectionHeader + Divider + HorizontalScroll + CardContainer + ListItem
+- BottomSheet wrapper + Modal overlay + SafeArea wrapper + FloatingBottomBar
+- AddSalonPromptCard + CrossSalonBalanceSummarySheet + CrossSalonAppointmentModal
+
+FULL-SCREEN FLOWS (CRITICAL NON-CORE)
+- WaitlistSetupScreen
+- ConversationScreen
+- ReviewSubmitScreen
+- StylistSelectScreen
+- MySalonsScreen
+- SameDayConflictModal
+- ReAuthSheet
+- ParentalConsentScreen
+```
+
+### 4D) Paste-Ready User Journeys Block (SET B Optimized + Critical Extras)
+Use this block when your full journey output is too long for one Figma run.
+Copy/paste this into the `=== USER JOURNEYS TO COVER END-TO-END ===` section of Option A.
+
+```text
+JOURNEY 1: New Client Onboarding -> First Booking
+Goal: complete first booking with minimal friction.
+Happy path:
+1) Launch -> splash -> welcome -> get started
+2) Sign-up: phone OTP or Apple/Google
+3) DOB + legal consent + minimal profile
+4) Optional vibe tags
+5) Home with activeSalonId = null
+6) Discovery -> provider/service -> 5-step booking (service, stylist, date, time, payment)
+7) Booking confirmation + add-salon prompt
+Edge cases: OTP fail, location denied, payment fail, underage parental consent.
+
+JOURNEY 2: Returning Client Quick Rebook
+Goal: rebook in 1-2 taps.
+Happy path:
+1) Home quick rebook strip at active salon
+2) Tap rebook -> prefilled date/time/payment
+3) Confirm -> success -> booking card updated
+Edge cases: discontinued service, price increase acknowledgement, stylist unavailable, expired card.
+
+JOURNEY 3: Discovery -> New Provider Booking
+Goal: find and book a new provider confidently.
+Happy path:
+1) Explore feed with search/filter chips
+2) Apply filters (distance, price, rating, availability)
+3) Open provider profile (UGC, reviews, service list)
+4) Select service -> date/time -> payment -> confirm
+Edge cases: no results, fully booked service (waitlist/notify), slot conflict during checkout.
+
+JOURNEY 4: Loyalty + Rewards
+Goal: understand points and redeem without confusion.
+Happy path:
+1) Rewards tab in active salon context
+2) See points, tier progress, earn rules
+3) Open perks -> redeem -> booking with reward applied
+4) Referral share flow tied to active salon
+Edge cases: insufficient points, reward expiry warning, tenant mismatch, pending points.
+
+JOURNEY 5: Profile + My Salons + Preferences
+Goal: manage profile, payment, notifications, and salon memberships.
+Happy path:
+1) Profile overview
+2) Edit profile (name/photo/tags)
+3) Manage payment methods
+4) Notification preferences
+5) My Salons list with per-salon balances and active salon switching
+Edge cases: phone number change verification, remove active salon, delete account flow.
+
+CRITICAL EXTRA FLOWS (include as supporting frames)
+- Join Salon flow (join & continue from discovery/booking)
+- Waitlist / Notify Me flow (manual + auto-book options)
+- Cancellation and Rescheduling flow (policy and refund visibility)
+- Review Submission flow (post-appointment with optional photos)
+
+MINIMUM OUTPUT PER JOURNEY
+- happy path sequence frames
+- at least one edge-case frame
+- explicit CTA hierarchy (one primary CTA)
+- accessibility notes for key interactions
+```
+
+### 4E) Paste-Ready Interaction Patterns Block (Final Merged)
+Use this block when your Step 2 interaction output is too long for one Figma run.
+Copy/paste this into the `=== INTERACTION PATTERNS ===` section of Option A.
+
+```text
+ONBOARDING (Value first)
+Goal: reach first meaningful browse in <20 seconds; first booking feasible in <4 minutes.
+- Max 2-4 onboarding screens before value.
+- Browse before hard signup gate where possible.
+- Minimal identity friction: phone OTP or social + first-name only.
+- Keep Skip visible on every onboarding screen.
+- One lightweight personalization step (1-5 chips), skippable.
+- Progressive permissions only:
+   - location on Explore/Near me intent
+   - notifications on booking confirmation or waitlist opt-in
+   - camera only on upload actions
+   - avoid contacts permission; use system share
+- Ban: invite friends/follow salons during onboarding.
+
+DISCOVERY (2-tap relevance)
+Goal: 2 taps home -> filtered results, 3 taps home -> service detail.
+- Sticky search bar + horizontal quick filters (category, location, price, availability, rating, vibe).
+- Advanced filters in bottom sheet (40% / 85% snap points).
+- Instant apply filters; no apply-confirm chain.
+- Default sort: recommended. One-tap toggles for list/map.
+- Card above-fold fields: image, service name, price, duration, rating+count, next slot, distance/salon.
+- Performance targets:
+   - skeleton visible <=100ms
+   - perceived filter feedback <=300ms
+   - first result paint ~200ms where possible
+- Empty state always includes reason + single CTA (clear filters / explore nearby).
+
+BOOKING CONFIRMATION (Trust + next action)
+Goal: one-screen confirmation that reassures and launches next steps.
+- One-screen confirmation, no extra navigation for essentials.
+- Micro-celebration 400-800ms max, non-blocking, reduced-motion fallback.
+- Trust block above fold:
+   - booking reference (copyable)
+   - provider/stylist name + photo
+   - salon address + map deep link
+   - date/time
+   - total price
+   - cancellation window summary
+- CTA row in priority:
+   - Add to calendar
+   - Share
+   - Message venue
+   - View booking/Rebook
+- Non-blocking secondary nudges only (add salon, book another service, invite/inspo).
+- Ban: review request before service is completed.
+
+LOYALTY (Visible, meaningful, forgiving)
+Goal: make earning immediate and redemption effortless.
+- Show progress at key surfaces (home, confirmation, rewards/profile).
+- Frame progress as current -> next milestone, not abstract points only.
+- Reward meaningful behaviors (completed bookings, qualified reviews, referrals).
+- Redemption in 1-2 taps, no manual promo typing in primary path.
+- Short celebration only (300-600ms), non-blocking.
+- Show exact expiry dates and eligibility in plain language.
+- If streaks exist, include forgiveness (freeze/recovery); do not hard-reset on one miss.
+- Keep balances and rules salon-scoped with clear active salon context.
+```
+
+### 4F) Paste-Ready Do/Don't Table (Final Merged)
+Use this table when you need a concise policy layer in the same Figma prompt.
+
+| Area | Do This | Don't Do This | Reason |
+| --- | --- | --- | --- |
+| Onboarding | Max 2-4 screens before first value; browse before hard signup where possible | Gate home behind long profile forms | Value-first reduces early churn |
+| Permissions | Ask in context at intent moments | Request location/notifications/camera on launch | Contextual asks convert higher |
+| Price display | Show price/deposit/fees transparently before final confirmation | Reveal fees only at checkout | Hidden fees drive abandonment |
+| Cancellation policy | Show policy summary on service detail and checkout | Bury policy in terms links | Upfront policy improves trust |
+| Discovery cards | Show image, price, duration, rating, next slot, distance | Hide key info until deep screens | Faster comparison lowers friction |
+| Filters | Instant chip updates + bottom-sheet advanced filters | Separate filter page chains with apply buttons | Fewer taps, faster exploration |
+| Empty states | Always provide reason + one recovery CTA | Show blank/no-path results | Keeps users moving forward |
+| Social proof | Use verified reviews and real recent photos | Use fake urgency counters/fabricated proof | Authenticity is critical for trust |
+| Booking flow | Keep continuous, minimal-step flow | Insert interruptions/upsell screens mid-flow | Extra steps increase drop-off |
+| Confirmation | One-screen success with next-step CTAs | Stop at static "Success" | Users need certainty and action |
+| Rewards visibility | Surface progress on key decision screens | Hide rewards only in a buried tab | Visible progress drives repeat use |
+| Reward mechanics | Reward meaningful behaviors | Reward empty app opens | Substance beats vanity loops |
+| Waitlist UX | Make fully booked slots actionable via waitlist | Hard-block with no next step | Converts blocked intent into retention |
+| Multi-salon context | Keep explicit active salon context in bookings/rewards | Mix all salons in one ambiguous stream | Prevents policy and loyalty confusion |
+| Profile data | Collect only essential fields upfront | Ask sensitive/low-value fields early | Reduces distrust and abandonment |
+| Notifications | Send specific value-linked messages at useful times | Blast generic promos | Relevance protects retention |
+| AI behavior | Use AI as assistive and explainable | Let AI auto-decide critical actions silently | User control increases trust |
+| Visual/tone | Keep UI fast, clear, and authentic | Overload trend effects or forced slang | Performance + authenticity win |
+
 
 ---
 
@@ -773,11 +993,51 @@ Output:
 - Guardrails copy for accepted file types and max size
 ```
 
+### Prompt G: Payment and Checkout Reliability (Non-Critical Follow-Up)
+Copy/paste into Figma AI:
+
+```text
+Extend the Zarkili booking flow with advanced payment and checkout reliability UX.
+
+Context:
+- This is a post-core, non-critical expansion slice.
+- Core booking must already be approved and functioning.
+- Reuse existing tokens, payment patterns, and service summary UI.
+
+Create these screens and states:
+1. Checkout method selection screen
+   - Saved card, Apple Pay/Google Pay, add new card
+   - Clear primary CTA: "Confirm and Pay"
+2. Deposit/pre-auth explanation panel
+   - Explain full prepay vs deposit vs pay-at-salon
+   - Show policy and refund notes in plain language
+3. Payment processing state
+   - In-progress confirmation with safe retry guidance
+4. Payment failure recovery screen
+   - Failure reason + retry + switch payment method + support entry
+5. Payment success screen variant
+   - Receipt summary + payment method used + next actions
+6. Refund and cancellation outcome state
+   - Approved refund, partial refund, pending refund statuses
+
+Required states:
+- Loading: payment initialization / processing
+- Empty: no saved payment methods
+- Error: payment declined / network interruption / timeout
+- No-access: payment method restricted by policy or region
+
+Output:
+- Frames for all screens above
+- Components for payment method row, deposit badge, retry banner, refund status chip
+- Copy constraints: no ambiguous payment terms; show exact amounts and policy implications
+```
+
 ### Sequencing recommendation (after core skeleton)
 1. Waiting List + Booking Image Attachments (booking-critical)
 2. Messaging (support-critical)
 3. Referral + Social Share (growth-critical)
 4. Language Switcher (scale-critical)
+5. Payment and Checkout Reliability (non-critical, hardening pass)
 
 ---
 
@@ -1265,11 +1525,45 @@ Output:
 - Validation rules summary (file types/sizes) and any unresolved backend assumptions
 ```
 
+### Prompt G: Payment and Checkout Reliability (Code Implementation)
+```text
+Implement the approved Payment and Checkout Reliability UI slice for Zarkili in React Native Expo + TypeScript.
+
+Scope:
+- Checkout payment method selection (saved card, Apple Pay/Google Pay, add new card)
+- Deposit/pre-auth explanation panel with policy messaging
+- Payment processing/in-progress state
+- Payment failure recovery flow (retry, switch method, support entry)
+- Payment success receipt variant
+- Refund/cancellation outcome states (full, partial, pending)
+
+Technical requirements:
+- Reuse existing booking/payment contracts and providers only; no contract redesign.
+- Keep amount transparency explicit across all states (service, fees, deposit, total).
+- Build reusable UI primitives if missing:
+   - PaymentMethodRow
+   - DepositPolicyBadge
+   - PaymentRetryBanner
+   - RefundStatusChip
+- Add states:
+   - loading (payment init/processing)
+   - empty (no saved methods)
+   - error (declined/network/timeout)
+   - no-access (method restricted by policy/region)
+
+Output:
+- Modified file list
+- New component list
+- Test coverage summary
+- Open TODOs for policy/regional constraints and edge-case handling
+```
+
 ### Recommended implementation order
 1. Waiting List + Booking Image Attachments
 2. Messaging
 3. Referral + Social Share
 4. Language Switcher
+5. Payment and Checkout Reliability (non-critical hardening pass)
 
 ---
 
