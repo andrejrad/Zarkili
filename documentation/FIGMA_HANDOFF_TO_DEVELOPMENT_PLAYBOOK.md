@@ -201,6 +201,47 @@ Use these short commands in chat:
 - "Generate Figma correction request" -> produce precise resend message for failed items.
 - "Scope to Explore only" -> implementation restricted to Explore slice.
 
+## Phase 10: Strict Response Scorecard (Paste After Any Figma Reply)
+Use this template to force automatic pass/fail decisioning from each Figma response.
+
+```text
+FIGMA HANDOFF SCORECARD
+Run: [YYYY-MM-DD HH:mm]
+Package version: [vX.Y.Z]
+Scope: [Explore only / Explore+Bookings / etc]
+
+1) One ZIP package delivered (not tar.gz): PASS | FAIL
+2) Required folders present (assets/icons, assets/images, tokens, components, specs, strings): PASS | FAIL
+3) Root-level ASSET_MANIFEST.json present: PASS | FAIL
+4) Full icon categories (nails, hair, skin, lashes, brows, massage, makeup, barber, waxing, spa, injectables, wellness): PASS | FAIL
+5) Both icon sizes (20 and 24): PASS | FAIL
+6) SVG + PNG @1x/@2x/@3x for each icon: PASS | FAIL
+7) Active and inactive icon states (or explicit token mapping): PASS | FAIL
+8) Naming convention consistent across exports: PASS | FAIL
+9) Stroke and padding consistency confirmed: PASS | FAIL
+10) Token JSON present and machine-readable: PASS | FAIL
+11) Semantic tokens included (primary, surface, text, text-muted, success, warning, error): PASS | FAIL
+12) Required components included (category pill, search bar, filter button, service card, bottom tab item, chips, badges): PASS | FAIL
+13) Component states covered (default, pressed, selected, disabled, loading, error where applicable): PASS | FAIL
+14) Specs include redlines, safe area, responsive rules, sticky/scroll behavior: PASS | FAIL
+15) Interaction spec includes duration, easing, triggers: PASS | FAIL
+16) Strings table includes max lengths and truncation rules: PASS | FAIL
+17) Accessibility includes touch targets, contrast, labels for icon-only controls: PASS | FAIL
+18) Manifest maps assets/components/tokens/strings to screen usage: PASS | FAIL
+
+Decision:
+- PASS: all checks are PASS.
+- CONDITIONAL PASS: no structural failures; only minor polish issues.
+- FAIL: any structural requirement fails (format, missing categories/sizes/formats, no token JSON, missing components/states, no manifest mapping).
+
+Failed checks:
+- [list check numbers]
+
+Regeneration request to send:
+Please regenerate handoff with missing items fixed: [failed check numbers].
+Keep the same folder structure and naming format; include updated ASSET_MANIFEST.json and token JSON in one ZIP package.
+```
+
 ## Notes
 - Markdown summaries are useful, but cannot replace asset/tokens/spec exports.
 - Keep source-of-truth in package files, not in chat messages.
