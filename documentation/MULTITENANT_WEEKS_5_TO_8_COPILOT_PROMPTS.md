@@ -184,14 +184,20 @@ Requirements:
 2. Ensure idempotency using event keys and processed markers.
 3. Add retry-safe behavior and structured logging.
 4. Keep all notifications tenant-branded via tenant settings.
-5. Add integration tests with mock event payloads.
+5. **Denormalize next appointment into UserTenantAccess (carry-over from Task 5.5.1)**:
+   - Add fields to UserTenantAccess model: `nextAppointmentAt: Timestamp | null` and `nextAppointmentServiceName: string | null`.
+   - On booking confirmed or rescheduled: set these fields on the customer's UserTenantAccess document for that tenant.
+   - On booking cancelled, completed, or no_show: re-query the next upcoming confirmed booking for that user+tenant and update the fields (set null if none).
+   - Dashboard SalonCard must be updated to render the next appointment when the field is present.
+6. Add integration tests with mock event payloads, including next-appointment sync accuracy.
 Return:
 - files changed
 - idempotency strategy
+- next-appointment denormalization test coverage
 - test summary
 
 Review prompt:
-Review trigger handlers for duplicate sends, race behavior, and error recovery gaps.
+Review trigger handlers for duplicate sends, race behavior, error recovery gaps, and stale next-appointment values after cancellation or rescheduling.
 
 ## Task 6.3 - Scheduled Reminder Service
 Prompt:

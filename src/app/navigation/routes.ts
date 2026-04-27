@@ -64,9 +64,87 @@ export const appRoutes: AppRouteDefinition[] = [
     guard: "none",
   },
   {
+    name: "TenantPublicProfile",
+    group: "public",
+    path: "/discover/tenant-profile",
+    guard: "none",
+  },
+  {
     name: "AppShell",
     group: "protected",
     path: "/app",
+    guard: "authenticated",
+  },
+  {
+    name: "CompleteProfile",
+    group: "protected",
+    path: "/app/complete-profile",
+    guard: "authenticated",
+  },
+  {
+    name: "TenantProfile",
+    group: "protected",
+    path: "/app/tenant-profile",
+    guard: "authenticated",
+  },
+  {
+    name: "TenantLocations",
+    group: "protected",
+    path: "/app/locations",
+    guard: "authenticated",
+  },
+  {
+    name: "CreateLocation",
+    group: "protected",
+    path: "/app/locations/create",
+    guard: "authenticated",
+  },
+  {
+    name: "StaffList",
+    group: "protected",
+    path: "/app/staff",
+    guard: "authenticated",
+  },
+  {
+    name: "StaffCreate",
+    group: "protected",
+    path: "/app/staff/create",
+    guard: "authenticated",
+  },
+  {
+    name: "StaffEdit",
+    group: "protected",
+    path: "/app/staff/edit",
+    guard: "authenticated",
+  },
+  {
+    name: "ServiceList",
+    group: "protected",
+    path: "/app/services",
+    guard: "authenticated",
+  },
+  {
+    name: "ServiceCreate",
+    group: "protected",
+    path: "/app/services/create",
+    guard: "authenticated",
+  },
+  {
+    name: "ServiceEdit",
+    group: "protected",
+    path: "/app/services/edit",
+    guard: "authenticated",
+  },
+  {
+    name: "AdminBookingQueue",
+    group: "protected",
+    path: "/app/booking-queue",
+    guard: "authenticated",
+  },
+  {
+    name: "SalonDashboard",
+    group: "protected",
+    path: "/app/salon-dashboard",
     guard: "authenticated",
   },
   {
@@ -162,4 +240,43 @@ export function resolveRouteFromPath(path: string, context: RouteAccessContext):
     resolvedRoute: route,
     reason: "direct",
   };
+}
+
+// ---------------------------------------------------------------------------
+// Salon context deep-link parsing (5.5.3)
+// Handles paths of the form: /salon/{tenantId}[/{section}]
+// ---------------------------------------------------------------------------
+
+export type SalonContextSection = "book" | "messages" | "loyalty" | "profile";
+
+export type SalonContextDeepLink = {
+  tenantId: string;
+  section: SalonContextSection | null;
+};
+
+/**
+ * Parses a salon context deep-link path.
+ *
+ * Examples:
+ *   /salon/tenant-abc            → { tenantId: "tenant-abc", section: null }
+ *   /salon/tenant-abc/messages   → { tenantId: "tenant-abc", section: "messages" }
+ *   /salon/tenant-abc/book       → { tenantId: "tenant-abc", section: "book" }
+ *
+ * Returns null for paths that don't match the /salon/{id} pattern.
+ */
+export function parseSalonContextPath(path: string): SalonContextDeepLink | null {
+  const normalized = normalizePath(path);
+  const match = /^\/salon\/([^/]+)(?:\/([^/]+))?$/.exec(normalized);
+  if (!match) return null;
+
+  const tenantId = match[1];
+  if (!tenantId || tenantId.trim().length === 0) return null;
+
+  const rawSection = match[2];
+  const validSections: SalonContextSection[] = ["book", "messages", "loyalty", "profile"];
+  const section = validSections.includes(rawSection as SalonContextSection)
+    ? (rawSection as SalonContextSection)
+    : null;
+
+  return { tenantId, section };
 }

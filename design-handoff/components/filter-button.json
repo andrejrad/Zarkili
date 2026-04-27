@@ -1,0 +1,173 @@
+{
+  "component": "FilterButton",
+  "description": "Filter and sort control button with icon and optional badge",
+  "variants": {
+    "type": {
+      "options": ["filter", "sort"],
+      "default": "filter"
+    },
+    "size": {
+      "options": ["default"],
+      "default": "default"
+    },
+    "state": {
+      "options": ["default", "pressed", "active", "disabled"],
+      "default": "default"
+    }
+  },
+  "states": {
+    "default": {
+      "background": "#FFFFFF",
+      "border": {
+        "width": 1,
+        "color": "#E5E0D1",
+        "radius": 9999
+      },
+      "icon": {
+        "filter": "sliders-horizontal",
+        "sort": "arrow-up-down",
+        "size": 20,
+        "color": "#6B6B6B"
+      },
+      "label": {
+        "color": "#1A1A1A",
+        "style": "label"
+      },
+      "shadow": "none"
+    },
+    "pressed": {
+      "background": "#F5F5F5",
+      "border": {
+        "width": 1,
+        "color": "#E5E0D1",
+        "radius": 9999
+      },
+      "icon": {
+        "color": "#6B6B6B"
+      },
+      "label": {
+        "color": "#1A1A1A"
+      },
+      "transform": "scale(0.95)",
+      "shadow": "none"
+    },
+    "active": {
+      "background": "#E3A9A0",
+      "border": {
+        "width": 1,
+        "color": "#E3A9A0",
+        "radius": 9999
+      },
+      "icon": {
+        "color": "#FFFFFF"
+      },
+      "label": {
+        "color": "#FFFFFF"
+      },
+      "shadow": "sm",
+      "badge": {
+        "display": true,
+        "background": "#FFFFFF",
+        "color": "#E3A9A0",
+        "position": "top-right"
+      }
+    },
+    "disabled": {
+      "background": "#F5F5F5",
+      "border": {
+        "width": 1,
+        "color": "#E5E0D1",
+        "radius": 9999
+      },
+      "icon": {
+        "color": "#B0B0B0"
+      },
+      "label": {
+        "color": "#B0B0B0"
+      },
+      "opacity": 0.6,
+      "shadow": "none"
+    }
+  },
+  "layout": {
+    "height": 44,
+    "minWidth": 44,
+    "paddingHorizontal": 16,
+    "paddingVertical": 10,
+    "borderRadius": 9999,
+    "gap": 8,
+    "flexDirection": "row",
+    "alignItems": "center",
+    "justifyContent": "center",
+    "icon": {
+      "size": 20,
+      "position": "leading"
+    },
+    "label": {
+      "fontSize": 14,
+      "fontWeight": "500",
+      "lineHeight": 20
+    },
+    "badge": {
+      "position": "absolute",
+      "top": -4,
+      "right": -4,
+      "size": "small",
+      "type": "count"
+    }
+  },
+  "content": {
+    "filter": {
+      "icon": "sliders-horizontal",
+      "labelDefault": "Filter",
+      "labelActive": "{{count}} active"
+    },
+    "sort": {
+      "icon": "arrow-up-down",
+      "labelDefault": "Sort",
+      "labelActive": "{{sortType}}"
+    }
+  },
+  "behavior": {
+    "hapticFeedback": "selection",
+    "onPress": "Open filter/sort bottom sheet",
+    "badgeCount": "Number of active filters",
+    "clearable": true
+  },
+  "transitions": {
+    "onPress": {
+      "duration": 100,
+      "easing": "ease-out",
+      "properties": ["background", "transform"]
+    },
+    "onActivate": {
+      "duration": 200,
+      "easing": "ease-out",
+      "properties": ["background", "border", "icon", "label"]
+    }
+  },
+  "accessibility": {
+    "role": "button",
+    "label": {
+      "filter": "Filter results",
+      "sort": "Sort results"
+    },
+    "hint": {
+      "filter": "Opens filter options",
+      "sort": "Opens sort options"
+    },
+    "state": {
+      "active": "{{count}} filters active",
+      "default": "No filters applied"
+    },
+    "minTouchTarget": "44x44"
+  },
+  "dependencies": {
+    "icons": ["sliders-horizontal", "arrow-up-down (system icons)"],
+    "components": ["badge.json (for active count)"],
+    "tokens": ["colors.json", "typography.json", "spacing.json"]
+  },
+  "example": {
+    "react": "import { FilterButton } from '@/components/FilterButton';\n\n// Filter button\n<FilterButton\n  type=\"filter\"\n  active={activeFilters.length > 0}\n  count={activeFilters.length}\n  onPress={handleOpenFilters}\n/>\n\n// Sort button\n<FilterButton\n  type=\"sort\"\n  active={sortType !== 'default'}\n  label={sortType === 'price' ? 'Price' : 'Rating'}\n  onPress={handleOpenSort}\n/>"
+  }
+}

@@ -1,0 +1,113 @@
+{
+  "component": "CategoryPill",
+  "description": "Selectable category filter pill with icon and label",
+  "variants": {
+    "size": {
+      "options": ["default"],
+      "default": "default"
+    },
+    "state": {
+      "options": ["default", "selected", "pressed", "disabled"],
+      "default": "default"
+    }
+  },
+  "states": {
+    "default": {
+      "background": "#FFFFFF",
+      "border": {
+        "width": 1,
+        "color": "#E5E0D1"
+      },
+      "icon": {
+        "color": "#E3A9A0",
+        "size": 20
+      },
+      "text": {
+        "color": "#1A1A1A",
+        "style": "label"
+      }
+    },
+    "selected": {
+      "background": "#E3A9A0",
+      "border": {
+        "width": 1,
+        "color": "#E3A9A0"
+      },
+      "icon": {
+        "color": "#FFFFFF",
+        "size": 20
+      },
+      "text": {
+        "color": "#FFFFFF",
+        "style": "label"
+      }
+    },
+    "pressed": {
+      "background": "#D99A90",
+      "border": {
+        "width": 1,
+        "color": "#D99A90"
+      },
+      "icon": {
+        "color": "#FFFFFF",
+        "size": 20
+      },
+      "text": {
+        "color": "#FFFFFF",
+        "style": "label"
+      },
+      "transform": "scale(0.98)"
+    },
+    "disabled": {
+      "background": "#F5F5F5",
+      "border": {
+        "width": 1,
+        "color": "#E5E0D1"
+      },
+      "icon": {
+        "color": "#B0B0B0",
+        "size": 20
+      },
+      "text": {
+        "color": "#B0B0B0",
+        "style": "label"
+      },
+      "opacity": 0.6
+    }
+  },
+  "layout": {
+    "display": "flex",
+    "flexDirection": "row",
+    "alignItems": "center",
+    "gap": 8,
+    "paddingHorizontal": 16,
+    "paddingVertical": 8,
+    "borderRadius": 9999,
+    "minWidth": 80,
+    "minHeight": 44
+  },
+  "transitions": {
+    "onPress": {
+      "duration": 100,
+      "easing": "ease-out",
+      "properties": ["background", "border", "transform"]
+    },
+    "onSelect": {
+      "duration": 200,
+      "easing": "ease-in-out",
+      "properties": ["background", "border", "icon", "text"]
+    }
+  },
+  "accessibility": {
+    "role": "button",
+    "label": "{categoryName} category",
+    "state": "selected={isSelected}",
+    "minTouchTarget": {
+      "width": 44,
+      "height": 44
+    }
+  },
+  "example": {
+    "react": "import { CategoryPill } from '@/components/CategoryPill';\n\n<CategoryPill\n  icon=\"nails\"\n  label=\"Nails\"\n  selected={selectedCategory === 'nails'}\n  onPress={() => setSelectedCategory('nails')}\n/>"
+  }
+}

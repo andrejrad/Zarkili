@@ -48,6 +48,9 @@ Review Stripe Billing integration for idempotency holes, status drift, and billi
 ## Task 13.2 - Stripe Connect Domain (Salon Payouts)
 Prompt:
 Implement Stripe Connect onboarding and account-state handling for salon payouts.
+
+**US-primary defaults (per [US_PRIMARY_MARKET_ADDENDUM.md](US_PRIMARY_MARKET_ADDENDUM.md)):** default Connect account type is **Express** for US salons; capture W-9 (US persons) and W-8BEN (foreign owners) at onboarding; track 1099-K reporting eligibility per US tax thresholds. EU salons follow Stripe defaults.
+
 Requirements:
 1. Add connected account creation/linking flow for tenant owners.
 2. Persist connect status: not_started, pending_verification, active, restricted.
@@ -65,6 +68,25 @@ Review Connect implementation for payout-blocking regressions and missing verifi
 ---
 
 ## Week 14 - Free Trial and Gating
+
+## Task 14.0 - Stripe Tax Integration (US sales tax + EU VAT)
+
+**Per [US_PRIMARY_MARKET_ADDENDUM.md](US_PRIMARY_MARKET_ADDENDUM.md).**
+
+Wire Stripe Tax to handle US state sales-tax and EU VAT in one product.
+
+1. Enable Stripe Tax on the platform Stripe account; configure default ship-from / origin per tenant location.
+2. Wire Stripe Tax automatic determination to:
+   - SaaS billing checkout (tenant subscription).
+   - In-app salon payments where the salon's state taxes services.
+3. Surface tax breakdown on receipts (consumer + admin) and on invoices (admin).
+4. Add idempotency on tax calculation; cache calc per quote with TTL.
+5. Tests:
+   - US states that tax personal services (CT, HI, NM, SD, WV; NYC surcharge) produce non-zero tax.
+   - US states that do not tax personal services produce zero tax with audit reason.
+   - EU VAT applies per buyer/seller jurisdiction with reverse-charge for B2B between EU member states.
+6. Document tax-jurisdiction summary surfaced in Phase 3 W33 admin tenant settings.
+7. Confirm HIPAA non-applicability is unaffected (no PHI flows through tax calls).
 
 ## Task 14.1 - Free Trial Lifecycle Engine
 Prompt:

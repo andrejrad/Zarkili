@@ -1,0 +1,300 @@
+{
+  "screen": "Explore",
+  "route": "/explore",
+  "description": "Main discovery screen for browsing salons and services across all categories",
+  "layout": {
+    "safeArea": {
+      "top": true,
+      "bottom": true,
+      "behavior": "padding"
+    },
+    "scrollable": true,
+    "scrollBehavior": {
+      "bounces": true,
+      "showsVerticalScrollIndicator": true,
+      "contentInsetAdjustmentBehavior": "automatic"
+    },
+    "stickyElements": [
+      {
+        "element": "navigationHeader",
+        "position": "top",
+        "zIndex": 50
+      },
+      {
+        "element": "tabBar",
+        "position": "bottom",
+        "zIndex": 50
+      }
+    ]
+  },
+  "structure": {
+    "navigationHeader": {
+      "height": 64,
+      "paddingHorizontal": 16,
+      "background": "#F2EDDD",
+      "borderBottom": {
+        "width": 1,
+        "color": "#E5E0D1"
+      },
+      "elements": {
+        "title": {
+          "text": "Explore",
+          "style": "heading-3",
+          "alignment": "left"
+        },
+        "messagesButton": {
+          "position": "right",
+          "size": 44,
+          "badge": {
+            "enabled": true,
+            "position": "top-right",
+            "offset": { "x": -4, "y": 4 }
+          }
+        }
+      }
+    },
+    "content": {
+      "paddingTop": 64,
+      "paddingBottom": 24,
+      "sections": [
+        {
+          "id": "search",
+          "paddingHorizontal": 16,
+          "paddingVertical": 12,
+          "elements": {
+            "searchBar": {
+              "height": 48,
+              "borderRadius": 9999,
+              "background": "#FFFFFF",
+              "border": {
+                "width": 1,
+                "color": "#E5E0D1"
+              },
+              "icon": {
+                "name": "search",
+                "size": 20,
+                "color": "#6B6B6B",
+                "position": "left",
+                "offset": 16
+              },
+              "input": {
+                "paddingLeft": 48,
+                "paddingRight": 16,
+                "style": "body",
+                "placeholder": "Search services, salons...",
+                "placeholderColor": "#6B6B6B"
+              }
+            }
+          }
+        },
+        {
+          "id": "categoryPills",
+          "paddingHorizontal": 16,
+          "paddingBottom": 8,
+          "elements": {
+            "scrollView": {
+              "horizontal": true,
+              "showsHorizontalScrollIndicator": false,
+              "gap": 8,
+              "contentInset": {
+                "left": 0,
+                "right": 16
+              }
+            }
+          }
+        },
+        {
+          "id": "filterBar",
+          "paddingHorizontal": 16,
+          "paddingVertical": 12,
+          "elements": {
+            "resultsCount": {
+              "style": "body-small",
+              "color": "#6B6B6B",
+              "alignment": "left"
+            },
+            "filterButton": {
+              "height": 36,
+              "paddingHorizontal": 16,
+              "borderRadius": 9999,
+              "background": "#FFFFFF",
+              "border": {
+                "width": 1,
+                "color": "#E5E0D1"
+              },
+              "gap": 8,
+              "icon": {
+                "name": "sliders",
+                "size": 16
+              },
+              "label": {
+                "style": "label-small"
+              }
+            }
+          },
+          "layout": {
+            "flexDirection": "row",
+            "justifyContent": "space-between",
+            "alignItems": "center"
+          }
+        },
+        {
+          "id": "salonList",
+          "paddingHorizontal": 16,
+          "paddingBottom": 96,
+          "elements": {
+            "salonCards": {
+              "gap": 16,
+              "layout": "vertical-stack"
+            }
+          }
+        }
+      ]
+    },
+    "tabBar": {
+      "height": 80,
+      "background": "#FFFFFF",
+      "borderTop": {
+        "width": 1,
+        "color": "#E5E0D1"
+      },
+      "safeAreaInsetBottom": true
+    }
+  },
+  "spacing": {
+    "pageHorizontal": 16,
+    "pageVertical": 24,
+    "sectionGap": 24,
+    "elementGap": 12,
+    "cardGap": 16
+  },
+  "states": {
+    "loading": {
+      "display": "skeleton",
+      "elements": [
+        { "type": "searchBar", "shimmer": true },
+        { "type": "categoryPills", "count": 6, "shimmer": true },
+        { "type": "salonCard", "count": 3, "shimmer": true }
+      ]
+    },
+    "empty": {
+      "display": "centered",
+      "illustration": {
+        "type": "icon",
+        "name": "search",
+        "size": 64,
+        "color": "#6B6B6B",
+        "background": "rgba(209, 191, 179, 0.2)",
+        "backgroundSize": 80,
+        "borderRadius": 9999
+      },
+      "title": {
+        "text": "No results found",
+        "style": "heading-3",
+        "marginTop": 16
+      },
+      "message": {
+        "text": "Try adjusting your filters or search terms",
+        "style": "body",
+        "color": "#6B6B6B",
+        "marginTop": 8,
+        "textAlign": "center",
+        "maxWidth": 280
+      },
+      "action": {
+        "text": "Clear filters",
+        "style": "primary-button",
+        "marginTop": 24
+      }
+    },
+    "error": {
+      "display": "centered",
+      "illustration": {
+        "type": "icon",
+        "name": "alert-circle",
+        "size": 64,
+        "color": "#F44336"
+      },
+      "title": {
+        "text": "Unable to load salons",
+        "style": "heading-3",
+        "marginTop": 16
+      },
+      "message": {
+        "text": "Please check your connection and try again",
+        "style": "body",
+        "color": "#6B6B6B",
+        "marginTop": 8,
+        "textAlign": "center",
+        "maxWidth": 280
+      },
+      "action": {
+        "text": "Retry",
+        "style": "primary-button",
+        "marginTop": 24
+      }
+    }
+  },
+  "responsive": {
+    "breakpoints": {
+      "small": {
+        "maxWidth": 390,
+        "adjustments": "none"
+      },
+      "medium": {
+        "minWidth": 391,
+        "maxWidth": 768,
+        "adjustments": {
+          "pageHorizontal": 24,
+          "salonCards": {
+            "layout": "grid",
+            "columns": 2,
+            "gap": 16
+          }
+        }
+      },
+      "large": {
+        "minWidth": 769,
+        "adjustments": {
+          "maxWidth": 1200,
+          "centerContent": true,
+          "pageHorizontal": 32
+        }
+      }
+    }
+  },
+  "accessibility": {
+    "navigationOrder": [
+      "messagesButton",
+      "searchBar",
+      "categoryPills",
+      "filterButton",
+      "salonCards"
+    ],
+    "announcements": {
+      "onLoad": "{{count}} salons loaded",
+      "onFilter": "{{count}} salons match your filters",
+      "onError": "Unable to load salons. Please try again."
+    },
+    "minimumContrast": "WCAG AA",
+    "focusIndicators": {
+      "visible": true,
+      "color": "#E3A9A0",
+      "width": 2,
+      "offset": 2
+    }
+  },
+  "performance": {
+    "listOptimization": {
+      "windowSize": 10,
+      "initialNumToRender": 5,
+      "maxToRenderPerBatch": 5,
+      "updateCellsBatchingPeriod": 50
+    },
+    "imageOptimization": {
+      "lazy": true,
+      "placeholder": "blur",
+      "cachePolicy": "memory-disk"
+    }
+  }
+}

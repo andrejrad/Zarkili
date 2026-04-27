@@ -12,3 +12,13 @@ ui-debug.log
 *.log
 functions/node_modules/
 functions/lib/
+
+# Firebase deploy cache
+.firebase/
+
+# Office lock files
+~$*
+
+# Exported PDFs (regenerated from .md)
+documentation/**/*.pdf
+

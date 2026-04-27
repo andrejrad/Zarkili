@@ -1,6 +1,8 @@
 export type AuthSession = {
   userId: string;
   email: string | null;
+  firstName: string | null;
+  lastName: string | null;
 };
 
 export type TenantRole =
@@ -22,6 +24,21 @@ export type TenantMembership = {
 export type SignInInput = {
   email: string;
   password: string;
+};
+
+export type CreateAccountInput = SignInInput;
+
+export type UpdateProfileInput = {
+  firstName: string;
+  lastName: string;
+};
+
+export type UpdateEmailInput = {
+  email: string;
+};
+
+export type PasswordResetInput = {
+  email: string;
 };
 
 export type OnboardingFlowType = "salon" | "client";

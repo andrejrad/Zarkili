@@ -1,0 +1,764 @@
+{
+  "package": {
+    "name": "Zarkili Design Handoff",
+    "version": "1.0.0",
+    "date": "2026-04-22",
+    "platform": "React Native with Expo",
+    "status": "Production Ready - SVG Primary",
+    "contractCompliance": "Design-to-Dev Handoff Contract v1.0"
+  },
+  "iconConsistency": {
+    "verified": true,
+    "totalIcons": {
+      "svg": 24,
+      "png": 0,
+      "categories": 12,
+      "sizes": 2,
+      "note": "SVG-only delivery - PNG export optional (guide provided)"
+    },
+    "pngStatus": "Not included - SVG is production-ready for React Native. Optional PNG export guide provided for alternative workflows.",
+    "specifications": {
+      "24px": {
+        "viewBox": "0 0 24 24",
+        "strokeWidth": "1.5",
+        "padding": "2px effective safe area",
+        "artboardSize": "24x24",
+        "pngExports": [
+          "@1x (24px)",
+          "@2x (48px)",
+          "@3x (72px)"
+        ]
+      },
+      "20px": {
+        "viewBox": "0 0 20 20",
+        "strokeWidth": "1.25",
+        "padding": "1.67px effective safe area",
+        "artboardSize": "20x20",
+        "pngExports": [
+          "@1x (20px)",
+          "@2x (40px)",
+          "@3x (60px)"
+        ]
+      }
+    },
+    "sharedProperties": {
+      "fill": "none",
+      "stroke": "currentColor",
+      "strokeLinecap": "round",
+      "strokeLinejoin": "round",
+      "xmlns": "http://www.w3.org/2000/svg"
+    },
+    "colorStates": {
+      "inactive": {
+        "token": "text-muted",
+        "value": "#6B6B6B",
+        "usage": "Default state for unselected categories"
+      },
+      "active": {
+        "token": "primary",
+        "value": "#E3A9A0",
+        "usage": "Selected/active category state"
+      },
+      "onPrimary": {
+        "token": "foreground",
+        "value": "#FFFFFF",
+        "usage": "Icon on primary background"
+      }
+    },
+    "notes": "All icons maintain consistent stroke-to-canvas ratio (1:16) and proportional padding across sizes. SVG source files provided; PNG exports must be generated using PNG_EXPORT_GUIDE.md"
+  },
+  "assets": {
+    "icons": {
+      "categoryNails": {
+        "files": {
+          "svg": [
+            "assets/icons/icon-category-nails-outline-24.svg",
+            "assets/icons/icon-category-nails-outline-20.svg"
+          ]
+        },
+        "usedIn": [
+          "components/category-pill.json",
+          "specs/screen-explore.json"
+        ],
+        "states": [
+          "inactive (#6B6B6B)",
+          "active (#E3A9A0)"
+        ],
+        "implementation": "Use SVG directly with react-native-svg"
+      },
+      "categoryHair": {
+        "files": {
+          "svg": [
+            "assets/icons/icon-category-hair-outline-24.svg",
+            "assets/icons/icon-category-hair-outline-20.svg"
+          ]
+        },
+        "usedIn": [
+          "components/category-pill.json",
+          "specs/screen-explore.json"
+        ],
+        "states": [
+          "inactive (#6B6B6B)",
+          "active (#E3A9A0)"
+        ],
+        "implementation": "Use SVG directly with react-native-svg"
+      },
+      "categorySkin": {
+        "files": {
+          "svg": [
+            "assets/icons/icon-category-skin-outline-24.svg",
+            "assets/icons/icon-category-skin-outline-20.svg"
+          ]
+        },
+        "usedIn": [
+          "components/category-pill.json",
+          "specs/screen-explore.json"
+        ],
+        "states": [
+          "inactive (#6B6B6B)",
+          "active (#E3A9A0)"
+        ],
+        "implementation": "Use SVG directly with react-native-svg"
+      },
+      "categoryLashes": {
+        "files": {
+          "svg": [
+            "assets/icons/icon-category-lashes-outline-24.svg",
+            "assets/icons/icon-category-lashes-outline-20.svg"
+          ]
+        },
+        "usedIn": [
+          "components/category-pill.json",
+          "specs/screen-explore.json"
+        ],
+        "states": [
+          "inactive (#6B6B6B)",
+          "active (#E3A9A0)"
+        ],
+        "implementation": "Use SVG directly with react-native-svg"
+      },
+      "categoryBrows": {
+        "files": {
+          "svg": [
+            "assets/icons/icon-category-brows-outline-24.svg",
+            "assets/icons/icon-category-brows-outline-20.svg"
+          ]
+        },
+        "usedIn": [
+          "components/category-pill.json",
+          "specs/screen-explore.json"
+        ],
+        "states": [
+          "inactive (#6B6B6B)",
+          "active (#E3A9A0)"
+        ],
+        "implementation": "Use SVG directly with react-native-svg"
+      },
+      "categoryMassage": {
+        "files": {
+          "svg": [
+            "assets/icons/icon-category-massage-outline-24.svg",
+            "assets/icons/icon-category-massage-outline-20.svg"
+          ]
+        },
+        "usedIn": [
+          "components/category-pill.json",
+          "specs/screen-explore.json"
+        ],
+        "states": [
+          "inactive (#6B6B6B)",
+          "active (#E3A9A0)"
+        ],
+        "implementation": "Use SVG directly with react-native-svg"
+      },
+      "categoryMakeup": {
+        "files": {
+          "svg": [
+            "assets/icons/icon-category-makeup-outline-24.svg",
+            "assets/icons/icon-category-makeup-outline-20.svg"
+          ]
+        },
+        "usedIn": [
+          "components/category-pill.json",
+          "specs/screen-explore.json"
+        ],
+        "states": [
+          "inactive (#6B6B6B)",
+          "active (#E3A9A0)"
+        ],
+        "implementation": "Use SVG directly with react-native-svg"
+      },
+      "categoryBarber": {
+        "files": {
+          "svg": [
+            "assets/icons/icon-category-barber-outline-24.svg",
+            "assets/icons/icon-category-barber-outline-20.svg"
+          ]
+        },
+        "usedIn": [
+          "components/category-pill.json",
+          "specs/screen-explore.json"
+        ],
+        "states": [
+          "inactive (#6B6B6B)",
+          "active (#E3A9A0)"
+        ],
+        "implementation": "Use SVG directly with react-native-svg"
+      },
+      "categoryWaxing": {
+        "files": {
+          "svg": [
+            "assets/icons/icon-category-waxing-outline-24.svg",
+            "assets/icons/icon-category-waxing-outline-20.svg"
+          ]
+        },
+        "usedIn": [
+          "components/category-pill.json",
+          "specs/screen-explore.json"
+        ],
+        "states": [
+          "inactive (#6B6B6B)",
+          "active (#E3A9A0)"
+        ],
+        "implementation": "Use SVG directly with react-native-svg"
+      },
+      "categorySpa": {
+        "files": {
+          "svg": [
+            "assets/icons/icon-category-spa-outline-24.svg",
+            "assets/icons/icon-category-spa-outline-20.svg"
+          ]
+        },
+        "usedIn": [
+          "components/category-pill.json",
+          "specs/screen-explore.json"
+        ],
+        "states": [
+          "inactive (#6B6B6B)",
+          "active (#E3A9A0)"
+        ],
+        "implementation": "Use SVG directly with react-native-svg"
+      },
+      "categoryInjectables": {
+        "files": {
+          "svg": [
+            "assets/icons/icon-category-injectables-outline-24.svg",
+            "assets/icons/icon-category-injectables-outline-20.svg"
+          ]
+        },
+        "usedIn": [
+          "components/category-pill.json",
+          "specs/screen-explore.json"
+        ],
+        "states": [
+          "inactive (#6B6B6B)",
+          "active (#E3A9A0)"
+        ],
+        "implementation": "Use SVG directly with react-native-svg"
+      },
+      "categoryWellness": {
+        "files": {
+          "svg": [
+            "assets/icons/icon-category-wellness-outline-24.svg",
+            "assets/icons/icon-category-wellness-outline-20.svg"
+          ]
+        },
+        "usedIn": [
+          "components/category-pill.json",
+          "specs/screen-explore.json"
+        ],
+        "states": [
+          "inactive (#6B6B6B)",
+          "active (#E3A9A0)"
+        ],
+        "implementation": "Use SVG directly with react-native-svg"
+      },
+      "systemIcons": {
+        "note": "Use icon library (Lucide, Feather, or similar) for system icons",
+        "required": [
+          "search (20px) - Search bar",
+          "x (16px) - Clear button, dismiss",
+          "loader (20px) - Loading state",
+          "sliders-horizontal (20px) - Filter button",
+          "arrow-up-down (20px) - Sort button",
+          "bell (24px) - Notifications button (Home screen)",
+          "calendar (24px) - Bookings tab",
+          "message-circle (24px) - Messages tab",
+          "gift (24px) - Rewards tab",
+          "user (24px) - Profile tab"
+        ]
+      }
+    },
+    "images": {
+      "strategy": "Runtime API-provided images with programmatic fallback",
+      "delivery": "All images provided via API at runtime - no bundled placeholders",
+      "fallback": "Programmatic placeholder generation using background colors",
+      "specifications": {
+        "serviceCardImage": {
+          "aspectRatio": "16:9",
+          "source": "API endpoint",
+          "fallbackBackground": "#F5F5F5",
+          "fallbackBorder": "#E5E0D1"
+        },
+        "avatarImage": {
+          "size": "40x40 pt",
+          "shape": "circle",
+          "source": "API endpoint",
+          "fallbackType": "initial on colored background",
+          "fallbackColors": ["#E3A9A0", "#D1BFB3", "#BBEDDA", "#6B6B6B"]
+        }
+      }
+    }
+  },
+  "tokens": {
+    "colors": {
+      "file": "tokens/colors.json",
+      "usedIn": [
+        "All components",
+        "All screens"
+      ],
+      "categories": [
+        "brand (Coral Blossom, Warm Oat, Cream Silk, Mint Fresh)",
+        "semantic (primary, background, surface, border, foreground, text-muted)",
+        "opacity (overlay, scrim, disabled-bg, disabled-fg)",
+        "states (hover, pressed, selected, disabled)",
+        "feedback (success, warning, error, info)"
+      ]
+    },
+    "typography": {
+      "file": "tokens/typography.json",
+      "fontDeliverySpec": "fonts/FONT_DELIVERY_SPEC.md",
+      "usedIn": [
+        "All components",
+        "All screens"
+      ],
+      "fontFamily": "Manrope",
+      "source": "Google Fonts (free, SIL OFL)",
+      "installation": "@expo-google-fonts/manrope or self-hosted",
+      "weights": [
+        300,
+        400,
+        500,
+        600
+      ],
+      "styles": 12
+    },
+    "spacing": {
+      "file": "tokens/spacing.json",
+      "usedIn": [
+        "All components",
+        "All screens"
+      ],
+      "grid": "4pt base",
+      "borderRadius": "sm(8), md(12), lg(16), xl(20), 2xl(24), full(9999)",
+      "shadows": "sm, md, lg, xl"
+    }
+  },
+  "components": {
+    "categoryPill": {
+      "file": "components/category-pill.json",
+      "usedIn": [
+        "specs/screen-explore.json (categoryPills section)"
+      ],
+      "states": [
+        "default",
+        "selected",
+        "pressed",
+        "disabled"
+      ],
+      "dependencies": {
+        "icons": [
+          "All 12 category icons (24px primary, 20px compact)"
+        ],
+        "tokens": [
+          "colors.json",
+          "typography.json",
+          "spacing.json"
+        ]
+      },
+      "accessibility": {
+        "role": "button",
+        "minTouchTarget": "44x44",
+        "labels": "Required with category name"
+      }
+    },
+    "serviceCard": {
+      "file": "components/service-card.json",
+      "usedIn": [
+        "specs/screen-explore.json (salonList section)",
+        "specs/screen-home.json (featured section)"
+      ],
+      "states": [
+        "default",
+        "pressed",
+        "loading",
+        "error"
+      ],
+      "dependencies": {
+        "icons": [
+          "star (rating)",
+          "heart (favorite)",
+          "badge (member)"
+        ],
+        "tokens": [
+          "colors.json",
+          "typography.json",
+          "spacing.json"
+        ],
+        "components": [
+          "badge.json",
+          "chip.json"
+        ]
+      },
+      "accessibility": {
+        "role": "button",
+        "labels": "Required with salon details",
+        "nestedControls": "Favorite button requires separate label"
+      }
+    },
+    "searchBar": {
+      "file": "components/search-bar.json",
+      "usedIn": [
+        "specs/screen-explore.json (search section)"
+      ],
+      "states": [
+        "default",
+        "focused",
+        "disabled",
+        "loading"
+      ],
+      "dependencies": {
+        "icons": [
+          "search",
+          "x (clear)",
+          "loader"
+        ],
+        "tokens": [
+          "colors.json",
+          "typography.json",
+          "spacing.json"
+        ]
+      },
+      "accessibility": {
+        "role": "search",
+        "labels": "Search salons and services",
+        "minHeight": "48pt"
+      }
+    },
+    "badge": {
+      "file": "components/badge.json",
+      "usedIn": [
+        "components/service-card.json",
+        "components/bottom-tab-item.json",
+        "specs/screen-explore.json"
+      ],
+      "variants": {
+        "size": [
+          "small",
+          "default"
+        ],
+        "type": [
+          "count",
+          "dot"
+        ],
+        "color": [
+          "primary",
+          "success",
+          "warning",
+          "error"
+        ]
+      },
+      "dependencies": {
+        "tokens": [
+          "colors.json",
+          "typography.json",
+          "spacing.json"
+        ]
+      },
+      "accessibility": {
+        "role": "status",
+        "labels": "{{count}} unread / Has notification",
+        "liveRegion": "polite"
+      }
+    },
+    "filterButton": {
+      "file": "components/filter-button.json",
+      "usedIn": [
+        "specs/screen-explore.json (filterBar section)"
+      ],
+      "states": [
+        "default",
+        "pressed",
+        "active",
+        "disabled"
+      ],
+      "dependencies": {
+        "icons": [
+          "sliders-horizontal",
+          "arrow-up-down"
+        ],
+        "tokens": [
+          "colors.json",
+          "typography.json",
+          "spacing.json"
+        ],
+        "components": [
+          "badge.json (active count)"
+        ]
+      },
+      "accessibility": {
+        "role": "button",
+        "minTouchTarget": "44x44",
+        "labels": "Filter/Sort results with active count"
+      }
+    },
+    "bottomTabItem": {
+      "file": "components/bottom-tab-item.json",
+      "usedIn": [
+        "Main navigation (bottom tab bar)"
+      ],
+      "states": [
+        "default",
+        "active",
+        "pressed"
+      ],
+      "dependencies": {
+        "icons": [
+          "search",
+          "calendar",
+          "message-circle",
+          "gift",
+          "user"
+        ],
+        "tokens": [
+          "colors.json",
+          "typography.json",
+          "spacing.json"
+        ],
+        "components": [
+          "badge.json (notifications)"
+        ]
+      },
+      "accessibility": {
+        "role": "tab",
+        "minTouchTarget": "44x64",
+        "labels": "{{tabName}} tab with notification count"
+      }
+    },
+    "chip": {
+      "file": "components/chip.json",
+      "usedIn": [
+        "components/service-card.json (category tags)",
+        "specs/screen-explore.json (active filters)"
+      ],
+      "variants": {
+        "type": [
+          "default",
+          "outlined",
+          "filled"
+        ],
+        "size": [
+          "small",
+          "default"
+        ],
+        "dismissible": [
+          true,
+          false
+        ]
+      },
+      "states": [
+        "default",
+        "pressed",
+        "selected",
+        "disabled"
+      ],
+      "dependencies": {
+        "icons": [
+          "x (dismiss)"
+        ],
+        "tokens": [
+          "colors.json",
+          "typography.json",
+          "spacing.json"
+        ]
+      },
+      "accessibility": {
+        "role": "button (if interactive), text (if display-only)",
+        "labels": "Chip text with dismiss hint if applicable",
+        "minTouchTarget": "32x32 (default), 24x24 (small - acceptable for tags)"
+      }
+    }
+  },
+  "screens": {
+    "welcome": {
+      "file": "specs/screen-welcome.json",
+      "purpose": "Onboarding/welcome flow",
+      "components": [
+        "Logo",
+        "HeroImage",
+        "TitleText",
+        "DescriptionText",
+        "CTAButton"
+      ],
+      "states": [
+        "default"
+      ]
+    },
+    "home": {
+      "file": "specs/screen-home.json",
+      "purpose": "Main dashboard/landing screen",
+      "components": [
+        "NavigationHeader",
+        "WelcomeBanner",
+        "FeaturedSection",
+        "CategoryGrid",
+        "RecentBookings"
+      ],
+      "states": [
+        "default",
+        "loading"
+      ]
+    },
+    "explore": {
+      "file": "specs/screen-explore.json",
+      "components": [
+        "NavigationHeader (64px)",
+        "SearchBar (48px)",
+        "CategoryPills (horizontal scroll)",
+        "FilterBar (filter/sort buttons)",
+        "SalonList (service cards)"
+      ],
+      "states": [
+        "default",
+        "loading",
+        "empty",
+        "error"
+      ],
+      "dependencies": {
+        "components": [
+          "category-pill.json",
+          "service-card.json",
+          "search-bar.json",
+          "badge.json",
+          "filter-button.json",
+          "chip.json"
+        ],
+        "tokens": [
+          "colors.json",
+          "typography.json",
+          "spacing.json"
+        ],
+        "strings": [
+          "en-US.json (explore section)"
+        ]
+      }
+    }
+  },
+  "interactions": {
+    "file": "specs/interactions.json",
+    "coverage": [
+      "Category pill selection",
+      "Service card tap",
+      "Favorite toggle",
+      "Pull-to-refresh",
+      "Search input focus",
+      "Filter/sort sheet",
+      "Haptic feedback"
+    ]
+  },
+  "strings": {
+    "file": "strings/en-US.json",
+    "language": "en-US",
+    "features": [
+      "pluralization",
+      "interpolation",
+      "truncation"
+    ],
+    "sections": [
+      "explore",
+      "serviceCard",
+      "accessibility",
+      "errors",
+      "actions"
+    ]
+  },
+  "accessibility": {
+    "file": "ACCESSIBILITY_GUIDE.md",
+    "compliance": "WCAG 2.1 Level AA",
+    "coverage": [
+      "Touch target guidance (44x44 minimum)",
+      "Color contrast requirements (4.5:1 text, 3:1 icons)",
+      "Accessibility labels for icon-only controls",
+      "Component-specific implementations",
+      "Screen reader support (VoiceOver/TalkBack)",
+      "Reduced motion handling",
+      "Focus management",
+      "Testing checklist"
+    ]
+  },
+  "documentation": {
+    "readme": "README.md - Quick start and implementation guide",
+    "manifest": "HANDOFF_MANIFEST.md - Complete package overview",
+    "assetManifest": "ASSET_MANIFEST.json - This file (asset-to-screen mapping)",
+    "iconGuide": "assets/icons/ICONS_MANIFEST.md - Icon specifications",
+    "pngReadme": "assets/icons/PNG_README.md - SVG-primary approach explanation",
+    "pngExportGuide": "assets/icons/PNG_EXPORT_GUIDE.md - PNG generation instructions",
+    "accessibilityGuide": "ACCESSIBILITY_GUIDE.md - Accessibility requirements",
+    "fontDelivery": "fonts/FONT_DELIVERY_SPEC.md - Font file specifications",
+    "imagesReadme": "assets/images/README.md - Image strategy"
+  },
+  "implementation": {
+    "platform": "React Native 0.73.x with Expo ~50.0.0",
+    "requiredDependencies": [
+      "react-native-svg ^14.1.0"
+    ],
+    "optionalDependencies": [
+      "@react-spring/native (animations)",
+      "@svgr/cli (icon conversion)"
+    ],
+    "fontFiles": "See fonts/FONT_DELIVERY_SPEC.md for required Manrope font files",
+    "iconUsage": "SVG-only (recommended for React Native with react-native-svg)",
+    "pngGeneration": "Optional - use PNG_EXPORT_GUIDE.md if needed for alternative workflows",
+    "imageStrategy": "Runtime API-provided with programmatic fallback"
+  },
+  "deliverables": {
+    "complete": [
+      "Design tokens (3 JSON files)",
+      "Icon system (24 SVG files - all 12 categories × 2 sizes, production-ready)",
+      "PNG export guide (optional - for alternative workflows)",
+      "Component specs (7 JSON files with all states)",
+      "Screen specs (3 screens: Welcome, Home, Explore)",
+      "Interaction specs (1 file)",
+      "Strings (1 localization file)",
+      "Accessibility guide (complete)",
+      "Font delivery specification",
+      "Documentation (8 files)",
+      "Asset manifest (this file)",
+      "Images strategy (API runtime with fallback)"
+    ],
+    "counts": {
+      "svgIcons": 24,
+      "componentSpecs": 7,
+      "tokenFiles": 3,
+      "screenSpecs": 3,
+      "interactionSpecs": 1,
+      "stringFiles": 1,
+      "documentationFiles": 8,
+      "pngIcons": 0
+    }
+  },
+  "qualityStandards": {
+    "accessibility": {
+      "wcag": "AA compliant",
+      "minTouchTarget": "44x44 pt",
+      "contrast": "4.5:1 text, 3:1 icons",
+      "screenReader": "Full support",
+      "reducedMotion": "Respected"
+    },
+    "performance": {
+      "animations": "60fps",
+      "responseTime": "<100ms",
+      "transitions": "200-300ms"
+    }
+  }
+}

@@ -1,0 +1,294 @@
+{
+  "name": "Zarkili Interaction Specifications",
+  "version": "1.0.0",
+  "interactions": {
+    "categoryPillSelection": {
+      "trigger": "User taps category pill",
+      "states": [
+        {
+          "from": "default",
+          "to": "pressed",
+          "duration": 100,
+          "easing": "ease-out",
+          "properties": {
+            "transform": "scale(0.98)",
+            "background": "#D99A90"
+          }
+        },
+        {
+          "from": "pressed",
+          "to": "selected",
+          "duration": 200,
+          "easing": "ease-in-out",
+          "properties": {
+            "transform": "scale(1.0)",
+            "background": "#E3A9A0",
+            "iconColor": "#FFFFFF",
+            "textColor": "#FFFFFF"
+          }
+        }
+      ],
+      "haptic": {
+        "type": "selection",
+        "enabled": true
+      }
+    },
+    "categoryPillDeselection": {
+      "trigger": "User taps selected pill again or selects different pill",
+      "states": [
+        {
+          "from": "selected",
+          "to": "default",
+          "duration": 200,
+          "easing": "ease-in-out",
+          "properties": {
+            "background": "#FFFFFF",
+            "iconColor": "#E3A9A0",
+            "textColor": "#1A1A1A"
+          }
+        }
+      ]
+    },
+    "filterApply": {
+      "trigger": "User taps 'Apply filters' button",
+      "sequence": [
+        {
+          "step": 1,
+          "action": "Close bottom sheet",
+          "duration": 300,
+          "easing": "ease-in-out"
+        },
+        {
+          "step": 2,
+          "action": "Show loading state on results",
+          "duration": 0
+        },
+        {
+          "step": 3,
+          "action": "Fetch filtered results",
+          "minDuration": 200
+        },
+        {
+          "step": 4,
+          "action": "Animate in new results",
+          "duration": 300,
+          "easing": "ease-out",
+          "stagger": 50
+        }
+      ],
+      "haptic": {
+        "type": "impactLight",
+        "enabled": true
+      }
+    },
+    "filterClear": {
+      "trigger": "User taps 'Clear all' button",
+      "sequence": [
+        {
+          "step": 1,
+          "action": "Reset all filter controls",
+          "duration": 200,
+          "easing": "ease-out"
+        },
+        {
+          "step": 2,
+          "action": "Update results count preview",
+          "duration": 0
+        }
+      ],
+      "haptic": {
+        "type": "impactLight",
+        "enabled": true
+      }
+    },
+    "serviceCardPress": {
+      "trigger": "User taps service/salon card",
+      "states": [
+        {
+          "from": "default",
+          "to": "pressed",
+          "duration": 100,
+          "easing": "ease-out",
+          "properties": {
+            "transform": "scale(0.99)",
+            "borderColor": "#E3A9A0"
+          }
+        },
+        {
+          "from": "pressed",
+          "to": "navigating",
+          "duration": 200,
+          "easing": "ease-in",
+          "properties": {
+            "transform": "scale(1.0)",
+            "opacity": 0.6
+          }
+        }
+      ],
+      "navigation": {
+        "type": "push",
+        "screen": "SalonDetail",
+        "transition": "slide-from-right",
+        "duration": 300
+      },
+      "haptic": {
+        "type": "impactLight",
+        "enabled": true
+      }
+    },
+    "tabChange": {
+      "trigger": "User taps bottom tab",
+      "states": [
+        {
+          "from": "inactive",
+          "to": "active",
+          "duration": 200,
+          "easing": "ease-in-out",
+          "properties": {
+            "iconColor": "#E3A9A0",
+            "textColor": "#E3A9A0",
+            "iconScale": "scale(1.1) -> scale(1.0)"
+          }
+        }
+      ],
+      "navigation": {
+        "type": "switch",
+        "preserveScroll": false,
+        "transition": "fade",
+        "duration": 200
+      },
+      "haptic": {
+        "type": "selection",
+        "enabled": true
+      }
+    },
+    "favoriteToggle": {
+      "trigger": "User taps heart icon on salon card",
+      "states": [
+        {
+          "from": "default",
+          "to": "active",
+          "duration": 300,
+          "easing": "spring",
+          "springConfig": {
+            "damping": 15,
+            "stiffness": 400
+          },
+          "properties": {
+            "iconColor": "#E3A9A0",
+            "iconFill": "#E3A9A0",
+            "transform": "scale(1.0) -> scale(1.3) -> scale(1.0)"
+          }
+        }
+      ],
+      "haptic": {
+        "type": "impactMedium",
+        "enabled": true
+      },
+      "stopPropagation": true
+    },
+    "messageBadgeUpdate": {
+      "trigger": "New unread message received",
+      "states": [
+        {
+          "from": "hidden",
+          "to": "visible",
+          "duration": 300,
+          "easing": "spring",
+          "springConfig": {
+            "damping": 12,
+            "stiffness": 350
+          },
+          "properties": {
+            "opacity": "0 -> 1",
+            "transform": "scale(0.5) -> scale(1.2) -> scale(1.0)"
+          }
+        }
+      ]
+    },
+    "pullToRefresh": {
+      "trigger": "User pulls down on scrollable content",
+      "threshold": 80,
+      "states": [
+        {
+          "phase": "pulling",
+          "indicator": "spinner",
+          "rotation": "proportional-to-pull"
+        },
+        {
+          "phase": "loading",
+          "duration": "until-complete",
+          "minDuration": 500,
+          "indicator": "spinner-animated"
+        },
+        {
+          "phase": "complete",
+          "duration": 300,
+          "easing": "ease-out"
+        }
+      ],
+      "haptic": {
+        "type": "impactLight",
+        "enabled": true,
+        "timing": "at-threshold"
+      }
+    },
+    "bottomSheetOpen": {
+      "trigger": "Filter button press or quick replies",
+      "states": [
+        {
+          "from": "closed",
+          "to": "open",
+          "duration": 300,
+          "easing": "ease-out",
+          "properties": {
+            "transform": "translateY(100%) -> translateY(0%)",
+            "backdropOpacity": "0 -> 0.5"
+          }
+        }
+      ],
+      "behavior": {
+        "snapPoints": ["40%", "85%"],
+        "initialSnap": 0,
+        "dismissOnBackdrop": true,
+        "dismissOnSwipeDown": true
+      }
+    },
+    "searchFocus": {
+      "trigger": "User taps search bar",
+      "states": [
+        {
+          "from": "default",
+          "to": "focused",
+          "duration": 200,
+          "easing": "ease-out",
+          "properties": {
+            "borderColor": "#E3A9A0",
+            "borderWidth": "1px -> 2px"
+          }
+        }
+      ],
+      "keyboard": {
+        "show": true,
+        "type": "default",
+        "returnKeyType": "search"
+      }
+    }
+  },
+  "hapticGuidelines": {
+    "selection": "Use for picker/segmented control changes",
+    "impactLight": "Use for button taps, toggles",
+    "impactMedium": "Use for important confirmations, favorites",
+    "impactHeavy": "Use for critical actions, errors",
+    "success": "Use for successful completions",
+    "warning": "Use for caution states",
+    "error": "Use for error states"
+  },
+  "performanceTargets": {
+    "interactionResponse": "< 100ms",
+    "animationFrameRate": "60fps",
+    "transitionDuration": "200-300ms (most cases)",
+    "longTransitionDuration": "300-500ms (screen transitions)",
+    "reducedMotion": "All animations respect prefers-reduced-motion"
+  }
+}

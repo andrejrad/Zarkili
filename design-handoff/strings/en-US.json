@@ -1,0 +1,199 @@
+{
+  "locale": "en-US",
+  "version": "1.0.0",
+  "strings": {
+    "navigation": {
+      "home": "Home",
+      "explore": "Explore",
+      "bookings": "Bookings",
+      "rewards": "Rewards",
+      "profile": "Profile",
+      "back": "Back",
+      "close": "Close",
+      "done": "Done",
+      "cancel": "Cancel",
+      "save": "Save"
+    },
+    "welcome": {
+      "tagline": "Your beauty, delivered",
+      "title": "Discover beauty services near you",
+      "description": "Book appointments with top-rated salons and beauty professionals in your area",
+      "ctaPrimary": "Get Started",
+      "ctaSecondary": "Already have an account? Sign In"
+    },
+    "home": {
+      "greeting": "Hello, {{firstName}}",
+      "banner": {
+        "title": "First booking discount",
+        "description": "Get 20% off your first appointment",
+        "cta": "Book Now"
+      },
+      "categories": {
+        "title": "Browse by category"
+      },
+      "featured": {
+        "title": "Featured salons",
+        "viewAll": "View All"
+      },
+      "recentBookings": {
+        "title": "Recent bookings"
+      },
+      "notifications": {
+        "label": "Notifications",
+        "labelWithCount": "Notifications, {{count}} unread"
+      }
+    },
+    "explore": {
+      "title": "Explore",
+      "searchPlaceholder": "Search services, salons...",
+      "filterButton": "Filters",
+      "resultsCount": {
+        "one": "{{count}} salon found",
+        "other": "{{count}} salons found",
+        "zero": "No salons found"
+      },
+      "emptyState": {
+        "title": "No results found",
+        "message": "Try adjusting your filters or search terms",
+        "action": "Clear filters"
+      },
+      "errorState": {
+        "title": "Unable to load salons",
+        "message": "Please check your connection and try again",
+        "action": "Retry"
+      },
+      "loadingMessage": "Loading salons..."
+    },
+    "categories": {
+      "all": "All",
+      "nails": "Nails",
+      "hair": "Hair",
+      "skin": "Skin",
+      "lashes": "Lashes",
+      "brows": "Brows",
+      "massage": "Massage",
+      "makeup": "Makeup",
+      "barber": "Barber",
+      "waxing": "Waxing",
+      "spa": "Spa",
+      "injectables": "Injectables",
+      "wellness": "Wellness"
+    },
+    "salonCard": {
+      "member": "Member",
+      "from": "From",
+      "reviewsCount": {
+        "one": "({{count}})",
+        "other": "({{count}})"
+      },
+      "distance": "{{value}} mi",
+      "nextAvailable": "{{time}}",
+      "today": "Today",
+      "tomorrow": "Tomorrow",
+      "availability": {
+        "today": "Today {{time}}",
+        "tomorrow": "Tomorrow {{time}}",
+        "date": "{{date}} {{time}}"
+      }
+    },
+    "filters": {
+      "title": "Filters",
+      "sort": "Sort",
+      "price": "Price",
+      "distance": "Distance",
+      "rating": "Rating",
+      "availability": "Availability",
+      "sortOptions": {
+        "recommended": "Recommended",
+        "nearest": "Nearest",
+        "price": "Price",
+        "rating": "Rating"
+      },
+      "priceRange": {
+        "any": "Any",
+        "budget": "Budget friendly",
+        "mid": "Mid-range",
+        "premium": "Premium"
+      },
+      "availabilityOptions": {
+        "any": "Any time",
+        "today": "Today",
+        "thisWeek": "This week"
+      },
+      "applyButton": "Apply filters",
+      "clearButton": "Clear all"
+    },
+    "booking": {
+      "bookNow": "Book Now",
+      "viewDetails": "View Details",
+      "joinWaitlist": "Join Waitlist",
+      "fullyBooked": "Fully Booked",
+      "messageSalon": "Message Salon"
+    },
+    "messages": {
+      "title": "Messages",
+      "newMessage": "New Message",
+      "searchPlaceholder": "Search messages...",
+      "emptyState": {
+        "title": "No messages yet",
+        "message": "Start a conversation with a salon to ask questions about services or bookings",
+        "action": "New Message"
+      },
+      "conversation": {
+        "inputPlaceholder": "Type a message...",
+        "quickReplies": "Quick replies",
+        "sending": "Sending...",
+        "failed": "Failed",
+        "retry": "Retry"
+      },
+      "notifications": {
+        "title": "Message Notifications",
+        "push": "Push notifications",
+        "pushDescription": "Get notified on your device",
+        "email": "Email notifications",
+        "emailDescription": "Receive emails for new messages",
+        "mutedConversations": "Muted Conversations",
+        "mutedDescription": "You won't receive notifications from muted conversations",
+        "mute": "Mute",
+        "unmute": "Unmute",
+        "muted": "Muted",
+        "disclaimer": "You'll always receive notifications for important booking updates and confirmations, even if a conversation is muted."
+      },
+      "disabled": {
+        "title": "Messaging not available",
+        "message": "{{salonName}} hasn't enabled messaging yet. You can still call them directly for any questions.",
+        "messageGeneric": "This salon hasn't enabled messaging yet. You can still call them directly for any questions."
+      },
+      "unreadCount": {
+        "one": "{{count}} unread message",
+        "other": "{{count}} unread messages"
+      }
+    },
+    "accessibility": {
+      "categoryButton": "{{category}} category",
+      "categoryButtonSelected": "{{category}} category, selected",
+      "favoriteButton": "Add to favorites",
+      "favoriteButtonActive": "Remove from favorites",
+      "messageButton": "Send message",
+      "messagesButton": "Messages, {{count}} unread",
+      "messagesButtonNoUnread": "Messages",
+      "filterButton": "Open filters",
+      "searchInput": "Search salons and services",
+      "salonCard": "{{salonName}}, {{rating}} stars, {{categories}}, from £{{price}}"
+    },
+    "truncation": {
+      "salonName": {
+        "maxLength": 40,
+        "truncate": "end"
+      },
+      "serviceName": {
+        "maxLength": 30,
+        "truncate": "end"
+      },
+      "messagePreview": {
+        "maxLength": 60,
+        "truncate": "end"
+      }
+    }
+  }
+}

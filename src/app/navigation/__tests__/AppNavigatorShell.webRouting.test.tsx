@@ -5,6 +5,7 @@ import { Platform } from "react-native";
 
 import { AppProviders } from "../../providers/AppProviders";
 import { AppNavigatorShell } from "../AppNavigatorShell";
+import type { DiscoveryService } from "../../../domains";
 import type { TenantMembership } from "../../../domains/auth";
 
 jest.mock("../onboarding/createPersistence", () => ({
@@ -19,6 +20,11 @@ jest.mock("../tenantMemberships", () => ({
 }));
 
 describe("AppNavigatorShell web routing", () => {
+  const suspendedDiscoveryService: DiscoveryService = {
+    getHomeFeed: () => new Promise<never>(() => {}),
+    getExploreFeed: () => new Promise<never>(() => {}),
+  };
+
   const originalPlatformOs = Platform.OS;
   const defaultMemberships: TenantMembership[] = [
     {
@@ -51,7 +57,10 @@ describe("AppNavigatorShell web routing", () => {
 
     render(
       <AppProviders>
-        <AppNavigatorShell listTenantMemberships={async () => defaultMemberships} />
+        <AppNavigatorShell
+          discoveryService={suspendedDiscoveryService}
+          listTenantMemberships={async () => defaultMemberships}
+        />
       </AppProviders>
     );
 
@@ -62,7 +71,10 @@ describe("AppNavigatorShell web routing", () => {
   it("syncs URL when navigation changes route", async () => {
     render(
       <AppProviders>
-        <AppNavigatorShell listTenantMemberships={async () => defaultMemberships} />
+        <AppNavigatorShell
+          discoveryService={suspendedDiscoveryService}
+          listTenantMemberships={async () => defaultMemberships}
+        />
       </AppProviders>
     );
 
@@ -77,7 +89,10 @@ describe("AppNavigatorShell web routing", () => {
   it("handles browser popstate and updates active route", async () => {
     render(
       <AppProviders>
-        <AppNavigatorShell listTenantMemberships={async () => defaultMemberships} />
+        <AppNavigatorShell
+          discoveryService={suspendedDiscoveryService}
+          listTenantMemberships={async () => defaultMemberships}
+        />
       </AppProviders>
     );
 
@@ -97,7 +112,10 @@ describe("AppNavigatorShell web routing", () => {
 
     render(
       <AppProviders>
-        <AppNavigatorShell listTenantMemberships={async () => []} />
+        <AppNavigatorShell
+          discoveryService={suspendedDiscoveryService}
+          listTenantMemberships={async () => []}
+        />
       </AppProviders>
     );
 
@@ -114,6 +132,60 @@ describe("AppNavigatorShell web routing", () => {
     await waitFor(() => {
       expect(screen.getByText("Current route: AppShell")).toBeTruthy();
       expect(screen.getByText("Select tenant context before onboarding.")).toBeTruthy();
+    });
+  });
+
+  it("resolves /salon/{tenantId} deep-link: selects tenant and navigates to AppShell", async () => {
+    window.history.replaceState(null, "", "/login");
+
+    render(
+      <AppProviders>
+        <AppNavigatorShell
+          discoveryService={suspendedDiscoveryService}
+          listTenantMemberships={async () => defaultMemberships}
+        />
+      </AppProviders>
+    );
+
+    fireEvent.press(await screen.findByText("Sign in as dev user"));
+    await waitFor(() => {
+      expect(screen.getByText(/Accessible routes: .*AppShell/)).toBeTruthy();
+    });
+
+    await act(async () => {
+      window.history.pushState(null, "", "/salon/tenantA");
+      window.dispatchEvent(new PopStateEvent("popstate"));
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText("Current route: AppShell")).toBeTruthy();
+    });
+  });
+
+  it("resolves /salon/{tenantId}/{section} deep-link: selects tenant and navigates to AppShell", async () => {
+    window.history.replaceState(null, "", "/login");
+
+    render(
+      <AppProviders>
+        <AppNavigatorShell
+          discoveryService={suspendedDiscoveryService}
+          listTenantMemberships={async () => defaultMemberships}
+        />
+      </AppProviders>
+    );
+
+    fireEvent.press(await screen.findByText("Sign in as dev user"));
+    await waitFor(() => {
+      expect(screen.getByText(/Accessible routes: .*AppShell/)).toBeTruthy();
+    });
+
+    await act(async () => {
+      window.history.pushState(null, "", "/salon/tenantA/messages");
+      window.dispatchEvent(new PopStateEvent("popstate"));
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText("Current route: AppShell")).toBeTruthy();
     });
   });
 });

@@ -1,5 +1,8 @@
 # Multi-Tenant Master Index
 
+> **Looking for the umbrella across the entire project (design, ops, runbooks, diary, etc.)?**
+> Open [DOCUMENTATION_COMMAND_CENTER.md](DOCUMENTATION_COMMAND_CENTER.md) — this index is a focused sub-view of the multi-tenant program only.
+
 ## Purpose
 This is the single starting point for your multi-tenant program.
 It links all generated strategy and execution documents and gives an exact run order for Day 1.
@@ -71,6 +74,34 @@ It links all generated strategy and execution documents and gives an exact run o
 
 18. Figma-to-development handoff playbook (new)
 - [FIGMA_HANDOFF_TO_DEVELOPMENT_PLAYBOOK.md](FIGMA_HANDOFF_TO_DEVELOPMENT_PLAYBOOK.md)
+
+19. Phase 2 consumer UI plan — Weeks 21-32 (new)
+- [PHASE2_CONSUMER_UI_PLAN_WEEKS_21_TO_28.md](PHASE2_CONSUMER_UI_PLAN_WEEKS_21_TO_28.md)
+- Phase 2.0 (Weeks 21-28) core UI build + Phase 2.1 (Weeks 29-32) completeness, edge cases, i18n, store readiness.
+
+20. Figma screen request priority list (new)
+- [FIGMA_SCREEN_REQUEST_PRIORITY_LIST.md](FIGMA_SCREEN_REQUEST_PRIORITY_LIST.md)
+- Nineteen prioritized design batches (A-S) feeding Phase 2 and Phase 3.
+
+21. Phase 3 admin and operator UI plan — Weeks 33-44 (new)
+- [PHASE3_ADMIN_UI_PLAN_WEEKS_33_TO_44.md](PHASE3_ADMIN_UI_PLAN_WEEKS_33_TO_44.md)
+- Owner, location-manager, marketing, and platform super-admin console build.
+
+22. Phase 3.5 release readiness plan — Weeks 45-49 (5 weeks; filename retains `45_TO_48`)
+- [PHASE3_5_RELEASE_READINESS_PLAN_WEEKS_45_TO_48.md](PHASE3_5_RELEASE_READINESS_PLAN_WEEKS_45_TO_48.md)
+- Observability, SLOs, pentest, DR drill, AI evaluation, marketing site, self-serve checkout, **W48 in-app support surfaces + platform-owner support dashboard (no AI router yet)**, BI export, compliance pack, commercial GA at end of W49 with support tab live.
+
+23. Phase 4 AI Support Router and Tuning plan — Weeks 50-52 (3 weeks; filename retains `49_TO_52`)
+- [PHASE4_AI_SUPPORT_SYSTEM_PLAN_WEEKS_49_TO_52.md](PHASE4_AI_SUPPORT_SYSTEM_PLAN_WEEKS_49_TO_52.md)
+- Adds the AI router on top of W48 support surfaces: confidence-scored auto-respond vs escalate (W50), eval/analytics/CSAT/tagging (W51), hardening + threshold tuning (W52). Implements [AI_SUPPORT_SYSTEM_ARCHITECTURE.md](AI_SUPPORT_SYSTEM_ARCHITECTURE.md) post-launch.
+
+24. US-primary market addendum (new)
+- [US_PRIMARY_MARKET_ADDENDUM.md](US_PRIMARY_MARKET_ADDENDUM.md)
+- Captures all program changes implied by US-primary, EU-secondary positioning: Stripe Tax (W14), Stripe Connect Express defaults (W13), CCPA/CPRA + state-privacy laws (W29 + W49), TCPA/CAN-SPAM (W26), COPPA (W21), ADA + WCAG 2.1 AA (W29 + W49), en-US locale defaults + DST tests (W32), US holidays seed (W35), multi-currency RESOLVED YES (W33/W34/W42), US-first marketing site (W47), SOC 2 Type 1 scheduled to Phase 5. Total program length unchanged at 52 weeks.
+
+25. Figma Prompt Pack — copy-pasteable AI prompts for Batches A–S (new)
+- [figma-prompts/README.md](figma-prompts/README.md)
+- 19 batch documents (A through S) plus a global anchor + reusable [`_TEMPLATE.md`](figma-prompts/_TEMPLATE.md). Every prompt reuses the existing `design-handoff/` tokens (Coral Blossom palette, Manrope typography, 4pt grid, 5-step radii) and existing components (`badge`, `bottom-tab-item`, `category-pill`, `chip`, `filter-button`, `search-bar`, `service-card`). All prompts bake in US-primary defaults (en-US, USD, MM/DD/YYYY, 12h AM/PM, ADA + WCAG 2.1 AA) and require default/loading/empty/error/role-denied/success states. Consumed week-by-week per [FIGMA_SCREEN_REQUEST_PRIORITY_LIST.md](FIGMA_SCREEN_REQUEST_PRIORITY_LIST.md); packaged per [FIGMA_HANDOFF_TO_DEVELOPMENT_PLAYBOOK.md](FIGMA_HANDOFF_TO_DEVELOPMENT_PLAYBOOK.md) Phase 5.
 
 ---
 

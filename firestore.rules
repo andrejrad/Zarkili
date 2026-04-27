@@ -115,6 +115,21 @@ service cloud.firestore {
         );
     }
 
+    match /userProfiles/{userId} {
+      allow read: if isPlatformAdmin() || (isSignedIn() && request.auth.uid == userId);
+
+      allow create, update: if (isSignedIn() && request.auth.uid == userId)
+        && request.resource.data.userId == userId
+        && (
+          request.resource.data.email == null
+          || request.resource.data.email is string
+        )
+        && request.resource.data.firstName is string
+        && request.resource.data.lastName is string;
+
+      allow delete: if isPlatformAdmin() || (isSignedIn() && request.auth.uid == userId);
+    }
+
     match /locations/{locationId} {
       allow read: if tenantScopedReadFromResource();
       allow create: if tenantScopedCreateWrite() && isTenantAdmin(request.resource.data.tenantId);
@@ -176,8 +191,399 @@ service cloud.firestore {
       );
     }
 
+    match /staffSchedules/{scheduleId} {
+      // scheduleId = tenantId_staffId_locationId
+      // Tenant members can read their own schedule templates.
+      // Only tenant admins (owner, admin, location_manager) can write.
+      allow read: if isPlatformAdmin()
+        || (isSignedIn() && resource.data.tenantId is string && isTenantMember(resource.data.tenantId));
+
+      allow create: if isPlatformAdmin()
+        || (
+          request.resource.data.tenantId is string
+          && request.resource.data.staffId is string
+          && request.resource.data.locationId is string
+          && scheduleId == request.resource.data.tenantId + '_' + request.resource.data.staffId + '_' + request.resource.data.locationId
+          && isTenantAdmin(request.resource.data.tenantId)
+        );
+
+      allow update: if isPlatformAdmin()
+        || (
+          request.resource.data.tenantId == resource.data.tenantId
+          && request.resource.data.staffId == resource.data.staffId
+          && request.resource.data.locationId == resource.data.locationId
+          && isTenantAdmin(resource.data.tenantId)
+        );
+
+      allow delete: if isPlatformAdmin()
+        || (resource.data.tenantId is string && isTenantAdmin(resource.data.tenantId));
+    }
+
+    match /userTenantAccess/{accessId} {
+      // accessId = userId_tenantId
+      // Users can read their own access entries.
+      // Tenant admins can read all entries for their tenant.
+      // Only platform admin or tenant owner/admin can write.
+      allow read: if isPlatformAdmin()
+        || (isSignedIn() && resource.data.userId == request.auth.uid)
+        || (resource.data.tenantId is string && isTenantAdmin(resource.data.tenantId));
+
+      allow create: if isPlatformAdmin()
+        || (
+          request.resource.data.userId is string
+          && request.resource.data.tenantId is string
+          && accessId == request.resource.data.userId + '_' + request.resource.data.tenantId
+          && isTenantOwnerOrAdmin(request.resource.data.tenantId)
+        );
+
+      allow update: if isPlatformAdmin()
+        || (
+          request.resource.data.userId == resource.data.userId
+          && request.resource.data.tenantId == resource.data.tenantId
+          && (
+            (isSignedIn() && resource.data.userId == request.auth.uid)
+            || isTenantOwnerOrAdmin(resource.data.tenantId)
+          )
+        );
+
+      allow delete: if isPlatformAdmin()
+        || (resource.data.tenantId is string && isTenantOwnerOrAdmin(resource.data.tenantId));
+    }
+
+    match /bookingSlotTokens/{tokenId} {
+      // Slot tokens are internal mutex documents created atomically with bookings.
+      // Clients may read to check slot availability.
+      // Creation requires tenant membership; update is forbidden (immutable);
+      // deletion is allowed to release a slot when a booking is cancelled.
+      allow read: if isPlatformAdmin()
+        || (isSignedIn() && resource.data.tenantId is string && isTenantMember(resource.data.tenantId));
+
+      allow create: if isSignedIn()
+        && request.resource.data.tenantId is string
+        && isTenantMember(request.resource.data.tenantId);
+
+      allow update: if false;
+
+      allow delete: if isPlatformAdmin()
+        || (isSignedIn() && resource.data.tenantId is string && isTenantMember(resource.data.tenantId));
+    }
+
+    match /discoveryFeaturedSalons/{salonId} {
+      allow read: if true;
+      allow write: if isPlatformAdmin();
+    }
+
     match /platform/config {
       allow read, write: if isPlatformAdmin();
+    }
+
+    // -------------------------------------------------------------------------
+    // W15.1 — Salon onboarding wizard drafts
+    //   tenants/{tenantId}/onboardingDrafts/{step}
+    //   docId = onboarding step name (e.g. "BUSINESS_PROFILE")
+    //   Read/write restricted to tenant admins and platform admins.
+    // -------------------------------------------------------------------------
+    match /tenants/{tenantId}/onboardingDrafts/{step} {
+      allow read: if isPlatformAdmin() || isTenantAdmin(tenantId);
+
+      allow create: if isPlatformAdmin() || (
+        isTenantAdmin(tenantId)
+        && request.resource.data.tenantId == tenantId
+        && request.resource.data.step == step
+        && request.resource.data.schemaVersion is int
+        && request.resource.data.schemaVersion > 0
+      );
+
+      allow update: if isPlatformAdmin() || (
+        isTenantAdmin(tenantId)
+        && request.resource.data.tenantId == tenantId
+        && request.resource.data.step == step
+        && request.resource.data.schemaVersion is int
+        && request.resource.data.schemaVersion >= resource.data.schemaVersion
+      );
+
+      allow delete: if isPlatformAdmin() || isTenantOwnerOrAdmin(tenantId);
+    }
+
+    // -------------------------------------------------------------------------
+    // W15.2 — Onboarding admin audit timeline
+    //   tenants/{tenantId}/onboardingTimeline/{eventId}
+    //   Append-only. Read by tenant admins + platform admins.
+    //   Writes only by platform admin or tenant_owner; updates/deletes forbidden.
+    // -------------------------------------------------------------------------
+    match /tenants/{tenantId}/onboardingTimeline/{eventId} {
+      allow read: if isPlatformAdmin() || isTenantAdmin(tenantId);
+
+      allow create: if (
+        isPlatformAdmin()
+        || hasTenantRole(tenantId, ['tenant_owner'])
+      )
+        && request.resource.data.tenantId == tenantId
+        && request.resource.data.eventId == eventId
+        && request.resource.data.action in
+            ['extend_trial', 'reset_step', 'verification_override', 'manual_advance']
+        && request.resource.data.actorRole in ['platform_admin', 'tenant_owner']
+        && request.resource.data.reason is string
+        && request.resource.data.reason.size() > 0;
+
+      // Audit log is append-only.
+      allow update, delete: if false;
+    }
+
+    // -------------------------------------------------------------------------
+    // Reviews (subcollection: tenants/{tenantId}/reviews/{reviewId})
+    // -------------------------------------------------------------------------
+    match /tenants/{tenantId}/reviews/{reviewId} {
+      // Tenant admins can read all statuses (moderation queue access).
+      // Regular members only see published reviews.
+      allow read: if isPlatformAdmin()
+        || (isTenantAdmin(tenantId))
+        || (isTenantMember(tenantId) && resource.data.status == 'published');
+
+      // Any authenticated tenant client may submit their own review.
+      // Guards: correct tenant, customer owns the review, valid rating, starts as pending.
+      allow create: if isTenantMember(tenantId)
+        && request.resource.data.tenantId == tenantId
+        && request.resource.data.customerId == request.auth.uid
+        && request.resource.data.status == 'pending_moderation'
+        && request.resource.data.rating is int
+        && request.resource.data.rating >= 1
+        && request.resource.data.rating <= 5;
+
+      // Only tenant admins may update (moderation actions).
+      // They must not change the immutable identity fields.
+      allow update: if (isPlatformAdmin() || isTenantAdmin(tenantId))
+        && request.resource.data.tenantId == resource.data.tenantId
+        && request.resource.data.customerId == resource.data.customerId
+        && request.resource.data.bookingId == resource.data.bookingId
+        && request.resource.data.rating == resource.data.rating;
+
+      // Reviews are never hard-deleted — status transitions to hidden/rejected instead.
+      allow delete: if isPlatformAdmin();
+    }
+
+    // -------------------------------------------------------------------------
+    // Rating aggregate cache (tenants/{tenantId}/ratingAggregates/{aggregateId})
+    // -------------------------------------------------------------------------
+    match /tenants/{tenantId}/ratingAggregates/{aggregateId} {
+      // All tenant members can read aggregates (displayed on staff/location profiles).
+      allow read: if isPlatformAdmin() || isTenantMember(tenantId);
+
+      // Writes are server-side only (inline after moderation, or scheduled sync).
+      // Restrict to platform admin and tenant admins.
+      allow write: if isPlatformAdmin() || isTenantAdmin(tenantId);
+    }
+
+    // -------------------------------------------------------------------------
+    // Loyalty config (tenants/{tenantId}/loyaltyConfig/{configId})
+    // -------------------------------------------------------------------------
+    match /tenants/{tenantId}/loyaltyConfig/{configId} {
+      // All tenant members may read loyalty config (needed to display point rules to clients).
+      allow read: if isPlatformAdmin() || isTenantMember(tenantId);
+
+      // Only admins may configure loyalty programs.
+      allow write: if isPlatformAdmin() || isTenantAdmin(tenantId);
+    }
+
+    // -------------------------------------------------------------------------
+    // Loyalty states (tenants/{tenantId}/loyaltyStates/{userId})
+    // -------------------------------------------------------------------------
+    match /tenants/{tenantId}/loyaltyStates/{userId} {
+      // A client may read their own state; admins may read all states.
+      allow read: if isPlatformAdmin()
+        || isTenantAdmin(tenantId)
+        || (isTenantMember(tenantId) && request.auth.uid == userId);
+
+      // Client state is updated by backend/Cloud Functions only.
+      // Direct client writes are prohibited; platform admin and tenant admins may write.
+      allow write: if isPlatformAdmin() || isTenantAdmin(tenantId);
+    }
+
+    // -------------------------------------------------------------------------
+    // Loyalty transactions (tenants/{tenantId}/loyaltyTransactions/{txId})
+    // -------------------------------------------------------------------------
+    match /tenants/{tenantId}/loyaltyTransactions/{txId} {
+      // A client may read their own transactions; admins may read all.
+      allow read: if isPlatformAdmin()
+        || isTenantAdmin(tenantId)
+        || (isTenantMember(tenantId) && resource.data.userId == request.auth.uid);
+
+      // Transactions are immutable server-side records — no client writes.
+      allow write: if isPlatformAdmin() || isTenantAdmin(tenantId);
+    }
+
+    // -------------------------------------------------------------------------
+    // Loyalty idempotency keys (tenants/{tenantId}/loyaltyIdempotency/{key})
+    // -------------------------------------------------------------------------
+    match /tenants/{tenantId}/loyaltyIdempotency/{key} {
+      // Internal deduplication store — admin/server only.
+      allow read, write: if isPlatformAdmin() || isTenantAdmin(tenantId);
+    }
+
+    // -------------------------------------------------------------------------
+    // Campaigns (tenants/{tenantId}/campaigns/{campaignId})
+    // -------------------------------------------------------------------------
+    match /tenants/{tenantId}/campaigns/{campaignId} {
+      // Tenant admins and location managers may view campaigns.
+      allow read: if isPlatformAdmin() || isTenantAdmin(tenantId);
+
+      // Only owner/admin may create, update, or delete campaigns.
+      allow write: if isPlatformAdmin() || isTenantOwnerOrAdmin(tenantId);
+    }
+
+    // -------------------------------------------------------------------------
+    // Campaign send logs (tenants/{tenantId}/campaignSendLogs/{logId})
+    // -------------------------------------------------------------------------
+    match /tenants/{tenantId}/campaignSendLogs/{logId} {
+      // Admins may audit send logs; no client access.
+      allow read: if isPlatformAdmin() || isTenantAdmin(tenantId);
+
+      // Sends are issued by server/Cloud Functions only.
+      allow write: if isPlatformAdmin() || isTenantAdmin(tenantId);
+    }
+
+    // -------------------------------------------------------------------------
+    // Activities / challenges (tenants/{tenantId}/activities/{activityId})
+    // -------------------------------------------------------------------------
+    match /tenants/{tenantId}/activities/{activityId} {
+      // All tenant members may read activities (clients need to see challenges they can join).
+      allow read: if isPlatformAdmin() || isTenantMember(tenantId);
+
+      // Only admins may create or modify activity definitions.
+      allow write: if isPlatformAdmin() || isTenantOwnerOrAdmin(tenantId);
+    }
+
+    // -------------------------------------------------------------------------
+    // Activity participations (tenants/{tenantId}/activityParticipations/{participationId})
+    // -------------------------------------------------------------------------
+    match /tenants/{tenantId}/activityParticipations/{participationId} {
+      // A client may read their own participation; admins may read all.
+      allow read: if isPlatformAdmin()
+        || isTenantAdmin(tenantId)
+        || (isTenantMember(tenantId) && resource.data.userId == request.auth.uid);
+
+      // Participation records are created/updated by server logic only.
+      allow write: if isPlatformAdmin() || isTenantAdmin(tenantId);
+    }
+
+    // -------------------------------------------------------------------------
+    // Segments (top-level, cross-tenant marketing segments)
+    // -------------------------------------------------------------------------
+    match /segments/{segmentId} {
+      // Only platform admins or the owning tenant's admins may access segments.
+      allow read: if isPlatformAdmin()
+        || (resource.data.tenantId is string && isTenantAdmin(resource.data.tenantId));
+
+      allow write: if isPlatformAdmin()
+        || (request.resource.data.tenantId is string && isTenantOwnerOrAdmin(request.resource.data.tenantId));
+    }
+
+    // -------------------------------------------------------------------------
+    // Messages (top-level transactional messages queue)
+    // -------------------------------------------------------------------------
+    match /messages/{messageId} {
+      // Sender or recipient may read; server/admin writes.
+      allow read: if isPlatformAdmin()
+        || (isSignedIn() && (
+          resource.data.toUserId == request.auth.uid
+          || resource.data.fromUserId == request.auth.uid
+        ));
+
+      // Messages are created by server (Cloud Functions); no direct client creates.
+      allow write: if isPlatformAdmin();
+    }
+
+    // -------------------------------------------------------------------------
+    // Waitlist (top-level booking waitlist entries)
+    // -------------------------------------------------------------------------
+    match /waitlist/{entryId} {
+      // A client may read their own waitlist entry; admins may read all.
+      allow read: if isPlatformAdmin()
+        || (resource.data.tenantId is string && isTenantAdmin(resource.data.tenantId))
+        || (isSignedIn() && resource.data.userId == request.auth.uid);
+
+      // A client may add themselves; admins and clients may delete their own entry.
+      allow create: if isSignedIn()
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.tenantId is string
+        && isTenantMember(request.resource.data.tenantId);
+
+      allow update: if isPlatformAdmin()
+        || (resource.data.tenantId is string && isTenantAdmin(resource.data.tenantId));
+
+      allow delete: if isPlatformAdmin()
+        || (resource.data.tenantId is string && isTenantAdmin(resource.data.tenantId))
+        || (isSignedIn() && resource.data.userId == request.auth.uid);
+    }
+
+    // -------------------------------------------------------------------------
+    // Billing — tenant SaaS subscriptions (Week 13.1)
+    // -------------------------------------------------------------------------
+    // Singleton subscription doc + webhook idempotency markers. Writes are
+    // server-side only (Stripe webhook handler running with admin credentials);
+    // tenant owner/admin may read for the billing settings UI.
+    match /tenants/{tenantId}/billing/{docId} {
+      allow read: if isPlatformAdmin() || isTenantOwnerOrAdmin(tenantId);
+      allow write: if isPlatformAdmin();
+    }
+
+    match /tenants/{tenantId}/billingWebhookIdempotency/{eventId} {
+      allow read, write: if isPlatformAdmin();
+    }
+
+    // -------------------------------------------------------------------------
+    // Stripe Connect — salon payout accounts (Week 13.2)
+    // -------------------------------------------------------------------------
+    // Singleton connect account doc + webhook idempotency markers. Tenant
+    // owner/admin may read connect health for the payout settings UI.
+    match /tenants/{tenantId}/connect/{docId} {
+      allow read: if isPlatformAdmin() || isTenantOwnerOrAdmin(tenantId);
+      allow write: if isPlatformAdmin();
+    }
+
+    match /tenants/{tenantId}/connectWebhookIdempotency/{eventId} {
+      allow read, write: if isPlatformAdmin();
+    }
+
+    // -------------------------------------------------------------------------
+    // Stripe Tax — quote calculation cache (Week 14.0)
+    // -------------------------------------------------------------------------
+    // Cached Stripe Tax calculation results keyed by quote hash. Tenant
+    // owner/admin may read for receipts/invoices; writes are server-side only.
+    match /tenants/{tenantId}/taxCalculations/{quoteId} {
+      allow read: if isPlatformAdmin() || isTenantOwnerOrAdmin(tenantId);
+      allow write: if isPlatformAdmin();
+    }
+
+    // Platform-level SaaS subscription tax cache (no tenantId). Read+write are
+    // restricted to platformAdmin since these calculations cover the platform's
+    // own SaaS revenue.
+    match /platform/{platformId}/taxCalculations/{quoteId} {
+      allow read, write: if isPlatformAdmin();
+    }
+
+    // -------------------------------------------------------------------------
+    // Free trial — lifecycle state + expiry job runs (Week 14.1)
+    // -------------------------------------------------------------------------
+    // Singleton trial record + idempotency markers for the expiry job.
+    // Tenant owner/admin may read trial state for the admin dashboard.
+    match /tenants/{tenantId}/trial/{docId} {
+      allow read: if isPlatformAdmin() || isTenantOwnerOrAdmin(tenantId);
+      allow write: if isPlatformAdmin();
+    }
+
+    match /tenants/{tenantId}/trialJobRuns/{runId} {
+      allow read, write: if isPlatformAdmin();
+    }
+
+    // -------------------------------------------------------------------------
+    // Feature gating — denial audit log (Week 14.2)
+    // -------------------------------------------------------------------------
+    // Append-only denial events recorded by the gating middleware. Tenant
+    // owner/admin may read for compliance review; writes are server-side only.
+    match /tenants/{tenantId}/gateDenials/{docId} {
+      allow read: if isPlatformAdmin() || isTenantOwnerOrAdmin(tenantId);
+      allow write: if isPlatformAdmin();
     }
 
     match /{document=**} {

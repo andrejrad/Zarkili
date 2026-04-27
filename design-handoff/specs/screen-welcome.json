@@ -1,0 +1,198 @@
+{
+  "screen": "Welcome",
+  "description": "Onboarding/welcome screen shown on first app launch",
+  "purpose": "Introduce app value proposition and guide user to sign up or sign in",
+  "hierarchy": {
+    "container": {
+      "background": "#F2EDDD",
+      "safeArea": true,
+      "paddingHorizontal": 24,
+      "paddingVertical": 48
+    },
+    "layout": {
+      "justifyContent": "space-between",
+      "minHeight": "100vh"
+    }
+  },
+  "sections": {
+    "header": {
+      "alignItems": "center",
+      "paddingTop": 40,
+      "children": ["logo", "tagline"]
+    },
+    "logo": {
+      "type": "image",
+      "source": "Brand logo SVG or image",
+      "width": 120,
+      "height": 40,
+      "marginBottom": 16
+    },
+    "tagline": {
+      "type": "text",
+      "style": "body",
+      "color": "#6B6B6B",
+      "textAlign": "center",
+      "content": "Your beauty, delivered"
+    },
+    "hero": {
+      "alignItems": "center",
+      "paddingVertical": 48,
+      "children": ["heroImage", "title", "description"]
+    },
+    "heroImage": {
+      "type": "illustration",
+      "source": "Illustration of beauty services",
+      "width": "80%",
+      "maxWidth": 280,
+      "aspectRatio": "1:1",
+      "marginBottom": 32
+    },
+    "title": {
+      "type": "text",
+      "style": "heading-1",
+      "color": "#1A1A1A",
+      "textAlign": "center",
+      "numberOfLines": 2,
+      "marginBottom": 16,
+      "content": "Discover beauty services near you"
+    },
+    "description": {
+      "type": "text",
+      "style": "body-large",
+      "color": "#6B6B6B",
+      "textAlign": "center",
+      "numberOfLines": 3,
+      "paddingHorizontal": 16,
+      "content": "Book appointments with top-rated salons and beauty professionals in your area"
+    },
+    "footer": {
+      "paddingBottom": 24,
+      "gap": 12,
+      "children": ["primaryCTA", "secondaryCTA"]
+    },
+    "primaryCTA": {
+      "type": "button",
+      "variant": "primary",
+      "label": "Get Started",
+      "action": "Navigate to sign up",
+      "style": {
+        "width": "100%",
+        "height": 56,
+        "backgroundColor": "#E3A9A0",
+        "borderRadius": 9999,
+        "justifyContent": "center",
+        "alignItems": "center"
+      },
+      "textStyle": {
+        "style": "label",
+        "color": "#FFFFFF"
+      },
+      "accessibility": {
+        "role": "button",
+        "label": "Get started with Zarkili",
+        "hint": "Tap to create an account"
+      }
+    },
+    "secondaryCTA": {
+      "type": "button",
+      "variant": "ghost",
+      "label": "Already have an account? Sign In",
+      "action": "Navigate to sign in",
+      "style": {
+        "width": "100%",
+        "height": 48,
+        "justifyContent": "center",
+        "alignItems": "center"
+      },
+      "textStyle": {
+        "style": "body",
+        "color": "#6B6B6B"
+      },
+      "accessibility": {
+        "role": "button",
+        "label": "Sign in to existing account",
+        "hint": "Tap to sign in"
+      }
+    }
+  },
+  "states": {
+    "default": {
+      "description": "Initial welcome screen",
+      "visibility": {
+        "header": true,
+        "hero": true,
+        "footer": true
+      }
+    }
+  },
+  "spacing": {
+    "pageHorizontal": 24,
+    "pageVertical": 48,
+    "headerPaddingTop": 40,
+    "heroPaddingVertical": 48,
+    "titleMarginBottom": 16,
+    "descriptionPaddingHorizontal": 16,
+    "footerPaddingBottom": 24,
+    "ctaGap": 12
+  },
+  "responsive": {
+    "small": {
+      "screenWidth": "< 375px",
+      "adjustments": {
+        "pageHorizontal": 20,
+        "heroImageWidth": "70%",
+        "titleFontSize": 28
+      }
+    },
+    "large": {
+      "screenWidth": "> 428px",
+      "adjustments": {
+        "pageHorizontal": 32,
+        "heroImageMaxWidth": 320
+      }
+    }
+  },
+  "transitions": {
+    "onLoad": {
+      "animation": "fade-in",
+      "duration": 400,
+      "easing": "ease-out",
+      "stagger": {
+        "logo": 0,
+        "heroImage": 100,
+        "title": 200,
+        "description": 300,
+        "primaryCTA": 400,
+        "secondaryCTA": 500
+      }
+    },
+    "ctaPress": {
+      "animation": "scale",
+      "duration": 100,
+      "scale": 0.98
+    }
+  },
+  "accessibility": {
+    "screenTitle": "Welcome to Zarkili",
+    "focusOrder": ["logo", "title", "description", "primaryCTA", "secondaryCTA"],
+    "announceOnLoad": "Welcome to Zarkili. Discover beauty services near you.",
+    "reducedMotion": {
+      "disableStagger": true,
+      "disableScale": true
+    }
+  },
+  "tokens": {
+    "colors": ["primary", "background", "foreground", "text-muted"],
+    "typography": ["heading-1", "body-large", "body", "label"],
+    "spacing": ["page-horizontal", "page-vertical", "section-gap"]
+  },
+  "strings": {
+    "keys": [
+      "welcome.tagline",
+      "welcome.title",
+      "welcome.description",
+      "welcome.ctaPrimary",
+      "welcome.ctaSecondary"
+    ]
+  }
+}

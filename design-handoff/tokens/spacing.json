@@ -1,0 +1,152 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Zarkili Spacing Tokens",
+  "version": "1.0.0",
+  "description": "4pt spacing grid system",
+  "spacing": {
+    "0": {
+      "value": 0,
+      "pixels": "0px"
+    },
+    "1": {
+      "value": 4,
+      "pixels": "4px"
+    },
+    "2": {
+      "value": 8,
+      "pixels": "8px"
+    },
+    "3": {
+      "value": 12,
+      "pixels": "12px"
+    },
+    "4": {
+      "value": 16,
+      "pixels": "16px"
+    },
+    "5": {
+      "value": 20,
+      "pixels": "20px"
+    },
+    "6": {
+      "value": 24,
+      "pixels": "24px"
+    },
+    "7": {
+      "value": 28,
+      "pixels": "28px"
+    },
+    "8": {
+      "value": 32,
+      "pixels": "32px"
+    },
+    "10": {
+      "value": 40,
+      "pixels": "40px"
+    },
+    "12": {
+      "value": 48,
+      "pixels": "48px"
+    },
+    "16": {
+      "value": 64,
+      "pixels": "64px"
+    },
+    "20": {
+      "value": 80,
+      "pixels": "80px"
+    },
+    "24": {
+      "value": 96,
+      "pixels": "96px"
+    }
+  },
+  "semanticSpacing": {
+    "page-horizontal": {
+      "value": 16,
+      "description": "Horizontal page margins"
+    },
+    "page-vertical": {
+      "value": 24,
+      "description": "Vertical page padding"
+    },
+    "card-padding": {
+      "value": 16,
+      "description": "Internal card padding"
+    },
+    "card-padding-large": {
+      "value": 20,
+      "description": "Large card padding"
+    },
+    "section-gap": {
+      "value": 24,
+      "description": "Gap between sections"
+    },
+    "element-gap": {
+      "value": 12,
+      "description": "Gap between related elements"
+    },
+    "element-gap-small": {
+      "value": 8,
+      "description": "Small gap between tight elements"
+    },
+    "touch-target": {
+      "value": 44,
+      "description": "Minimum touch target size (WCAG AA)"
+    }
+  },
+  "borderRadius": {
+    "none": {
+      "value": 0,
+      "pixels": "0px"
+    },
+    "sm": {
+      "value": 8,
+      "pixels": "8px",
+      "description": "Small radius for chips, badges"
+    },
+    "md": {
+      "value": 12,
+      "pixels": "12px",
+      "description": "Medium radius for buttons"
+    },
+    "lg": {
+      "value": 16,
+      "pixels": "16px",
+      "description": "Large radius for cards"
+    },
+    "xl": {
+      "value": 20,
+      "pixels": "20px",
+      "description": "Extra large radius"
+    },
+    "2xl": {
+      "value": 24,
+      "pixels": "24px",
+      "description": "2XL radius for prominent cards"
+    },
+    "full": {
+      "value": 9999,
+      "pixels": "9999px",
+      "description": "Fully rounded (pills, avatars)"
+    }
+  },
+  "shadows": {
+    "sm": {
+      "value": "0px 1px 2px rgba(0, 0, 0, 0.05)",
+      "description": "Small shadow for subtle elevation"
+    },
+    "md": {
+      "value": "0px 2px 4px rgba(0, 0, 0, 0.08)",
+      "description": "Medium shadow for cards"
+    },
+    "lg": {
+      "value": "0px 4px 8px rgba(0, 0, 0, 0.12)",
+      "description": "Large shadow for modals"
+    },
+    "xl": {
+      "value": "0px 8px 16px rgba(0, 0, 0, 0.16)",
+      "description": "Extra large shadow for elevated modals"
+    }
+  }
+}

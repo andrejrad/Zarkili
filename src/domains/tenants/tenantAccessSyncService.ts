@@ -29,6 +29,8 @@ export function createTenantAccessSyncService(
       unreadMessageCount: 0,
       lastMessageAt: null,
       lastAccessedAt: null,
+      nextAppointmentAt: null,
+      nextAppointmentServiceName: null,
       status: membership.status,
     });
   }

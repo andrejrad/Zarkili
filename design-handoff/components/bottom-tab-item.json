@@ -1,0 +1,184 @@
+{
+  "component": "BottomTabItem",
+  "description": "Bottom navigation tab bar item with icon and label",
+  "variants": {
+    "state": {
+      "options": ["default", "active", "pressed"],
+      "default": "default"
+    }
+  },
+  "states": {
+    "default": {
+      "icon": {
+        "size": 24,
+        "color": "#6B6B6B",
+        "strokeWidth": 1.5
+      },
+      "label": {
+        "color": "#6B6B6B",
+        "fontSize": 12,
+        "fontWeight": "400",
+        "lineHeight": 16
+      },
+      "background": "transparent",
+      "badge": {
+        "visible": false
+      }
+    },
+    "active": {
+      "icon": {
+        "size": 24,
+        "color": "#E3A9A0",
+        "strokeWidth": 1.5
+      },
+      "label": {
+        "color": "#E3A9A0",
+        "fontSize": 12,
+        "fontWeight": "500",
+        "lineHeight": 16
+      },
+      "background": "transparent",
+      "badge": {
+        "visible": true
+      }
+    },
+    "pressed": {
+      "icon": {
+        "size": 24,
+        "color": "#6B6B6B",
+        "strokeWidth": 1.5
+      },
+      "label": {
+        "color": "#6B6B6B",
+        "fontSize": 12,
+        "fontWeight": "400",
+        "lineHeight": 16
+      },
+      "background": "rgba(0, 0, 0, 0.05)",
+      "transform": "scale(0.95)"
+    }
+  },
+  "layout": {
+    "width": "flex (equal distribution)",
+    "height": 64,
+    "paddingVertical": 8,
+    "paddingHorizontal": 12,
+    "flexDirection": "column",
+    "alignItems": "center",
+    "justifyContent": "center",
+    "gap": 4,
+    "iconContainer": {
+      "position": "relative",
+      "width": 24,
+      "height": 24
+    },
+    "badge": {
+      "position": "absolute",
+      "top": -4,
+      "right": -8,
+      "type": "dot",
+      "size": "small"
+    }
+  },
+  "tabs": {
+    "explore": {
+      "icon": "search",
+      "label": "Explore",
+      "badge": false
+    },
+    "bookings": {
+      "icon": "calendar",
+      "label": "Bookings",
+      "badge": true,
+      "badgeType": "count"
+    },
+    "messages": {
+      "icon": "message-circle",
+      "label": "Messages",
+      "badge": true,
+      "badgeType": "count"
+    },
+    "rewards": {
+      "icon": "gift",
+      "label": "Rewards",
+      "badge": false
+    },
+    "profile": {
+      "icon": "user",
+      "label": "Profile",
+      "badge": false
+    }
+  },
+  "container": {
+    "background": "#FFFFFF",
+    "borderTop": {
+      "width": 1,
+      "color": "#E5E0D1"
+    },
+    "safeArea": "bottom",
+    "height": "64 + safeAreaBottom",
+    "shadow": {
+      "offsetY": -2,
+      "blur": 8,
+      "color": "rgba(0, 0, 0, 0.08)"
+    }
+  },
+  "behavior": {
+    "hapticFeedback": "selection",
+    "animation": {
+      "type": "spring",
+      "onPress": {
+        "duration": 100,
+        "easing": "ease-out"
+      },
+      "onActivate": {
+        "duration": 200,
+        "easing": "ease-out",
+        "properties": ["icon", "label"]
+      }
+    },
+    "badgeUpdate": {
+      "animation": "scale",
+      "duration": 300,
+      "easing": "spring"
+    }
+  },
+  "transitions": {
+    "tabSwitch": {
+      "duration": 200,
+      "easing": "ease-out",
+      "properties": ["color", "fontWeight"]
+    },
+    "badgeAppear": {
+      "type": "spring",
+      "duration": 300,
+      "from": {
+        "scale": 0.5,
+        "opacity": 0
+      },
+      "to": {
+        "scale": 1,
+        "opacity": 1
+      }
+    }
+  },
+  "accessibility": {
+    "role": "tab",
+    "label": "{{tabName}} tab",
+    "hint": "Navigate to {{tabName}} screen",
+    "state": {
+      "selected": true,
+      "badge": "{{count}} unread items"
+    },
+    "minTouchTarget": "44x64 (full tab height)",
+    "traits": ["button", "selected"]
+  },
+  "dependencies": {
+    "icons": ["search", "calendar", "message-circle", "gift", "user (system icons)"],
+    "components": ["badge.json (for notification counts)"],
+    "tokens": ["colors.json", "typography.json", "spacing.json"]
+  },
+  "example": {
+    "react": "import { BottomTabItem } from '@/components/BottomTabItem';\nimport { createBottomTabNavigator } from '@react-navigation/bottom-tabs';\n\nconst Tab = createBottomTabNavigator();\n\n<Tab.Navigator\n  screenOptions={({ route }) => ({\n    tabBarIcon: ({ focused, color }) => {\n      const icons = {\n        Explore: 'search',\n        Bookings: 'calendar',\n        Messages: 'message-circle',\n        Rewards: 'gift',\n        Profile: 'user'\n      };\n      return <Icon name={icons[route.name]} color={color} size={24} />;\n    },\n    tabBarActiveTintColor: '#E3A9A0',\n    tabBarInactiveTintColor: '#6B6B6B',\n    tabBarStyle: {\n      height: 64,\n      borderTopWidth: 1,\n      borderTopColor: '#E5E0D1',\n      backgroundColor: '#FFFFFF'\n    },\n    tabBarLabelStyle: {\n      fontSize: 12,\n      fontWeight: focused ? '500' : '400'\n    }\n  })}\n>\n  <Tab.Screen name=\"Explore\" component={ExploreScreen} />\n  <Tab.Screen \n    name=\"Bookings\" \n    component={BookingsScreen}\n    options={{\n      tabBarBadge: upcomingBookings > 0 ? upcomingBookings : undefined\n    }}\n  />\n  <Tab.Screen \n    name=\"Messages\" \n    component={MessagesScreen}\n    options={{\n      tabBarBadge: unreadMessages > 0 ? unreadMessages : undefined\n    }}\n  />\n  <Tab.Screen name=\"Rewards\" component={RewardsScreen} />\n  <Tab.Screen name=\"Profile\" component={ProfileScreen} />\n</Tab.Navigator>"
+  }
+}

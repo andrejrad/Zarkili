@@ -1,0 +1,121 @@
+{
+  "component": "Badge",
+  "description": "Notification badge for counters and status indicators",
+  "variants": {
+    "size": {
+      "options": ["small", "default"],
+      "default": "default"
+    },
+    "type": {
+      "options": ["count", "dot"],
+      "default": "count"
+    },
+    "color": {
+      "options": ["primary", "success", "warning", "error"],
+      "default": "primary"
+    }
+  },
+  "sizes": {
+    "small": {
+      "minWidth": 16,
+      "height": 16,
+      "paddingHorizontal": 4,
+      "fontSize": 10,
+      "lineHeight": 16,
+      "borderRadius": 9999
+    },
+    "default": {
+      "minWidth": 20,
+      "height": 20,
+      "paddingHorizontal": 6,
+      "fontSize": 12,
+      "lineHeight": 20,
+      "borderRadius": 9999
+    }
+  },
+  "colors": {
+    "primary": {
+      "background": "#E3A9A0",
+      "text": "#FFFFFF"
+    },
+    "success": {
+      "background": "#4CAF50",
+      "text": "#FFFFFF"
+    },
+    "warning": {
+      "background": "#FF9800",
+      "text": "#FFFFFF"
+    },
+    "error": {
+      "background": "#F44336",
+      "text": "#FFFFFF"
+    }
+  },
+  "dotVariant": {
+    "small": {
+      "width": 8,
+      "height": 8,
+      "borderRadius": 9999
+    },
+    "default": {
+      "width": 10,
+      "height": 10,
+      "borderRadius": 9999
+    }
+  },
+  "positioning": {
+    "position": "absolute",
+    "placement": {
+      "topRight": {
+        "top": -4,
+        "right": -4
+      },
+      "topLeft": {
+        "top": -4,
+        "left": -4
+      },
+      "bottomRight": {
+        "bottom": -4,
+        "right": -4
+      },
+      "bottomLeft": {
+        "bottom": -4,
+        "left": -4
+      }
+    }
+  },
+  "behavior": {
+    "maxCount": 9,
+    "overflowIndicator": "9+",
+    "zeroBehavior": "hide",
+    "animation": {
+      "entrance": {
+        "type": "spring",
+        "duration": 300,
+        "from": {
+          "scale": 0.5,
+          "opacity": 0
+        },
+        "to": {
+          "scale": 1,
+          "opacity": 1
+        },
+        "springConfig": {
+          "damping": 12,
+          "stiffness": 350
+        }
+      }
+    }
+  },
+  "accessibility": {
+    "role": "status",
+    "label": {
+      "count": "{{count}} unread",
+      "dot": "Has notification"
+    },
+    "liveRegion": "polite"
+  },
+  "example": {
+    "react": "import { Badge } from '@/components/Badge';\n\n// Count badge\n<View style={{ position: 'relative' }}>\n  <MessageIcon />\n  <Badge count={3} size=\"default\" color=\"primary\" />\n</View>\n\n// Dot badge\n<View style={{ position: 'relative' }}>\n  <BellIcon />\n  <Badge type=\"dot\" color=\"error\" />\n</View>"
+  }
+}

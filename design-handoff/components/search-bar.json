@@ -1,0 +1,137 @@
+{
+  "component": "SearchBar",
+  "description": "Search input with icon and optional clear button",
+  "variants": {
+    "size": {
+      "options": ["default"],
+      "default": "default"
+    },
+    "state": {
+      "options": ["default", "focused", "disabled", "loading"],
+      "default": "default"
+    }
+  },
+  "states": {
+    "default": {
+      "background": "#FFFFFF",
+      "border": {
+        "width": 1,
+        "color": "#E5E0D1"
+      },
+      "icon": {
+        "name": "search",
+        "size": 20,
+        "color": "#6B6B6B"
+      },
+      "text": {
+        "color": "#1A1A1A",
+        "placeholderColor": "#6B6B6B",
+        "style": "body"
+      }
+    },
+    "focused": {
+      "background": "#FFFFFF",
+      "border": {
+        "width": 2,
+        "color": "#E3A9A0"
+      },
+      "icon": {
+        "name": "search",
+        "size": 20,
+        "color": "#E3A9A0"
+      },
+      "text": {
+        "color": "#1A1A1A",
+        "placeholderColor": "#6B6B6B",
+        "style": "body"
+      }
+    },
+    "disabled": {
+      "background": "#F5F5F5",
+      "border": {
+        "width": 1,
+        "color": "#E5E0D1"
+      },
+      "icon": {
+        "name": "search",
+        "size": 20,
+        "color": "#B0B0B0"
+      },
+      "text": {
+        "color": "#B0B0B0",
+        "placeholderColor": "#B0B0B0",
+        "style": "body"
+      },
+      "opacity": 0.6
+    },
+    "loading": {
+      "background": "#FFFFFF",
+      "border": {
+        "width": 1,
+        "color": "#E5E0D1"
+      },
+      "icon": {
+        "name": "loader",
+        "size": 20,
+        "color": "#E3A9A0",
+        "animation": "spin"
+      },
+      "text": {
+        "color": "#1A1A1A",
+        "style": "body"
+      }
+    }
+  },
+  "layout": {
+    "height": 48,
+    "borderRadius": 9999,
+    "paddingLeft": 48,
+    "paddingRight": 16,
+    "icon": {
+      "position": "absolute",
+      "left": 16,
+      "top": "50%",
+      "transform": "translateY(-50%)"
+    },
+    "clearButton": {
+      "display": "when-text-present",
+      "position": "absolute",
+      "right": 8,
+      "size": 32,
+      "borderRadius": 9999,
+      "icon": {
+        "name": "x",
+        "size": 16,
+        "color": "#6B6B6B"
+      }
+    }
+  },
+  "behavior": {
+    "clearOnFocus": false,
+    "autoCapitalize": "none",
+    "autoCorrect": false,
+    "returnKeyType": "search",
+    "clearButtonMode": "while-editing"
+  },
+  "transitions": {
+    "onFocus": {
+      "duration": 200,
+      "easing": "ease-out",
+      "properties": ["border"]
+    },
+    "onBlur": {
+      "duration": 200,
+      "easing": "ease-in",
+      "properties": ["border"]
+    }
+  },
+  "accessibility": {
+    "role": "search",
+    "label": "Search salons and services",
+    "hint": "Enter search terms and press search",
+    "traits": ["searchField"]
+  },
+  "example": {
+    "react": "import { SearchBar } from '@/components/SearchBar';\n\n<SearchBar\n  value={searchQuery}\n  onChangeText={setSearchQuery}\n  placeholder=\"Search services, salons...\"\n  onSubmit={handleSearch}\n  loading={isSearching}\n/>"
+  }
+}

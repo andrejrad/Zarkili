@@ -1,0 +1,486 @@
+{
+  "screen": "Home",
+  "description": "Main dashboard/landing screen shown after user authentication",
+  "purpose": "Quick access to featured salons, categories, and recent bookings",
+  "hierarchy": {
+    "container": {
+      "background": "#F2EDDD",
+      "safeArea": true
+    },
+    "scroll": {
+      "type": "ScrollView",
+      "bounces": true,
+      "showsVerticalScrollIndicator": false
+    }
+  },
+  "sections": {
+    "header": {
+      "type": "fixed",
+      "height": 64,
+      "background": "#F2EDDD",
+      "paddingHorizontal": 16,
+      "borderBottomWidth": 1,
+      "borderBottomColor": "#E5E0D1",
+      "children": ["greeting", "notificationButton"]
+    },
+    "greeting": {
+      "type": "text",
+      "style": "heading-3",
+      "color": "#1A1A1A",
+      "content": "Hello, {firstName}",
+      "accessibility": {
+        "role": "header",
+        "label": "Welcome back, {firstName}"
+      }
+    },
+    "notificationButton": {
+      "type": "iconButton",
+      "icon": "bell",
+      "iconSize": 24,
+      "iconColor": "#6B6B6B",
+      "size": 44,
+      "position": "absolute",
+      "right": 16,
+      "top": 10,
+      "badge": {
+        "visible": "when unreadCount > 0",
+        "count": "{unreadCount}",
+        "type": "count",
+        "color": "error"
+      },
+      "accessibility": {
+        "role": "button",
+        "label": "Notifications. {unreadCount} unread",
+        "hint": "Tap to view notifications"
+      }
+    },
+    "welcomeBanner": {
+      "paddingHorizontal": 16,
+      "paddingVertical": 24,
+      "children": ["bannerCard"]
+    },
+    "bannerCard": {
+      "background": "#E3A9A0",
+      "borderRadius": 16,
+      "padding": 20,
+      "flexDirection": "row",
+      "alignItems": "center",
+      "justifyContent": "space-between",
+      "gap": 16,
+      "children": ["bannerContent", "bannerImage"]
+    },
+    "bannerContent": {
+      "flex": 1,
+      "gap": 8,
+      "children": ["bannerTitle", "bannerDescription", "bannerCTA"]
+    },
+    "bannerTitle": {
+      "type": "text",
+      "style": "heading-4",
+      "color": "#FFFFFF",
+      "content": "First booking discount"
+    },
+    "bannerDescription": {
+      "type": "text",
+      "style": "body-small",
+      "color": "rgba(255, 255, 255, 0.9)",
+      "content": "Get 20% off your first appointment"
+    },
+    "bannerCTA": {
+      "type": "button",
+      "variant": "secondary",
+      "label": "Book Now",
+      "style": {
+        "backgroundColor": "#FFFFFF",
+        "paddingHorizontal": 16,
+        "paddingVertical": 8,
+        "borderRadius": 9999,
+        "alignSelf": "flex-start"
+      },
+      "textStyle": {
+        "style": "label-small",
+        "color": "#E3A9A0"
+      }
+    },
+    "bannerImage": {
+      "type": "illustration",
+      "width": 80,
+      "height": 80,
+      "source": "Promotional illustration"
+    },
+    "categoriesSection": {
+      "paddingTop": 24,
+      "children": ["categoriesHeader", "categoriesGrid"]
+    },
+    "categoriesHeader": {
+      "paddingHorizontal": 16,
+      "marginBottom": 16,
+      "children": ["categoriesTitle"]
+    },
+    "categoriesTitle": {
+      "type": "text",
+      "style": "heading-4",
+      "color": "#1A1A1A",
+      "content": "Browse by category"
+    },
+    "categoriesGrid": {
+      "paddingHorizontal": 16,
+      "layout": "grid",
+      "columns": 3,
+      "gap": 12,
+      "children": "12 category items"
+    },
+    "categoryItem": {
+      "type": "button",
+      "aspectRatio": "1:1",
+      "background": "#FFFFFF",
+      "borderWidth": 1,
+      "borderColor": "#E5E0D1",
+      "borderRadius": 12,
+      "padding": 12,
+      "alignItems": "center",
+      "justifyContent": "center",
+      "gap": 8,
+      "children": ["categoryIcon", "categoryLabel"]
+    },
+    "categoryIcon": {
+      "size": 24,
+      "color": "#6B6B6B",
+      "source": "Category SVG icon"
+    },
+    "categoryLabel": {
+      "type": "text",
+      "style": "body-small",
+      "color": "#1A1A1A",
+      "textAlign": "center",
+      "numberOfLines": 1
+    },
+    "featuredSection": {
+      "paddingTop": 32,
+      "children": ["featuredHeader", "featuredList"]
+    },
+    "featuredHeader": {
+      "paddingHorizontal": 16,
+      "marginBottom": 16,
+      "flexDirection": "row",
+      "justifyContent": "space-between",
+      "alignItems": "center",
+      "children": ["featuredTitle", "viewAllLink"]
+    },
+    "featuredTitle": {
+      "type": "text",
+      "style": "heading-4",
+      "color": "#1A1A1A",
+      "content": "Featured salons"
+    },
+    "viewAllLink": {
+      "type": "button",
+      "variant": "ghost",
+      "label": "View All",
+      "textStyle": {
+        "style": "body",
+        "color": "#E3A9A0"
+      },
+      "accessibility": {
+        "role": "button",
+        "label": "View all featured salons",
+        "hint": "Tap to see complete list"
+      }
+    },
+    "featuredList": {
+      "type": "horizontal-scroll",
+      "paddingLeft": 16,
+      "gap": 12,
+      "showsHorizontalScrollIndicator": false,
+      "children": "3-5 featured service cards"
+    },
+    "featuredServiceCard": {
+      "width": 280,
+      "component": "ServiceCard",
+      "variant": "compact",
+      "states": ["default", "pressed", "loading"]
+    },
+    "recentBookingsSection": {
+      "paddingTop": 32,
+      "paddingBottom": 24,
+      "children": ["recentBookingsHeader", "recentBookingsList"]
+    },
+    "recentBookingsHeader": {
+      "paddingHorizontal": 16,
+      "marginBottom": 16,
+      "children": ["recentBookingsTitle"]
+    },
+    "recentBookingsTitle": {
+      "type": "text",
+      "style": "heading-4",
+      "color": "#1A1A1A",
+      "content": "Recent bookings"
+    },
+    "recentBookingsList": {
+      "paddingHorizontal": 16,
+      "gap": 12,
+      "children": "2-3 recent booking items"
+    },
+    "bookingItem": {
+      "background": "#FFFFFF",
+      "borderWidth": 1,
+      "borderColor": "#E5E0D1",
+      "borderRadius": 12,
+      "padding": 16,
+      "flexDirection": "row",
+      "gap": 12,
+      "alignItems": "center",
+      "children": ["bookingSalonImage", "bookingContent", "bookingStatus"]
+    },
+    "bookingSalonImage": {
+      "width": 56,
+      "height": 56,
+      "borderRadius": 8,
+      "source": "Salon image or fallback"
+    },
+    "bookingContent": {
+      "flex": 1,
+      "gap": 4,
+      "children": ["bookingSalonName", "bookingService", "bookingDateTime"]
+    },
+    "bookingSalonName": {
+      "type": "text",
+      "style": "body",
+      "fontWeight": 500,
+      "color": "#1A1A1A",
+      "numberOfLines": 1
+    },
+    "bookingService": {
+      "type": "text",
+      "style": "body-small",
+      "color": "#6B6B6B",
+      "numberOfLines": 1
+    },
+    "bookingDateTime": {
+      "type": "text",
+      "style": "body-small",
+      "color": "#6B6B6B",
+      "numberOfLines": 1
+    },
+    "bookingStatus": {
+      "type": "chip",
+      "variant": "filled",
+      "size": "small",
+      "label": "{status}",
+      "color": "{statusColor}"
+    }
+  },
+  "states": {
+    "default": {
+      "description": "Home screen with all content loaded",
+      "visibility": {
+        "header": true,
+        "welcomeBanner": true,
+        "categoriesSection": true,
+        "featuredSection": true,
+        "recentBookingsSection": "if hasBookings"
+      }
+    },
+    "loading": {
+      "description": "Initial load state",
+      "skeleton": {
+        "header": false,
+        "welcomeBanner": true,
+        "categoriesGrid": true,
+        "featuredList": true,
+        "recentBookingsList": "if hasBookings"
+      },
+      "animation": "pulse",
+      "duration": 1500
+    }
+  },
+  "spacing": {
+    "headerHeight": 64,
+    "headerPaddingHorizontal": 16,
+    "sectionPaddingHorizontal": 16,
+    "sectionPaddingTop": 24,
+    "sectionGap": 32,
+    "cardGap": 12,
+    "welcomeBannerPaddingVertical": 24,
+    "categoriesGridGap": 12,
+    "featuredListGap": 12,
+    "bookingItemGap": 12
+  },
+  "responsive": {
+    "small": {
+      "screenWidth": "< 375px",
+      "adjustments": {
+        "categoriesGridColumns": 3,
+        "featuredCardWidth": 260,
+        "sectionPaddingHorizontal": 12
+      }
+    },
+    "medium": {
+      "screenWidth": "375px - 428px",
+      "adjustments": {
+        "categoriesGridColumns": 3,
+        "featuredCardWidth": 280
+      }
+    },
+    "large": {
+      "screenWidth": "> 428px",
+      "adjustments": {
+        "categoriesGridColumns": 4,
+        "featuredCardWidth": 300,
+        "sectionPaddingHorizontal": 20
+      }
+    }
+  },
+  "scrollBehavior": {
+    "type": "vertical",
+    "bounces": true,
+    "stickyHeader": false,
+    "refreshControl": {
+      "enabled": true,
+      "tintColor": "#E3A9A0",
+      "action": "Reload home data"
+    }
+  },
+  "interactions": {
+    "categoryItemPress": {
+      "action": "Navigate to category explore",
+      "params": {
+        "categoryId": "{categoryId}"
+      },
+      "haptic": "light",
+      "animation": {
+        "type": "scale",
+        "duration": 100,
+        "scale": 0.95
+      }
+    },
+    "featuredCardPress": {
+      "action": "Navigate to salon detail",
+      "params": {
+        "salonId": "{salonId}"
+      },
+      "haptic": "medium"
+    },
+    "bookingItemPress": {
+      "action": "Navigate to booking detail",
+      "params": {
+        "bookingId": "{bookingId}"
+      }
+    },
+    "bannerCTAPress": {
+      "action": "Navigate to explore with discount filter",
+      "haptic": "medium"
+    },
+    "viewAllPress": {
+      "action": "Navigate to featured salons list"
+    },
+    "notificationButtonPress": {
+      "action": "Navigate to notifications",
+      "haptic": "light"
+    }
+  },
+  "transitions": {
+    "onLoad": {
+      "animation": "fade-in",
+      "duration": 300
+    },
+    "pullToRefresh": {
+      "indicator": "spinner",
+      "color": "#E3A9A0"
+    }
+  },
+  "accessibility": {
+    "screenTitle": "Home",
+    "announceOnLoad": "Home screen. {greeting}. {unreadCount} notifications.",
+    "focusOrder": [
+      "greeting",
+      "notificationButton",
+      "bannerCTA",
+      "categoryGrid",
+      "featuredList",
+      "viewAllLink",
+      "recentBookingsList"
+    ],
+    "reducedMotion": {
+      "disableSkeletonPulse": true,
+      "disableCardScale": true
+    }
+  },
+  "dependencies": {
+    "components": [
+      "service-card.json",
+      "badge.json",
+      "chip.json"
+    ],
+    "tokens": [
+      "colors.json",
+      "typography.json",
+      "spacing.json"
+    ],
+    "icons": [
+      "bell (notifications)",
+      "All 12 category icons"
+    ],
+    "strings": [
+      "en-US.json (home section)"
+    ]
+  },
+  "tokens": {
+    "colors": [
+      "primary",
+      "background",
+      "surface",
+      "border",
+      "foreground",
+      "text-muted"
+    ],
+    "typography": [
+      "heading-3",
+      "heading-4",
+      "body",
+      "body-small",
+      "label-small"
+    ],
+    "spacing": [
+      "page-horizontal",
+      "section-gap",
+      "element-gap",
+      "card-padding"
+    ],
+    "borderRadius": [
+      "md",
+      "lg"
+    ],
+    "shadows": [
+      "md"
+    ]
+  },
+  "strings": {
+    "keys": [
+      "home.greeting",
+      "home.banner.title",
+      "home.banner.description",
+      "home.banner.cta",
+      "home.categories.title",
+      "home.featured.title",
+      "home.featured.viewAll",
+      "home.recentBookings.title",
+      "home.notifications.label"
+    ]
+  },
+  "performance": {
+    "lazyLoad": {
+      "enabled": true,
+      "threshold": "50%",
+      "components": [
+        "featuredServiceCard (below fold)",
+        "recentBookingsSection (if present)"
+      ]
+    },
+    "imageOptimization": {
+      "featuredCards": "Preload first 2, lazy load rest",
+      "categoryIcons": "Preload all (SVG, minimal size)",
+      "bookingImages": "Lazy load"
+    }
+  }
+}

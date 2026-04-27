@@ -9,7 +9,7 @@ const config: ExpoConfig = {
   version: "0.1.0",
   orientation: "portrait",
   userInterfaceStyle: "automatic",
-  plugins: [],
+  plugins: ["expo-font"],
   extra: {
     appVariant: APP_VARIANT,
     firebaseProjectId: process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID ?? ""

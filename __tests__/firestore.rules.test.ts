@@ -318,4 +318,127 @@ describe("Firestore multi-tenant rules", () => {
       })
     );
   });
+
+  // ---------------------------------------------------------------------------
+  // W15.1 — onboarding wizard drafts
+  // ---------------------------------------------------------------------------
+
+  it("allows tenant_owner to create an onboarding draft", async () => {
+    await seedTenantMembership("tenantA", "ownerA", "tenant_owner");
+    const db = testEnv.authenticatedContext("ownerA").firestore();
+
+    await assertSucceeds(
+      db.doc("tenants/tenantA/onboardingDrafts/BUSINESS_PROFILE").set({
+        tenantId: "tenantA",
+        step: "BUSINESS_PROFILE",
+        schemaVersion: 1,
+        payload: { legalName: "Acme" },
+      })
+    );
+  });
+
+  it("blocks technician from reading onboarding drafts", async () => {
+    await seedTenantMembership("tenantA", "techA", "technician");
+    await testEnv.withSecurityRulesDisabled(async (context) => {
+      await context.firestore().doc("tenants/tenantA/onboardingDrafts/SERVICES").set({
+        tenantId: "tenantA",
+        step: "SERVICES",
+        schemaVersion: 1,
+        payload: {},
+      });
+    });
+
+    const db = testEnv.authenticatedContext("techA").firestore();
+    await assertFails(db.doc("tenants/tenantA/onboardingDrafts/SERVICES").get());
+  });
+
+  it("blocks onboarding draft create with mismatched tenantId", async () => {
+    await seedTenantMembership("tenantA", "ownerA", "tenant_owner");
+    const db = testEnv.authenticatedContext("ownerA").firestore();
+
+    await assertFails(
+      db.doc("tenants/tenantA/onboardingDrafts/SERVICES").set({
+        tenantId: "tenantB",
+        step: "SERVICES",
+        schemaVersion: 1,
+        payload: {},
+      })
+    );
+  });
+
+  // ---------------------------------------------------------------------------
+  // W15.2 — onboarding timeline (audit log)
+  // ---------------------------------------------------------------------------
+
+  it("allows tenant_owner to append a timeline event", async () => {
+    await seedTenantMembership("tenantA", "ownerA", "tenant_owner");
+    const db = testEnv.authenticatedContext("ownerA").firestore();
+
+    await assertSucceeds(
+      db.doc("tenants/tenantA/onboardingTimeline/evt-1").set({
+        eventId: "evt-1",
+        tenantId: "tenantA",
+        action: "extend_trial",
+        actorUserId: "ownerA",
+        actorRole: "tenant_owner",
+        reason: "VIP",
+        details: { daysAdded: 7 },
+      })
+    );
+  });
+
+  it("blocks tenant_admin (non-owner) from writing timeline", async () => {
+    await seedTenantMembership("tenantA", "adminA", "tenant_admin");
+    const db = testEnv.authenticatedContext("adminA").firestore();
+
+    await assertFails(
+      db.doc("tenants/tenantA/onboardingTimeline/evt-2").set({
+        eventId: "evt-2",
+        tenantId: "tenantA",
+        action: "reset_step",
+        actorUserId: "adminA",
+        actorRole: "tenant_owner",
+        reason: "x",
+        details: {},
+      })
+    );
+  });
+
+  it("rejects timeline events with empty reason", async () => {
+    await seedTenantMembership("tenantA", "ownerA", "tenant_owner");
+    const db = testEnv.authenticatedContext("ownerA").firestore();
+
+    await assertFails(
+      db.doc("tenants/tenantA/onboardingTimeline/evt-3").set({
+        eventId: "evt-3",
+        tenantId: "tenantA",
+        action: "reset_step",
+        actorUserId: "ownerA",
+        actorRole: "tenant_owner",
+        reason: "",
+        details: {},
+      })
+    );
+  });
+
+  it("forbids updates and deletes on timeline events", async () => {
+    await seedTenantMembership("tenantA", "ownerA", "tenant_owner");
+    await testEnv.withSecurityRulesDisabled(async (context) => {
+      await context.firestore().doc("tenants/tenantA/onboardingTimeline/evt-4").set({
+        eventId: "evt-4",
+        tenantId: "tenantA",
+        action: "reset_step",
+        actorUserId: "ownerA",
+        actorRole: "tenant_owner",
+        reason: "seed",
+        details: {},
+      });
+    });
+
+    const db = testEnv.authenticatedContext("ownerA").firestore();
+    await assertFails(
+      db.doc("tenants/tenantA/onboardingTimeline/evt-4").set({ reason: "edited" }, { merge: true })
+    );
+    await assertFails(db.doc("tenants/tenantA/onboardingTimeline/evt-4").delete());
+  });
 });

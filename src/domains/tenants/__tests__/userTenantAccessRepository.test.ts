@@ -73,6 +73,8 @@ function makeAccessInput(overrides: Partial<CreateUserTenantAccessInput> = {}): 
     unreadMessageCount: 0,
     lastMessageAt: null,
     lastAccessedAt: null,
+    nextAppointmentAt: null,
+    nextAppointmentServiceName: null,
     status: "active",
     ...overrides,
   };

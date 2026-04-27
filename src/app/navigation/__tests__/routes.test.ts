@@ -6,6 +6,7 @@ import {
   getAccessibleRoutes,
   resolveRouteFromPath,
   resolvePreferredRoute,
+  parseSalonContextPath,
   type RouteAccessContext,
 } from "../routes";
 
@@ -20,6 +21,7 @@ describe("navigation route guards", () => {
       "Login",
       "Register",
       "DiscoverBusinesses",
+      "TenantPublicProfile",
     ]);
   });
 
@@ -29,6 +31,9 @@ describe("navigation route guards", () => {
     const routes = getAccessibleRoutes(context);
 
     expect(routes.map((route) => route.name)).toContain("AppShell");
+    expect(routes.map((route) => route.name)).toContain("TenantProfile");
+    expect(routes.map((route) => route.name)).toContain("TenantLocations");
+    expect(routes.map((route) => route.name)).toContain("CreateLocation");
     expect(routes.map((route) => route.name)).toContain("SalonOnboardingAccount");
     expect(routes.map((route) => route.name)).toContain("ClientOnboardingAccountGuest");
     expect(routes.map((route) => route.name)).not.toContain("OwnerAiBudgetSettings");
@@ -65,12 +70,22 @@ describe("navigation route guards", () => {
   it("resolves route by path with normalization", () => {
     expect(getRouteByPath("discover")).toMatchObject({ name: "DiscoverBusinesses" });
     expect(getRouteByPath("/discover/")).toMatchObject({ name: "DiscoverBusinesses" });
+    expect(getRouteByPath("/discover/tenant-profile")).toMatchObject({ name: "TenantPublicProfile" });
+    expect(getRouteByPath("/app/tenant-profile")).toMatchObject({ name: "TenantProfile" });
+    expect(getRouteByPath("/app/locations")).toMatchObject({ name: "TenantLocations" });
+    expect(getRouteByPath("/app/locations/create")).toMatchObject({ name: "CreateLocation" });
     expect(getRouteByPath("/unknown")).toBeNull();
   });
 
   it("canAccessPath enforces guards for deep links", () => {
     expect(canAccessPath("/app", { userId: null })).toBe(false);
     expect(canAccessPath("/app", { userId: "u1" })).toBe(true);
+    expect(canAccessPath("/app/tenant-profile", { userId: null })).toBe(false);
+    expect(canAccessPath("/app/tenant-profile", { userId: "u1" })).toBe(true);
+    expect(canAccessPath("/app/locations", { userId: null })).toBe(false);
+    expect(canAccessPath("/app/locations", { userId: "u1" })).toBe(true);
+    expect(canAccessPath("/app/locations/create", { userId: null })).toBe(false);
+    expect(canAccessPath("/app/locations/create", { userId: "u1" })).toBe(true);
     expect(canAccessPath("/onboarding/salon/account", { userId: null })).toBe(false);
     expect(canAccessPath("/onboarding/salon/account", { userId: "u1" })).toBe(true);
     expect(canAccessPath("/owner/ai-budget", { userId: "u1", isPlatformAdmin: false })).toBe(false);
@@ -97,5 +112,75 @@ describe("navigation route guards", () => {
 
     expect(resolution.reason).toBe("direct");
     expect(resolution.resolvedRoute.name).toBe("DiscoverBusinesses");
+  });
+
+  it("SalonDashboard route exists and is authenticated-guarded", () => {
+    expect(appRoutes.find((r) => r.name === "SalonDashboard")).toMatchObject({
+      name: "SalonDashboard",
+      group: "protected",
+      guard: "authenticated",
+    });
+  });
+});
+
+// ---------------------------------------------------------------------------
+// parseSalonContextPath
+// ---------------------------------------------------------------------------
+
+describe("parseSalonContextPath", () => {
+  it("parses a bare tenant path with no section", () => {
+    const result = parseSalonContextPath("/salon/tenant-abc");
+    expect(result).toEqual({ tenantId: "tenant-abc", section: null });
+  });
+
+  it("parses a path with 'book' section", () => {
+    expect(parseSalonContextPath("/salon/tenant-abc/book")).toEqual({
+      tenantId: "tenant-abc",
+      section: "book",
+    });
+  });
+
+  it("parses a path with 'messages' section", () => {
+    expect(parseSalonContextPath("/salon/t1/messages")).toEqual({
+      tenantId: "t1",
+      section: "messages",
+    });
+  });
+
+  it("parses a path with 'loyalty' section", () => {
+    expect(parseSalonContextPath("/salon/t1/loyalty")).toEqual({
+      tenantId: "t1",
+      section: "loyalty",
+    });
+  });
+
+  it("parses a path with 'profile' section", () => {
+    expect(parseSalonContextPath("/salon/t1/profile")).toEqual({
+      tenantId: "t1",
+      section: "profile",
+    });
+  });
+
+  it("returns null for unknown section — section is set to null", () => {
+    const result = parseSalonContextPath("/salon/t1/unknown-section");
+    expect(result).toEqual({ tenantId: "t1", section: null });
+  });
+
+  it("returns null for non-salon paths", () => {
+    expect(parseSalonContextPath("/app/tenant-profile")).toBeNull();
+    expect(parseSalonContextPath("/discover")).toBeNull();
+    expect(parseSalonContextPath("/")).toBeNull();
+  });
+
+  it("handles paths without leading slash", () => {
+    const result = parseSalonContextPath("salon/tenant-abc");
+    expect(result).toEqual({ tenantId: "tenant-abc", section: null });
+  });
+
+  it("handles paths with trailing slash", () => {
+    const result = parseSalonContextPath("/salon/tenant-abc/");
+    // Trailing slash results in an empty section segment → null section
+    expect(result).not.toBeNull();
+    expect(result?.tenantId).toBe("tenant-abc");
   });
 });

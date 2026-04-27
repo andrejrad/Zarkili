@@ -1,0 +1,247 @@
+{
+  "component": "Chip",
+  "description": "Compact element for tags, filters, or metadata display",
+  "variants": {
+    "type": {
+      "options": ["default", "outlined", "filled"],
+      "default": "default"
+    },
+    "size": {
+      "options": ["small", "default"],
+      "default": "default"
+    },
+    "state": {
+      "options": ["default", "pressed", "selected", "disabled"],
+      "default": "default"
+    },
+    "dismissible": {
+      "options": [true, false],
+      "default": false
+    }
+  },
+  "states": {
+    "default": {
+      "default": {
+        "background": "#F5F5F5",
+        "border": "none",
+        "text": {
+          "color": "#1A1A1A",
+          "style": "label-small"
+        },
+        "icon": {
+          "color": "#6B6B6B"
+        }
+      },
+      "outlined": {
+        "background": "transparent",
+        "border": {
+          "width": 1,
+          "color": "#E5E0D1"
+        },
+        "text": {
+          "color": "#1A1A1A",
+          "style": "label-small"
+        },
+        "icon": {
+          "color": "#6B6B6B"
+        }
+      },
+      "filled": {
+        "background": "#E3A9A0",
+        "border": "none",
+        "text": {
+          "color": "#FFFFFF",
+          "style": "label-small"
+        },
+        "icon": {
+          "color": "#FFFFFF"
+        }
+      }
+    },
+    "pressed": {
+      "default": {
+        "background": "#E5E0D1",
+        "transform": "scale(0.95)"
+      },
+      "outlined": {
+        "background": "#F5F5F5",
+        "border": {
+          "width": 1,
+          "color": "#E5E0D1"
+        }
+      },
+      "filled": {
+        "background": "#D19A91",
+        "transform": "scale(0.95)"
+      }
+    },
+    "selected": {
+      "default": {
+        "background": "#E3A9A0",
+        "text": {
+          "color": "#FFFFFF"
+        },
+        "icon": {
+          "color": "#FFFFFF"
+        }
+      },
+      "outlined": {
+        "background": "#E3A9A0",
+        "border": {
+          "width": 1,
+          "color": "#E3A9A0"
+        },
+        "text": {
+          "color": "#FFFFFF"
+        },
+        "icon": {
+          "color": "#FFFFFF"
+        }
+      },
+      "filled": {
+        "background": "#D19A91",
+        "border": "none"
+      }
+    },
+    "disabled": {
+      "background": "#F5F5F5",
+      "border": {
+        "width": 1,
+        "color": "#E5E0D1"
+      },
+      "text": {
+        "color": "#B0B0B0"
+      },
+      "icon": {
+        "color": "#B0B0B0"
+      },
+      "opacity": 0.6
+    }
+  },
+  "sizes": {
+    "small": {
+      "height": 24,
+      "paddingHorizontal": 8,
+      "paddingVertical": 4,
+      "borderRadius": 12,
+      "gap": 4,
+      "text": {
+        "fontSize": 10,
+        "lineHeight": 16,
+        "fontWeight": "500"
+      },
+      "icon": {
+        "size": 12
+      },
+      "dismissIcon": {
+        "size": 12,
+        "padding": 2
+      }
+    },
+    "default": {
+      "height": 32,
+      "paddingHorizontal": 12,
+      "paddingVertical": 6,
+      "borderRadius": 16,
+      "gap": 6,
+      "text": {
+        "fontSize": 12,
+        "lineHeight": 20,
+        "fontWeight": "500"
+      },
+      "icon": {
+        "size": 16
+      },
+      "dismissIcon": {
+        "size": 16,
+        "padding": 4
+      }
+    }
+  },
+  "layout": {
+    "flexDirection": "row",
+    "alignItems": "center",
+    "justifyContent": "center",
+    "leadingIcon": {
+      "position": "leading",
+      "optional": true
+    },
+    "dismissButton": {
+      "position": "trailing",
+      "display": "when dismissible=true",
+      "hitSlop": {
+        "top": 8,
+        "right": 8,
+        "bottom": 8,
+        "left": 8
+      }
+    }
+  },
+  "useCases": {
+    "serviceCategories": {
+      "type": "default",
+      "size": "small",
+      "dismissible": false,
+      "example": "Gel Nails, Massage, Facial"
+    },
+    "activeFilters": {
+      "type": "filled",
+      "size": "default",
+      "dismissible": true,
+      "example": "Under $50 ×, Open Now ×"
+    },
+    "memberBadge": {
+      "type": "outlined",
+      "size": "small",
+      "dismissible": false,
+      "example": "Zarkili Member"
+    },
+    "tags": {
+      "type": "default",
+      "size": "small",
+      "dismissible": false,
+      "example": "Trending, New, Popular"
+    }
+  },
+  "behavior": {
+    "interactive": "Optional (can be pressable or display-only)",
+    "hapticFeedback": "selection (when interactive)",
+    "onPress": "Select/toggle chip or trigger action",
+    "onDismiss": "Remove chip from list (when dismissible)",
+    "maxWidth": "Truncate text with ellipsis if exceeds container"
+  },
+  "transitions": {
+    "onPress": {
+      "duration": 100,
+      "easing": "ease-out",
+      "properties": ["background", "transform"]
+    },
+    "onDismiss": {
+      "duration": 200,
+      "easing": "ease-in",
+      "properties": ["opacity", "scale"],
+      "remove": true
+    }
+  },
+  "accessibility": {
+    "role": "button (if interactive), text (if display-only)",
+    "label": "{{chipText}}",
+    "hint": {
+      "selectable": "Tap to select filter",
+      "dismissible": "Tap X to remove",
+      "displayOnly": null
+    },
+    "state": {
+      "selected": true,
+      "disabled": true
+    },
+    "minTouchTarget": "32x32 (default size), 24x24 (small size - acceptable for non-critical actions)"
+  },
+  "dependencies": {
+    "icons": ["x (dismiss icon, system)"],
+    "tokens": ["colors.json", "typography.json", "spacing.json"]
+  },
+  "example": {
+    "react": "import { Chip } from '@/components/Chip';\n\n// Display-only category tags\n<View style={{ flexDirection: 'row', gap: 8 }}>\n  <Chip type=\"default\" size=\"small\" label=\"Gel Nails\" />\n  <Chip type=\"default\" size=\"small\" label=\"Massage\" />\n</View>\n\n// Interactive filter chips\n<View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap' }}>\n  {activeFilters.map(filter => (\n    <Chip\n      key={filter.id}\n      type=\"filled\"\n      size=\"default\"\n      label={filter.label}\n      dismissible\n      onDismiss={() => handleRemoveFilter(filter.id)}\n    />\n  ))}\n</View>\n\n// Selectable chips\n<Chip\n  type=\"outlined\"\n  size=\"default\"\n  label=\"Under $50\"\n  selected={priceFilter === 'under50'}\n  onPress={() => setPriceFilter('under50')}\n/>"
+  }
+}

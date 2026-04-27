@@ -1,4 +1,7 @@
 import { PropsWithChildren } from "react";
+import { SafeAreaProvider } from "react-native-safe-area-context";
+
+import type { AuthRepository } from "../../domains/auth";
 
 import { AuthProvider, useAuth } from "./AuthProvider";
 import { TenantProvider } from "./TenantProvider";
@@ -17,10 +20,16 @@ function AppProvidersWithinAuth({ children }: PropsWithChildren) {
   );
 }
 
-export function AppProviders({ children }: PropsWithChildren) {
+type AppProvidersProps = PropsWithChildren<{
+  authRepository?: AuthRepository | null;
+}>;
+
+export function AppProviders({ children, authRepository }: AppProvidersProps) {
   return (
-    <AuthProvider>
-      <AppProvidersWithinAuth>{children}</AppProvidersWithinAuth>
-    </AuthProvider>
+    <SafeAreaProvider>
+      <AuthProvider authRepository={authRepository}>
+        <AppProvidersWithinAuth>{children}</AppProvidersWithinAuth>
+      </AuthProvider>
+    </SafeAreaProvider>
   );
 }

@@ -1,0 +1,131 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "Zarkili Color Tokens",
+  "version": "1.0.0",
+  "colors": {
+    "brand": {
+      "coral-blossom": {
+        "value": "#E3A9A0",
+        "description": "Primary brand color"
+      },
+      "warm-oat": {
+        "value": "#D1BFB3",
+        "description": "Secondary brand color"
+      },
+      "cream-silk": {
+        "value": "#F2EDDD",
+        "description": "Background base"
+      },
+      "mint-fresh": {
+        "value": "#BBEDDA",
+        "description": "Accent color"
+      }
+    },
+    "semantic": {
+      "primary": {
+        "value": "#E3A9A0",
+        "description": "Primary actions, selected states"
+      },
+      "primary-hover": {
+        "value": "#D99A90",
+        "description": "Primary color hover state (10% darker)"
+      },
+      "primary-pressed": {
+        "value": "#CF8B80",
+        "description": "Primary color pressed state (15% darker)"
+      },
+      "background": {
+        "value": "#F2EDDD",
+        "description": "App background"
+      },
+      "surface": {
+        "value": "#FFFFFF",
+        "description": "Card and container background"
+      },
+      "border": {
+        "value": "#E5E0D1",
+        "description": "Border and divider color"
+      },
+      "foreground": {
+        "value": "#1A1A1A",
+        "description": "Primary text color"
+      },
+      "text-muted": {
+        "value": "#6B6B6B",
+        "description": "Secondary text, labels"
+      },
+      "accent": {
+        "value": "#BBEDDA",
+        "description": "Highlights and special states"
+      },
+      "accent-foreground": {
+        "value": "#2D4A42",
+        "description": "Text on accent background"
+      },
+      "success": {
+        "value": "#4CAF50",
+        "description": "Success states, confirmations"
+      },
+      "warning": {
+        "value": "#FF9800",
+        "description": "Warning states, alerts"
+      },
+      "error": {
+        "value": "#F44336",
+        "description": "Error states, destructive actions"
+      },
+      "info": {
+        "value": "#2196F3",
+        "description": "Informational states"
+      }
+    },
+    "opacity": {
+      "primary-10": {
+        "value": "rgba(227, 169, 160, 0.1)",
+        "description": "Primary color at 10% opacity"
+      },
+      "primary-20": {
+        "value": "rgba(227, 169, 160, 0.2)",
+        "description": "Primary color at 20% opacity"
+      },
+      "secondary-5": {
+        "value": "rgba(209, 191, 179, 0.05)",
+        "description": "Secondary color at 5% opacity"
+      },
+      "secondary-10": {
+        "value": "rgba(209, 191, 179, 0.1)",
+        "description": "Secondary color at 10% opacity"
+      },
+      "secondary-20": {
+        "value": "rgba(209, 191, 179, 0.2)",
+        "description": "Secondary color at 20% opacity"
+      },
+      "black-50": {
+        "value": "rgba(0, 0, 0, 0.5)",
+        "description": "Black at 50% opacity for overlays"
+      }
+    },
+    "states": {
+      "disabled": {
+        "value": "#B0B0B0",
+        "description": "Disabled state color"
+      },
+      "disabled-bg": {
+        "value": "#F5F5F5",
+        "description": "Disabled background"
+      },
+      "selected": {
+        "value": "#E3A9A0",
+        "description": "Selected state background"
+      },
+      "hover": {
+        "value": "rgba(0, 0, 0, 0.05)",
+        "description": "Hover state overlay"
+      },
+      "pressed": {
+        "value": "rgba(0, 0, 0, 0.1)",
+        "description": "Pressed state overlay"
+      }
+    }
+  }
+}

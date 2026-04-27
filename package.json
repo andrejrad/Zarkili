@@ -22,20 +22,26 @@
     "firebase:emulators": "firebase emulators:start --project zarkili-dev",
     "firebase:deploy:dev": "firebase deploy --project zarkili-dev",
     "firebase:deploy:prod": "firebase deploy --project zarkili-production",
+    "seed:discovery:dev": "dotenv -e .env.development -- node scripts/seed-discovery-featured-salons.mjs",
     "functions:serve": "npm --prefix functions run serve",
     "functions:build": "npm --prefix functions run build"
   },
   "dependencies": {
+    "@expo-google-fonts/manrope": "^0.4.2",
     "@react-native-async-storage/async-storage": "^1.24.0",
     "babel-preset-expo": "~54.0.10",
     "expo": "^54.0.0",
     "expo-constants": "~18.0.13",
+    "expo-font": "~14.0.11",
     "expo-status-bar": "~3.0.9",
     "firebase": "^11.2.0",
     "react": "19.1.0",
+    "react-dom": "19.1.0",
     "react-native": "0.81.5",
     "react-native-safe-area-context": "~5.6.0",
-    "react-native-screens": "~4.16.0"
+    "react-native-screens": "~4.16.0",
+    "react-native-svg": "15.12.1",
+    "react-native-web": "^0.21.0"
   },
   "devDependencies": {
     "@firebase/rules-unit-testing": "^4.0.1",
