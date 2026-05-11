@@ -1,19 +1,19 @@
 ﻿# Phase 4 — AI Support Router and Tuning (Weeks 55–57)
 
 ## Why This Plan Exists
-The platform launches commercially at the end of Phase 3.5 (Week 51) with **in-app support and the platform-owner dashboard live but human-handled** (Phase 3.5 Week 50 ships the surfaces, rules, KB authoring UI, and macros from [AI_SUPPORT_SYSTEM_ARCHITECTURE.md](AI_SUPPORT_SYSTEM_ARCHITECTURE.md) without the AI router).
+The platform launches commercially at the end of Phase 3.5 (Week 54) with **in-app support and the platform-owner dashboard live but human-handled** (Phase 3.5 Week 53 ships the surfaces, rules, KB authoring UI, and macros from [AI_SUPPORT_SYSTEM_ARCHITECTURE.md](AI_SUPPORT_SYSTEM_ARCHITECTURE.md) without the AI router).
 
 Phase 4 adds the **AI first-response layer** on top of those live surfaces, using the first ~4 weeks of post-launch ticket data as input to the knowledge base and as a baseline for the AI eval set.
 
 This phase runs **after** commercial GA. It does not block launch.
 
 ## Entry Conditions (must be true before Week 55 starts)
-1. Commercial GA achieved at end of Week 51; platform serving real tenants with in-app support live.
+1. Commercial GA achieved at end of Week 54; platform serving real tenants with in-app support live.
 2. Minimum 4 weeks of post-launch human-handled ticket data available (≥ 50 tickets across tenant admins + end clients) to seed the knowledge base and the AI eval set.
-3. Customer support runbook from W51 is the source of truth for canonical answers; KB seeded in W50.
-4. AI evaluation harness from W49 is operational; Phase 4 extends it with a `support` eval set.
-5. AI budget guard `aiSupport` feature key registered in W50; consumed in W55.
-6. Support surfaces from Phase 3.5 W50 (`SupportChatScreen`, `AdminSupportQueueScreen`, KB authoring UI, escalation queue, macros) are live in production.
+3. Customer support runbook from W54 is the source of truth for canonical answers; KB seeded in W53.
+4. AI evaluation harness from W52 is operational; Phase 4 extends it with a `support` eval set.
+5. AI budget guard `aiSupport` feature key registered in W53; consumed in W55.
+6. Support surfaces from Phase 3.5 W53 (`SupportChatScreen`, `AdminSupportQueueScreen`, KB authoring UI, escalation queue, macros) are live in production.
 
 ## Exit Conditions (Definition of Done for Phase 4)
 1. `aiSupportRouter` Cloud Function live with confidence-scored auto-respond vs escalate decision.
@@ -30,18 +30,18 @@ This phase runs **after** commercial GA. It does not block launch.
 ### Week 55 — AI Router, Context Injection, Escalation Pipeline
 - `aiSupportRouter` Cloud Function:
   - Loads tenant context safely (role, recent bookings, account age, locale, last booking status).
-  - Builds prompt from `platform/aiSupportKb/{current}` (seeded in W48) + per-tenant overlays + safety guardrails.
+  - Builds prompt from `platform/aiSupportKb/{current}` (seeded in W53) + per-tenant overlays + safety guardrails.
   - Calls AI provider with structured output: `{reply: string, confidence: number, reason: string, suggestedTags: string[]}`.
   - Decides auto-respond vs escalate based on confidence threshold (configurable).
   - Writes AI message + updates ticket status; if escalating, mirrors to `escalationQueue` with draft reply.
 - Tenant-context injection security review: write adversarial tests that try to read other-tenant data via prompt injection or context misuse.
 - Escalation delivery: email to platform owner with draft reply + deep link to `AdminSupportQueueScreen`. Email template and SES/SendGrid (or chosen provider) wired.
-- AI budget guard integration: route uses `aiSupport` feature key registered in W50; respects Healthy/Warning/Protection/Exhausted state thresholds. In Protection or Exhausted, all tickets escalate immediately to human (no AI call).
+- AI budget guard integration: route uses `aiSupport` feature key registered in W53; respects Healthy/Warning/Protection/Exhausted state thresholds. In Protection or Exhausted, all tickets escalate immediately to human (no AI call).
 - Per-tenant routing flag: optional tenant config to route to tenant owner first; platform owner remains fallback after SLA breach.
 - Tenant comms: announce AI assistance in support chat once router is live (in-app banner + email).
 
 ### Week 56 — Eval, Analytics, CSAT, Tagging
-- Extend the W49 AI evaluation harness with a `support` eval set, ≥ 100 examples drawn from real W47–W55 tickets, with rubric (correctness, tone, escalation appropriateness, no-leakage). Record baseline. Wire to CI for any prompt or model-tier change.
+- Extend the W52 AI evaluation harness with a `support` eval set, ≥ 100 examples drawn from real W54–W55 tickets, with rubric (correctness, tone, escalation appropriateness, no-leakage). Record baseline. Wire to CI for any prompt or model-tier change.
 - Ticket tagging (auto-suggested by AI, editable by admin).
 - CSAT survey after `resolved`/`closed` — 1-tap rating + optional comment, stored on ticket.
 - Support analytics dashboard:
@@ -55,7 +55,7 @@ This phase runs **after** commercial GA. It does not block launch.
 - Add weekly human-in-the-loop review process: sample 10 AI replies per week, score against rubric, feed corrections back into KB.
 
 ### Week 57 — Hardening, Tuning, Phase 4 Close
-- Tune confidence threshold based on Week 53 deflection vs CSAT data.
+- Tune confidence threshold based on Week 56 deflection vs CSAT data.
 - KB iteration pass — rewrite weak system-prompt sections based on flagged tickets.
 - Load behavior: confirm Cloud Function concurrency and provider rate-limits hold under simulated burst (use the W47 load harness).
 - Accessibility re-audit on `SupportChatScreen` and `AdminSupportQueueScreen`.
@@ -77,7 +77,7 @@ This phase runs **after** commercial GA. It does not block launch.
 
 ## Parallel Streams (run alongside Weeks 55–57)
 - **Customer success / human-tier-2**: continues handling escalations through Week 54; their feedback is the primary KB tuning input.
-- **Tenant comms**: announce AI assistance in support chat in Week 52 once router is live.
+- **Tenant comms**: announce AI assistance in support chat in Week 55 once router is live.
 - **Engineering on-call**: continues from Phase 3.5; no rotation change required.
 
 ## Acceptance Gate Per Week
@@ -123,7 +123,7 @@ Explicitly out of scope and tracked as Phase 4+ backlog:
 - Gantt: [PROJECT_GANTT_AGILE_PLAN.md](PROJECT_GANTT_AGILE_PLAN.md)
 - Tracking board: [PROGRAM_TRACKING_BOARD.md](PROGRAM_TRACKING_BOARD.md)
 - Phase 3.5 (precedes this): [PHASE3_5_RELEASE_READINESS_PLAN_WEEKS_50_TO_54.md](PHASE3_5_RELEASE_READINESS_PLAN_WEEKS_50_TO_54.md)
-- AI eval harness origin: W47 in [PHASE3_5_RELEASE_READINESS_PLAN_WEEKS_50_TO_54.md](PHASE3_5_RELEASE_READINESS_PLAN_WEEKS_50_TO_54.md)
+- AI eval harness origin: W52 in [PHASE3_5_RELEASE_READINESS_PLAN_WEEKS_50_TO_54.md](PHASE3_5_RELEASE_READINESS_PLAN_WEEKS_50_TO_54.md)
 - AI budget guard: Phase 1 (delivered)
 
 
