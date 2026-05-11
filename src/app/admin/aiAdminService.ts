@@ -3,6 +3,7 @@ import {
   doc,
   getDocs,
   getDoc,
+  getCountFromServer,
   setDoc,
   updateDoc,
   query,
@@ -127,14 +128,24 @@ export function createAiAdminService(db: Firestore) {
     assertTenantId(tenantId);
     assertAllowed(actorRole);
 
+    const todayMidnight = new Date();
+    todayMidnight.setUTCHours(0, 0, 0, 0);
+    const todayMidnightISO = todayMidnight.toISOString();
+
     const colRef = collection(db, "tenants", tenantId, "aiSuggestions");
-    const [pendingSnap] = await Promise.all([
+    const [pendingSnap, approvedSnap, rejectedSnap] = await Promise.all([
       getDocs(query(colRef, where("status", "==", "pending"), limit(500))),
+      getCountFromServer(
+        query(colRef, where("status", "==", "approved"), where("reviewedAt", ">=", todayMidnightISO))
+      ),
+      getCountFromServer(
+        query(colRef, where("status", "==", "rejected"), where("reviewedAt", ">=", todayMidnightISO))
+      ),
     ]);
     return {
       pendingCount: pendingSnap.size,
-      approvedToday: 0, // Requires timestamp-range query; stub for MVP
-      rejectedToday: 0,
+      approvedToday: approvedSnap.data().count,
+      rejectedToday: rejectedSnap.data().count,
     };
   }
 

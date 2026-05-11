@@ -441,4 +441,172 @@ describe("Firestore multi-tenant rules", () => {
     );
     await assertFails(db.doc("tenants/tenantA/onboardingTimeline/evt-4").delete());
   });
+
+  // -------------------------------------------------------------------------
+  // KI-003 — Loyalty + Campaigns Firestore rules
+  // -------------------------------------------------------------------------
+
+  describe("loyaltyConfig", () => {
+    it("tenant member (client) may read loyaltyConfig", async () => {
+      await seedTenantMembership("tenantA", "lcClient1", "client");
+      await testEnv.withSecurityRulesDisabled(async (ctx) => {
+        await ctx.firestore().doc("tenants/tenantA/loyaltyConfig/default").set({ pointsPerUsd: 10 });
+      });
+      const db = testEnv.authenticatedContext("lcClient1").firestore();
+      await assertSucceeds(db.doc("tenants/tenantA/loyaltyConfig/default").get());
+    });
+
+    it("tenant admin may write loyaltyConfig", async () => {
+      await seedTenantMembership("tenantA", "lcAdmin1", "tenant_admin");
+      const db = testEnv.authenticatedContext("lcAdmin1").firestore();
+      await assertSucceeds(
+        db.doc("tenants/tenantA/loyaltyConfig/default").set({ pointsPerUsd: 20 })
+      );
+    });
+
+    it("client cannot write loyaltyConfig", async () => {
+      await seedTenantMembership("tenantA", "lcClient2", "client");
+      const db = testEnv.authenticatedContext("lcClient2").firestore();
+      await assertFails(
+        db.doc("tenants/tenantA/loyaltyConfig/default").set({ pointsPerUsd: 99 })
+      );
+    });
+
+    it("unauthenticated user cannot read loyaltyConfig", async () => {
+      const db = testEnv.unauthenticatedContext().firestore();
+      await assertFails(db.doc("tenants/tenantA/loyaltyConfig/default").get());
+    });
+  });
+
+  describe("loyaltyStates", () => {
+    it("client may read their own loyalty state (doc id == uid)", async () => {
+      await seedTenantMembership("tenantA", "lsClient1", "client");
+      await testEnv.withSecurityRulesDisabled(async (ctx) => {
+        await ctx.firestore().doc("tenants/tenantA/loyaltyStates/lsClient1").set({ points: 50 });
+      });
+      const db = testEnv.authenticatedContext("lsClient1").firestore();
+      await assertSucceeds(db.doc("tenants/tenantA/loyaltyStates/lsClient1").get());
+    });
+
+    it("client cannot read another user's loyalty state", async () => {
+      await seedTenantMembership("tenantA", "lsClient2", "client");
+      await testEnv.withSecurityRulesDisabled(async (ctx) => {
+        await ctx.firestore().doc("tenants/tenantA/loyaltyStates/otherUserLS").set({ points: 50 });
+      });
+      const db = testEnv.authenticatedContext("lsClient2").firestore();
+      await assertFails(db.doc("tenants/tenantA/loyaltyStates/otherUserLS").get());
+    });
+
+    it("tenant admin may read any loyalty state", async () => {
+      await seedTenantMembership("tenantA", "lsAdmin1", "tenant_admin");
+      await testEnv.withSecurityRulesDisabled(async (ctx) => {
+        await ctx.firestore().doc("tenants/tenantA/loyaltyStates/someClientLS").set({ points: 30 });
+      });
+      const db = testEnv.authenticatedContext("lsAdmin1").firestore();
+      await assertSucceeds(db.doc("tenants/tenantA/loyaltyStates/someClientLS").get());
+    });
+
+    it("client cannot write loyalty state directly", async () => {
+      await seedTenantMembership("tenantA", "lsClient3", "client");
+      const db = testEnv.authenticatedContext("lsClient3").firestore();
+      await assertFails(
+        db.doc("tenants/tenantA/loyaltyStates/lsClient3").set({ points: 999 })
+      );
+    });
+  });
+
+  describe("loyaltyTransactions", () => {
+    it("tenant admin may write a loyalty transaction", async () => {
+      await seedTenantMembership("tenantA", "ltAdmin1", "tenant_admin");
+      const db = testEnv.authenticatedContext("ltAdmin1").firestore();
+      await assertSucceeds(
+        db.doc("tenants/tenantA/loyaltyTransactions/tx-001").set({ userId: "clientX", delta: 10 })
+      );
+    });
+
+    it("client cannot write a loyalty transaction", async () => {
+      await seedTenantMembership("tenantA", "ltClient1", "client");
+      const db = testEnv.authenticatedContext("ltClient1").firestore();
+      await assertFails(
+        db.doc("tenants/tenantA/loyaltyTransactions/tx-002").set({ userId: "ltClient1", delta: 10 })
+      );
+    });
+
+    it("client may read their own loyalty transactions (resource.data.userId == uid)", async () => {
+      await seedTenantMembership("tenantA", "ltClient2", "client");
+      await testEnv.withSecurityRulesDisabled(async (ctx) => {
+        await ctx.firestore().doc("tenants/tenantA/loyaltyTransactions/tx-003").set({
+          userId: "ltClient2",
+          delta: 5,
+        });
+      });
+      const db = testEnv.authenticatedContext("ltClient2").firestore();
+      await assertSucceeds(db.doc("tenants/tenantA/loyaltyTransactions/tx-003").get());
+    });
+
+    it("client cannot read another user's loyalty transaction", async () => {
+      await seedTenantMembership("tenantA", "ltClient3", "client");
+      await testEnv.withSecurityRulesDisabled(async (ctx) => {
+        await ctx.firestore().doc("tenants/tenantA/loyaltyTransactions/tx-004").set({
+          userId: "anotherClientLT",
+          delta: 5,
+        });
+      });
+      const db = testEnv.authenticatedContext("ltClient3").firestore();
+      await assertFails(db.doc("tenants/tenantA/loyaltyTransactions/tx-004").get());
+    });
+  });
+
+  describe("campaigns", () => {
+    it("tenant admin may read campaigns", async () => {
+      await seedTenantMembership("tenantA", "campAdmin1", "tenant_admin");
+      await testEnv.withSecurityRulesDisabled(async (ctx) => {
+        await ctx.firestore().doc("tenants/tenantA/campaigns/camp-001").set({ name: "Summer Sale" });
+      });
+      const db = testEnv.authenticatedContext("campAdmin1").firestore();
+      await assertSucceeds(db.doc("tenants/tenantA/campaigns/camp-001").get());
+    });
+
+    it("location_manager may read campaigns", async () => {
+      await seedTenantMembership("tenantA", "campLM1", "location_manager");
+      await testEnv.withSecurityRulesDisabled(async (ctx) => {
+        await ctx.firestore().doc("tenants/tenantA/campaigns/camp-001").set({ name: "Summer Sale" });
+      });
+      const db = testEnv.authenticatedContext("campLM1").firestore();
+      await assertSucceeds(db.doc("tenants/tenantA/campaigns/camp-001").get());
+    });
+
+    it("client cannot read campaigns", async () => {
+      await seedTenantMembership("tenantA", "campClient1", "client");
+      await testEnv.withSecurityRulesDisabled(async (ctx) => {
+        await ctx.firestore().doc("tenants/tenantA/campaigns/camp-001").set({ name: "Summer Sale" });
+      });
+      const db = testEnv.authenticatedContext("campClient1").firestore();
+      await assertFails(db.doc("tenants/tenantA/campaigns/camp-001").get());
+    });
+
+    it("tenant owner may write campaigns", async () => {
+      await seedTenantMembership("tenantA", "campOwner1", "tenant_owner");
+      const db = testEnv.authenticatedContext("campOwner1").firestore();
+      await assertSucceeds(
+        db.doc("tenants/tenantA/campaigns/camp-002").set({ name: "Winter Deal" })
+      );
+    });
+
+    it("location_manager cannot write campaigns", async () => {
+      await seedTenantMembership("tenantA", "campLM2", "location_manager");
+      const db = testEnv.authenticatedContext("campLM2").firestore();
+      await assertFails(
+        db.doc("tenants/tenantA/campaigns/camp-003").set({ name: "Unauthorised" })
+      );
+    });
+
+    it("client cannot write campaigns", async () => {
+      await seedTenantMembership("tenantA", "campClient2", "client");
+      const db = testEnv.authenticatedContext("campClient2").firestore();
+      await assertFails(
+        db.doc("tenants/tenantA/campaigns/camp-004").set({ name: "Spam" })
+      );
+    });
+  });
 });

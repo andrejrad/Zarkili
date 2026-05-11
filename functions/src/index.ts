@@ -35,6 +35,10 @@ export {
 
 export { receiptsGeneratePdf } from "./receipts";
 
+export { check1099KThreshold } from "./tax1099K";
+
+export { computePopularityIndex } from "./popularityIndex";
+
 setGlobalOptions({ maxInstances: 10 });
 
 export const health = onRequest((req, res) => {
