@@ -41,6 +41,8 @@ export type PasswordResetInput = {
   email: string;
 };
 
+export type SocialProvider = "apple" | "google" | "facebook";
+
 export type OnboardingFlowType = "salon" | "client";
 
 export type OnboardingDraftStatus = "draft" | "submitted";

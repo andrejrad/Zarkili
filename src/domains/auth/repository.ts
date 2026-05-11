@@ -2,9 +2,11 @@ import {
   createUserWithEmailAndPassword,
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
+  signInWithCredential,
   signOut,
   updateEmail as updateAuthEmail,
   type Auth,
+  type AuthCredential,
   type UserCredential,
 } from "firebase/auth";
 import {
@@ -185,6 +187,16 @@ export function createAuthRepository(auth: Auth, db: Firestore) {
     }
   }
 
+  async function signInWithSocialCredential(credential: AuthCredential): Promise<AuthSession> {
+    try {
+      const result = await signInWithCredential(auth, credential);
+      const profile = await readUserProfile(result.user.uid);
+      return toSession(result, profile);
+    } catch (error) {
+      throw toUserFacingAuthError(error, "Social sign-in failed.");
+    }
+  }
+
   async function signOutCurrentUser(): Promise<void> {
     await signOut(auth);
   }
@@ -210,6 +222,7 @@ export function createAuthRepository(auth: Auth, db: Firestore) {
     getCurrentSession,
     signIn,
     createAccount,
+    signInWithSocialCredential,
     updateProfile,
     updateEmailAddress,
     sendPasswordReset,

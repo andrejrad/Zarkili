@@ -13,7 +13,7 @@ import { StripeProvider } from "@stripe/stripe-react-native";
 import Constants from "expo-constants";
 
 import { AppProviders } from "./src/app/providers/AppProviders";
-import { appAuthRepository } from "./src/app/auth/runtime";
+import { appAuthRepository, appSocialAuthService } from "./src/app/auth/runtime";
 import { tenantLocationAdminService, staffAdminService, serviceAdminService, ownerKpiService } from "./src/app/admin/runtime";
 import { AppNavigatorShell } from "./src/app/navigation";
 import { appDiscoveryService } from "./src/app/navigation/runtime";
@@ -104,7 +104,7 @@ export default function App() {
 
   return (
     <AppErrorBoundary>
-      <AppProviders authRepository={appAuthRepository}>
+      <AppProviders authRepository={appAuthRepository} socialAuthService={appSocialAuthService}>
         {stripePublishableKey ? (
           <StripeProvider
             publishableKey={stripePublishableKey}

@@ -12,6 +12,10 @@ const firebaseCodeMessages: Record<string, string> = {
   "auth/network-request-failed": "Network error. Please check your connection and try again.",
   "auth/invalid-credential": "Invalid email or password.",
   "auth/requires-recent-login": "For security, please log in again before changing your email.",
+  "auth/account-exists-with-different-credential": "An account already exists with the same email but with a different sign-in method.",
+  "auth/credential-already-in-use": "This credential is already associated with a different user account.",
+  "auth/popup-closed-by-user": "Sign-in was cancelled.",
+  "auth/cancelled-popup-request": "Sign-in was cancelled.",
 };
 
 export function isFirebaseAuthError(error: unknown): error is FirebaseAuthLikeError {

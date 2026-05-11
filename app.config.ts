@@ -11,6 +11,7 @@ const config: ExpoConfig = {
   userInterfaceStyle: "automatic",
   plugins: [
     "expo-font",
+    "expo-apple-authentication",
     [
       "react-native-maps",
       {

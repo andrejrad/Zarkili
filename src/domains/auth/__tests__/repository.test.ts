@@ -3,6 +3,7 @@ import { createAuthRepository } from "../repository";
 const mockCreateUserWithEmailAndPassword = jest.fn();
 const mockSendPasswordResetEmail = jest.fn();
 const mockSignInWithEmailAndPassword = jest.fn();
+const mockSignInWithCredential = jest.fn();
 const mockSignOut = jest.fn();
 const mockUpdateEmail = jest.fn();
 const mockGetDoc = jest.fn();
@@ -12,6 +13,7 @@ jest.mock("firebase/auth", () => ({
   createUserWithEmailAndPassword: (...args: unknown[]) => mockCreateUserWithEmailAndPassword(...args),
   sendPasswordResetEmail: (...args: unknown[]) => mockSendPasswordResetEmail(...args),
   signInWithEmailAndPassword: (...args: unknown[]) => mockSignInWithEmailAndPassword(...args),
+  signInWithCredential: (...args: unknown[]) => mockSignInWithCredential(...args),
   signOut: (...args: unknown[]) => mockSignOut(...args),
   updateEmail: (...args: unknown[]) => mockUpdateEmail(...args),
 }));
@@ -60,6 +62,7 @@ describe("AuthRepository", () => {
     mockCreateUserWithEmailAndPassword.mockReset();
     mockSendPasswordResetEmail.mockReset();
     mockSignInWithEmailAndPassword.mockReset();
+    mockSignInWithCredential.mockReset();
     mockSignOut.mockReset();
     mockUpdateEmail.mockReset();
     mockGetDoc.mockReset();
@@ -300,5 +303,61 @@ describe("AuthRepository", () => {
     const repo = createAuthRepository(auth as never, db as never);
 
     await expect(repo.listUserTenantMemberships(" ")).rejects.toThrow("userId is required");
+  });
+
+  // ── signInWithSocialCredential ─────────────────────────────────────────
+
+  it("signs in with a social credential and returns auth session", async () => {
+    const fakeCredential = { providerId: "google.com" };
+    mockSignInWithCredential.mockResolvedValue({
+      user: { uid: "social-uid-1", email: "social@example.com" },
+    });
+
+    const repo = createAuthRepository(auth as never, db as never);
+    const result = await repo.signInWithSocialCredential(fakeCredential as never);
+
+    expect(mockSignInWithCredential).toHaveBeenCalledWith(auth, fakeCredential);
+    expect(result).toEqual({
+      userId: "social-uid-1",
+      email: "social@example.com",
+      firstName: null,
+      lastName: null,
+    });
+  });
+
+  it("hydrates profile names after social sign-in when profile exists", async () => {
+    const fakeCredential = { providerId: "apple.com" };
+    mockSignInWithCredential.mockResolvedValue({
+      user: { uid: "social-uid-2", email: null },
+    });
+    mockUserProfiles["social-uid-2"] = {
+      userId: "social-uid-2",
+      email: null,
+      firstName: "Lea",
+      lastName: "Gross",
+    };
+
+    const repo = createAuthRepository(auth as never, db as never);
+    const result = await repo.signInWithSocialCredential(fakeCredential as never);
+
+    expect(result).toEqual({
+      userId: "social-uid-2",
+      email: null,
+      firstName: "Lea",
+      lastName: "Gross",
+    });
+  });
+
+  it("maps Firebase social sign-in errors to friendly messages", async () => {
+    const fakeCredential = { providerId: "google.com" };
+    mockSignInWithCredential.mockRejectedValue({
+      code: "auth/account-exists-with-different-credential",
+      message: "raw firebase error",
+    });
+
+    const repo = createAuthRepository(auth as never, db as never);
+    await expect(repo.signInWithSocialCredential(fakeCredential as never)).rejects.toThrow(
+      "different sign-in method"
+    );
   });
 });

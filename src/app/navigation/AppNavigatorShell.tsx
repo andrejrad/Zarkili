@@ -290,7 +290,6 @@ import { SignInScreen } from "../auth/SignInScreen";
 import { SignUpScreen } from "../auth/SignUpScreen";
 import {
   SocialSignInSelectorScreen,
-  type SocialProvider,
 } from "../auth/SocialSignInSelectorScreen";
 import { ForgotPasswordScreen } from "../auth/ForgotPasswordScreen";
 import { ResetPasswordScreen } from "../auth/ResetPasswordScreen";
@@ -685,6 +684,7 @@ export function AppNavigatorShell({
     createAccount,
     signIn,
     signInAsDev,
+    signInWithSocialProvider,
     signOut,
     updateProfile,
     updateEmailAddress,
@@ -3885,9 +3885,10 @@ export function AppNavigatorShell({
     if (activeRoute.name === "SocialSignIn") {
       return (
         <SocialSignInSelectorScreen
-          onProvider={async (_provider: SocialProvider) => {
-            // Phase 2.2: stub. Real social sign-in wired in Phase 2.3.
-            navigate("AppShell");
+          onProvider={async (provider) => {
+            await signInWithSocialProvider(provider);
+            setActiveRouteName("AppShell");
+            setActiveTab("Home");
           }}
           onUseEmailInstead={() => navigate("SignIn")}
           onClose={() => navigate("AppShell")}

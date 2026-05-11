@@ -8,10 +8,16 @@
 
 import { useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
+import * as WebBrowser from "expo-web-browser";
+
+import type { SocialProvider } from "../../domains/auth";
+
+// Required on Android: closes the custom tab after the OAuth redirect fires.
+WebBrowser.maybeCompleteAuthSession();
 
 import { Banner, Button, colors, spacing } from "../../shared/ui";
 
-export type SocialProvider = "apple" | "google" | "facebook";
+export type { SocialProvider };
 
 export type SocialSignInSelectorScreenProps = {
   /** Async sign-in handler per provider. */

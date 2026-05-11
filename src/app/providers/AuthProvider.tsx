@@ -5,6 +5,8 @@ import type {
   CreateAccountInput,
   PasswordResetInput,
   SignInInput,
+  SocialAuthService,
+  SocialProvider,
   UpdateEmailInput,
   UpdateProfileInput,
 } from "../../domains/auth";
@@ -17,6 +19,7 @@ type AuthContextValue = {
   authReady: boolean;
   signIn: (input: SignInInput) => Promise<void>;
   createAccount: (input: CreateAccountInput) => Promise<void>;
+  signInWithSocialProvider: (provider: SocialProvider) => Promise<void>;
   updateProfile: (input: UpdateProfileInput) => Promise<void>;
   updateEmailAddress: (input: UpdateEmailInput) => Promise<void>;
   sendPasswordReset: (input: PasswordResetInput) => Promise<void>;
@@ -28,9 +31,10 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 type AuthProviderProps = PropsWithChildren<{
   authRepository?: AuthRepository | null;
+  socialAuthService?: SocialAuthService | null;
 }>;
 
-export function AuthProvider({ children, authRepository = null }: AuthProviderProps) {
+export function AuthProvider({ children, authRepository = null, socialAuthService = null }: AuthProviderProps) {
   const [userId, setUserId] = useState<string | null>(null);
   const [email, setEmail] = useState<string | null>(null);
   const [firstName, setFirstName] = useState<string | null>(null);
@@ -101,6 +105,17 @@ export function AuthProvider({ children, authRepository = null }: AuthProviderPr
         setFirstName(session.firstName);
         setLastName(session.lastName);
       },
+      signInWithSocialProvider: async (provider) => {
+        if (!socialAuthService) {
+          throw new Error("Social sign-in is not configured.");
+        }
+
+        const session = await socialAuthService.signInWithProvider(provider);
+        setUserId(session.userId);
+        setEmail(session.email);
+        setFirstName(session.firstName);
+        setLastName(session.lastName);
+      },
       updateProfile: async (input) => {
         if (!authRepository) {
           throw new Error("Auth repository is not configured.");
@@ -154,7 +169,7 @@ export function AuthProvider({ children, authRepository = null }: AuthProviderPr
         setLastName(null);
       }
     }),
-    [authReady, authRepository, email, firstName, lastName, userId]
+    [authReady, authRepository, email, firstName, lastName, socialAuthService, userId]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

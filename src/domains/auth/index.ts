@@ -7,6 +7,7 @@ export type {
 	PasswordResetInput,
 	SaveOnboardingDraftInput,
 	SignInInput,
+	SocialProvider,
 	TenantMembership,
 	TenantRole,
 	UpdateEmailInput,
@@ -28,3 +29,7 @@ export { createOnboardingDraftService } from "./onboardingDraftService";
 export type { OnboardingDraftService } from "./onboardingDraftService";
 export { createAuthRepository } from "./repository";
 export type { AuthRepository } from "./repository";
+export { createSocialAuthService } from "./socialAuthService";
+export type { SocialAuthService } from "./socialAuthService";
+export { createSocialAuthService } from "./socialAuthService";
+export type { SocialAuthService } from "./socialAuthService";
