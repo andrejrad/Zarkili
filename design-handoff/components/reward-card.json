@@ -1,0 +1,404 @@
+{
+  "component": "RewardCard",
+  "description": "Card displaying reward details with image, title, and points cost",
+  "purpose": "Surface a redeemable loyalty reward with its image, name, points cost, and lock/redeem/expire state in catalog grids and lists",
+  "source": {
+    "batch": "E",
+    "screen": "E.2 Reward Catalog / E.3 Reward Redemption",
+    "promotedFrom": "documentation/figma-prompts/BATCH_E_LOYALTY_ACTIVITIES_REVIEWS.md",
+    "figmaFrames": [
+      "E-component-reward-card-default",
+      "E-component-reward-card-pressed",
+      "E-component-reward-card-locked",
+      "E-component-reward-card-redeemed",
+      "E-component-reward-card-expired",
+      "E-component-reward-card-loading",
+      "E-component-reward-card-error",
+      "E-component-reward-card-compact"
+    ],
+    "lockedAt": "2026-04-28"
+  },
+  "variants": {
+    "size": {
+      "options": ["default", "compact"],
+      "default": "default"
+    },
+    "state": {
+      "options": ["unlocked", "pressed", "locked", "redeemed", "expired", "loading", "error"],
+      "default": "unlocked"
+    }
+  },
+  "states": {
+    "unlocked": {
+      "background": "#FFFFFF",
+      "border": {
+        "width": 1,
+        "color": "#E5E0D1"
+      },
+      "shadow": "0px 2px 4px rgba(0, 0, 0, 0.08)",
+      "image": {
+        "filter": "none",
+        "opacity": 1
+      },
+      "points": {
+        "color": "#E3A9A0"
+      },
+      "lockedChip": {
+        "visible": false
+      }
+    },
+    "pressed": {
+      "background": "#FFFFFF",
+      "border": {
+        "width": 1,
+        "color": "#E5E0D1"
+      },
+      "shadow": "0px 1px 2px rgba(0, 0, 0, 0.04)",
+      "transform": "scale(0.98)"
+    },
+    "locked": {
+      "background": "#FFFFFF",
+      "border": {
+        "width": 1,
+        "color": "#E5E0D1"
+      },
+      "shadow": "0px 2px 4px rgba(0, 0, 0, 0.08)",
+      "image": {
+        "filter": "grayscale(100%)",
+        "overlay": {
+          "visible": true,
+          "icon": {
+            "name": "lock",
+            "size": 24,
+            "color": "#1A1A1A"
+          },
+          "background": {
+            "shape": "circle",
+            "size": 48,
+            "color": "rgba(255, 255, 255, 0.8)"
+          },
+          "position": "center"
+        }
+      },
+      "subtitle": {
+        "content": "Need {{delta}} more pts",
+        "color": "#6B6B6B"
+      },
+      "points": {
+        "color": "#6B6B6B"
+      },
+      "lockedChip": {
+        "visible": true,
+        "label": "Locked",
+        "background": "#F5F5F5",
+        "color": "#6B6B6B"
+      }
+    },
+    "redeemed": {
+      "background": "#FFFFFF",
+      "border": {
+        "width": 1,
+        "color": "#E5E0D1"
+      },
+      "shadow": "0px 2px 4px rgba(0, 0, 0, 0.08)",
+      "ribbon": {
+        "visible": true,
+        "position": "top-right",
+        "background": "#BBEDDA",
+        "label": "Redeemed",
+        "labelColor": "#2D4A42",
+        "shape": "triangle",
+        "size": 64
+      },
+      "points": {
+        "color": "#6B6B6B"
+      }
+    },
+    "expired": {
+      "background": "#FFFFFF",
+      "border": {
+        "width": 1,
+        "color": "#E5E0D1"
+      },
+      "shadow": "0px 2px 4px rgba(0, 0, 0, 0.08)",
+      "opacity": 0.6,
+      "points": {
+        "visible": false
+      },
+      "expiredLabel": {
+        "visible": true,
+        "content": "Expired",
+        "style": "label-small",
+        "color": "#6B6B6B"
+      }
+    },
+    "loading": {
+      "background": "#FFFFFF",
+      "border": {
+        "width": 1,
+        "color": "#E5E0D1"
+      },
+      "skeleton": {
+        "image": {
+          "background": "#F5F5F5",
+          "shimmer": true
+        },
+        "title": {
+          "width": 280,
+          "height": 28,
+          "background": "#F5F5F5",
+          "borderRadius": 4
+        },
+        "subtitle": {
+          "width": 160,
+          "height": 16,
+          "background": "#F5F5F5",
+          "borderRadius": 4
+        },
+        "points": {
+          "width": 60,
+          "height": 16,
+          "background": "#F5F5F5",
+          "borderRadius": 4
+        }
+      }
+    },
+    "error": {
+      "background": "#FFFFFF",
+      "border": {
+        "width": 1,
+        "color": "#E5E0D1"
+      },
+      "shadow": "0px 2px 4px rgba(0, 0, 0, 0.08)",
+      "image": {
+        "fallback": {
+          "background": "#F5F5F5",
+          "icon": {
+            "name": "alert-circle",
+            "size": 48,
+            "color": "#F44336"
+          }
+        }
+      },
+      "title": {
+        "content": "Couldn't load",
+        "color": "#F44336"
+      },
+      "subtitle": {
+        "content": "Tap to retry",
+        "color": "#6B6B6B"
+      },
+      "points": {
+        "visible": false
+      }
+    }
+  },
+  "layout": {
+    "default": {
+      "width": 343,
+      "minHeight": 220,
+      "borderRadius": 16,
+      "image": {
+        "aspectRatio": "16:10",
+        "height": 214,
+        "borderRadiusTop": 16,
+        "objectFit": "cover"
+      },
+      "body": {
+        "padding": 12,
+        "gap": 4
+      }
+    },
+    "compact": {
+      "width": 343,
+      "minHeight": 220,
+      "borderRadius": 16,
+      "image": {
+        "aspectRatio": "4:3",
+        "height": 257,
+        "borderRadiusTop": 16,
+        "objectFit": "cover"
+      },
+      "body": {
+        "padding": 12,
+        "gap": 4
+      }
+    }
+  },
+  "anatomy": {
+    "container": {
+      "position": "relative",
+      "borderRadius": 16,
+      "overflow": "hidden",
+      "minHeight": 220
+    },
+    "image": {
+      "width": "100%",
+      "borderRadiusTop": 16,
+      "objectFit": "cover"
+    },
+    "imageOverlay": {
+      "position": "absolute",
+      "top": 0,
+      "left": 0,
+      "right": 0,
+      "bottom": 0,
+      "display": "flex",
+      "alignItems": "center",
+      "justifyContent": "center"
+    },
+    "ribbon": {
+      "position": "absolute",
+      "top": 0,
+      "right": 0,
+      "width": 64,
+      "height": 64,
+      "clipPath": "polygon(100% 0, 0 0, 100% 100%)",
+      "display": "flex",
+      "alignItems": "center",
+      "justifyContent": "center"
+    },
+    "ribbonLabel": {
+      "style": "label-small",
+      "transform": "rotate(45deg) translate(8px, -8px)",
+      "transformOrigin": "center",
+      "whiteSpace": "nowrap"
+    },
+    "body": {
+      "padding": 12,
+      "gap": 4,
+      "display": "flex",
+      "flexDirection": "column"
+    },
+    "title": {
+      "default": {
+        "style": "heading-3",
+        "numberOfLines": 2,
+        "textOverflow": "ellipsis"
+      },
+      "compact": {
+        "style": "heading-4",
+        "numberOfLines": 2,
+        "textOverflow": "ellipsis"
+      },
+      "color": "#1A1A1A"
+    },
+    "subtitle": {
+      "style": "body-small",
+      "color": "#6B6B6B",
+      "numberOfLines": 1,
+      "textOverflow": "ellipsis"
+    },
+    "footer": {
+      "display": "flex",
+      "flexDirection": "row",
+      "justifyContent": "space-between",
+      "alignItems": "center",
+      "marginTop": 4
+    },
+    "points": {
+      "style": "label-small",
+      "format": "{{points}} PTS"
+    },
+    "lockedChip": {
+      "height": 24,
+      "paddingHorizontal": 8,
+      "borderRadius": 8,
+      "style": "label-small"
+    }
+  },
+  "transitions": {
+    "onPress": {
+      "duration": 100,
+      "easing": "ease-out",
+      "properties": ["transform", "shadow"]
+    },
+    "shimmer": {
+      "duration": 1500,
+      "easing": "ease-in-out",
+      "iterations": "infinite",
+      "keyframes": {
+        "0%": {
+          "backgroundPosition": "-200% 0"
+        },
+        "100%": {
+          "backgroundPosition": "200% 0"
+        }
+      },
+      "reduceMotion": "Disable shimmer; show static skeleton"
+    }
+  },
+  "accessibility": {
+    "role": "button",
+    "label": {
+      "unlocked": "{{title}}, {{points}} points, available",
+      "locked": "{{title}}, {{points}} points, locked, need {{delta}} more points",
+      "redeemed": "{{title}}, {{points}} points, redeemed",
+      "expired": "{{title}}, expired",
+      "error": "Reward card, couldn't load, tap to retry"
+    },
+    "hint": "Opens reward details",
+    "isAccessibilityElement": true,
+    "accessible": true,
+    "hitArea": {
+      "minWidth": 44,
+      "minHeight": 44,
+      "hitSlop": 8
+    }
+  },
+  "usage": {
+    "context": [
+      "Rewards catalog grid",
+      "Available rewards list",
+      "Redeemed rewards history",
+      "Locked tier preview"
+    ],
+    "rules": [
+      "Whole card is a tappable button",
+      "Min height 220 ensures adequate touch target",
+      "Locked state shows grayscale image with centered lock icon and Locked chip",
+      "Redeemed state adds mint-fresh corner ribbon",
+      "Expired state reduces entire card opacity to 60 percent",
+      "Loading shows skeleton blocks with shimmer animation; reduce-motion disables shimmer",
+      "Error state shows fallback icon and retry prompt",
+      "Compact variant uses 4:3 image aspect and heading-4 title"
+    ]
+  },
+  "examples": {
+    "affordableReward": {
+      "size": "default",
+      "state": "unlocked",
+      "title": "20% Off Any Service",
+      "subtitle": "Valid for 90 days",
+      "points": 500,
+      "imageUrl": "https://example.com/reward-1.jpg"
+    },
+    "lockedReward": {
+      "size": "default",
+      "state": "locked",
+      "title": "Free Manicure",
+      "subtitle": "Need 150 more pts",
+      "points": 750,
+      "delta": 150,
+      "imageUrl": "https://example.com/reward-2.jpg"
+    },
+    "redeemedReward": {
+      "size": "compact",
+      "state": "redeemed",
+      "title": "Spa Day Package",
+      "subtitle": "Redeemed 03/15/2026",
+      "points": 1200,
+      "imageUrl": "https://example.com/reward-3.jpg"
+    }
+  },
+  "implementationNotes": [
+    "Default uses 16:10 image (214px tall at 343 width). Compact uses 4:3 (257px tall) and heading-4 title.",
+    "Locked subtitle 'Need {{delta}} more pts' = required points - user's current balance.",
+    "Redeemed corner ribbon: 64x64 right-triangle clip-path top-right; label rotated 45deg; mint-fresh #BBEDDA bg with #2D4A42 text.",
+    "Loading shimmer = linear gradient #F5F5F5 -> #E5E0D1 -> #F5F5F5, background-position -200% to 200% over 1.5s. Reduce-motion disables.",
+    "Whole card is the button; min-height 220 + 8px hitSlop guarantees >=44pt target.",
+    "Points format always '{value} PTS' label-small. Color: #E3A9A0 unlocked, #6B6B6B locked/redeemed/expired.",
+    "Expired applies 0.6 opacity to the container, not individual elements.",
+    "Error keeps the card tappable so the same surface is the retry affordance."
+  ]
+}

@@ -1,0 +1,648 @@
+{
+  "source": {
+    "batch": "G",
+    "prompt": "G.4.2",
+    "figmaFrames": [
+      "G-4-detail-default",
+      "G-4-detail-loading",
+      "G-4-detail-error"
+    ],
+    "lockedAt": "2026-04-28",
+    "referenceImpl": "design-handoff/reference/ClientDetailScreen.tsx",
+    "primaryDevice": "iPhone 14 (390×844)",
+    "note": "iPad responsive — same component, wider layout on ≥768px"
+  },
+  "screen": "ClientDetail",
+  "version": "1.0.0",
+  "device": {
+    "primary": {
+      "name": "iPhone 14",
+      "width": 390,
+      "height": 844,
+      "safeArea": { "top": 47, "bottom": 34 }
+    },
+    "responsive": "iPad 768×1024 (same component, wider)"
+  },
+  "description": "Full client profile with 6-tab detail view. Accessible from ClientLookup.",
+  "userPersona": "Authenticated staff member (stylist / manager)",
+  "userJob": "Review client history, add notes, check loyalty tier, verify consents, book for client",
+  "states": {
+    "G-4-detail-default": {
+      "description": "Client fully loaded, Overview tab active"
+    },
+    "G-4-detail-loading": {
+      "description": "Async fetch — skeleton client header + skeleton stats + 3 skeleton content blocks"
+    },
+    "G-4-detail-error": {
+      "description": "Network/server error — WifiOff + 'Couldn't load client' + Retry"
+    }
+  },
+  "layout": {
+    "background": "#F2EDDD",
+    "sections": [
+      {
+        "name": "header",
+        "type": "sticky",
+        "height": 56,
+        "background": "#F2EDDD",
+        "borderBottom": { "width": 1, "color": "#E5E0D1" },
+        "zIndex": 20
+      },
+      {
+        "name": "clientHeader",
+        "type": "static",
+        "background": "#FFFFFF",
+        "hiddenOnStates": ["G-4-detail-error"],
+        "skeletonOnStates": ["G-4-detail-loading"]
+      },
+      {
+        "name": "statsStrip",
+        "type": "static",
+        "background": "#F2EDDD",
+        "hiddenOnStates": ["G-4-detail-error", "G-4-detail-loading"]
+      },
+      {
+        "name": "tabBar",
+        "type": "sticky",
+        "height": 44,
+        "background": "#FFFFFF",
+        "borderBottom": { "width": 1, "color": "#E5E0D1" },
+        "horizontalScroll": true,
+        "scrollbarVisible": false,
+        "hiddenOnStates": ["G-4-detail-error"]
+      },
+      {
+        "name": "tabContent",
+        "type": "scrollable",
+        "flex": 1,
+        "paddingBottom": 72
+      },
+      {
+        "name": "bookCta",
+        "type": "fixed",
+        "position": "bottom",
+        "height": 52,
+        "paddingHorizontal": 16,
+        "paddingBottom": 8,
+        "background": "#FFFFFF",
+        "borderTop": { "width": 1, "color": "#E5E0D1" },
+        "hiddenOnStates": ["G-4-detail-error"]
+      }
+    ]
+  },
+  "components": {
+    "header": {
+      "height": 56,
+      "paddingHorizontal": 16,
+      "structure": { "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" },
+      "left": {
+        "backButton": { "icon": "chevron-left", "iconSize": 24, "color": "#1A1A1A", "touchTarget": 44 }
+      },
+      "right": {
+        "moreButton": { "icon": "more-horizontal", "iconSize": 24, "color": "#1A1A1A", "touchTarget": 44 }
+      }
+    },
+    "clientHeader": {
+      "padding": 16,
+      "background": "#FFFFFF",
+      "structure": { "flexDirection": "row", "gap": 16, "alignItems": "flex-start" },
+      "avatar": {
+        "size": 80,
+        "borderRadius": 9999,
+        "background": "nameHash → AVATAR_PALETTE",
+        "initials": { "style": "heading-2", "color": "#FFFFFF" },
+        "vipOverlay": {
+          "visible": "{{isVIP}}",
+          "icon": "star",
+          "size": 20,
+          "color": "#F59E0B",
+          "position": "bottom-right of avatar",
+          "background": "#FFFFFF",
+          "borderRadius": 9999,
+          "padding": 2
+        }
+      },
+      "info": {
+        "flex": 1,
+        "name": { "style": "heading-2", "color": "#1A1A1A" },
+        "badgeRow": {
+          "flexDirection": "row",
+          "alignItems": "center",
+          "gap": 8,
+          "marginTop": 4,
+          "tierBadge": "TierBadge (default size)",
+          "vipPill": {
+            "visible": "{{isVIP}}",
+            "content": "VIP",
+            "background": "rgba(245,158,11,0.12)",
+            "color": "#F59E0B",
+            "paddingHorizontal": 8,
+            "height": 22,
+            "borderRadius": 9999,
+            "style": "label-small",
+            "fontWeight": 600
+          }
+        },
+        "clientSince": {
+          "content": "Client since {{since}}",
+          "style": "body-small",
+          "color": "#6B6B6B",
+          "marginTop": 4
+        },
+        "contactRow": {
+          "flexDirection": "row",
+          "gap": 8,
+          "marginTop": 12,
+          "buttons": [
+            {
+              "label": "Call",
+              "icon": "phone",
+              "href": "tel:{{phone}}",
+              "flex": 1,
+              "height": 44,
+              "borderRadius": 12,
+              "background": "#F5F5F5",
+              "iconColor": "#E3A9A0",
+              "iconSize": 16,
+              "labelStyle": "label-small",
+              "labelColor": "#1A1A1A"
+            },
+            {
+              "label": "Text",
+              "icon": "message-circle",
+              "href": "sms:{{phone}}",
+              "flex": 1,
+              "height": 44,
+              "borderRadius": 12,
+              "background": "#F5F5F5",
+              "iconColor": "#E3A9A0",
+              "iconSize": 16,
+              "labelStyle": "label-small",
+              "labelColor": "#1A1A1A"
+            },
+            {
+              "label": "Email",
+              "icon": "mail",
+              "href": "mailto:{{email}}",
+              "flex": 1,
+              "height": 44,
+              "borderRadius": 12,
+              "background": "#F5F5F5",
+              "iconColor": "#E3A9A0",
+              "iconSize": 16,
+              "labelStyle": "label-small",
+              "labelColor": "#1A1A1A"
+            }
+          ]
+        }
+      }
+    },
+    "statsStrip": {
+      "flexDirection": "row",
+      "gap": 8,
+      "paddingHorizontal": 16,
+      "paddingVertical": 12,
+      "cards": [
+        { "key": "visits", "label": "Visits", "binding": "{{visits}}", "warningCondition": null },
+        { "key": "ltv", "label": "Lifetime", "binding": "${{lifetimeValue}}", "warningCondition": null },
+        { "key": "lastVisit", "label": "Last Visit", "binding": "{{lastVisit}}", "warningCondition": null },
+        {
+          "key": "noShows",
+          "label": "No-shows",
+          "binding": "{{noShows}}",
+          "warningCondition": "noShows > 0",
+          "warningStyle": { "valueColor": "#FF9800", "background": "rgba(255,152,0,0.06)" }
+        }
+      ],
+      "card": {
+        "flex": 1,
+        "background": "#FFFFFF",
+        "borderRadius": 12,
+        "padding": 10,
+        "value": { "style": "body", "fontWeight": 600, "color": "#1A1A1A" },
+        "label": { "style": "body-small", "color": "#6B6B6B", "marginTop": 2 }
+      }
+    },
+    "tabBar": {
+      "height": 44,
+      "paddingHorizontal": 16,
+      "background": "#FFFFFF",
+      "borderBottom": { "width": 1, "color": "#E5E0D1" },
+      "horizontalScroll": true,
+      "tabs": [
+        { "key": "overview", "label": "Overview", "icon": "sparkles" },
+        { "key": "history", "label": "History", "icon": "calendar" },
+        { "key": "notes", "label": "Notes", "icon": "sticky-note" },
+        { "key": "loyalty", "label": "Loyalty", "icon": "star" },
+        { "key": "photos", "label": "Photos", "icon": "image" },
+        { "key": "consents", "label": "Consents", "icon": "shield-check" }
+      ],
+      "selected": {
+        "borderBottom": { "width": 2, "color": "#E3A9A0" },
+        "labelColor": "#1A1A1A",
+        "fontWeight": 600
+      },
+      "unselected": {
+        "labelColor": "#6B6B6B",
+        "fontWeight": 400
+      }
+    },
+    "tabContent": {
+      "overview": {
+        "paddingHorizontal": 16,
+        "paddingTop": 16,
+        "gap": 16,
+        "sections": {
+          "allergyBanner": {
+            "visible": "{{allergies != null}}",
+            "background": "rgba(255,152,0,0.08)",
+            "border": "1px solid #FF9800",
+            "borderRadius": 12,
+            "padding": 12,
+            "role": "alert",
+            "icon": { "name": "alert-triangle", "size": 18, "color": "#FF9800" },
+            "label": { "content": "SENSITIVITY", "style": "label-small", "color": "#FF9800", "uppercase": true },
+            "text": { "style": "body-small", "color": "#1A1A1A", "binding": "{{allergies}}" }
+          },
+          "upcomingAppt": {
+            "visible": "{{upcomingAppt != null}}",
+            "background": "rgba(187,237,218,0.15)",
+            "border": "1px solid #BBEDDA",
+            "borderRadius": 16,
+            "padding": 16,
+            "label": { "content": "UPCOMING", "style": "label-small", "color": "#2D4A42", "uppercase": true },
+            "date": { "style": "body", "fontWeight": 600, "color": "#1A1A1A" },
+            "details": { "style": "body-small", "color": "#6B6B6B" }
+          },
+          "preferences": {
+            "services": {
+              "label": "Preferred Services",
+              "chips": { "style": "chip", "background": "rgba(227,169,160,0.12)", "color": "#1A1A1A", "borderRadius": 9999, "paddingH": 10, "height": 28 }
+            },
+            "stylists": {
+              "label": "Preferred Stylists",
+              "avatars": { "size": 32, "borderRadius": 9999, "overlap": -8 }
+            }
+          },
+          "tierProgress": {
+            "label": "Loyalty Progress",
+            "progressBar": {
+              "height": 8,
+              "borderRadius": 4,
+              "background": "#F5F5F5",
+              "fill": { "background": "#E3A9A0", "borderRadius": 4 }
+            },
+            "nextTierLabel": { "style": "body-small", "color": "#6B6B6B" }
+          },
+          "clientSinceRow": {
+            "icon": "calendar-days",
+            "iconSize": 16,
+            "iconColor": "#6B6B6B",
+            "background": "#FFFFFF",
+            "borderRadius": 12,
+            "border": "1px solid #E5E0D1",
+            "paddingHorizontal": 16,
+            "paddingVertical": 12
+          }
+        }
+      },
+      "history": {
+        "filterChips": {
+          "options": ["all", "completed", "cancelled"],
+          "scrollable": true,
+          "paddingHorizontal": 16,
+          "paddingVertical": 12
+        },
+        "appointmentCard": {
+          "background": "#FFFFFF",
+          "borderRadius": 16,
+          "padding": 16,
+          "marginHorizontal": 16,
+          "marginBottom": 8,
+          "border": "1px solid #E5E0D1",
+          "fields": ["service", "stylist", "date (MM/DD/YYYY)", "amount ($NNN)", "statusBadge"],
+          "statusStyles": {
+            "completed": { "background": "rgba(76,175,80,0.1)", "color": "#2E7D32", "label": "Completed" },
+            "no-show": { "background": "rgba(255,152,0,0.1)", "color": "#FF9800", "label": "No-show" },
+            "cancelled": { "background": "rgba(244,67,54,0.1)", "color": "#F44336", "label": "Cancelled" }
+          }
+        },
+        "emptyState": {
+          "icon": "calendar-days",
+          "iconSize": 48,
+          "title": "No visit history",
+          "body": "Completed appointments will appear here."
+        }
+      },
+      "notes": {
+        "addNoteButton": {
+          "height": 44,
+          "borderRadius": 12,
+          "background": "rgba(227,169,160,0.12)",
+          "border": "1.5px dashed #E3A9A0",
+          "color": "#E3A9A0",
+          "leadingIcon": { "name": "plus", "size": 16 },
+          "label": "Add note",
+          "marginBottom": 16
+        },
+        "draftForm": {
+          "background": "#FFFFFF",
+          "borderRadius": 16,
+          "border": "1px solid #E3A9A0",
+          "padding": 16,
+          "textarea": {
+            "minHeight": 88,
+            "borderRadius": 8,
+            "border": "1px solid #E5E0D1",
+            "padding": "10px 12px",
+            "style": "body-small",
+            "background": "#F5F5F5"
+          },
+          "actions": {
+            "gap": 8,
+            "save": { "background": "#E3A9A0", "color": "#FFFFFF", "height": 36, "borderRadius": 8 },
+            "cancel": { "background": "transparent", "color": "#6B6B6B", "height": 36, "borderRadius": 8 }
+          }
+        },
+        "noteCard": {
+          "background": "#FFFFFF",
+          "borderRadius": 16,
+          "padding": 16,
+          "marginBottom": 8,
+          "border": "1px solid #E5E0D1",
+          "fields": ["author (body-small weight 500)", "date (body-small #6B6B6B)", "content (body-small #1A1A1A, marginTop 8)"]
+        },
+        "emptyState": {
+          "icon": "sticky-note",
+          "iconSize": 48,
+          "title": "No notes yet",
+          "body": "Add internal notes visible only to staff.",
+          "cta": "Add first note"
+        }
+      },
+      "loyalty": {
+        "pointsCard": {
+          "background": "linear-gradient(135deg, #E3A9A0 0%, #D1BFB3 100%)",
+          "borderRadius": 24,
+          "padding": "24px 20px",
+          "textAlign": "center",
+          "shadow": "0 4px 20px rgba(227,169,160,0.35)",
+          "note": "ENGINEERING FLAG: requires expo-linear-gradient (same dependency as G.1/G.2 aiSuggestionCard)"
+        },
+        "quickStats": {
+          "flexDirection": "row",
+          "gap": 8,
+          "cards": ["Redeemable $", "Points per $"]
+        },
+        "transactionList": {
+          "item": {
+            "flexDirection": "row",
+            "justifyContent": "space-between",
+            "paddingVertical": 12,
+            "borderBottom": "1px solid #E5E0D1",
+            "desc": { "style": "body-small", "color": "#1A1A1A" },
+            "date": { "style": "body-small", "color": "#6B6B6B" },
+            "points": {
+              "positive": { "style": "body-small", "fontWeight": 600, "color": "#2E7D32" },
+              "negative": { "style": "body-small", "fontWeight": 600, "color": "#F44336" }
+            }
+          }
+        }
+      },
+      "photos": {
+        "layout": "2-column Before/After grid",
+        "pair": {
+          "marginBottom": 16,
+          "label": { "style": "body-small", "fontWeight": 500, "color": "#6B6B6B", "marginBottom": 8 },
+          "columns": {
+            "gap": 8,
+            "slot": {
+              "height": 140,
+              "borderRadius": 12,
+              "background": "placeholder-color",
+              "label": { "content": "Before | After", "style": "label-small", "color": "#FFFFFF" }
+            }
+          }
+        },
+        "addButton": {
+          "icon": "plus",
+          "label": "Add photos",
+          "style": "secondary"
+        }
+      },
+      "consents": {
+        "header": {
+          "justifyContent": "space-between",
+          "cta": { "label": "Request All", "style": "label-small", "color": "#E3A9A0" }
+        },
+        "consentRow": {
+          "background": "#FFFFFF",
+          "borderRadius": 16,
+          "padding": "14px 16px",
+          "marginBottom": 8,
+          "border": "1px solid #E5E0D1",
+          "flexDirection": "row",
+          "alignItems": "center",
+          "gap": 12,
+          "signedIcon": { "name": "check-circle-2", "size": 20, "color": "#4CAF50" },
+          "pendingIcon": { "name": "clock", "size": 20, "color": "#FF9800" },
+          "name": { "style": "body-small", "fontWeight": 500, "color": "#1A1A1A" },
+          "date": { "style": "body-small", "color": "#6B6B6B" },
+          "sendButton": {
+            "visible": "{{!form.signed}}",
+            "label": "Send",
+            "style": "label-small",
+            "color": "#E3A9A0",
+            "border": "1px solid #E3A9A0",
+            "borderRadius": 8,
+            "paddingH": 12,
+            "height": 32
+          }
+        }
+      }
+    },
+    "bookCta": {
+      "height": 52,
+      "width": "100% - 32px",
+      "marginHorizontal": 16,
+      "borderRadius": 14,
+      "background": "#E3A9A0",
+      "shadow": "0px 4px 16px rgba(227,169,160,0.4)",
+      "label": { "content": "Book for client", "style": "label", "color": "#FFFFFF" },
+      "accessibilityLabel": "Book appointment for {{clientName}}"
+    },
+    "skeletonClientHeader": {
+      "padding": 16,
+      "background": "#FFFFFF",
+      "flexDirection": "row",
+      "gap": 16,
+      "avatar": { "width": 80, "height": 80, "borderRadius": 9999, "shimmer": true },
+      "body": {
+        "flex": 1,
+        "lines": [
+          { "height": 28, "borderRadius": 8, "width": "60%", "shimmer": true },
+          { "height": 20, "borderRadius": 9999, "width": "30%", "shimmer": true, "marginTop": 10 },
+          { "height": 44, "borderRadius": 12, "width": "100%", "shimmer": true, "marginTop": 12 }
+        ]
+      }
+    },
+    "skeletonStats": {
+      "flexDirection": "row",
+      "gap": 8,
+      "paddingHorizontal": 16,
+      "paddingVertical": 12,
+      "cards": 4,
+      "card": { "flex": 1, "height": 52, "borderRadius": 12, "shimmer": true }
+    },
+    "skeletonContent": {
+      "padding": 16,
+      "blocks": 3,
+      "block": {
+        "marginBottom": 16,
+        "label": { "height": 16, "borderRadius": 8, "width": "40%", "shimmer": true, "marginBottom": 10 },
+        "content": { "height": 72, "borderRadius": 16, "shimmer": true }
+      }
+    },
+    "errorState": {
+      "position": "center",
+      "flex": 1,
+      "paddingHorizontal": 32,
+      "textAlign": "center",
+      "icon": { "name": "wifi-off", "size": 64, "color": "#6B6B6B", "strokeWidth": 1.25 },
+      "title": { "content": "Couldn't load client", "style": "heading-2", "color": "#1A1A1A", "marginTop": 24 },
+      "body": { "content": "Check your connection and try again.", "style": "body", "color": "#6B6B6B", "marginTop": 8, "maxWidth": 260 },
+      "retryButton": {
+        "content": "Retry",
+        "background": "#E3A9A0",
+        "color": "#FFFFFF",
+        "paddingHorizontal": 24,
+        "paddingVertical": 12,
+        "borderRadius": 12,
+        "minHeight": 44,
+        "marginTop": 20
+      }
+    }
+  },
+  "interactions": {
+    "tabBar": { "tap": "Switch active tab" },
+    "contactRow": {
+      "call": "Opens tel: deep link",
+      "text": "Opens sms: deep link",
+      "email": "Opens mailto: deep link"
+    },
+    "bookCta": { "tap": "Navigate to stylist-selection with clientId pre-filled" },
+    "addNote": { "tap": "Show inline draft textarea" },
+    "saveNote": { "tap": "Prepend note to list, hide draft form" },
+    "sendConsent": { "tap": "Trigger consent request for unsigned form" },
+    "historyFilter": { "tap": "Filter appointment history by status" }
+  },
+  "dataModel": {
+    "clientDetail": {
+      "id": "string",
+      "name": "string",
+      "initials": "string",
+      "tier": "Bronze | Silver | Gold | Platinum",
+      "phone": "string ((XXX) XXX-XXXX)",
+      "email": "string",
+      "isVIP": "boolean",
+      "visits": "number",
+      "lifetimeValue": "number (USD)",
+      "lastVisit": "string (MM/DD/YYYY)",
+      "noShows": "number",
+      "since": "string (MM/DD/YYYY)",
+      "preferredStylists": "string[]",
+      "preferredServices": "string[]",
+      "allergies": "string | null",
+      "points": "number",
+      "upcomingAppt": "{ date, service, stylist, time } | null",
+      "history": "Appointment[]",
+      "notes": "Note[]",
+      "loyalty": "LoyaltyTransaction[]",
+      "consents": "ConsentForm[]"
+    },
+    "appointment": {
+      "id": "string",
+      "date": "string (MM/DD/YYYY)",
+      "service": "string",
+      "stylist": "string",
+      "amount": "number",
+      "status": "completed | no-show | cancelled"
+    },
+    "note": {
+      "id": "string",
+      "author": "string",
+      "date": "string (MM/DD/YYYY)",
+      "content": "string"
+    },
+    "loyaltyTransaction": {
+      "id": "string",
+      "date": "string (MM/DD/YYYY)",
+      "desc": "string",
+      "points": "number (positive = earned, negative = redeemed)"
+    },
+    "consentForm": {
+      "id": "string",
+      "name": "string",
+      "signed": "boolean",
+      "date": "string (MM/DD/YYYY) | null"
+    }
+  },
+  "engineeringFlags": [
+    {
+      "id": "G4-FLAG-1",
+      "severity": "must-fix-before-build",
+      "description": "Loyalty points card uses linear-gradient(135deg, #E3A9A0 0%, #D1BFB3 100%). Requires expo-linear-gradient — same dependency already flagged for G.1 aiSuggestionCard and G.2/G.3 skeletons."
+    }
+  ],
+  "tierThresholds": {
+    "Bronze": { "min": 0, "max": 500 },
+    "Silver": { "min": 500, "max": 1500 },
+    "Gold": { "min": 1500, "max": 3500 },
+    "Platinum": { "min": 3500, "max": null }
+  },
+  "usLocale": {
+    "dateFormat": "MM/DD/YYYY",
+    "currency": "USD ($NNN or $Xk)",
+    "phone": "(XXX) XXX-XXXX",
+    "timeFormat": "h:mm A"
+  },
+  "accessibility": {
+    "standard": "WCAG 2.1 AA",
+    "minTouchTarget": "44×44px",
+    "tabBar": { "role": "tablist", "tabRole": "tab", "ariaSelected": true },
+    "contactButtons": { "role": "link", "ariaLabel": "{{action}} {{clientName}}" },
+    "bookCta": { "ariaLabel": "Book appointment for {{clientName}}" },
+    "allergyBanner": { "role": "alert" },
+    "decorativeIcons": "aria-hidden=true",
+    "reduceMotion": { "disableShimmer": true, "disableGradient": "cross-fade fallback" }
+  },
+  "transitions": {
+    "tabSwitch": { "type": "cross-fade", "duration": "150ms" },
+    "shimmer": { "duration": "1500ms", "timing": "linear", "iterations": "infinite" },
+    "noteFormExpand": { "type": "fade-in", "duration": "200ms" }
+  },
+  "usage": {
+    "navigation": {
+      "from": ["ClientLookup (tap client row)"],
+      "to": [
+        "Back to ClientLookup (← button)",
+        "Stylist selection (tap 'Book for client')",
+        "Phone dialer (tap Call)",
+        "SMS app (tap Text)",
+        "Email app (tap Email)"
+      ]
+    },
+    "rules": [
+      "History tab supports All / Completed / Cancelled|No-show filter chips",
+      "Notes sorted newest-first; newly added note prepended",
+      "Loyalty transaction points: positive green, negative red",
+      "No-shows stat card shows amber tint when noShows > 0",
+      "Allergy banner shows only when allergies field is non-null",
+      "Consents: signed rows show CheckCircle2 (green), unsigned show Clock (amber) + Send button",
+      "Book for client CTA always visible when not in error/loading state",
+      "Tab bar horizontally scrollable on narrow devices (no scrollbar visible)",
+      "All contact buttons open native deep links (tel:, sms:, mailto:)",
+      "Photos tab shows Before/After pairs with placeholder color-blocks; real image upload is W28+"
+    ]
+  }
+}

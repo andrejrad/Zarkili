@@ -64,6 +64,13 @@ See `ICONS_MANIFEST.md` for complete specifications.
 |-----------|------|--------|
 | Category Pill | `category-pill.json` | default, selected, pressed, disabled |
 | Service/Salon Card | `service-card.json` | default, pressed, loading, error |
+| Calendar Grid (Batch C) | `calendar-grid.json` | default, today, selected, disabled, holiday, pressed |
+| Time-Slot Chip (Batch C) | `time-slot-chip.json` | default, selected, disabled, pressed |
+| Progress Ring (Batch E) | `progress-ring.json` | default, loading, empty, error, disabled |
+| Tier Badge (Batch E) | `tier-badge.json` | bronze, silver, gold, platinum, locked, pressed, selected |
+| Reward Card (Batch E) | `reward-card.json` | unlocked, pressed, locked, redeemed, expired, loading, error, compact |
+| Rating Selector (Batch E) | `rating-selector.json` | default-32, default-24, hovered, selected, pressed, disabled, error, readonly |
+| Photo Upload Tile (Batch E) | `photo-upload-tile.json` | empty, pressed, filled, uploading, error, disabled, max-reached |
 
 **Each component spec includes**:
 - Layout properties (spacing, sizing, alignment)
@@ -94,6 +101,9 @@ import { CategoryPill } from '@/components/CategoryPill';
 | Explore | `screen-explore.json` | Layout, spacing, states, responsive rules |
 | Welcome | `screen-welcome.json` | Onboarding/welcome layout |
 | Home | `screen-home.json` | Main dashboard layout |
+| Booking — Date Picker (Batch C) | `screen-booking-date-picker.json` | Step 3/5; default, fully-booked, holiday, loading, error |
+| Booking — Time Picker (Batch C) | `screen-booking-time-picker.json` | Step 4/5; default, no-slots, partial, loading, error |
+| Loyalty Landing (Batch E) | `screen-loyalty-landing.json` | default, zero-balance, tier-up, loading, error |
 
 **Specifications include**:
 - Complete layout hierarchy

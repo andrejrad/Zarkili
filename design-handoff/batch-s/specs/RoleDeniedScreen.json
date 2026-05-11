@@ -1,0 +1,53 @@
+{
+  "screen": "RoleDeniedScreen",
+  "route": "RoleDenied",
+  "device": { "primary": "Mobile 375×812", "secondary": "Desktop 1280+" },
+  "stateNames": ["denied", "requestPending", "requestApproved", "error"],
+  "layout": {
+    "centered": true,
+    "maxWidth": 480,
+    "illustration": { "type": "locked-illustration", "size": 160 },
+    "title": { "text": "strings.roleDenied.title", "variant": "heading-2", "align": "center" },
+    "body": { "text": "strings.roleDenied.body", "variant": "body-medium", "align": "center", "color": "on-surface-variant" },
+    "requestAccessSection": {
+      "title": { "text": "strings.roleDenied.requestAccessTitle", "variant": "title-medium" },
+      "form": {
+        "fields": [
+          { "id": "targetRole", "type": "select", "label": "strings.roleDenied.targetRoleLabel", "required": true },
+          { "id": "justification", "type": "textArea", "label": "strings.roleDenied.justificationLabel", "rows": 4, "required": true }
+        ]
+      },
+      "cta": { "label": "strings.roleDenied.submitRequestCta", "variant": "filled", "fullWidth": true }
+    },
+    "requestPendingState": {
+      "illustration": { "type": "pending-illustration", "size": 120 },
+      "body": { "text": "strings.roleDenied.requestedBody", "variant": "body-medium", "align": "center" }
+    },
+    "requestApprovedState": {
+      "illustration": { "type": "success-illustration", "size": 120 },
+      "title": { "text": "strings.roleDenied.approvedTitle", "variant": "heading-3", "align": "center" },
+      "body": { "text": "strings.roleDenied.approvedBody", "variant": "body-medium", "align": "center" },
+      "cta": { "label": "strings.roleDenied.reloadCta", "variant": "filled", "fullWidth": true }
+    }
+  },
+  "states": {
+    "denied": {
+      "requestAccessSection": { "visible": true }
+    },
+    "requestPending": {
+      "requestAccessSection": { "visible": false },
+      "requestPendingState": { "visible": true }
+    },
+    "requestApproved": {
+      "requestPendingState": { "visible": false },
+      "requestApprovedState": { "visible": true }
+    },
+    "error": {
+      "inlineBanner": {
+        "background": "error 10%",
+        "borderLeft": { "width": 4, "color": "error" },
+        "message": "strings.roleDenied.errorMessage"
+      }
+    }
+  }
+}

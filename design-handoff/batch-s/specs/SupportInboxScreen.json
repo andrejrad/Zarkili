@@ -1,0 +1,88 @@
+{
+  "screen": "SupportInboxScreen",
+  "route": "SuperAdminSupportInbox",
+  "device": { "primary": "Desktop 1280+", "secondary": "iPad 1024×768" },
+  "stateNames": ["default", "threadOpen", "error"],
+  "layout": {
+    "splitPane": {
+      "layout": "left-sidebar + main",
+      "sidebar": {
+        "width": 320,
+        "header": {
+          "title": { "text": "Support Inbox", "variant": "heading-2" },
+          "filters": {
+            "type": "filterChipRow",
+            "filters": [
+              { "key": "status", "options": ["open", "pending", "resolved"] },
+              { "key": "priority", "options": ["urgent", "high", "normal", "low"] }
+            ]
+          }
+        },
+        "threadList": {
+          "item": {
+            "fields": [
+              { "key": "tenantName", "variant": "body-medium", "weight": "500" },
+              { "key": "subject", "variant": "body-medium", "maxLines": 1, "fontStyle": "unreadBold" },
+              { "key": "preview", "variant": "caption", "maxLines": 2, "color": "on-surface-variant" },
+              { "key": "priority", "type": "pill", "position": "top-right" },
+              { "key": "slaTimer", "type": "monoClock", "font": "mono", "variant": "caption", "colorWhen": { "slaBreaching": "error" } },
+              { "key": "assignee", "type": "avatar", "size": 24, "position": "bottom-right" }
+            ],
+            "slaBreachBanner": {
+              "showWhen": "slaBreach === true",
+              "background": "error",
+              "label": "strings.supportInbox.slaBreachBanner",
+              "variant": "caption",
+              "color": "on-error"
+            }
+          }
+        }
+      },
+      "main": {
+        "threadDetail": {
+          "header": {
+            "fields": [
+              { "key": "subject", "variant": "heading-3" },
+              { "key": "tenantName", "variant": "body-medium" },
+              { "key": "priority", "type": "pill" },
+              { "key": "status", "type": "pill" },
+              { "key": "assignee", "type": "userPill" }
+            ]
+          },
+          "messageList": {
+            "direction": "chronological",
+            "item": {
+              "fields": [
+                { "key": "sender", "type": "userPill", "showAvatar": true },
+                { "key": "sentAt", "type": "relative", "variant": "caption" },
+                { "key": "body", "type": "markdown", "variant": "body-medium" },
+                { "key": "attachments", "type": "attachmentChipRow" }
+              ]
+            }
+          },
+          "replyComposer": {
+            "type": "textArea",
+            "minRows": 3,
+            "toolbar": { "bold": true, "italic": true, "codeBlock": true, "attachment": true },
+            "footer": {
+              "cta": { "label": "strings.supportInbox.replyCta", "variant": "filled", "icon": "send" }
+            }
+          }
+        }
+      }
+    }
+  },
+  "states": {
+    "threadOpen": {
+      "sidebar": { "selectedThread": { "background": "primary-container" } },
+      "main": { "visible": true }
+    },
+    "error": {
+      "inlineBanner": {
+        "background": "error 10%",
+        "borderLeft": { "width": 4, "color": "error" },
+        "message": "strings.supportInbox.errorMessage"
+      }
+    }
+  }
+}

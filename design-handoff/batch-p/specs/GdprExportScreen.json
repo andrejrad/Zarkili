@@ -1,0 +1,179 @@
+{
+  "screen": "GdprExportScreen",
+  "route": "/admin/clients/:id/gdpr",
+  "description": "GDPR data export and account deletion interface",
+  "dimensions": {
+    "width": 390,
+    "height": "auto-scroll"
+  },
+  "states": [
+    "default",
+    "loading",
+    "error",
+    "processing"
+  ],
+  "accessibility": {
+    "screenReaderLabel": "strings.gdprExport.screenTitle",
+    "semanticRoles": [
+      {"element": "exportTypeSelector", "role": "radiogroup"},
+      {"element": "formatSelector", "role": "radiogroup"},
+      {"element": "requestsTable", "role": "table"},
+      {"element": "deleteButton", "role": "button", "hint": "strings.gdprExport.deleteHint"}
+    ]
+  },
+  "rtl": "deferred",
+  "darkMode": "deferred",
+  "layout": {
+    "header": {
+      "component": "client-header",
+      "readOnly": true,
+      "height": "auto"
+    },
+    "exportSection": {
+      "paddingHorizontal": 16,
+      "paddingVertical": 24,
+      "gap": 16,
+      "exportType": {
+        "label": "strings.gdprExport.exportTypeLabel",
+        "options": [
+          "strings.gdprExport.typeFull",
+          "strings.gdprExport.typeBookings",
+          "strings.gdprExport.typeLoyalty"
+        ]
+      },
+      "format": {
+        "label": "strings.gdprExport.formatLabel",
+        "options": [
+          "strings.gdprExport.formatJson",
+          "strings.gdprExport.formatCsv"
+        ]
+      },
+      "requestButton": {
+        "height": 48,
+        "label": "strings.gdprExport.requestExport"
+      }
+    },
+    "previousRequests": {
+      "marginTop": 32,
+      "title": "strings.gdprExport.previousRequestsTitle",
+      "table": {
+        "columns": [
+          "strings.gdprExport.columnDate",
+          "strings.gdprExport.columnType",
+          "strings.gdprExport.columnStatus",
+          "strings.gdprExport.columnActions"
+        ],
+        "rowHeight": 56
+      }
+    },
+    "deleteSection": {
+      "marginTop": 48,
+      "paddingHorizontal": 16,
+      "paddingVertical": 24,
+      "borderTop": "1px solid semantic.cardBorder",
+      "title": "strings.gdprExport.deleteTitle",
+      "subtitle": "strings.gdprExport.deleteSubtitle",
+      "reasonInput": {
+        "height": 96,
+        "rows": 4,
+        "placeholder": "strings.gdprExport.deleteReasonPlaceholder"
+      },
+      "deleteButton": {
+        "height": 48,
+        "label": "strings.gdprExport.deleteAccount",
+        "style": "destructive"
+      }
+    }
+  },
+  "components": [
+    {
+      "id": "navigationHeader",
+      "ref": "navigation-header",
+      "props": {
+        "showBack": true,
+        "title": "strings.gdprExport.title"
+      }
+    },
+    {
+      "id": "clientHeader",
+      "ref": "client-header",
+      "props": {
+        "readOnly": true,
+        "name": "{{clientName}}",
+        "email": "{{clientEmail}}"
+      }
+    },
+    {
+      "id": "exportTypeRadio",
+      "ref": "radio-group",
+      "props": {
+        "label": "strings.gdprExport.exportTypeLabel",
+        "options": [
+          "strings.gdprExport.typeFull",
+          "strings.gdprExport.typeBookings",
+          "strings.gdprExport.typeLoyalty"
+        ]
+      }
+    },
+    {
+      "id": "formatRadio",
+      "ref": "radio-group",
+      "props": {
+        "label": "strings.gdprExport.formatLabel",
+        "options": [
+          "strings.gdprExport.formatJson",
+          "strings.gdprExport.formatCsv"
+        ]
+      }
+    },
+    {
+      "id": "requestsTable",
+      "ref": "data-table",
+      "props": {
+        "columns": [
+          "strings.gdprExport.columnDate",
+          "strings.gdprExport.columnType",
+          "strings.gdprExport.columnStatus",
+          "strings.gdprExport.columnActions"
+        ]
+      }
+    }
+  ],
+  "interactions": [
+    {
+      "trigger": "requestButton.tap",
+      "action": "createExportRequest"
+    },
+    {
+      "trigger": "downloadLink.tap",
+      "action": "downloadExport"
+    },
+    {
+      "trigger": "deleteButton.tap",
+      "action": "showDeleteConfirmation",
+      "condition": "reasonFilled"
+    },
+    {
+      "trigger": "deleteConfirmation.confirm",
+      "action": "deleteAccountData"
+    }
+  ],
+  "tokens": {
+    "used": [
+      "semantic.pageBackground",
+      "semantic.surface",
+      "semantic.cardBorder",
+      "semantic.foreground",
+      "semantic.secondaryText",
+      "semantic.error",
+      "semantic.warning"
+    ]
+  },
+  "redlines": {
+    "sectionGap": 24,
+    "inputHeight": 48,
+    "textareaHeight": 96,
+    "buttonHeight": 48,
+    "tableRowHeight": 56
+  }
+}

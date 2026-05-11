@@ -1,0 +1,94 @@
+{
+  "screen": "ReviewRequestRulesScreen",
+  "route": "AdminReviewRequestRules",
+  "device": {
+    "primary": "iPad 1024×768",
+    "secondary": "iPhone 14 390×844"
+  },
+  "stateNames": [
+    "default",
+    "editing",
+    "saved",
+    "error"
+  ],
+  "layout": {
+    "header": {
+      "title": "strings.reviewRequestRules.title",
+      "right": { "type": "button", "label": "strings.reviewRequestRules.addRule", "variant": "primary" }
+    },
+    "ruleList": {
+      "type": "FlatList",
+      "ruleCard": {
+        "background": "surface",
+        "border": { "width": 1, "color": "cardBorder" },
+        "radius": 16,
+        "padding": 16,
+        "row1": {
+          "enableToggle": { "position": "left" },
+          "ruleName": { "variant": "body", "weight": "bold" },
+          "editLink": { "variant": "tertiary", "position": "right" },
+          "deleteIconButton": true
+        },
+        "row2": {
+          "triggerChip": true,
+          "channelChips": ["Email", "SMS", "Push"],
+          "audienceChip": true,
+          "freqCapChip": true
+        },
+        "onExpand": "rendered channel preview panel per selected channel"
+      }
+    },
+    "addRuleSheet": {
+      "type": "sheet",
+      "width": 390,
+      "radius": 20,
+      "fields": {
+        "triggerDropdown": {
+          "options": [
+            { "value": "appointmentCompleted", "label": "strings.reviewRequestRules.trigger.appointmentCompleted" },
+            { "value": "checkoutComplete", "label": "strings.reviewRequestRules.trigger.checkoutComplete" }
+          ]
+        },
+        "delayNumber": { "type": "numberInput" },
+        "delayUnit": {
+          "type": "dropdown",
+          "options": [
+            { "value": "hours", "label": "strings.reviewRequestRules.delay.hours" },
+            { "value": "days", "label": "strings.reviewRequestRules.delay.days" }
+          ]
+        },
+        "channelMultiSelect": {
+          "type": "chips",
+          "options": [
+            { "value": "email", "label": "strings.reviewRequestRules.channel.email" },
+            { "value": "sms", "label": "strings.reviewRequestRules.channel.sms" },
+            { "value": "push", "label": "strings.reviewRequestRules.channel.push" }
+          ]
+        },
+        "audienceFilter": {
+          "type": "chips",
+          "options": [
+            { "value": "allClients", "label": "strings.reviewRequestRules.audience.allClients" },
+            { "value": "newOnly", "label": "strings.reviewRequestRules.audience.newOnly" },
+            { "value": "returningOnly", "label": "strings.reviewRequestRules.audience.returningOnly" }
+          ]
+        },
+        "frequencyCap": {
+          "numberInput": { "label": "Max" },
+          "separator": "per",
+          "periodDropdown": { "options": ["7 days", "30 days", "90 days"] }
+        }
+      },
+      "footer": {
+        "actions": [
+          { "type": "button", "label": "strings.reviewRequestRules.cancel", "variant": "secondary" },
+          { "type": "button", "label": "strings.reviewRequestRules.saveRule", "variant": "primary" }
+        ]
+      }
+    }
+  },
+  "states": {
+    "saved": { "toast": "strings.reviewRequestRules.savedToast" },
+    "error": { "inlineBanner": { "position": "inside sheet" } }
+  }
+}

@@ -1,0 +1,175 @@
+{
+  "component": "QueueCard",
+  "description": "Appointment/walk-in row card for the staff queue view. Shows position, client, service, wait estimate, and contextual action buttons.",
+  "purpose": "Represent a single queue entry (waiting, in-service, or completed) with drag-to-reorder support and primary action buttons. Used in G.3 Walk-in Queue and G.1 Staff Today appointment list.",
+  "source": {
+    "batch": "G",
+    "screens": ["G.3 Walk-in Queue", "G.1 Staff Today"],
+    "promotedFrom": "design-handoff/specs/screen-queue.json",
+    "figmaFrames": "code-derived — spec locked from screen-queue.json (real Figma JSON)",
+    "lockedAt": "2026-04-28"
+  },
+  "variants": {
+    "status": {
+      "options": ["waiting", "in-service", "completed", "skipped"],
+      "default": "waiting"
+    },
+    "state": {
+      "options": ["default", "pressed", "dragging", "disabled"],
+      "default": "default"
+    }
+  },
+  "anatomy": {
+    "container": {
+      "background": "#FFFFFF",
+      "borderRadius": 16,
+      "padding": 16,
+      "border": { "width": 1, "color": "#E5E0D1" },
+      "accessibilityRole": "listitem",
+      "accessibilityLabel": "Position {{position}}, {{clientName}}, {{service}}, {{statusLabel}}"
+    },
+    "row1": {
+      "flexDirection": "row",
+      "alignItems": "center",
+      "gap": 8,
+      "children": ["positionChip", "clientName", "statusPill"]
+    },
+    "positionChip": {
+      "size": 28,
+      "borderRadius": 9999,
+      "background": "#E3A9A0",
+      "label": { "style": "label-small", "fontWeight": 600, "color": "#FFFFFF", "textAlign": "center" },
+      "content": "#{{position}}"
+    },
+    "clientName": {
+      "flex": 1,
+      "paddingHorizontal": 8,
+      "style": "heading-3",
+      "fontWeight": 600,
+      "color": "#1A1A1A",
+      "numberOfLines": 1,
+      "ellipsis": true
+    },
+    "statusPill": {
+      "borderRadius": 8,
+      "height": 22,
+      "paddingHorizontal": 8,
+      "style": "label-small",
+      "fontWeight": 500,
+      "variants": {
+        "waiting":    { "background": "rgba(255,152,0,0.10)",  "color": "#FF9800",  "label": "Waiting"    },
+        "in-service": { "background": "rgba(76,175,80,0.10)",   "color": "#2E7D32",  "label": "In service" },
+        "completed":  { "background": "rgba(33,150,243,0.10)",  "color": "#1565C0",  "label": "Done"       },
+        "skipped":    { "background": "rgba(244,67,54,0.10)",   "color": "#C62828",  "label": "Skipped"    }
+      }
+    },
+    "row2": {
+      "flexDirection": "row",
+      "alignItems": "center",
+      "marginTop": 8,
+      "children": ["serviceName", "separator", "estWait", "startedTime"]
+    },
+    "serviceName": {
+      "style": "body-small",
+      "color": "#6B6B6B"
+    },
+    "separator": {
+      "content": "·",
+      "style": "body-small",
+      "color": "#6B6B6B",
+      "marginHorizontal": 4
+    },
+    "estWait": {
+      "style": "body-small",
+      "color": "#6B6B6B",
+      "format": "~{{n}} min wait"
+    },
+    "startedTime": {
+      "visible": "status === in-service",
+      "style": "body-small",
+      "color": "#6B6B6B",
+      "marginLeft": "auto",
+      "format": "Started {{time 12h}}"
+    },
+    "row3": {
+      "flexDirection": "row",
+      "alignItems": "center",
+      "marginTop": 12,
+      "gap": 8,
+      "children": ["startButton", "notifyButton", "removeButton"]
+    },
+    "startButton": {
+      "visible": "status !== in-service AND status !== completed",
+      "flex": 1,
+      "height": 36,
+      "borderRadius": 12,
+      "background": "#E3A9A0",
+      "label": { "style": "label-small", "fontWeight": 500, "color": "#FFFFFF", "content": "Start" },
+      "accessibilityLabel": "Start service for {{clientName}}"
+    },
+    "notifyButton": {
+      "flex": 1,
+      "height": 36,
+      "borderRadius": 12,
+      "background": "#F5F5F5",
+      "label": { "style": "label-small", "fontWeight": 500, "color": "#6B6B6B", "content": "Notify" },
+      "accessibilityLabel": "Notify {{clientName}}"
+    },
+    "removeButton": {
+      "width": 36,
+      "height": 36,
+      "borderRadius": 12,
+      "background": "rgba(244,67,54,0.08)",
+      "icon": { "name": "x", "size": 16, "color": "#F44336" },
+      "touchTarget": "44×44 with hit slop",
+      "accessibilityLabel": "Remove {{clientName}} from queue"
+    }
+  },
+  "states": {
+    "default": {},
+    "pressed": {
+      "container": { "background": "#F5F5F5" }
+    },
+    "dragging": {
+      "container": {
+        "shadow": "0 8px 24px rgba(0,0,0,0.12)",
+        "transform": "scale(1.02)",
+        "zIndex": 100
+      }
+    },
+    "disabled": {
+      "container": { "opacity": 0.5 },
+      "buttons": { "disabled": true }
+    }
+  },
+  "interactions": {
+    "startTap": "Mark status = in-service; update statusPill; hide startButton",
+    "notifyTap": "Send push notification to client (show success toast)",
+    "removeTap": "Remove card from queue list with fade-out 150ms; renumber remaining positions",
+    "longPress": "Enter drag mode; drag to reorder; positions renumber on release",
+    "positionRenumber": "All cards above/below the dropped position renumber sequentially"
+  },
+  "accessibility": {
+    "container": {
+      "role": "listitem",
+      "label": "Position {{position}}, {{clientName}}, {{service}}, {{statusLabel}}"
+    },
+    "startButton":  { "label": "Start service for {{clientName}}" },
+    "notifyButton": { "label": "Notify {{clientName}}" },
+    "removeButton": { "label": "Remove {{clientName}} from queue" },
+    "dragging":     { "label": "Reorder, drag to change position" },
+    "statusPill":   { "note": "Color is never sole signal — label always present" }
+  },
+  "props": {
+    "position": "number — required",
+    "clientName": "string — required",
+    "service": "string — required",
+    "status": "waiting | in-service | completed | skipped — required",
+    "estWaitMinutes": "number — required when status=waiting",
+    "startedAt": "Date | null — required when status=in-service",
+    "onStart": "() => void — optional",
+    "onNotify": "() => void — optional",
+    "onRemove": "() => void — optional",
+    "dragging": "boolean — optional (controlled by drag parent)"
+  }
+}

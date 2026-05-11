@@ -44,6 +44,10 @@ import {
   createAdminBillingRepository,
   createAdminConnectRepository,
 } from "./stripe/adminRepositories.js";
+import {
+  applyPaymentEvent,
+  createAdminPaymentsRepository,
+} from "./stripe/paymentsWebhookDispatcher.js";
 
 if (getApps().length === 0) {
   initializeApp();
@@ -58,6 +62,7 @@ const STRIPE_WEBHOOK_SECRET = defineSecret("STRIPE_WEBHOOK_SECRET");
 export type HandlerDeps = {
   billing: ReturnType<typeof createAdminBillingRepository>;
   connect: ReturnType<typeof createAdminConnectRepository>;
+  payments: ReturnType<typeof createAdminPaymentsRepository>;
   now: () => { seconds: number; nanoseconds: number };
 };
 
@@ -154,6 +159,14 @@ export async function handleStripeWebhook(input: {
       return { status: 200, body: { received: true, outcome: "applied" } };
     }
 
+    // payment
+    if (parsed.kind === "payment") {
+      const paymentResult = await applyPaymentEvent(parsed.event, {
+        payments: input.deps.payments,
+      });
+      return { status: 200, body: { received: true, outcome: paymentResult.outcome } };
+    }
+
     // connect
     const tenantId = parsed.event.tenantId;
     if (await input.deps.connect.hasProcessedEvent(tenantId, parsed.event.id)) {
@@ -205,6 +218,7 @@ export const stripeWebhookHandler = onRequest(
       deps: {
         billing: createAdminBillingRepository(db),
         connect: createAdminConnectRepository(db),
+        payments: createAdminPaymentsRepository(db),
         now: () => ({ seconds: Math.floor(Date.now() / 1000), nanoseconds: 0 }),
       },
     });

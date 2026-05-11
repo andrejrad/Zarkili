@@ -1,0 +1,195 @@
+{
+  "screen": "MultiChannelTemplateEditorScreen",
+  "route": "/admin/campaigns/templates/:id",
+  "description": "Multi-channel template editor with live preview for push, email, SMS, and in-app",
+  "dimensions": {
+    "width": 390,
+    "height": "auto-scroll"
+  },
+  "states": [
+    "default",
+    "loading",
+    "error",
+    "saving"
+  ],
+  "accessibility": {
+    "screenReaderLabel": "strings.templateEditor.screenTitle",
+    "semanticRoles": [
+      {"element": "channelTabs", "role": "tablist"},
+      {"element": "channelTab", "role": "tab"},
+      {"element": "editorPanel", "role": "group"},
+      {"element": "previewPanel", "role": "img", "hint": "strings.templateEditor.previewHint"}
+    ]
+  },
+  "rtl": "deferred",
+  "darkMode": "deferred",
+  "layout": {
+    "header": {
+      "height": 64,
+      "title": "strings.templateEditor.title",
+      "rightAction": {
+        "label": "strings.templateEditor.save",
+        "style": "primary"
+      }
+    },
+    "channelTabs": {
+      "height": 48,
+      "tabs": [
+        {"label": "strings.templateEditor.tabPush", "icon": "bell"},
+        {"label": "strings.templateEditor.tabEmail", "icon": "mail"},
+        {"label": "strings.templateEditor.tabSms", "icon": "message"},
+        {"label": "strings.templateEditor.tabInApp", "icon": "app"}
+      ]
+    },
+    "editorPanel": {
+      "paddingHorizontal": 16,
+      "paddingVertical": 24,
+      "push": {
+        "fields": [
+          {"id": "title", "label": "strings.templateEditor.pushTitle", "height": 48, "maxLength": 50},
+          {"id": "body", "label": "strings.templateEditor.pushBody", "height": 96, "maxLength": 150},
+          {"id": "action", "label": "strings.templateEditor.pushAction", "height": 48}
+        ]
+      },
+      "email": {
+        "fields": [
+          {"id": "subject", "label": "strings.templateEditor.emailSubject", "height": 48},
+          {"id": "previewText", "label": "strings.templateEditor.emailPreview", "height": 48},
+          {"id": "body", "label": "strings.templateEditor.emailBody", "height": 320, "richText": true}
+        ],
+        "toolbar": {
+          "component": "variable-picker-toolbar",
+          "height": 48
+        },
+        "sendTestButton": {
+          "height": 48,
+          "label": "strings.templateEditor.sendTest",
+          "style": "outlined"
+        }
+      },
+      "sms": {
+        "fields": [
+          {"id": "message", "label": "strings.templateEditor.smsMessage", "height": 96, "maxLength": 160}
+        ],
+        "characterCount": {
+          "label": "{{charCount}}/160",
+          "segmentCount": "{{segmentCount}} segments"
+        },
+        "toolbar": {
+          "component": "variable-picker-toolbar",
+          "height": 48
+        }
+      },
+      "inApp": {
+        "fields": [
+          {"id": "type", "label": "strings.templateEditor.inAppType", "height": 48, "options": ["Banner", "Modal"]},
+          {"id": "image", "label": "strings.templateEditor.inAppImage", "height": 120, "component": "photo-upload-tile"},
+          {"id": "ctaLabel", "label": "strings.templateEditor.inAppCtaLabel", "height": 48},
+          {"id": "ctaLink", "label": "strings.templateEditor.inAppCtaLink", "height": 48}
+        ]
+      }
+    },
+    "previewPanel": {
+      "position": "sticky-sidebar",
+      "width": 360,
+      "component": "channel-preview-tile",
+      "platformToggle": {
+        "height": 40,
+        "options": ["iOS", "Android"]
+      }
+    }
+  },
+  "components": [
+    {
+      "id": "navigationHeader",
+      "ref": "navigation-header",
+      "props": {
+        "showBack": true,
+        "title": "strings.templateEditor.title",
+        "rightAction": {
+          "label": "strings.templateEditor.save"
+        }
+      }
+    },
+    {
+      "id": "channelTabs",
+      "ref": "tabs",
+      "props": {
+        "tabs": [
+          {"label": "strings.templateEditor.tabPush", "icon": "bell"},
+          {"label": "strings.templateEditor.tabEmail", "icon": "mail"},
+          {"label": "strings.templateEditor.tabSms", "icon": "message"},
+          {"label": "strings.templateEditor.tabInApp", "icon": "app"}
+        ]
+      }
+    },
+    {
+      "id": "variablePickerToolbar",
+      "ref": "variable-picker-toolbar",
+      "props": {
+        "variables": [
+          {"key": "first_name", "label": "{{first_name}}"},
+          {"key": "salon_name", "label": "{{salon_name}}"},
+          {"key": "booking_date", "label": "{{booking_date}}"},
+          {"key": "service_name", "label": "{{service_name}}"},
+          {"key": "staff_name", "label": "{{staff_name}}"},
+          {"key": "points_balance", "label": "{{points_balance}}"},
+          {"key": "reward_name", "label": "{{reward_name}}"},
+          {"key": "promo_code", "label": "{{promo_code}}"}
+        ]
+      }
+    },
+    {
+      "id": "channelPreview",
+      "ref": "channel-preview-tile",
+      "props": {
+        "channel": "{{activeChannel}}",
+        "platform": "ios",
+        "title": "{{title}}",
+        "body": "{{body}}"
+      }
+    }
+  ],
+  "interactions": [
+    {
+      "trigger": "channelTab.tap",
+      "action": "switchChannel"
+    },
+    {
+      "trigger": "field.change",
+      "action": "updatePreview",
+      "debounce": 300
+    },
+    {
+      "trigger": "variableChip.tap",
+      "action": "insertVariable"
+    },
+    {
+      "trigger": "sendTestButton.tap",
+      "action": "sendTestEmail"
+    },
+    {
+      "trigger": "saveButton.tap",
+      "action": "saveTemplate"
+    }
+  ],
+  "tokens": {
+    "used": [
+      "semantic.pageBackground",
+      "semantic.surface",
+      "semantic.cardBorder",
+      "semantic.foreground",
+      "semantic.secondaryText",
+      "semantic.primary"
+    ]
+  },
+  "redlines": {
+    "tabHeight": 48,
+    "inputHeight": 48,
+    "textareaHeight": 96,
+    "richTextHeight": 320,
+    "toolbarHeight": 48,
+    "previewWidth": 360,
+    "gap": 16
+  }
+}

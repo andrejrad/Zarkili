@@ -1,0 +1,38 @@
+{
+  "batch": "O",
+  "phase": 3,
+  "week": 40,
+  "title": "Booking Operations + Master Calendar",
+  "version": "1.0.0",
+  "designSystem": "Zarkili v1.0.0",
+  "scope": {
+    "screens": 11,
+    "components": 5,
+    "strings": 1,
+    "tokenDeltas": 2
+  },
+  "newComponents": [
+    "master-calendar-grid",
+    "drag-shadow",
+    "conflict-resolution-modal",
+    "force-book-reason-form",
+    "audit-timeline-row"
+  ],
+  "screens": {
+    "calendar": [
+      "MasterCalendarScreen",
+      "DragRescheduleSpec"
+    ],
+    "bookings": [
+      "BookingDetailAdminScreen",
+      "ManualBookingScreen",
+      "BlockTimeScreen",
+      "ForceBookScreen",
+      "NoShowScreen",
+      "CancelBookingScreen",
+      "RebookScreen",
+      "RecurringBookingScreen",
+      "ConflictResolverScreen"
+    ]
+  }
+}

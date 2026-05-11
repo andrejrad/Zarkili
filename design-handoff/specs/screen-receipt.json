@@ -1,0 +1,266 @@
+{
+  "screen": "Receipt",
+  "batchId": "D.4",
+  "description": "Read-only post-transaction receipt. Shows salon header, formatted date/time, itemised service lines, tax breakdown, tip, grand total, payment method, and a three-action bar (Email · Download PDF · Share). Optional 'Report a problem' tertiary link.",
+  "purpose": "Provide consumers with a record of a completed booking payment. Actions connect to the receiptsGeneratePdf Cloud Function for PDF export.",
+  "sourceFile": "src/app/payments/ReceiptScreen.tsx",
+  "hierarchy": {
+    "container": {
+      "background": "#F2EDDD",
+      "safeArea": true,
+      "flex": 1
+    },
+    "scroll": {
+      "type": "ScrollView",
+      "contentContainerPadding": 16,
+      "contentContainerGap": 12
+    }
+  },
+  "sections": {
+    "header": {
+      "type": "fixed",
+      "height": 56,
+      "background": "#FFFFFF",
+      "paddingHorizontal": 16,
+      "paddingVertical": 12,
+      "borderBottomWidth": 1,
+      "borderBottomColor": "#E5E0D1",
+      "layout": "row",
+      "children": ["backButton", "titleLabel", "headerSpacer"]
+    },
+    "backButton": {
+      "type": "iconButton",
+      "glyph": "←",
+      "size": 44,
+      "color": "#1A1A1A",
+      "optional": true,
+      "accessibility": { "role": "button", "label": "Back" }
+    },
+    "titleLabel": {
+      "type": "text",
+      "content": "Receipt",
+      "fontSize": 18,
+      "lineHeight": 24,
+      "fontWeight": "600",
+      "color": "#1A1A1A",
+      "textAlign": "center",
+      "flex": 1
+    },
+    "headerSpacer": { "type": "view", "width": 44 },
+    "errorBanner": {
+      "type": "banner",
+      "variant": "error",
+      "optional": true,
+      "showWhen": "errorMessage is set"
+    },
+    "emailedToast": {
+      "type": "banner",
+      "variant": "success",
+      "background": "#5CB85C",
+      "borderRadius": 8,
+      "padding": 12,
+      "optional": true,
+      "showWhen": "emailedToast is set",
+      "autoDismiss": "caller-managed"
+    },
+    "salonBlock": {
+      "type": "view",
+      "gap": 4,
+      "children": ["salonNameText", "salonAddressText", "dateLineText"]
+    },
+    "salonNameText": {
+      "type": "text",
+      "content": "{salonName}",
+      "fontSize": 18,
+      "lineHeight": 24,
+      "fontWeight": "600",
+      "color": "#1A1A1A"
+    },
+    "salonAddressText": {
+      "type": "text",
+      "content": "{salonAddress}",
+      "fontSize": 14,
+      "lineHeight": 20,
+      "color": "#6B6B6B"
+    },
+    "dateLineText": {
+      "type": "text",
+      "content": "{MM/DD/YYYY} · {h:mm AM/PM}",
+      "fontSize": 14,
+      "lineHeight": 20,
+      "color": "#6B6B6B",
+      "marginTop": 4
+    },
+    "servicesCard": {
+      "type": "card",
+      "background": "#FFFFFF",
+      "borderRadius": 16,
+      "borderWidth": 1,
+      "borderColor": "#E5E0D1",
+      "padding": 16,
+      "children": ["servicesSectionLabel", "receiptLineItemList"]
+    },
+    "servicesSectionLabel": {
+      "type": "text",
+      "content": "Services",
+      "fontSize": 12,
+      "lineHeight": 16,
+      "fontWeight": "600",
+      "color": "#6B6B6B",
+      "textTransform": "uppercase",
+      "letterSpacing": 0.5,
+      "marginBottom": 8
+    },
+    "receiptLineItemList": {
+      "type": "list",
+      "itemComponent": "ReceiptLineItem",
+      "description": "One ReceiptLineItem per items[] entry"
+    },
+    "totalsCard": {
+      "type": "card",
+      "background": "#FFFFFF",
+      "borderRadius": 16,
+      "borderWidth": 1,
+      "borderColor": "#E5E0D1",
+      "padding": 16,
+      "gap": 4,
+      "children": ["subtotalRow", "taxLines", "tipRow", "grandTotalRow"],
+      "notes": "taxLines and tipRow are optional; always show grandTotalRow"
+    },
+    "subtotalRow": {
+      "type": "row",
+      "layout": "row",
+      "justifyContent": "space-between",
+      "children": [
+        { "type": "text", "content": "Subtotal", "fontSize": 14, "color": "#6B6B6B" },
+        { "type": "text", "content": "{subtotal}", "fontSize": 14, "fontWeight": "500", "color": "#1A1A1A" }
+      ]
+    },
+    "taxLines": {
+      "type": "list",
+      "showWhen": "taxLines is non-empty",
+      "itemLayout": "row justifyContent='space-between'",
+      "itemChildren": [
+        { "type": "text", "content": "{taxLine.label}", "fontSize": 14, "color": "#6B6B6B" },
+        { "type": "text", "content": "{taxLine.amount}", "fontSize": 14, "fontWeight": "500", "color": "#1A1A1A" }
+      ]
+    },
+    "tipRow": {
+      "type": "row",
+      "layout": "row",
+      "justifyContent": "space-between",
+      "showWhen": "tip > 0",
+      "children": [
+        { "type": "text", "content": "Tip", "fontSize": 14, "color": "#6B6B6B" },
+        { "type": "text", "content": "{tip}", "fontSize": 14, "fontWeight": "500", "color": "#1A1A1A" }
+      ]
+    },
+    "grandTotalRow": {
+      "type": "row",
+      "layout": "row",
+      "justifyContent": "space-between",
+      "borderTopWidth": 1,
+      "borderTopColor": "#E5E0D1",
+      "paddingTop": 12,
+      "marginTop": 8,
+      "children": [
+        { "type": "text", "content": "Total", "fontSize": 16, "fontWeight": "600", "color": "#1A1A1A" },
+        { "type": "text", "content": "{grandTotal}", "fontSize": 16, "fontWeight": "600", "color": "#1A1A1A" }
+      ]
+    },
+    "paymentCard": {
+      "type": "card",
+      "background": "#FFFFFF",
+      "borderRadius": 16,
+      "borderWidth": 1,
+      "borderColor": "#E5E0D1",
+      "padding": 16,
+      "children": ["paymentSectionLabel", "paymentMethodLine"]
+    },
+    "paymentSectionLabel": {
+      "type": "text",
+      "content": "Payment",
+      "fontSize": 12,
+      "lineHeight": 16,
+      "fontWeight": "600",
+      "color": "#6B6B6B",
+      "textTransform": "uppercase",
+      "letterSpacing": 0.5,
+      "marginBottom": 8
+    },
+    "paymentMethodLine": {
+      "type": "text",
+      "content": "{paymentMethodLabel}",
+      "fontSize": 14,
+      "lineHeight": 20,
+      "color": "#1A1A1A"
+    },
+    "actionRow": {
+      "type": "row",
+      "layout": "row",
+      "gap": 8,
+      "children": ["emailActionButton", "downloadActionButton", "shareActionButton"]
+    },
+    "emailActionButton": {
+      "type": "ActionButton",
+      "label": "Email receipt",
+      "loadingLabel": "Emailing…",
+      "showLoadingWhen": "emailing === true",
+      "style": "tertiary-outlined"
+    },
+    "downloadActionButton": {
+      "type": "ActionButton",
+      "label": "Download PDF",
+      "style": "tertiary-outlined"
+    },
+    "shareActionButton": {
+      "type": "ActionButton",
+      "label": "Share",
+      "style": "tertiary-outlined"
+    },
+    "reportProblemLink": {
+      "type": "pressable",
+      "optional": true,
+      "showWhen": "onPressReportProblem is provided",
+      "children": [
+        { "type": "text", "content": "Report a problem", "fontSize": 14, "color": "#6B6B6B", "textDecorationLine": "underline" }
+      ],
+      "accessibility": { "role": "button", "label": "Report a problem" }
+    }
+  },
+  "actionButtonStyle": {
+    "height": 44,
+    "flex": 1,
+    "background": "#FFFFFF",
+    "borderRadius": 12,
+    "borderWidth": 1,
+    "borderColor": "#E5E0D1",
+    "fontSize": 13,
+    "fontWeight": "500",
+    "color": "#1A1A1A",
+    "textAlign": "center",
+    "disabledOpacity": 0.5
+  },
+  "tokens": {
+    "background": "#F2EDDD",
+    "surface": "#FFFFFF",
+    "border": "#E5E0D1",
+    "foreground": "#1A1A1A",
+    "textMuted": "#6B6B6B",
+    "success": "#5CB85C",
+    "error": "#D9534F",
+    "pageHorizontalPadding": 16,
+    "cornerRadius": { "md": 12, "lg": 16 }
+  },
+  "interactions": {
+    "tapEmail": "calls onPressEmail → caller invokes receiptsGeneratePdf CF → Linking.openURL(mailto:...)",
+    "tapDownload": "calls onPressDownload → caller invokes receiptsGeneratePdf CF → Linking.openURL(signedUrl)",
+    "tapShare": "calls onPressShare → caller invokes receiptsGeneratePdf CF → Share.share({ url })",
+    "tapReportProblem": "calls onPressReportProblem (optional)"
+  },
+  "accessibility": {
+    "screenLabel": "Receipt",
+    "actionButtons": "each has explicit accessibilityLabel matching label text",
+    "emailButtonDisabledState": "accessibilityState.disabled=true when emailing===true"
+  }
+}

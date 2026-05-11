@@ -1,0 +1,113 @@
+{
+  "schemaVersion": "1.0.0",
+  "componentId": "MC.1",
+  "componentName": "DataTableV1",
+  "exportedAs": "DataTableV1",
+  "category": "admin-data-display",
+  "description": "Sortable, selectable, bulk-actionable admin table used across M.6, M.12, M.17, M.18.",
+  "props": {
+    "columns": {
+      "type": "ColDef[]",
+      "required": true,
+      "description": "Column definitions with key, label, width, align, renderer"
+    },
+    "rows": {
+      "type": "object[]",
+      "required": true,
+      "description": "Data rows, each with a unique id field"
+    },
+    "sortKey": {
+      "type": "string | null",
+      "required": false,
+      "default": null,
+      "description": "Currently sorted column key"
+    },
+    "sortDirection": {
+      "type": "'asc' | 'desc'",
+      "required": false,
+      "default": "asc",
+      "description": "Sort direction for the active sort column"
+    },
+    "selectedIds": {
+      "type": "string[]",
+      "required": false,
+      "default": [],
+      "description": "Array of row ids currently selected for bulk action"
+    },
+    "onSelectRow": {
+      "type": "(id: string) => void",
+      "required": false,
+      "description": "Callback when a row's checkbox is toggled"
+    },
+    "onBulkAction": {
+      "type": "(action: string, ids: string[]) => void",
+      "required": false,
+      "description": "Callback for bulk action bar actions"
+    },
+    "loading": {
+      "type": "boolean",
+      "required": false,
+      "default": false,
+      "description": "Shows skeleton loading rows when true"
+    },
+    "emptyState": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Content rendered when rows array is empty"
+    },
+    "stickyFirstColumn": {
+      "type": "boolean",
+      "required": false,
+      "default": false,
+      "description": "Pins the first data column during horizontal scroll"
+    },
+    "zebraStripe": {
+      "type": "boolean",
+      "required": false,
+      "default": true,
+      "description": "Applies alternating row background tint"
+    }
+  },
+  "tokens": {
+    "headerBg": "admin.surface",
+    "headerText": "text.muted",
+    "rowBorder": "admin.border",
+    "selectedRowBg": "accent",
+    "bulkBarBg": "coach.popoverBg",
+    "bulkBarText": "surface"
+  },
+  "anatomy": [
+    "header-row (label-small uppercase, sortable carets)",
+    "data-row (height 56)",
+    "bulk-select-checkbox (col width 32, leftmost, sticky)",
+    "sticky-bulk-action-bar (slides up on row selection)",
+    "loading-skeleton-rows",
+    "empty-state-slot"
+  ],
+  "sizes": [
+    {
+      "name": "default",
+      "width": "100%",
+      "height": 56
+    },
+    {
+      "name": "compact",
+      "width": "100%",
+      "height": 40,
+      "note": "omits bulk-select"
+    }
+  ],
+  "stateNames": [
+    "default",
+    "loading",
+    "empty",
+    "error",
+    "bulk-selected"
+  ],
+  "accessibility": {
+    "role": "table",
+    "ariaLabel": "{{tableLabel}}",
+    "columnHeaderRole": "columnheader",
+    "rowRole": "row"
+  }
+}

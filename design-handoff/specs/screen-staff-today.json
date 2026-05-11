@@ -1,0 +1,705 @@
+{
+  "screen": "StaffToday",
+  "source": {
+    "batch": "G",
+    "prompt": "G.1",
+    "figmaFrames": [
+      "G-1-default",
+      "G-1-light-day",
+      "G-1-no-day",
+      "G-1-error",
+      "G-1-loading"
+    ],
+    "lockedAt": "2026-04-28"
+  },
+  "version": "1.0.0",
+  "device": {
+    "mobile": {
+      "name": "iPhone 14",
+      "width": 390,
+      "height": 844,
+      "safeArea": {
+        "top": 47,
+        "bottom": 34
+      }
+    },
+    "tablet": {
+      "name": "iPad",
+      "width": 768,
+      "height": 1024,
+      "safeArea": {
+        "top": 24,
+        "bottom": 24
+      }
+    }
+  },
+  "description": "Staff member's daily dashboard showing schedule, KPIs, and next appointment",
+  "userPersona": "Authenticated staff member (stylist/technician)",
+  "userJob": "View today's schedule, track performance metrics, manage walk-ins and availability",
+  "states": {
+    "default": {
+      "description": "Normal workday with appointments scheduled"
+    },
+    "light-day": {
+      "description": "Few appointments, shows encouragement message"
+    },
+    "no-day": {
+      "description": "Off day, no schedule, shows next shift info"
+    },
+    "error": {
+      "description": "Failed to load schedule data, shows retry option"
+    },
+    "loading": {
+      "description": "Initial load, skeleton UI"
+    }
+  },
+  "layout": {
+    "mobile": {
+      "background": "#F2EDDD",
+      "scrollable": true,
+      "sections": [
+        {
+          "name": "header",
+          "type": "sticky",
+          "paddingHorizontal": 16,
+          "paddingVertical": 16
+        },
+        {
+          "name": "kpiRow",
+          "type": "scrollable",
+          "marginHorizontal": 16,
+          "marginTop": 16
+        },
+        {
+          "name": "aiSuggestion",
+          "type": "scrollable",
+          "marginHorizontal": 16,
+          "marginTop": 16,
+          "conditional": true
+        },
+        {
+          "name": "nextUp",
+          "type": "scrollable",
+          "marginHorizontal": 16,
+          "marginTop": 16
+        },
+        {
+          "name": "appointmentsList",
+          "type": "scrollable",
+          "marginHorizontal": 16,
+          "marginTop": 24
+        },
+        {
+          "name": "fab",
+          "type": "fixed",
+          "bottom": 24,
+          "right": 16
+        }
+      ]
+    },
+    "tablet": {
+      "background": "#F2EDDD",
+      "scrollable": true,
+      "layout": "two-column",
+      "leftColumn": {
+        "width": 360,
+        "sections": ["header", "kpiRow", "nextUp", "aiSuggestion"]
+      },
+      "rightColumn": {
+        "width": 380,
+        "sections": ["appointmentsList"]
+      },
+      "gap": 24
+    }
+  },
+  "components": {
+    "header": {
+      "structure": {
+        "paddingHorizontal": 16,
+        "paddingVertical": 16,
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+        "alignItems": "center"
+      },
+      "avatar": {
+        "size": 40,
+        "borderRadius": 9999,
+        "border": {
+          "width": 2,
+          "color": "#E3A9A0"
+        },
+        "fallback": {
+          "background": "#D1BFB3",
+          "text": {
+            "content": "{{initials}}",
+            "style": "label",
+            "color": "#FFFFFF"
+          }
+        }
+      },
+      "greeting": {
+        "marginLeft": 12,
+        "greeting": {
+          "style": "heading-4",
+          "color": "#1A1A1A",
+          "format": "Good {{timeOfDay}}, {{firstName}}"
+        },
+        "date": {
+          "style": "body-small",
+          "color": "#6B6B6B",
+          "format": "dddd, MM/DD/YYYY"
+        }
+      },
+      "locationPill": {
+        "paddingHorizontal": 12,
+        "paddingVertical": 6,
+        "borderRadius": 9999,
+        "background": "#FFFFFF",
+        "border": {
+          "width": 1,
+          "color": "#E5E0D1"
+        },
+        "structure": {
+          "flexDirection": "row",
+          "alignItems": "center",
+          "gap": 4
+        },
+        "icon": {
+          "name": "map-pin",
+          "size": 16,
+          "color": "#6B6B6B"
+        },
+        "label": {
+          "style": "body-small",
+          "color": "#1A1A1A"
+        },
+        "chevron": {
+          "name": "chevron-down",
+          "size": 16,
+          "color": "#6B6B6B"
+        },
+        "accessibility": {
+          "role": "button",
+          "label": "Location: {{locationName}}, tap to change",
+          "hint": "Opens location selector"
+        }
+      }
+    },
+    "kpiRow": {
+      "mobile": {
+        "flexDirection": "row",
+        "gap": 8,
+        "cardWidth": 84.5
+      },
+      "tablet": {
+        "display": "grid",
+        "gridTemplateColumns": "repeat(2, 1fr)",
+        "gap": 12,
+        "cardWidth": "auto"
+      },
+      "kpiCard": {
+        "borderRadius": 12,
+        "background": "#FFFFFF",
+        "border": {
+          "width": 1,
+          "color": "#E5E0D1"
+        },
+        "paddingVertical": 12,
+        "paddingHorizontal": 8,
+        "textAlign": "center",
+        "value": {
+          "style": "heading-3",
+          "color": "#1A1A1A"
+        },
+        "label": {
+          "style": "body-small",
+          "color": "#6B6B6B",
+          "marginTop": 4
+        }
+      },
+      "metrics": [
+        {
+          "id": "appointments",
+          "label": "Appointments",
+          "format": "{{count}}"
+        },
+        {
+          "id": "revenue",
+          "label": "Revenue",
+          "format": "${{amount}}",
+          "locale": "en-US",
+          "currency": "USD"
+        },
+        {
+          "id": "tips",
+          "label": "Tips",
+          "format": "${{amount}}",
+          "locale": "en-US",
+          "currency": "USD"
+        },
+        {
+          "id": "noShows",
+          "label": "No-shows",
+          "format": "{{count}}"
+        }
+      ]
+    },
+    "aiSuggestionCard": {
+      "marginHorizontal": 16,
+      "marginTop": 16,
+      "borderRadius": 16,
+      "background": "linear-gradient(135deg, #BBEDDA 0%, #F2EDDD 100%)",
+      "border": {
+        "width": 1,
+        "color": "#E5E0D1"
+      },
+      "padding": 16,
+      "position": "relative",
+      "icon": {
+        "name": "sparkles",
+        "size": 24,
+        "color": "#2D4A42"
+      },
+      "title": {
+        "style": "heading-4",
+        "color": "#1A1A1A",
+        "marginTop": 8
+      },
+      "body": {
+        "style": "body",
+        "color": "#6B6B6B",
+        "marginTop": 4
+      },
+      "cta": {
+        "paddingHorizontal": 12,
+        "paddingVertical": 6,
+        "borderRadius": 8,
+        "background": "#E3A9A0",
+        "marginTop": 12,
+        "label": {
+          "style": "label-small",
+          "color": "#FFFFFF"
+        }
+      },
+      "dismissButton": {
+        "position": "absolute",
+        "top": 16,
+        "right": 16,
+        "icon": "x",
+        "size": 24,
+        "color": "#6B6B6B",
+        "touchTarget": 44,
+        "accessibilityLabel": "Dismiss suggestion"
+      },
+      "variants": {
+        "suggestion": {
+          "title": "Fill {{count}} empty slots today",
+          "body": "Try a {{discount}}% promo to book {{timeRange}} slots",
+          "ctaLabel": "Send promo"
+        },
+        "encouragement": {
+          "icon": "sun",
+          "title": "Light day ahead",
+          "body": "Only {{count}} appointments scheduled. Enjoy some downtime to prep for tomorrow or reach out to regulars!",
+          "ctaVisible": false
+        }
+      }
+    },
+    "nextUpCard": {
+      "marginHorizontal": 16,
+      "marginTop": 16,
+      "borderRadius": 16,
+      "background": "#FFFFFF",
+      "border": {
+        "width": 2,
+        "color": "#E3A9A0"
+      },
+      "padding": 16,
+      "badge": {
+        "content": "NEXT UP",
+        "style": "label-small",
+        "textTransform": "uppercase",
+        "letterSpacing": 0.5,
+        "color": "#E3A9A0",
+        "marginBottom": 8
+      },
+      "structure": {
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+        "alignItems": "flex-start"
+      },
+      "leftContent": {
+        "flex": 1,
+        "time": {
+          "style": "heading-3",
+          "color": "#1A1A1A",
+          "format": "h:mm A"
+        },
+        "client": {
+          "style": "body",
+          "color": "#1A1A1A",
+          "marginTop": 4
+        },
+        "service": {
+          "style": "body-small",
+          "color": "#6B6B6B",
+          "marginTop": 2,
+          "format": "{{serviceName}} · {{duration}}"
+        }
+      },
+      "countdownCircle": {
+        "size": 64,
+        "borderRadius": 9999,
+        "track": {
+          "stroke": "#E5E0D1",
+          "strokeWidth": 4,
+          "fill": "none"
+        },
+        "progress": {
+          "stroke": "#E3A9A0",
+          "strokeWidth": 4,
+          "fill": "none",
+          "strokeLinecap": "round"
+        },
+        "label": {
+          "style": "heading-4",
+          "color": "#E3A9A0",
+          "content": "{{minutes}}",
+          "position": "center"
+        },
+        "sublabel": {
+          "style": "body-small",
+          "color": "#6B6B6B",
+          "content": "min",
+          "position": "center"
+        }
+      },
+      "accessibility": {
+        "role": "group",
+        "label": "Next appointment: {{client}} at {{time}}, in {{minutes}} minutes"
+      }
+    },
+    "appointmentCard": {
+      "borderRadius": 16,
+      "background": "#FFFFFF",
+      "paddingHorizontal": 16,
+      "paddingVertical": 12,
+      "position": "relative",
+      "marginBottom": 12,
+      "leftStripe": {
+        "position": "absolute",
+        "left": 0,
+        "top": 0,
+        "bottom": 0,
+        "width": 4,
+        "borderTopLeftRadius": 16,
+        "borderBottomLeftRadius": 16,
+        "colorByStatus": {
+          "completed": "#4CAF50",
+          "inProgress": "#E3A9A0",
+          "confirmed": "#2196F3",
+          "cancelled": "#F44336",
+          "noShow": "#FF9800"
+        }
+      },
+      "structure": {
+        "flexDirection": "row",
+        "gap": 12,
+        "alignItems": "center"
+      },
+      "timeBlock": {
+        "width": 64,
+        "time": {
+          "style": "label",
+          "color": "#1A1A1A",
+          "format": "h:mm A"
+        }
+      },
+      "content": {
+        "flex": 1,
+        "client": {
+          "style": "heading-4",
+          "color": "#1A1A1A"
+        },
+        "service": {
+          "style": "body-small",
+          "color": "#6B6B6B",
+          "marginTop": 2
+        },
+        "duration": {
+          "style": "body-small",
+          "color": "#6B6B6B"
+        }
+      },
+      "statusPill": {
+        "paddingHorizontal": 8,
+        "paddingVertical": 4,
+        "borderRadius": 8,
+        "label": {
+          "style": "label-small"
+        },
+        "variants": {
+          "completed": {
+            "background": "rgba(76,175,80,0.1)",
+            "color": "#4CAF50",
+            "label": "Completed"
+          },
+          "inProgress": {
+            "background": "rgba(227,169,160,0.1)",
+            "color": "#E3A9A0",
+            "label": "In progress"
+          },
+          "confirmed": {
+            "background": "rgba(33,150,243,0.1)",
+            "color": "#2196F3",
+            "label": "Confirmed"
+          },
+          "cancelled": {
+            "background": "rgba(244,67,54,0.1)",
+            "color": "#F44336",
+            "label": "Cancelled"
+          },
+          "noShow": {
+            "background": "rgba(255,152,0,0.1)",
+            "color": "#FF9800",
+            "label": "No-show"
+          }
+        }
+      },
+      "states": {
+        "default": {
+          "border": { "width": 1, "color": "#E5E0D1" }
+        },
+        "active": {
+          "border": { "width": 2, "color": "#E3A9A0" }
+        },
+        "openSlot": {
+          "border": { "width": 1, "style": "dashed", "color": "#E5E0D1" },
+          "background": "#F5F5F5",
+          "content": { "text": "Open slot", "style": "body", "color": "#B0B0B0" },
+          "icon": { "name": "plus-circle", "size": 24, "color": "#B0B0B0" }
+        }
+      },
+      "accessibility": {
+        "role": "button",
+        "label": "{{time}}, {{client}}, {{service}}, {{duration}}, {{status}}",
+        "hint": "Tap to view appointment details"
+      }
+    },
+    "fab": {
+      "position": "fixed",
+      "mobile": { "bottom": 24, "right": 16, "width": 120, "height": 56 },
+      "tablet": { "bottom": 32, "right": 32, "width": 140, "height": 64 },
+      "borderRadius": 28,
+      "background": "#E3A9A0",
+      "shadow": "0px 4px 12px rgba(227,169,160,0.4)",
+      "structure": {
+        "flexDirection": "row",
+        "alignItems": "center",
+        "justifyContent": "center",
+        "gap": 8
+      },
+      "icon": { "name": "plus", "size": 24, "color": "#FFFFFF" },
+      "label": { "content": "Walk-in", "style": "label", "color": "#FFFFFF" },
+      "states": {
+        "default": { "background": "#E3A9A0" },
+        "hover": { "background": "#D99A90" },
+        "pressed": { "background": "#CF8B80", "transform": "scale(0.95)" },
+        "disabled": {
+          "background": "#F5F5F5",
+          "labelColor": "#B0B0B0",
+          "iconColor": "#B0B0B0",
+          "shadow": "none"
+        }
+      },
+      "accessibility": {
+        "role": "button",
+        "label": "Add walk-in appointment",
+        "hint": "Opens walk-in form"
+      }
+    },
+    "offDayBanner": {
+      "marginHorizontal": 16,
+      "marginTop": 16,
+      "borderRadius": 16,
+      "background": "#FFFFFF",
+      "border": { "width": 1, "color": "#E5E0D1" },
+      "padding": 24,
+      "textAlign": "center",
+      "icon": { "name": "calendar-x", "size": 64, "color": "#6B6B6B" },
+      "title": {
+        "style": "heading-2",
+        "color": "#1A1A1A",
+        "content": "You're off today",
+        "marginTop": 16
+      },
+      "body": {
+        "style": "body",
+        "color": "#6B6B6B",
+        "content": "Enjoy your day off! Your next shift is {{nextShiftDate}}",
+        "marginTop": 8
+      },
+      "cta": {
+        "marginTop": 16,
+        "paddingHorizontal": 16,
+        "paddingVertical": 12,
+        "borderRadius": 12,
+        "background": "#F5F5F5",
+        "label": { "style": "label", "color": "#1A1A1A", "content": "View full schedule" }
+      }
+    },
+    "errorBanner": {
+      "marginHorizontal": 16,
+      "marginTop": 16,
+      "borderRadius": 16,
+      "background": "#FFF5F5",
+      "border": { "width": 1, "color": "#F44336" },
+      "padding": 16,
+      "structure": { "flexDirection": "row", "alignItems": "center", "gap": 12 },
+      "icon": { "name": "alert-circle", "size": 24, "color": "#F44336" },
+      "content": {
+        "flex": 1,
+        "title": {
+          "style": "body",
+          "fontWeight": 500,
+          "color": "#F44336",
+          "content": "Couldn't load your schedule"
+        },
+        "message": {
+          "style": "body-small",
+          "color": "#F44336",
+          "content": "Check your connection and try again",
+          "marginTop": 2
+        }
+      },
+      "retryButton": {
+        "paddingHorizontal": 12,
+        "paddingVertical": 6,
+        "borderRadius": 8,
+        "background": "#F44336",
+        "label": { "style": "label-small", "color": "#FFFFFF", "content": "Retry" }
+      }
+    },
+    "skeleton": {
+      "shimmer": {
+        "animation": {
+          "duration": 1500,
+          "easing": "ease-in-out",
+          "iterations": "infinite",
+          "gradient": "linear-gradient(90deg, #F5F5F5 0%, #E5E0D1 50%, #F5F5F5 100%)"
+        }
+      },
+      "kpiCard": {
+        "borderRadius": 12,
+        "background": "#F5F5F5",
+        "paddingVertical": 12,
+        "value": { "width": 40, "height": 28, "borderRadius": 4, "background": "#E5E0D1" },
+        "label": { "width": 60, "height": 12, "borderRadius": 4, "background": "#E5E0D1", "marginTop": 4 }
+      },
+      "suggestionCard": { "width": 358, "height": 120, "borderRadius": 16, "background": "#F5F5F5" },
+      "nextUpCard": { "width": 358, "height": 100, "borderRadius": 16, "background": "#F5F5F5" },
+      "appointmentCard": { "width": 358, "height": 76, "borderRadius": 16, "background": "#F5F5F5" }
+    }
+  },
+  "dataModel": {
+    "staff": {
+      "id": "string",
+      "firstName": "string",
+      "lastName": "string",
+      "avatar": "string (URL)",
+      "location": { "id": "string", "name": "string" }
+    },
+    "kpis": {
+      "appointments": "number",
+      "revenue": "number",
+      "tips": "number",
+      "noShows": "number"
+    },
+    "nextAppointment": {
+      "id": "string",
+      "time": "string (ISO 8601)",
+      "client": { "name": "string" },
+      "service": { "name": "string", "duration": "number (minutes)" },
+      "minutesUntil": "number"
+    },
+    "appointments": [
+      {
+        "id": "string",
+        "time": "string (ISO 8601)",
+        "client": { "name": "string" },
+        "service": { "name": "string", "duration": "number (minutes)" },
+        "status": "string (completed | inProgress | confirmed | cancelled | noShow)",
+        "isOpenSlot": "boolean"
+      }
+    ],
+    "aiSuggestion": {
+      "type": "string (suggestion | encouragement)",
+      "title": "string",
+      "body": "string",
+      "ctaLabel": "string",
+      "ctaAction": "string"
+    }
+  },
+  "usLocale": {
+    "dateFormat": "MM/DD/YYYY",
+    "timeFormat": "12h (h:mm A)",
+    "currency": "USD ($)",
+    "numberFormat": "1,234"
+  },
+  "accessibility": {
+    "screenLabel": "Today's schedule",
+    "header": { "greetingLabel": "Hello {{firstName}}" },
+    "kpiRow": { "role": "group", "label": "Today's metrics" },
+    "nextUpCard": {
+      "role": "group",
+      "label": "Next appointment: {{client}} at {{time}}, in {{minutes}} minutes"
+    },
+    "appointmentCard": {
+      "role": "button",
+      "label": "{{time}}, {{client}}, {{service}}, {{duration}}, {{status}}",
+      "hint": "Tap to view appointment details"
+    },
+    "fab": {
+      "role": "button",
+      "label": "Add walk-in appointment",
+      "hint": "Opens walk-in form"
+    },
+    "reduceMotion": {
+      "disableShimmerAnimation": true,
+      "disableFABScaleAnimation": true
+    }
+  },
+  "transitions": {
+    "screenEnter": { "duration": 300, "easing": "ease-out", "type": "fade" },
+    "fabPress": { "duration": 100, "easing": "ease-out", "properties": ["background", "transform"] },
+    "shimmer": { "duration": 1500, "easing": "ease-in-out", "iterations": "infinite" }
+  },
+  "usage": {
+    "navigation": {
+      "from": ["Bottom tab 'Schedule'", "Login screen", "Push notification"],
+      "to": [
+        "Appointment detail (tap appointment card)",
+        "Walk-in form (tap FAB)",
+        "Location selector (tap location pill)",
+        "Full schedule (tap 'View full schedule' on off-day)"
+      ]
+    },
+    "rules": [
+      "Time format: 12-hour with AM/PM (9:00 AM, 1:00 PM)",
+      "Date format: MM/DD/YYYY (04/30/2026)",
+      "Currency: USD with $ prefix ($640, $85)",
+      "Greeting changes based on time: morning (before 12pm), afternoon (12pm-5pm), evening (after 5pm)",
+      "Next-up card shows appointment within next 2 hours",
+      "Countdown circle animates in real-time, updates every minute",
+      "AI suggestion card is dismissible and doesn't reappear for 24 hours",
+      "Open slots show dashed border and grey background",
+      "Active appointment (in progress) has coral 2px border",
+      "Left stripe color indicates status: green (completed), coral (in progress), blue (confirmed), red (cancelled), orange (no-show)",
+      "FAB disabled on off days or error state",
+      "Loading state shows shimmer animation on skeletons",
+      "iPad uses two-column layout with left sidebar for KPIs/next-up, right for appointments list",
+      "All touch targets meet 44×44 minimum",
+      "Respect prefers-reduced-motion for animations"
+    ]
+  }
+}

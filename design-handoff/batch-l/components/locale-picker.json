@@ -1,0 +1,107 @@
+{
+  "componentId": "locale-picker",
+  "name": "LocalePicker",
+  "description": "Row-based locale and language selector with flag icon, native name, and optional coming-soon label",
+  "category": "settings",
+  "version": "1.0.0",
+  "rowLayout": {
+    "height": 56,
+    "horizontalPadding": 16,
+    "verticalPadding": 12,
+    "separator": {
+      "color": "#D1BFB3",
+      "thickness": 1,
+      "insetLeft": 64
+    }
+  },
+  "elements": [
+    {
+      "id": "flag-icon",
+      "label": "Flag Icon",
+      "type": "image",
+      "width": 28,
+      "height": 21,
+      "borderRadius": 2,
+      "marginRight": 16
+    },
+    {
+      "id": "name-section",
+      "label": "Name Section",
+      "type": "group",
+      "flex": 1,
+      "children": [
+        {
+          "id": "native-name",
+          "label": "Native Name",
+          "type": "text",
+          "style": "bodyMedium",
+          "color": "#1A1A1A"
+        },
+        {
+          "id": "english-name",
+          "label": "English Name",
+          "type": "text",
+          "style": "bodySmall",
+          "color": "#6B6B6B",
+          "marginTop": 2,
+          "visibleWhen": "nativeName !== englishName"
+        }
+      ]
+    },
+    {
+      "id": "check-icon",
+      "label": "Check Icon",
+      "type": "icon",
+      "icon": "checkmark",
+      "size": 20,
+      "color": "#E3A9A0",
+      "visibleWhen": "selected"
+    },
+    {
+      "id": "coming-soon-label",
+      "label": "Coming Soon Label",
+      "type": "badge",
+      "style": "subtle",
+      "textKey": "languageLocalePicker.comingSoonBadge",
+      "backgroundColor": "#BBEDDA",
+      "textColor": "#1A1A1A",
+      "borderRadius": 4,
+      "paddingHorizontal": 8,
+      "paddingVertical": 3,
+      "visibleWhen": "comingSoon"
+    }
+  ],
+  "sectionHeader": {
+    "height": 36,
+    "text": {
+      "style": "labelSmall",
+      "color": "#6B6B6B",
+      "uppercase": true,
+      "letterSpacing": 0.8
+    },
+    "backgroundColor": "#F2EDDD",
+    "paddingHorizontal": 16
+  },
+  "states": [
+    {
+      "id": "default",
+      "name": "Default",
+      "description": "Unselected, available locale row"
+    },
+    {
+      "id": "selected",
+      "name": "Selected",
+      "description": "Currently active locale — shows check icon, row background tinted Cream Silk at 60%"
+    },
+    {
+      "id": "disabled",
+      "name": "Disabled (Coming Soon)",
+      "description": "Locale not yet available — shows coming-soon badge, text is muted, row is non-interactive"
+    }
+  ],
+  "accessibility": {
+    "semanticRole": "radio",
+    "selectedAnnouncement": "{{localeName}} selected",
+    "comingSoonAnnouncement": "{{localeName}} coming soon"
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "component": "CannedReplyEditor",
+  "props": {
+    "replies": { "type": "array", "required": true },
+    "onInsert": { "type": "function", "required": false },
+    "onSave": { "type": "function", "required": true },
+    "onDelete": { "type": "function", "required": true },
+    "editMode": { "type": "boolean", "required": true }
+  },
+  "variants": ["listView", "editView"],
+  "layout": {
+    "listView": {
+      "searchBar": { "fullWidth": true },
+      "tagFilterChips": { "type": "row" },
+      "replyRow": {
+        "height": "components.cannedReplyRowHeight",
+        "divider": { "width": 1, "color": "border" },
+        "replyName": { "variant": "body", "weight": "bold" },
+        "tagChips": { "variant": "label-small" },
+        "insertIconButton": { "visibleWhen": "onInsert present" },
+        "editLink": true,
+        "deleteIconButton": true,
+        "onExpand": {
+          "bodyPreview": {
+            "variant": "caption",
+            "color": "muted",
+            "lines": 2,
+            "variables": { "highlight": "primary-tinted spans" }
+          }
+        }
+      }
+    },
+    "editView": {
+      "device": {
+        "iPad": { "type": "right-panel", "width": 480 },
+        "iPhone": { "type": "sheet", "width": 390, "radius": 20 }
+      },
+      "nameInput": { "required": true, "label": "strings.cannedReplyEditor.nameLabel" },
+      "bodyTextarea": { "required": true, "minHeight": 80, "placeholder": "strings.cannedReplyEditor.bodyPlaceholder" },
+      "variablePicker": {
+        "type": "iconButton",
+        "icon": "{ }",
+        "popover": {
+          "type": "merge tags list",
+          "tags": ["{{client.firstName}}", "{{service.name}}", "{{salon.name}}", "{{booking.date}}", "{{booking.time}}"],
+          "onTap": "insert at cursor"
+        }
+      },
+      "tagInput": {
+        "type": "chip-input",
+        "separator": "enter/comma",
+        "removeAction": "X",
+        "maxTags": 5
+      },
+      "footer": {
+        "left": { "type": "link", "label": "strings.cannedReplyEditor.deleteButton", "variant": "destructive" },
+        "right": {
+          "actions": [
+            { "type": "button", "label": "strings.cannedReplyEditor.cancelButton", "variant": "secondary" },
+            { "type": "button", "label": "strings.cannedReplyEditor.saveButton", "variant": "primary" }
+          ]
+        }
+      }
+    }
+  },
+  "tokens": ["surface", "primary", "border", "muted", "foreground", "error"]
+}

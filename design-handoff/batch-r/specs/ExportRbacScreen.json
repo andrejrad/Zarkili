@@ -1,0 +1,45 @@
+{
+  "screen": "ExportRbacScreen",
+  "route": "/admin/analytics/export",
+  "description": "Role-aware data export where columns user cannot access are locked and greyed",
+  "platform": "admin-desktop",
+  "dimensions": { "width": 1280, "contentWidth": "calc(1280 - 240px sidebar)" },
+  "states": ["default", "generating", "ready", "error"],
+  "accessibility": {
+    "screenReaderLabel": "strings.exportRbac.screenTitle",
+    "semanticRoles": [
+      { "element": "exportForm", "role": "form" },
+      { "element": "previousExportsTable", "role": "table" }
+    ]
+  },
+  "rtl": "deferred",
+  "darkMode": "deferred",
+  "layout": {
+    "header": { "component": "AdminHeader", "title": "strings.exportRbac.title" },
+    "body": {
+      "padding": 24,
+      "maxWidth": 800,
+      "centered": true,
+      "form": [
+        { "component": "FormField", "label": "strings.exportRbac.exportTypeLabel", "type": "radio group", "options": ["strings.exportRbac.typeClients", "strings.exportRbac.typeBookings", "strings.exportRbac.typeRevenue", "strings.exportRbac.typeStaff", "strings.exportRbac.typeCustom"], "note": "Changing type reloads column selector" },
+        { "component": "FormField", "label": "strings.exportRbac.dateRangeLabel", "type": "DateRangePicker" },
+        { "component": "Card", "title": "strings.exportRbac.columns", "border": true, "padding": 16, "content": { "component": "Checkbox list", "layout": "3-column grid", "lockedColumns": "greyed checkbox + lock icon + tooltip with requiredRole" } },
+        { "component": "FormField", "label": "strings.exportRbac.formatLabel", "type": "segmented control", "options": ["CSV", "XLSX", "JSON"] },
+        { "component": "FormField", "label": "strings.exportRbac.deliveryLabel", "type": "radio", "options": ["strings.exportRbac.downloadNow", "strings.exportRbac.emailDelivery"], "conditional": { "Email": { "component": "text input", "label": "strings.exportRbac.recipientLabel", "validation": "email" } } },
+        { "component": "Card", "bg": "admin.tableHeaderBg", "content": "~[n] rows · ~[size] MB estimated" },
+        { "component": "PrimaryButton", "label": "strings.exportRbac.generateExport", "fullWidth": true }
+      ],
+      "divider": true,
+      "previousExportsTable": {
+        "component": "DataTable",
+        "title": "strings.exportRbac.previousExports",
+        "columns": ["Date", "Type", "Format", "Rows", "Requested By", "Status", "Download (link, disabled until ready)"]
+      }
+    }
+  },
+  "components": [
+    { "id": "exportForm", "ref": "Form", "props": { "fields": "{{exportFields}}" } },
+    { "id": "previousExportsTable", "ref": "DataTable", "props": { "title": "strings.exportRbac.previousExports", "columns": "{{exportHistoryColumns}}", "data": "{{exportHistoryData}}" } }
+  ],
+  "strings": "See strings/en-us.json for exportRbac keys"
+}

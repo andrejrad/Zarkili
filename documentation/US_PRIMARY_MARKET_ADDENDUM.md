@@ -1,11 +1,11 @@
-# US-Primary Market Addendum
+﻿# US-Primary Market Addendum
 
 **Decision date:** 2026-04-25  
 **Decision:** Primary target market is the United States. European Union is the secondary target market and remains a supported launch geography.  
-**Scope:** This addendum captures every change to the 52-week program plan implied by US-primary positioning. It does not re-architect anything; it adjusts defaults, scope items, and decision-gate outcomes.
+**Scope:** This addendum captures every change to the 57-week program plan implied by US-primary positioning. It does not re-architect anything; it adjusts defaults, scope items, and decision-gate outcomes.
 
 ## Summary of Impact
-- **Total program length unchanged at 52 weeks.** All changes fit inside existing weeks except multi-currency, which already had a +1 week absorption budget per the Phase 3 Group B addendum.
+- **Total program length is 57 weeks.** The +2 week extension from Phase 2.2 navigation wiring (W33–W34) plus the +3 week extension from Phase 2.3 consumer Firebase integration (W35–W37) shift Phase 3 start to W38 and Phase 4 end to W57.
 - **Decision gates resolved.** Several previously-open Group B gates are now answered (multi-currency = YES) so they no longer block.
 - **No new phase added.** EU data-residency is post-launch backlog (Phase 4+).
 
@@ -32,34 +32,34 @@ The Phase 3 Group B addendum listed multi-currency as a "decide" gate that, if Y
 ### 3. Compliance and legal
 | Item | Plan change | Where |
 |---|---|---|
-| GDPR (EU) | Already in plan; no change | W29 + W49 |
-| **CCPA / CPRA (California)** | Add explicit "Do Not Sell or Share My Personal Information" toggle, right-to-know, right-to-delete, opt-out preference signals (GPC) | W29 legal/lifecycle + W49 compliance pack |
-| **VCDPA (Virginia), CPA (Colorado), CTDPA (Connecticut), UCPA (Utah)** | Add to privacy controls and to public privacy notice; reuse the CCPA toggle and right-to-delete plumbing | W29 + W49 |
+| GDPR (EU) | Already in plan; no change | W29 + W52 |
+| **CCPA / CPRA (California)** | Add explicit "Do Not Sell or Share My Personal Information" toggle, right-to-know, right-to-delete, opt-out preference signals (GPC) | W29 legal/lifecycle + W52 compliance pack |
+| **VCDPA (Virginia), CPA (Colorado), CTDPA (Connecticut), UCPA (Utah)** | Add to privacy controls and to public privacy notice; reuse the CCPA toggle and right-to-delete plumbing | W29 + W52 |
 | **COPPA (US, children under 13)** | Add age affirmation at registration; if a service recipient is under 13, require parental-consent affirmation by the booking adult; do not create separate child accounts | W21 auth/onboarding |
-| **ADA + WCAG 2.1 AA** | Cite ADA explicitly in the public accessibility statement (already-existing accessibility guide stays as the implementation reference); audit covers `SupportChatScreen` and `AdminSupportQueueScreen` | W29 + W49 + ASE accessibility re-audits |
+| **ADA + WCAG 2.1 AA** | Cite ADA explicitly in the public accessibility statement (already-existing accessibility guide stays as the implementation reference); audit covers `SupportChatScreen` and `AdminSupportQueueScreen` | W29 + W52 + ASE accessibility re-audits |
 | **TCPA (US SMS)** | Explicit prior consent before SMS appointment reminders; STOP / HELP keyword handling; opt-out wired end-to-end; quiet-hours respected per US time zone | W26 messaging/notifications/waitlist |
-| **CAN-SPAM (US email)** | Sender identity, physical address in footer, one-click unsubscribe; verify SES/SendGrid templates | W26 + W47 marketing site |
+| **CAN-SPAM (US email)** | Sender identity, physical address in footer, one-click unsubscribe; verify SES/SendGrid templates | W26 + W50 marketing site |
 | **CAN-SPAM equivalence in EU (ePrivacy / GDPR)** | Already covered by GDPR consent; no change | W29 |
-| HIPAA | Not applicable (no PHI). Confirm in security whitepaper | W49 compliance pack |
-| **SOC 2 Type 1** | Promote from "after launch (vague)" to a scheduled **Phase 5 workstream**, kickoff in W53. Vendor selection during W47 | W49 decision gate updated; new Phase 5 backlog item |
+| HIPAA | Not applicable (no PHI). Confirm in security whitepaper | W52 compliance pack |
+| **SOC 2 Type 1** | Promote from "after launch (vague)" to a scheduled **Phase 5 workstream**, kickoff in W56. Vendor selection during W50 | W52 decision gate updated; new Phase 5 backlog item |
 
 ### 4. Localization and defaults
 | Item | Plan change | Where |
 |---|---|---|
 | Default locale | **en-US** (currency USD, dates `MM/DD/YYYY`, time 12-hour AM/PM) | W32 i18n / store readiness |
 | Secondary locale | en-GB, de-DE, hr-HR (or chosen EU set) with EUR, dates `DD/MM/YYYY`, time 24-hour | W32 |
-| Time zones | All 4 contiguous US zones + AK + HI; DST transition test in booking engine | W32 hardening + W46 DR drill checks |
+| Time zones | All 4 contiguous US zones + AK + HI; DST transition test in booking engine | W32 hardening + W49 DR drill checks |
 | Address / phone validation | Per-country at salon onboarding (W15) and client account; US ZIP + state required for US tenants | W15 + W21 |
-| Holiday calendar seed | US federal holidays + state-optional toggles for salon hours and booking blackouts | W36 (calendar/master scheduling depth) |
+| Holiday calendar seed | US federal holidays + state-optional toggles for salon hours and booking blackouts | W39 (calendar/master scheduling depth) |
 
-### 5. Marketing site / GTM (Phase 3.5 W47)
+### 5. Marketing site / GTM (Phase 3.5 W50)
 - US-first messaging and copy.
 - Named competitor comparison: Vagaro, Square Appointments, Booksy (US presence).
 - USD pricing primary; EUR pricing on EU-locale path.
 - Domain strategy: `.com` primary; EU TLD secondary (decide which when EU launch is dated).
 - App-store listings: en-US primary copy and screenshots; EU localized variants follow.
 
-### 6. Customer support (Phase 3.5 W48 + W49)
+### 6. Customer support (Phase 3.5 W53 + W54)
 - **On-call coverage**: US East/West rotation primary; EU rotation as the secondary tier.
 - **Response SLAs**: 24 business hours v1 framed against US business hours; document EU-business-hours equivalence.
 - **Time-zone display in admin queue**: render ticket timestamps in operator-local TZ with US zone hints.
@@ -89,28 +89,30 @@ The Phase 3 Group B addendum listed multi-currency as a "decide" gate that, if Y
 - `[W29-LEG-009]` VCDPA / CPA / CTDPA / UCPA privacy notices and reuse of CCPA right-to-delete plumbing
 - `[W32-I18N-005]` en-US default locale: USD, MM/DD/YYYY, 12-hour AM/PM
 - `[W32-I18N-006]` US time-zone DST transition tests (4 contiguous + AK + HI)
-- `[W36-ADM-018]` US federal holidays seed + state-optional toggles for booking calendar
-- `[W42-RPT-007]` Multi-currency reporting columns (per-currency revenue + FX rate snapshot)
-- `[W47-MKT-005]` US-first marketing copy + competitor comparison (Vagaro, Square Appointments, Booksy)
-- `[W47-MKT-006]` USD pricing primary; EUR pricing on EU-locale route
-- `[W47-OPS-007]` SOC 2 Type 1 vendor selection (kickoff in Phase 5 / W53)
-- `[W49-LEG-010]` Compliance pack: ADA + WCAG 2.1 AA citation; CCPA + state-privacy disclosures
+- `[W39-ADM-018]` US federal holidays seed + state-optional toggles for booking calendar
+- `[W45-RPT-007]` Multi-currency reporting columns (per-currency revenue + FX rate snapshot)
+- `[W50-MKT-005]` US-first marketing copy + competitor comparison (Vagaro, Square Appointments, Booksy)
+- `[W50-MKT-006]` USD pricing primary; EUR pricing on EU-locale route
+- `[W50-OPS-007]` SOC 2 Type 1 vendor selection (kickoff in Phase 5 / W56)
+- `[W52-LEG-010]` Compliance pack: ADA + WCAG 2.1 AA citation; CCPA + state-privacy disclosures
 - `B-040` (backlog) Multi-region EU tenant residency (Phase 4+ / Phase 5)
 - `B-041` (backlog) SOC 2 Type 1 audit kickoff (Phase 5 / W53+)
 
 ## What Did NOT Change
-- 52-week total program length.
+- 57-week total program length (current; originally 52 weeks, extended by Phase 2.2 and Phase 2.3 insertions).
 - Multi-tenant + RBAC + audit + Firestore architecture.
 - React Native + Expo + Firebase + Stripe stack.
-- Phase sequencing (Phase 1 → 1.5 → 2.0 → 2.1 → 3 → 3.5 → 4).
+- Phase sequencing (Phase 1 → 1.5 → 2.0 → 2.1 → 2.2 → 2.3 → 3 → 3.5 → 4).
 - Booking, loyalty, marketplace, AI feature scope.
 - Phase 2 / Phase 3 / Phase 3.5 / Phase 4 week-by-week structure (only scope items inside selected weeks were extended).
 
 ## Cross-References
 - Phase 1.5 prompts: [MULTITENANT_WEEKS_13_TO_20_COPILOT_PROMPTS.md](MULTITENANT_WEEKS_13_TO_20_COPILOT_PROMPTS.md)
-- Phase 2 plan: [PHASE2_CONSUMER_UI_PLAN_WEEKS_21_TO_28.md](PHASE2_CONSUMER_UI_PLAN_WEEKS_21_TO_28.md)
-- Phase 3 plan + Group B addendum: [PHASE3_ADMIN_UI_PLAN_WEEKS_33_TO_44.md](PHASE3_ADMIN_UI_PLAN_WEEKS_33_TO_44.md)
-- Phase 3.5 plan: [PHASE3_5_RELEASE_READINESS_PLAN_WEEKS_45_TO_48.md](PHASE3_5_RELEASE_READINESS_PLAN_WEEKS_45_TO_48.md)
-- Phase 4 plan: [PHASE4_AI_SUPPORT_SYSTEM_PLAN_WEEKS_49_TO_52.md](PHASE4_AI_SUPPORT_SYSTEM_PLAN_WEEKS_49_TO_52.md)
+- Phase 2 plan: [PHASE2_CONSUMER_UI_PLAN_WEEKS_21_TO_32.md](PHASE2_CONSUMER_UI_PLAN_WEEKS_21_TO_32.md)
+- Phase 3 plan + Group B addendum: [PHASE3_ADMIN_UI_PLAN_WEEKS_38_TO_49.md](PHASE3_ADMIN_UI_PLAN_WEEKS_38_TO_49.md)
+- Phase 3.5 plan: [PHASE3_5_RELEASE_READINESS_PLAN_WEEKS_50_TO_54.md](PHASE3_5_RELEASE_READINESS_PLAN_WEEKS_50_TO_54.md)
+- Phase 4 plan: [PHASE4_AI_SUPPORT_SYSTEM_PLAN_WEEKS_55_TO_57.md](PHASE4_AI_SUPPORT_SYSTEM_PLAN_WEEKS_55_TO_57.md)
 - Master index: [MULTITENANT_MASTER_INDEX.md](MULTITENANT_MASTER_INDEX.md)
 - Tracking board: [PROGRAM_TRACKING_BOARD.md](PROGRAM_TRACKING_BOARD.md)
+
+

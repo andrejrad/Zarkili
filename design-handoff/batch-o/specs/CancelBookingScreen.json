@@ -1,0 +1,146 @@
+{
+  "screen": "CancelBookingScreen",
+  "route": "AdminCancelBooking",
+  "device": {
+    "type": "modal-sheet",
+    "width": 390,
+    "maxHeight": "80vh",
+    "radius": 20
+  },
+  "states": [
+    "default",
+    "feeWaived",
+    "submitting",
+    "refundIssued",
+    "error"
+  ],
+  "layout": {
+    "handle": {
+      "width": 36,
+      "height": 4
+    },
+    "header": {
+      "title": "strings.cancelAdmin.title"
+    },
+    "refundPreviewCard": {
+      "background": "surface",
+      "border": {
+        "width": 1,
+        "color": "cardBorder"
+      },
+      "radius": 12,
+      "padding": 16,
+      "rows": [
+        {
+          "label": "strings.cancelAdmin.totalPaid",
+          "value": "$X.XX",
+          "color": "foreground"
+        },
+        {
+          "label": "strings.cancelAdmin.feeRetained",
+          "value": "$Y.YY",
+          "color": "error"
+        },
+        {
+          "type": "divider"
+        },
+        {
+          "label": "strings.cancelAdmin.amountRefunded",
+          "value": "$Z.ZZ",
+          "color": "success",
+          "weight": "bold"
+        }
+      ],
+      "feeWaivedVariant": {
+        "feeRetainedRow": {
+          "value": "$0.00",
+          "strikethrough": true,
+          "badge": {
+            "label": "strings.cancelAdmin.feeWaivedBadge",
+            "color": "success"
+          }
+        },
+        "amountRefunded": "equals totalPaid"
+      }
+    },
+    "waiveFeeRow": {
+      "label": "strings.cancelAdmin.waiveFeeToggle",
+      "description": "strings.cancelAdmin.waiveFeeDesc",
+      "roleGate": {
+        "allowedRoles": [
+          "location_manager",
+          "tenant_admin"
+        ],
+        "canToggle": true,
+        "otherRoles": {
+          "icon": "lock",
+          "size": 16,
+          "tooltip": "strings.cancelAdmin.waiveFeeRoleTooltip"
+        }
+      },
+      "cardUpdateRealTime": true
+    },
+    "reasonDropdown": {
+      "required": true,
+      "options": [
+        {
+          "value": "clientRequest",
+          "label": "strings.cancelAdmin.reasonClientRequest"
+        },
+        {
+          "value": "staffUnavailable",
+          "label": "strings.cancelAdmin.reasonStaffUnavailable"
+        },
+        {
+          "value": "emergency",
+          "label": "strings.cancelAdmin.reasonEmergency"
+        },
+        {
+          "value": "clientNoShow",
+          "label": "strings.cancelAdmin.reasonNoShow"
+        },
+        {
+          "value": "other",
+          "label": "strings.cancelAdmin.reasonOther"
+        }
+      ]
+    },
+    "notifyClientToggle": {
+      "label": "strings.cancelAdmin.notifyClientLabel",
+      "defaultOn": true
+    },
+    "footer": {
+      "actions": [
+        {
+          "type": "button",
+          "label": "strings.cancelAdmin.keepBooking",
+          "variant": "secondary"
+        },
+        {
+          "type": "button",
+          "label": "strings.cancelAdmin.confirmCancel",
+          "variant": "destructive-primary"
+        }
+      ]
+    }
+  },
+  "states": {
+    "submitting": {
+      "ctaButton": {
+        "spinner": true
+      },
+      "form": {
+        "locked": true
+      }
+    },
+    "refundIssued": {
+      "toast": "strings.cancelAdmin.refundIssuedToast",
+      "action": "dismiss sheet"
+    },
+    "error": {
+      "inlineBanner": {
+        "position": "below header"
+      }
+    }
+  }
+}

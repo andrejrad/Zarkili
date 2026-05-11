@@ -1,0 +1,90 @@
+{
+  "screen": "ReplyComposerScreen",
+  "route": "AdminReplyComposer",
+  "device": {
+    "iPad": { "type": "side-panel", "width": 480 },
+    "iPhone": { "type": "modal-sheet", "width": 390 }
+  },
+  "stateNames": [
+    "draft",
+    "posted",
+    "error"
+  ],
+  "layout": {
+    "originalReview": {
+      "type": "card",
+      "background": "surface",
+      "border": { "width": 1, "color": "cardBorder" },
+      "radius": 12,
+      "padding": 16,
+      "marginBottom": 16,
+      "content": {
+        "clientAvatar": { "size": 40 },
+        "clientName": { "variant": "body-medium" },
+        "ratingStars": { "size": 16 },
+        "date": { "format": "MM/DD/YYYY" },
+        "reviewBody": { "lines": 4, "clamp": true },
+        "readMoreLink": { "label": "Read more" }
+      }
+    },
+    "templatePicker": {
+      "type": "horizontal chip-row",
+      "maxVisible": 3,
+      "overflow": { "type": "chip", "label": "+N more" },
+      "onChipTap": "fill composer with template text"
+    },
+    "composer": {
+      "type": "textarea",
+      "minHeight": "components.replyComposerMinHeight",
+      "placeholder": "strings.replyComposer.placeholder",
+      "variablePicker": {
+        "type": "iconButton",
+        "icon": "{ }",
+        "position": "above right",
+        "popover": {
+          "type": "list",
+          "items": ["{{client.firstName}}", "{{service.name}}", "{{salon.name}}"],
+          "onTap": "insert at cursor"
+        }
+      },
+      "characterCounter": {
+        "format": "NN / 1000",
+        "variant": "label-small",
+        "color": "muted",
+        "position": "below"
+      }
+    },
+    "toneHints": {
+      "label": { "text": "AI tone suggestion:", "variant": "label-small", "color": "muted" },
+      "chips": [
+        { "label": "strings.replyComposer.toneApologetic" },
+        { "label": "strings.replyComposer.toneGrateful" },
+        { "label": "strings.replyComposer.toneProfessional" }
+      ],
+      "selected": { "border": { "width": 1, "color": "primary" } },
+      "onTap": "AI rewrites composer for selected tone"
+    },
+    "saveAsTemplate": {
+      "type": "tertiary link",
+      "label": "strings.replyComposer.saveAsTemplate",
+      "position": "below composer",
+      "onClick": "expand inline name input"
+    },
+    "footer": {
+      "position": "sticky",
+      "actions": [
+        { "type": "button", "label": "strings.replyComposer.saveAsDraft", "variant": "secondary" },
+        { "type": "button", "label": "strings.replyComposer.postReply", "variant": "primary", "disabledWhen": "composer empty" }
+      ]
+    }
+  },
+  "states": {
+    "posted": {
+      "toast": "strings.replyComposer.postedToast",
+      "action": "dismiss"
+    },
+    "error": {
+      "inlineBanner": { "position": "below originalReview" }
+    }
+  }
+}

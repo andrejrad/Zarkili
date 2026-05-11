@@ -1,0 +1,65 @@
+{
+  "screen": "AdminSignInScreen",
+  "route": "SuperAdminSignIn",
+  "device": { "primary": "Mobile 375×812", "secondary": "Desktop 1280+" },
+  "stateNames": ["idle", "mfa", "locked", "error"],
+  "layout": {
+    "centered": true,
+    "maxWidth": 400,
+    "logo": { "type": "platformLogo", "position": "top-center", "marginBottom": 32 },
+    "title": { "text": "Admin Portal", "variant": "heading-2", "align": "center" },
+    "credentialsForm": {
+      "fields": [
+        { "id": "email", "type": "emailInput", "label": "strings.adminSignIn.emailLabel", "required": true, "autocomplete": "email" },
+        { "id": "password", "type": "passwordInput", "label": "strings.adminSignIn.passwordLabel", "required": true, "autocomplete": "current-password" }
+      ],
+      "footer": {
+        "cta": { "label": "strings.adminSignIn.submitCta", "variant": "filled", "fullWidth": true }
+      }
+    },
+    "mfaForm": {
+      "visibleWhen": "state === mfa",
+      "title": { "text": "strings.adminSignIn.mfaTitle", "variant": "heading-4", "align": "center" },
+      "body": { "text": "strings.adminSignIn.mfaBody", "variant": "body-medium", "align": "center", "color": "on-surface-variant" },
+      "fields": [
+        { "id": "code", "type": "otpInput", "length": 6, "numeric": true, "autoFocus": true }
+      ],
+      "alternatives": {
+        "link": { "label": "strings.adminSignIn.useBackupCodeLink", "variant": "body-medium", "align": "center" }
+      },
+      "footer": {
+        "cta": { "label": "strings.adminSignIn.verifyCodeCta", "variant": "filled", "fullWidth": true }
+      }
+    },
+    "lockedBanner": {
+      "showWhen": "state === locked",
+      "component": "InlineBanner",
+      "background": "error 10%",
+      "borderLeft": { "width": 4, "color": "error" },
+      "icon": "lockFilled",
+      "message": "strings.adminSignIn.lockedBanner"
+    },
+    "errorMessage": {
+      "showWhen": "state === error",
+      "type": "text",
+      "color": "error",
+      "variant": "body-medium",
+      "align": "center",
+      "text": "strings.adminSignIn.errorMessage"
+    }
+  },
+  "states": {
+    "mfa": {
+      "credentialsForm": { "visible": false },
+      "mfaForm": { "visible": true }
+    },
+    "locked": {
+      "credentialsForm": { "visible": true },
+      "lockedBanner": { "visible": true },
+      "submitCta": { "disabled": true }
+    },
+    "error": {
+      "errorMessage": { "visible": true }
+    }
+  }
+}

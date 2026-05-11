@@ -1,0 +1,183 @@
+{
+  "screen": "SegmentBuilderScreen",
+  "route": "/admin/segments/new",
+  "description": "Filter canvas for building client segments with live count preview",
+  "dimensions": {
+    "width": 390,
+    "height": "auto-scroll"
+  },
+  "states": [
+    "default",
+    "loading",
+    "empty",
+    "error",
+    "previewing"
+  ],
+  "accessibility": {
+    "screenReaderLabel": "strings.segmentBuilder.screenTitle",
+    "semanticRoles": [
+      {"element": "filterList", "role": "list"},
+      {"element": "filterRow", "role": "listitem"},
+      {"element": "addFilterButton", "role": "button"},
+      {"element": "previewSheet", "role": "dialog"}
+    ]
+  },
+  "rtl": "deferred",
+  "darkMode": "deferred",
+  "layout": {
+    "header": {
+      "height": 64,
+      "title": "strings.segmentBuilder.title"
+    },
+    "segmentNameInput": {
+      "height": 48,
+      "marginHorizontal": 16,
+      "marginBottom": 12,
+      "placeholder": "strings.segmentBuilder.namePlaceholder"
+    },
+    "estimatedCount": {
+      "component": "badge",
+      "marginHorizontal": 16,
+      "marginBottom": 24,
+      "label": "strings.segmentBuilder.estimatedCount"
+    },
+    "filterCanvas": {
+      "paddingHorizontal": 16,
+      "gap": 12,
+      "attributes": [
+        "location",
+        "lastVisit",
+        "totalSpend",
+        "loyaltyTier",
+        "serviceUsed",
+        "noShowCount",
+        "tag"
+      ]
+    },
+    "addFilterButton": {
+      "height": 48,
+      "marginHorizontal": 16,
+      "marginTop": 12,
+      "style": "outlined"
+    },
+    "previewSheet": {
+      "type": "bottom-sheet",
+      "maxHeight": "60vh",
+      "title": "strings.segmentBuilder.previewTitle",
+      "maxClients": 5
+    },
+    "actionBar": {
+      "height": 72,
+      "paddingHorizontal": 16,
+      "gap": 12,
+      "buttons": [
+        {
+          "label": "strings.segmentBuilder.saveSegment",
+          "style": "primary"
+        },
+        {
+          "label": "strings.segmentBuilder.runCampaign",
+          "style": "outlined"
+        }
+      ]
+    }
+  },
+  "components": [
+    {
+      "id": "navigationHeader",
+      "ref": "navigation-header",
+      "props": {
+        "showBack": true,
+        "title": "strings.segmentBuilder.title"
+      }
+    },
+    {
+      "id": "segmentNameInput",
+      "ref": "input",
+      "props": {
+        "placeholder": "strings.segmentBuilder.namePlaceholder"
+      }
+    },
+    {
+      "id": "estimatedCountBadge",
+      "ref": "badge",
+      "props": {
+        "label": "{{estimatedCount}} clients",
+        "variant": "info"
+      }
+    },
+    {
+      "id": "filterRow",
+      "ref": "segment-filter-row",
+      "props": {
+        "attribute": "{{attribute}}",
+        "operator": "{{operator}}",
+        "value": "{{value}}",
+        "onRemove": "{{onRemove}}"
+      }
+    },
+    {
+      "id": "addFilterButton",
+      "ref": "button",
+      "props": {
+        "label": "strings.segmentBuilder.addFilter",
+        "icon": "plus",
+        "variant": "outlined"
+      }
+    },
+    {
+      "id": "previewSheet",
+      "ref": "bottom-sheet",
+      "props": {
+        "title": "strings.segmentBuilder.previewTitle",
+        "isOpen": "{{isPreviewOpen}}"
+      }
+    }
+  ],
+  "interactions": [
+    {
+      "trigger": "addFilterButton.tap",
+      "action": "addFilterRow"
+    },
+    {
+      "trigger": "filterRow.remove",
+      "action": "removeFilterRow"
+    },
+    {
+      "trigger": "filterRow.change",
+      "action": "updateEstimatedCount",
+      "debounce": 500
+    },
+    {
+      "trigger": "previewButton.tap",
+      "action": "openPreviewSheet"
+    },
+    {
+      "trigger": "saveButton.tap",
+      "action": "saveSegment"
+    },
+    {
+      "trigger": "runCampaignButton.tap",
+      "action": "navigate",
+      "target": "/admin/campaigns/new?segmentId={{segmentId}}"
+    }
+  ],
+  "tokens": {
+    "used": [
+      "semantic.pageBackground",
+      "semantic.surface",
+      "semantic.cardBorder",
+      "semantic.foreground",
+      "semantic.secondaryText",
+      "semantic.primary",
+      "semantic.info"
+    ]
+  },
+  "redlines": {
+    "filterRowHeight": 48,
+    "filterRowGap": 12,
+    "inputHeight": 48,
+    "buttonHeight": 48,
+    "addFilterMarginTop": 12
+  }
+}

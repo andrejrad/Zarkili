@@ -1,0 +1,105 @@
+{
+  "schemaVersion": "1.0.0",
+  "screenId": "M.4",
+  "screenName": "BusinessProfileSettingsScreen",
+  "route": "admin/settings/business-profile",
+  "designSystem": "Zarkili v1.0.0",
+  "device": "iPad 768x1024",
+  "engineeringStatus": "delivered",
+  "description": "Form screen for owners to view and update core business identity details including legal name, EIN, and contact information.",
+  "layout": {
+    "type": "form",
+    "padding": {
+      "top": 24,
+      "right": 32,
+      "bottom": 40,
+      "left": 32
+    },
+    "maxContentWidth": 960,
+    "gap": 24
+  },
+  "sections": [
+    {
+      "id": "business-profile-form",
+      "type": "form-section",
+      "title": null,
+      "component": null,
+      "fields": [
+        {
+          "id": "businessName",
+          "type": "text-input",
+          "label": "Business name",
+          "required": true
+        },
+        {
+          "id": "einTaxId",
+          "type": "text-input",
+          "label": "EIN / Tax ID",
+          "masked": true,
+          "placeholder": "XX-XXXXXXX"
+        },
+        {
+          "id": "businessType",
+          "type": "picker",
+          "label": "Business type",
+          "options": [
+            "Sole Proprietorship",
+            "LLC",
+            "Corporation",
+            "Partnership"
+          ]
+        },
+        {
+          "id": "industry",
+          "type": "text-input",
+          "label": "Industry"
+        },
+        {
+          "id": "foundedDate",
+          "type": "date-picker",
+          "label": "Founded date",
+          "format": "MM/DD/YYYY"
+        },
+        {
+          "id": "supportEmail",
+          "type": "email-input",
+          "label": "Support email"
+        },
+        {
+          "id": "supportPhone",
+          "type": "phone-input",
+          "label": "Support phone",
+          "format": "US"
+        }
+      ]
+    },
+    {
+      "id": "sticky-footer",
+      "type": "form-section",
+      "title": null,
+      "component": null,
+      "sticky": true,
+      "buttons": [
+        {
+          "label": "Save",
+          "variant": "primary"
+        },
+        {
+          "label": "Discard",
+          "variant": "tertiary"
+        }
+      ]
+    }
+  ],
+  "stateNames": [
+    "default",
+    "editing",
+    "saving",
+    "saved",
+    "error",
+    "role-denied"
+  ],
+  "accessibility": {
+    "screenReaderLabel": "Business profile settings"
+  }
+}

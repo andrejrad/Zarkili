@@ -1,0 +1,323 @@
+{
+  "screen": "BookingDetailAdminScreen",
+  "route": "AdminBookingDetail",
+  "device": {
+    "primary": "iPad 1024×768",
+    "secondary": "iPhone 14 390×844"
+  },
+  "states": [
+    "confirmed",
+    "completed",
+    "cancelled",
+    "noShow",
+    "refunded",
+    "error"
+  ],
+  "layout": {
+    "header": {
+      "left": {
+        "type": "button",
+        "icon": "chevron-left",
+        "label": "Calendar",
+        "action": "back"
+      },
+      "center": {
+        "type": "statusPill",
+        "background": "booking.[status]Bg",
+        "color": "booking.[status]",
+        "label": "strings.bookingDetail.statusLabel"
+      },
+      "right": {
+        "elements": [
+          {
+            "type": "label",
+            "text": "bookingNumber",
+            "variant": "mono caption"
+          },
+          {
+            "type": "menu",
+            "icon": "kebab",
+            "options": [
+              {
+                "label": "strings.bookingDetail.print",
+                "action": "print"
+              },
+              {
+                "label": "strings.bookingDetail.copyId",
+                "action": "copyId"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "tabs": {
+      "options": [
+        {
+          "value": "overview",
+          "label": "strings.bookingDetail.tabOverview"
+        },
+        {
+          "value": "timeline",
+          "label": "strings.bookingDetail.tabTimeline"
+        },
+        {
+          "value": "customer",
+          "label": "strings.bookingDetail.tabCustomer"
+        },
+        {
+          "value": "notes",
+          "label": "strings.bookingDetail.tabNotes"
+        }
+      ],
+      "activeUnderline": {
+        "width": 2,
+        "color": "primary"
+      }
+    }
+  },
+  "tabs": {
+    "overview": {
+      "clientRow": {
+        "avatar": {
+          "size": 48
+        },
+        "clientName": {
+          "variant": "body-large"
+        },
+        "phone": {
+          "variant": "caption",
+          "format": "US"
+        },
+        "onTap": {
+          "navigate": "ClientDetail"
+        }
+      },
+      "infoGrid": {
+        "columns": 2,
+        "border": {
+          "width": 1,
+          "color": "cardBorder"
+        },
+        "radius": 16,
+        "fields": [
+          {
+            "key": "location",
+            "label": "strings.bookingDetail.location"
+          },
+          {
+            "key": "service",
+            "label": "strings.bookingDetail.service"
+          },
+          {
+            "key": "staff",
+            "label": "strings.bookingDetail.staff"
+          },
+          {
+            "key": "date",
+            "label": "strings.bookingDetail.date",
+            "format": "MM/DD/YYYY"
+          },
+          {
+            "key": "time",
+            "label": "strings.bookingDetail.time",
+            "format": "h:mm AM"
+          },
+          {
+            "key": "duration",
+            "label": "strings.bookingDetail.duration",
+            "format": "N min"
+          },
+          {
+            "key": "price",
+            "label": "strings.bookingDetail.price",
+            "format": "USD"
+          },
+          {
+            "key": "paymentStatus",
+            "label": "strings.bookingDetail.paymentStatus"
+          }
+        ]
+      },
+      "paymentCard": {
+        "background": "surface",
+        "border": {
+          "width": 1,
+          "color": "cardBorder"
+        },
+        "radius": 16,
+        "fields": [
+          {
+            "type": "cardBrandIcon"
+          },
+          {
+            "type": "last4"
+          },
+          {
+            "type": "amount",
+            "format": "USD"
+          },
+          {
+            "type": "statusBadge"
+          }
+        ]
+      }
+    },
+    "timeline": {
+      "component": "audit-timeline-row",
+      "type": "FlatList",
+      "order": "chronological",
+      "events": [
+        "pending",
+        "confirmed",
+        "reminderSent",
+        "checkedIn",
+        "completed",
+        "tipAdded",
+        "reviewLeft",
+        "cancelled",
+        "rescheduled",
+        "noShow"
+      ]
+    },
+    "customer": {
+      "kpiRow": {
+        "type": "chips",
+        "count": 4,
+        "items": [
+          {
+            "label": "strings.bookingDetail.totalVisits",
+            "value": "totalVisits"
+          },
+          {
+            "label": "strings.bookingDetail.totalSpend",
+            "value": "totalSpend",
+            "format": "USD"
+          },
+          {
+            "label": "strings.bookingDetail.avgRating",
+            "value": "avgRating",
+            "format": "stars"
+          },
+          {
+            "label": "strings.bookingDetail.lastVisit",
+            "value": "lastVisit",
+            "format": "MM/DD/YYYY"
+          }
+        ]
+      },
+      "visitList": {
+        "max": 5,
+        "rowHeight": 56,
+        "cells": [
+          {
+            "field": "date",
+            "format": "MM/DD/YYYY"
+          },
+          {
+            "field": "service"
+          },
+          {
+            "field": "amount",
+            "format": "USD",
+            "position": "right"
+          },
+          {
+            "field": "statusPill"
+          }
+        ]
+      }
+    },
+    "notes": {
+      "noteList": {
+        "order": "chronological",
+        "row": {
+          "avatar": {
+            "size": 24
+          },
+          "authorName": {
+            "variant": "label-small"
+          },
+          "timestamp": {
+            "variant": "caption"
+          },
+          "body": {
+            "variant": "body"
+          }
+        }
+      },
+      "addNote": {
+        "type": "textarea",
+        "position": "bottom pinned",
+        "placeholder": "strings.bookingDetail.addNotePlaceholder",
+        "action": {
+          "type": "button",
+          "label": "strings.bookingDetail.save"
+        }
+      }
+    }
+  },
+  "actionRow": {
+    "position": "fixed bottom",
+    "height": 64,
+    "background": "surface",
+    "borderTop": {
+      "width": 1,
+      "color": "border"
+    },
+    "actions": [
+      {
+        "key": "reschedule",
+        "label": "strings.bookingDetail.actionReschedule"
+      },
+      {
+        "key": "cancel",
+        "label": "strings.bookingDetail.actionCancel"
+      },
+      {
+        "key": "markNoShow",
+        "label": "strings.bookingDetail.actionNoShow"
+      },
+      {
+        "key": "refund",
+        "label": "strings.bookingDetail.actionRefund"
+      },
+      {
+        "key": "message",
+        "label": "strings.bookingDetail.actionMessage"
+      },
+      {
+        "key": "rebook",
+        "label": "strings.bookingDetail.actionRebook"
+      }
+    ],
+    "disableRules": {
+      "completed": {
+        "disable": [
+          "reschedule",
+          "cancel",
+          "markNoShow"
+        ]
+      },
+      "cancelled": {
+        "disable": [
+          "reschedule",
+          "cancel",
+          "markNoShow"
+        ]
+      },
+      "noShow": {
+        "disable": [
+          "reschedule",
+          "cancel",
+          "markNoShow"
+        ]
+      },
+      "noPayment": {
+        "disable": [
+          "refund"
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,65 @@
+{
+  "screen": "RevenueDashboardScreen",
+  "route": "/admin/analytics/revenue",
+  "description": "Primary analytics landing screen with revenue KPIs, trend charts, service/staff breakdowns, and goal tracking",
+  "platform": "admin-desktop",
+  "dimensions": { "width": 1280, "contentWidth": "calc(1280 - 240px sidebar)" },
+  "states": ["default", "loading", "empty", "error"],
+  "accessibility": {
+    "screenReaderLabel": "strings.revenueDashboard.screenTitle",
+    "semanticRoles": [
+      { "element": "kpiGrid", "role": "grid" },
+      { "element": "chartCard", "role": "img" }
+    ]
+  },
+  "rtl": "deferred",
+  "darkMode": "deferred",
+  "layout": {
+    "header": {
+      "component": "AdminHeader",
+      "title": "strings.revenueDashboard.title",
+      "rightActions": [
+        { "component": "DateRangePicker", "defaultRange": "last 30 days" },
+        { "component": "SecondaryButton", "label": "strings.revenueDashboard.exportButton" }
+      ]
+    },
+    "body": {
+      "padding": 24,
+      "scrollable": true,
+      "kpiRow": {
+        "tiles": 6,
+        "width": "1/6 each",
+        "metrics": [
+          "Total Revenue",
+          "Avg Transaction Value",
+          "Gross Margin %",
+          "New vs Returning Revenue ratio",
+          "Refund Rate %",
+          "Revenue vs Goal progress"
+        ]
+      },
+      "row2": {
+        "layout": "2 columns equal",
+        "left": "LineChartCard: Revenue Over Time (current vs prior, 2 series)",
+        "right": "LineChartCard: Avg Transaction Value Trend"
+      },
+      "row3": {
+        "layout": "2 columns equal",
+        "left": "BarChartCard: Revenue by Day of Week (vertical, 7 bars)",
+        "right": "BarChartCard: Revenue by Hour of Day (vertical, 24 bars)"
+      },
+      "row4": {
+        "layout": "2 columns equal",
+        "left": "BarChartCard: Top 10 Services by Revenue (horizontal)",
+        "right": "BarChartCard: Top 10 Staff by Revenue (horizontal)"
+      }
+    }
+  },
+  "components": [
+    { "id": "adminHeader", "ref": "AdminHeader", "props": { "title": "strings.revenueDashboard.title" } },
+    { "id": "dateRangePicker", "ref": "DateRangePicker", "props": { "defaultRange": "last30days" } },
+    { "id": "revenueOverTimeChart", "ref": "LineChartCard", "props": { "title": "strings.revenueDashboard.chartRevenueOverTime", "data": "{{revenueData}}", "seriesLabels": ["Current Period", "Prior Period"] } },
+    { "id": "topServicesChart", "ref": "BarChartCard", "props": { "title": "strings.revenueDashboard.chartTopServices", "orientation": "horizontal", "data": "{{topServicesData}}" } }
+  ],
+  "strings": "See strings/en-us.json for revenueDashboard keys"
+}

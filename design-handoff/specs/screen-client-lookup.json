@@ -1,0 +1,458 @@
+{
+  "source": {
+    "batch": "G",
+    "prompt": "G.4.1",
+    "figmaFrames": [
+      "G-4-lookup-default",
+      "G-4-lookup-no-results",
+      "G-4-lookup-loading",
+      "G-4-lookup-error"
+    ],
+    "lockedAt": "2026-04-28",
+    "referenceImpl": "design-handoff/reference/ClientLookupScreen.tsx",
+    "primaryDevice": "iPhone 14 (390×844)"
+  },
+  "screen": "ClientLookup",
+  "version": "1.0.0",
+  "device": {
+    "primary": {
+      "name": "iPhone 14",
+      "width": 390,
+      "height": 844,
+      "safeArea": { "top": 47, "bottom": 34 }
+    }
+  },
+  "description": "Staff-facing client directory with search, filter, and sort. Gateway to ClientDetail.",
+  "userPersona": "Authenticated staff member (front desk / manager)",
+  "userJob": "Find a client quickly by name, phone, or email; filter by status; navigate to full client detail",
+  "states": {
+    "G-4-lookup-default": {
+      "description": "Client list loaded, search empty, filter 'All', sorted by Recent Visit"
+    },
+    "G-4-lookup-no-results": {
+      "description": "Search query returns 0 matches — shows Search icon + query echo + Clear CTA"
+    },
+    "G-4-lookup-loading": {
+      "description": "Async fetch in-flight — 7 shimmer skeleton rows"
+    },
+    "G-4-lookup-error": {
+      "description": "Network/server error — WifiOff icon + Retry CTA"
+    }
+  },
+  "layout": {
+    "background": "#F2EDDD",
+    "sections": [
+      {
+        "name": "header",
+        "type": "sticky",
+        "height": 56,
+        "background": "#F2EDDD",
+        "borderBottom": { "width": 1, "color": "#E5E0D1" },
+        "zIndex": 20
+      },
+      {
+        "name": "sortDropdown",
+        "type": "absolute-overlay",
+        "position": { "top": 56, "right": 16 },
+        "zIndex": 50,
+        "visible": "{{showSort}}"
+      },
+      {
+        "name": "searchBar",
+        "type": "static",
+        "paddingHorizontal": 16,
+        "paddingTop": 12
+      },
+      {
+        "name": "filterChips",
+        "type": "static",
+        "horizontalScroll": true,
+        "paddingHorizontal": 16,
+        "paddingVertical": 10,
+        "scrollbarVisible": false
+      },
+      {
+        "name": "countRow",
+        "type": "static",
+        "paddingHorizontal": 16,
+        "paddingBottom": 6,
+        "visibleStates": ["G-4-lookup-default"]
+      },
+      {
+        "name": "clientList",
+        "type": "scrollable",
+        "flex": 1,
+        "background": "#F2EDDD",
+        "role": "list",
+        "ariaLabel": "Client list"
+      }
+    ]
+  },
+  "components": {
+    "header": {
+      "height": 56,
+      "paddingHorizontal": 16,
+      "background": "#F2EDDD",
+      "borderBottom": { "width": 1, "color": "#E5E0D1" },
+      "structure": { "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" },
+      "left": {
+        "backButton": {
+          "icon": "chevron-left",
+          "iconSize": 24,
+          "color": "#1A1A1A",
+          "touchTarget": 44
+        },
+        "title": {
+          "content": "Clients",
+          "style": "heading-3",
+          "color": "#1A1A1A"
+        }
+      },
+      "right": {
+        "sortButton": {
+          "icon": "arrow-up-down",
+          "iconSize": 22,
+          "color": "#1A1A1A",
+          "touchTarget": 44,
+          "accessibilityLabel": "Sort clients"
+        },
+        "refreshButton": {
+          "icon": "refresh-cw",
+          "iconSize": 20,
+          "color": "#E3A9A0",
+          "touchTarget": 44,
+          "accessibilityLabel": "Refresh client list",
+          "animation": {
+            "trigger": "onRefresh",
+            "type": "spin",
+            "duration": "1s",
+            "timing": "linear",
+            "iterations": "infinite while refreshing"
+          }
+        }
+      }
+    },
+    "sortDropdown": {
+      "background": "#FFFFFF",
+      "borderRadius": 16,
+      "border": { "width": 1, "color": "#E5E0D1" },
+      "shadow": "0 4px 24px rgba(0,0,0,0.12)",
+      "minWidth": 168,
+      "overflow": "hidden",
+      "options": [
+        { "key": "name", "label": "Name A–Z" },
+        { "key": "last-visit", "label": "Recent Visit" },
+        { "key": "ltv", "label": "Top Spenders" }
+      ],
+      "option": {
+        "height": 44,
+        "paddingHorizontal": 16,
+        "style": "body",
+        "color": "#1A1A1A",
+        "borderBottom": { "width": 1, "color": "#E5E0D1" },
+        "lastOptionBorder": "none"
+      },
+      "selectedOption": {
+        "background": "rgba(227,169,160,0.1)",
+        "fontWeight": 600,
+        "color": "#E3A9A0",
+        "trailingIcon": { "name": "check", "size": 16, "color": "#E3A9A0" }
+      }
+    },
+    "searchBar": {
+      "height": 44,
+      "borderRadius": 9999,
+      "background": "#FFFFFF",
+      "border": { "default": "1px solid #E5E0D1", "focus": "1px solid #E3A9A0" },
+      "paddingHorizontal": 14,
+      "structure": { "flexDirection": "row", "alignItems": "center", "gap": 10 },
+      "leadingIcon": { "name": "search", "size": 18, "color": "#6B6B6B" },
+      "input": {
+        "placeholder": "Search clients…",
+        "style": "body",
+        "color": "#1A1A1A",
+        "ariaLabel": "Search clients by name, phone, or email"
+      },
+      "clearButton": {
+        "icon": "x",
+        "size": 18,
+        "color": "#6B6B6B",
+        "touchTarget": 44,
+        "visible": "{{search.length > 0}}",
+        "accessibilityLabel": "Clear search"
+      }
+    },
+    "filterChips": {
+      "chips": [
+        { "key": "all", "label": "All", "showCount": false },
+        { "key": "vip", "label": "VIP", "showCount": true },
+        { "key": "recent", "label": "Recent", "showCount": true },
+        { "key": "no-shows", "label": "No-shows", "showCount": true },
+        { "key": "inactive", "label": "Inactive", "showCount": true }
+      ],
+      "chip": {
+        "height": 32,
+        "paddingHorizontal": 12,
+        "borderRadius": 9999,
+        "style": "body-small",
+        "default": {
+          "background": "#FFFFFF",
+          "border": "1px solid #E5E0D1",
+          "color": "#1A1A1A"
+        },
+        "active": {
+          "background": "#E3A9A0",
+          "border": "1px solid #E3A9A0",
+          "color": "#FFFFFF",
+          "leadingIcon": { "name": "check", "size": 13 }
+        },
+        "countBadge": {
+          "height": 16,
+          "minWidth": 16,
+          "paddingHorizontal": 4,
+          "borderRadius": 9999,
+          "default": { "background": "#E5E0D1", "color": "#6B6B6B" },
+          "active": { "background": "rgba(255,255,255,0.3)", "color": "#FFFFFF" },
+          "style": "label-small"
+        }
+      }
+    },
+    "clientRow": {
+      "minHeight": 68,
+      "paddingHorizontal": 16,
+      "paddingVertical": 12,
+      "background": "#FFFFFF",
+      "borderBottom": { "width": 1, "color": "#E5E0D1" },
+      "structure": { "flexDirection": "row", "alignItems": "center", "gap": 12 },
+      "accessibility": {
+        "role": "button",
+        "label": "View {{name}}, {{tier}} tier, last visit {{lastVisit}}"
+      },
+      "avatar": {
+        "size": 40,
+        "borderRadius": 9999,
+        "background": "nameHash → AVATAR_PALETTE",
+        "initials": {
+          "style": "body-small",
+          "fontWeight": 600,
+          "color": "#FFFFFF"
+        }
+      },
+      "body": {
+        "flex": 1,
+        "minWidth": 0,
+        "nameRow": {
+          "flexDirection": "row",
+          "alignItems": "center",
+          "gap": 6,
+          "name": { "style": "body", "fontWeight": 500, "color": "#1A1A1A", "truncate": true },
+          "vipBadge": {
+            "visible": "{{isVIP}}",
+            "icon": "star",
+            "size": 14,
+            "color": "#F59E0B",
+            "accessibilityLabel": "VIP client"
+          },
+          "noShowBadge": {
+            "visible": "{{noShows > 0}}",
+            "content": "NS",
+            "style": "label-small",
+            "background": "rgba(255,152,0,0.1)",
+            "color": "#FF9800",
+            "paddingHorizontal": 5,
+            "height": 16,
+            "borderRadius": 4
+          }
+        },
+        "metaRow": {
+          "flexDirection": "row",
+          "alignItems": "center",
+          "gap": 6,
+          "marginTop": 3,
+          "lastVisit": { "style": "body-small", "color": "#6B6B6B", "format": "MM/DD/YYYY" },
+          "separator": { "width": 3, "height": 3, "borderRadius": 9999, "background": "#6B6B6B" },
+          "ltv": { "style": "body-small", "color": "#6B6B6B", "format": "${{value}} (abbrev $Xk above 1000)" }
+        }
+      },
+      "right": {
+        "tierBadge": "TierBadge (small variant)"
+      }
+    },
+    "tierBadge": {
+      "variants": {
+        "Bronze":   { "background": "#FBE8D8", "color": "#8B4513" },
+        "Silver":   { "background": "#EBEBEB", "color": "#5A5A5A" },
+        "Gold":     { "background": "#FFF4D6", "color": "#9B7000" },
+        "Platinum": { "background": "#EDE7F6", "color": "#5E35B1" }
+      },
+      "default": { "height": 22, "paddingHorizontal": 8, "borderRadius": 9999, "style": "label-small", "fontWeight": 600 },
+      "small": { "height": 20, "paddingHorizontal": 7, "fontSize": 10 }
+    },
+    "skeletonRow": {
+      "count": 7,
+      "minHeight": 68,
+      "paddingHorizontal": 16,
+      "paddingVertical": 12,
+      "borderBottom": { "width": 1, "color": "#E5E0D1" },
+      "structure": { "flexDirection": "row", "alignItems": "center", "gap": 12 },
+      "avatar": { "width": 40, "height": 40, "borderRadius": 9999, "shimmer": true },
+      "body": {
+        "flex": 1,
+        "lines": [
+          { "height": 16, "borderRadius": 8, "width": "55%", "shimmer": true },
+          { "height": 12, "borderRadius": 8, "width": "80%", "shimmer": true, "marginTop": 6 }
+        ]
+      },
+      "right": { "width": 48, "height": 20, "borderRadius": 9999, "shimmer": true }
+    },
+    "noResultsState": {
+      "position": "center",
+      "paddingHorizontal": 32,
+      "textAlign": "center",
+      "icon": { "name": "search", "size": 56, "color": "#6B6B6B", "strokeWidth": 1.25 },
+      "title": { "content": "No clients found", "style": "heading-2", "color": "#1A1A1A", "marginTop": 20 },
+      "body": {
+        "content": "No results for '{{query}}'. Try a different name, phone, or email.",
+        "style": "body",
+        "color": "#6B6B6B",
+        "marginTop": 8
+      },
+      "cta": {
+        "content": "Clear search",
+        "paddingHorizontal": 24,
+        "paddingVertical": 12,
+        "borderRadius": 12,
+        "background": "transparent",
+        "border": "1.5px solid #E3A9A0",
+        "color": "#E3A9A0",
+        "style": "label",
+        "minHeight": 44,
+        "marginTop": 20
+      }
+    },
+    "emptyState": {
+      "position": "center",
+      "paddingHorizontal": 32,
+      "textAlign": "center",
+      "icon": { "name": "users", "size": 64, "color": "#6B6B6B", "strokeWidth": 1.25 },
+      "title": { "content": "No clients yet", "style": "heading-2", "color": "#1A1A1A", "marginTop": 24 },
+      "body": {
+        "content": "Client profiles appear here once they've visited your salon.",
+        "style": "body",
+        "color": "#6B6B6B",
+        "marginTop": 8
+      }
+    },
+    "errorState": {
+      "position": "center",
+      "paddingHorizontal": 32,
+      "textAlign": "center",
+      "icon": { "name": "wifi-off", "size": 64, "color": "#6B6B6B", "strokeWidth": 1.25 },
+      "title": { "content": "Couldn't load clients", "style": "heading-2", "color": "#1A1A1A", "marginTop": 24 },
+      "body": { "content": "Check your connection and try again.", "style": "body", "color": "#6B6B6B", "marginTop": 8 },
+      "retryButton": {
+        "content": "Retry",
+        "background": "#E3A9A0",
+        "color": "#FFFFFF",
+        "paddingHorizontal": 24,
+        "paddingVertical": 12,
+        "borderRadius": 12,
+        "minHeight": 44,
+        "marginTop": 20
+      }
+    }
+  },
+  "interactions": {
+    "searchInput": {
+      "onChange": "Filter list in real time, show/hide × clear button"
+    },
+    "filterChip": {
+      "tap": "Set active filter, recompute visible list"
+    },
+    "sortButton": {
+      "tap": "Toggle sort dropdown"
+    },
+    "sortOption": {
+      "tap": "Set sort key, close dropdown"
+    },
+    "clientRow": {
+      "tap": "Navigate to ClientDetail screen with clientId"
+    },
+    "refreshButton": {
+      "tap": "Trigger pull-to-refresh, spin icon for 1.5s"
+    },
+    "clearSearch": {
+      "tap": "Clear search input, restore full list"
+    }
+  },
+  "dataModel": {
+    "clientSummary": {
+      "id": "string",
+      "name": "string",
+      "initials": "string (2 chars, derived)",
+      "lastVisit": "string (MM/DD/YYYY)",
+      "lifetimeValue": "number (USD)",
+      "visits": "number",
+      "noShows": "number",
+      "tier": "Bronze | Silver | Gold | Platinum",
+      "phone": "string ((XXX) XXX-XXXX)",
+      "email": "string",
+      "isVIP": "boolean",
+      "isInactive": "boolean"
+    }
+  },
+  "filterLogic": {
+    "vip": "isVIP === true",
+    "recent": "daysSince(lastVisit) <= 30",
+    "no-shows": "noShows > 0",
+    "inactive": "isInactive === true"
+  },
+  "sortLogic": {
+    "name": "localeCompare A–Z",
+    "last-visit": "parseMDY(lastVisit) descending",
+    "ltv": "lifetimeValue descending"
+  },
+  "avatarColors": {
+    "palette": ["#E3A9A0", "#BBEDDA", "#D1BFB3", "#A8C5BD", "#C4A49B", "#9ED3C0", "#B8D4CE", "#E8C4C0"],
+    "algorithm": "djb2 hash of clientName → index mod 8"
+  },
+  "usLocale": {
+    "dateFormat": "MM/DD/YYYY",
+    "currency": "USD ($X or $Xk)",
+    "phone": "(XXX) XXX-XXXX"
+  },
+  "accessibility": {
+    "standard": "WCAG 2.1 AA",
+    "minTouchTarget": "44×44px",
+    "list": { "role": "list", "ariaLabel": "Client list" },
+    "clientRow": { "role": "button", "ariaLabel": "View {{name}}, {{tier}} tier, last visit {{lastVisit}}" },
+    "filterChip": { "ariaPressedState": true },
+    "sortOption": { "ariaPressedState": true },
+    "decorativeIcons": "aria-hidden=true",
+    "searchInput": { "ariaLabel": "Search clients by name, phone, or email" }
+  },
+  "transitions": {
+    "listFilter": { "type": "instant-rerender" },
+    "sortDropdown": { "type": "fade-in", "duration": "150ms" },
+    "refreshSpin": { "duration": "1s", "timing": "linear", "iterations": "infinite while active" },
+    "shimmer": { "duration": "1500ms", "timing": "linear", "iterations": "infinite" }
+  },
+  "usage": {
+    "navigation": {
+      "from": ["Profile → Staff Tools → Client Lookup"],
+      "to": ["ClientDetail screen (tap client row)"]
+    },
+    "rules": [
+      "Search filters name, phone, and email fields simultaneously",
+      "Filter chips and search are combinable (AND logic)",
+      "Sort persists across filter changes within the same session",
+      "VIP badge: gold star inline with name",
+      "No-show badge: amber 'NS' pill inline with name when noShows > 0",
+      "Inactive badge shown in Inactive filter but not on row (row uses tier badge only)",
+      "LTV formatted as $1.2k above $999, else $NNN",
+      "Pull-to-refresh indicator shown at top of list during refresh",
+      "Sort dropdown dismissed by tapping outside",
+      "All touch targets minimum 44×44px"
+    ]
+  }
+}

@@ -1,0 +1,154 @@
+{
+  "screen": "AiContentApprovalQueueScreen",
+  "route": "/admin/campaigns/ai-queue",
+  "description": "Review and approve AI-generated campaign content",
+  "dimensions": {
+    "width": 390,
+    "height": "auto-scroll"
+  },
+  "states": [
+    "default",
+    "loading",
+    "empty",
+    "error"
+  ],
+  "accessibility": {
+    "screenReaderLabel": "strings.aiApprovalQueue.screenTitle",
+    "semanticRoles": [
+      {"element": "queueList", "role": "list"},
+      {"element": "queueRow", "role": "listitem"},
+      {"element": "approveButton", "role": "button", "hint": "strings.aiApprovalQueue.approveHint"},
+      {"element": "rejectButton", "role": "button", "hint": "strings.aiApprovalQueue.rejectHint"}
+    ]
+  },
+  "rtl": "deferred",
+  "darkMode": "deferred",
+  "layout": {
+    "header": {
+      "height": 64,
+      "title": "strings.aiApprovalQueue.title",
+      "rightAction": {
+        "label": "strings.aiApprovalQueue.bulkApprove",
+        "style": "primary"
+      }
+    },
+    "queueList": {
+      "rowHeight": 120,
+      "paddingHorizontal": 16,
+      "gap": 12,
+      "dividerColor": "semantic.cardBorder",
+      "dividerThickness": 0.5
+    },
+    "queueRow": {
+      "height": 120,
+      "paddingHorizontal": 12,
+      "paddingVertical": 12,
+      "columns": [
+        {
+          "component": "channelIcon",
+          "width": 32,
+          "height": 32
+        },
+        {
+          "component": "info",
+          "flex": 1,
+          "children": [
+            "campaignName",
+            "snippet",
+            "aiModel",
+            "generatedAt"
+          ]
+        },
+        {
+          "component": "statusBadge",
+          "width": "auto"
+        }
+      ],
+      "actions": {
+        "height": 44,
+        "gap": 8,
+        "buttons": [
+          {
+            "label": "strings.aiApprovalQueue.approve",
+            "style": "success",
+            "icon": "check"
+          },
+          {
+            "label": "strings.aiApprovalQueue.reject",
+            "style": "destructive",
+            "icon": "x"
+          },
+          {
+            "label": "strings.aiApprovalQueue.edit",
+            "style": "outlined",
+            "icon": "edit"
+          }
+        ]
+      }
+    }
+  },
+  "components": [
+    {
+      "id": "navigationHeader",
+      "ref": "navigation-header",
+      "props": {
+        "showBack": true,
+        "title": "strings.aiApprovalQueue.title",
+        "rightAction": {
+          "label": "strings.aiApprovalQueue.bulkApprove"
+        }
+      }
+    },
+    {
+      "id": "queueRow",
+      "ref": "list-row",
+      "props": {
+        "channelIcon": "{{channelIcon}}",
+        "campaignName": "{{campaignName}}",
+        "snippet": "{{snippet}}",
+        "aiModel": "{{aiModel}}",
+        "generatedAt": "{{generatedAt}}",
+        "statusBadge": "{{status}}"
+      }
+    }
+  ],
+  "interactions": [
+    {
+      "trigger": "approveButton.tap",
+      "action": "approveContent"
+    },
+    {
+      "trigger": "rejectButton.tap",
+      "action": "rejectContent"
+    },
+    {
+      "trigger": "editButton.tap",
+      "action": "navigate",
+      "target": "/admin/campaigns/templates/:id/edit"
+    },
+    {
+      "trigger": "bulkApproveButton.tap",
+      "action": "bulkApprove"
+    }
+  ],
+  "tokens": {
+    "used": [
+      "semantic.pageBackground",
+      "semantic.surface",
+      "semantic.cardBorder",
+      "semantic.foreground",
+      "semantic.secondaryText",
+      "semantic.success",
+      "semantic.error",
+      "semantic.primary"
+    ]
+  },
+  "redlines": {
+    "queueRowHeight": 120,
+    "channelIconSize": 32,
+    "actionButtonHeight": 44,
+    "actionButtonGap": 8,
+    "snippetMaxLines": 2,
+    "gap": 12
+  }
+}

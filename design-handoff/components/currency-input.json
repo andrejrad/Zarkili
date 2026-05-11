@@ -1,0 +1,109 @@
+{
+  "component": "CurrencyInput",
+  "batchId": "D.3",
+  "description": "Controlled numeric text input for USD tip or payment amounts. Fixed leading '$' glyph, decimal-pad keyboard, 2-decimal-place clamping, optional helper/error text beneath.",
+  "sourceFile": "src/shared/ui/CurrencyInput.tsx",
+  "variants": {
+    "state": {
+      "options": ["default", "focused", "error", "disabled"],
+      "default": "default"
+    }
+  },
+  "dimensions": {
+    "fieldHeight": 56,
+    "paddingHorizontal": 16,
+    "borderRadius": 12,
+    "dollarSignWidth": 20,
+    "inputFlex": 1,
+    "helperTextMarginTop": 4
+  },
+  "states": {
+    "default": {
+      "background": "#FFFFFF",
+      "borderWidth": 1,
+      "borderColor": "#E5E0D1",
+      "dollarColor": "#6B6B6B",
+      "inputColor": "#1A1A1A"
+    },
+    "focused": {
+      "background": "#FFFFFF",
+      "borderWidth": 2,
+      "borderColor": "#E3A9A0",
+      "dollarColor": "#6B6B6B",
+      "inputColor": "#1A1A1A"
+    },
+    "error": {
+      "background": "#FFFFFF",
+      "borderWidth": 1,
+      "borderColor": "#D9534F",
+      "dollarColor": "#D9534F",
+      "inputColor": "#1A1A1A",
+      "helperTextColor": "#D9534F"
+    },
+    "disabled": {
+      "background": "#F5F5F5",
+      "borderColor": "#E5E0D1",
+      "opacity": 0.6
+    }
+  },
+  "elements": {
+    "dollarGlyph": {
+      "type": "text",
+      "content": "$",
+      "fontSize": 18,
+      "fontWeight": "500",
+      "color": "#6B6B6B",
+      "lineHeight": 24
+    },
+    "textInput": {
+      "type": "TextInput",
+      "keyboardType": "decimal-pad",
+      "inputMode": "decimal",
+      "placeholder": "0.00",
+      "placeholderColor": "#6B6B6B",
+      "fontSize": 18,
+      "lineHeight": 24,
+      "fontWeight": "400",
+      "color": "#1A1A1A",
+      "textAlign": "left",
+      "flex": 1,
+      "autoFocus": "optional prop"
+    },
+    "helperText": {
+      "type": "text",
+      "showWhen": "helperText is set and no errorText",
+      "fontSize": 12,
+      "lineHeight": 16,
+      "color": "#6B6B6B",
+      "marginTop": 4
+    },
+    "errorText": {
+      "type": "text",
+      "showWhen": "errorText is set",
+      "fontSize": 12,
+      "lineHeight": 16,
+      "color": "#D9534F",
+      "marginTop": 4
+    }
+  },
+  "behavior": {
+    "sanitization": "Strips all characters except digits and '.'; allows only one decimal point; clamps to 2 decimal places",
+    "valueEmission": "onChangeText emits sanitized string; onChangeValue emits numeric (NaN if unparseable)",
+    "autoFocus": "Supported via autoFocus prop — used by TippingScreen custom amount field"
+  },
+  "tokens": {
+    "surface": "#FFFFFF",
+    "border": "#E5E0D1",
+    "borderFocused": "#E3A9A0",
+    "borderError": "#D9534F",
+    "foreground": "#1A1A1A",
+    "textMuted": "#6B6B6B",
+    "error": "#D9534F",
+    "cornerRadius": 12,
+    "fieldHeight": 56
+  },
+  "accessibility": {
+    "inputLabel": "Amount in US dollars",
+    "accessibilityValue": "{ text: '$X.XX' } when numeric value is defined"
+  }
+}

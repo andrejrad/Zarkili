@@ -1,0 +1,98 @@
+{
+  "schemaVersion": "1.0.0",
+  "componentId": "MC.4",
+  "componentName": "DocumentUploadTile",
+  "exportedAs": "DocumentUploadTile",
+  "category": "admin-form",
+  "description": "Status-aware drag-and-drop file upload tile used for legal docs, Connect verification, and brand logo.",
+  "props": {
+    "label": {
+      "type": "string",
+      "required": true,
+      "description": "Display label shown above the upload zone"
+    },
+    "accept": {
+      "type": "string",
+      "required": false,
+      "description": "MIME types accepted, e.g. 'image/png,image/svg+xml'"
+    },
+    "multiple": {
+      "type": "boolean",
+      "required": false,
+      "default": false,
+      "description": "Allows selecting multiple files when true"
+    },
+    "maxSizeMb": {
+      "type": "number",
+      "required": false,
+      "default": 10,
+      "description": "Maximum file size in megabytes"
+    },
+    "value": {
+      "type": "UploadedFile[] | null",
+      "required": false,
+      "description": "Currently uploaded file objects"
+    },
+    "onUpload": {
+      "type": "(files: File[]) => void",
+      "required": false,
+      "description": "Callback when files are selected or dropped"
+    },
+    "onRemove": {
+      "type": "(file: UploadedFile) => void",
+      "required": false,
+      "description": "Callback when a user removes an uploaded file"
+    },
+    "required": {
+      "type": "boolean",
+      "required": false,
+      "default": false,
+      "description": "Marks the upload as mandatory in a form context"
+    },
+    "loading": {
+      "type": "boolean",
+      "required": false,
+      "default": false,
+      "description": "Shows upload progress bar when true"
+    },
+    "error": {
+      "type": "string | null",
+      "required": false,
+      "default": null,
+      "description": "Error message displayed in error state"
+    }
+  },
+  "tokens": {
+    "borderColor": "admin.border",
+    "bg": "surface",
+    "uploadIcon": "text.muted",
+    "progressFill": "accent",
+    "errorColor": "admin.danger"
+  },
+  "anatomy": [
+    "container (1px dashed border radius medium 12, padding 20)",
+    "idle-zone (cloud-upload icon 32 + label body-small + browse-button tertiary)",
+    "progress-bar (full width, accent fill)",
+    "uploaded-row (file-icon 24 + name truncated + size label-small muted + check-chip + remove-icon 44x44)",
+    "error-chip (admin.danger label-small)"
+  ],
+  "sizes": [
+    {
+      "name": "default",
+      "width": "100%",
+      "height": 80,
+      "note": "minHeight; grows with uploaded files"
+    }
+  ],
+  "stateNames": [
+    "idle",
+    "uploading",
+    "uploaded",
+    "error"
+  ],
+  "accessibility": {
+    "role": "button",
+    "ariaLabel": "Upload {{label}}",
+    "uploadedAriaLabel": "{{fileName}} uploaded"
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "delta": "colors-batch-p",
+  "note": "No new brand colors — all values reference locked Zarkili system",
+  "semantic": {
+    "admin": {
+      "tableHeaderBg": "#F7F4EC",
+      "tableRowAlt": "#FAF8F4",
+      "bulkActionBarBg": "#1A1A1A",
+      "bulkActionBarText": "#FFFFFF",
+      "auditRowBg": "#FAF8F4"
+    },
+    "campaign": {
+      "statusDraft": "#9CA3AF",
+      "statusScheduled": "#2196F3",
+      "statusSending": "#FF9800",
+      "statusSent": "#4CAF50",
+      "statusArchived": "#9CA3AF",
+      "statusFailed": "#F44336"
+    },
+    "compliance": {
+      "passed": "#4CAF50",
+      "failedBlocking": "#F44336",
+      "failedAdvisory": "#FF9800",
+      "checking": "#9CA3AF"
+    }
+  },
+  "references": {
+    "pageBackground": "#F2EDDD",
+    "surface": "#FFFFFF",
+    "cardBorder": "#E5E0D1",
+    "primary": "#E3A9A0",
+    "primaryHover": "#D99A90",
+    "primaryPressed": "#CF8B80",
+    "accent": "#BBEDDA",
+    "foreground": "#1A1A1A",
+    "secondaryText": "#6B6B6B",
+    "muted": "#9CA3AF",
+    "success": "#4CAF50",
+    "warning": "#FF9800",
+    "error": "#F44336",
+    "info": "#2196F3"
+  }
+}

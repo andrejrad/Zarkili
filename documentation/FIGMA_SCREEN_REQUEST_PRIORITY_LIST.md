@@ -1,4 +1,4 @@
-# Figma Screen Request — Priority List for Phase 2
+﻿# Figma Screen Request — Priority List for Phase 2
 
 > **Companion**: copy-pasteable AI prompts for every batch below live in [`figma-prompts/README.md`](figma-prompts/README.md). Each batch (A–S) has its own prompt-pack file that reuses existing `design-handoff/` tokens and components and bakes in US-primary defaults.
 
@@ -60,11 +60,13 @@ The rule: **start each wave at the phase gate *before* the engineering wave that
 | Wave | Start week | Batches in this wave | Reason for timing |
 |---|---|---|---|
 | **Wave 1** | W19 | C (one-pass), E (one-pass) | C is critical-path for W23 engineering; E unlocks W25. Both are consumer-side, design them before Phase 2 starts. |
-| **Wave 2** | W25 | G (one-pass), H (one-pass), M (one-pass) | G/H needed by W27–28. M is the most important one-pass in the program — it locks admin density for all Phase 3 batches (N, P, Q, R, S). Must be promoted into `design-handoff/` before W33. |
-| **Wave 3** | W30 | P (one-pass), R (one-pass), O (full-Figma — start here) | P locks segment/campaign patterns needed by W39. R locks analytics/chart patterns by W42. O is the longest Figma task (~1.5-week generation alone) — start by W32 at the absolute latest so engineering begins W38 on time. |
-| **Wave 4** | W43 | L (full-Figma) | L must be complete before Phase 3.5 release readiness locks at W45. Starting W43 gives ~2 weeks of generation + review + promotion, landing at W45. Marketing-site sub-track parallelizes with Phase 3 engineering. |
+| **Wave 2** | W25 | G (one-pass), H (one-pass), M (one-pass) | G/H needed by W27–28. M is the most important one-pass in the program — it locks admin density for all Phase 3 batches (N, P, Q, R, S). Must be promoted into `design-handoff/` before W35. |
+| **Wave 3** | W30 | P (one-pass), R (one-pass), O (full-Figma — start here) | P locks segment/campaign patterns needed by W41. R locks analytics/chart patterns by W44. O is the longest Figma task (~1.5-week generation alone) — start by W32 at the absolute latest so engineering begins W40 on time. |
+| **Wave 4** | W45 | L (full-Figma) | L must be complete before Phase 3.5 release readiness locks at W47. Starting W45 gives ~2 weeks of generation + review + promotion, landing at W47. Marketing-site sub-track parallelizes with Phase 3 engineering. |
 
 **After Wave 4, Figma is closed for the program.** All surfaces introduced in Phase 4 (AI support router, Phase 3.5 release hardening screens) are built `code-only` from patterns already in `design-handoff/`.
+
+> **Wave 4 timing note:** Wave 4 was originally scheduled at W43. With the insertion of Phase 2.2 (W33–W34), Phase 3 shifted to W35–W46 and Phase 3.5 to W47–W51. Wave 4 now starts at W45 (two weeks before Phase 3.5) to maintain the same 2-week design-ahead buffer.
 
 Full workflow details for one-pass and full-Figma batches are in [FIGMA_HANDOFF_TO_DEVELOPMENT_PLAYBOOK.md](FIGMA_HANDOFF_TO_DEVELOPMENT_PLAYBOOK.md).
 
@@ -194,7 +196,7 @@ Components needed: 3DS overlay, payment-method-row variants, conflict-recovery m
 6. Staff app: location switcher, time-off request, availability override, payout / earnings, walk-in capture, daily close report, staff onboarding
 Components needed: AI feedback bar, explainability sheet, channel-preference matrix, tier-up celebration screen, follow toggle, walk-in form.
 
-### Batch L — Cross-Cutting Platform, i18n, Store Readiness (Required by Week 43 — Wave 4 start, delivered by Week 45, consumed Phase 3.5)
+### Batch L — Cross-Cutting Platform, i18n, Store Readiness (Required by Week 45 — Wave 4 start, delivered by Week 47, consumed Phase 3.5)
 1. App update required / force-update gate
 2. Maintenance mode
 3. Offline state and offline-aware list/detail patterns
@@ -211,9 +213,9 @@ Components needed: AI feedback bar, explainability sheet, channel-preference mat
 Components needed: full-screen gate templates (force-update, maintenance, offline, error), permission recovery card, locale picker, RTL audit notes, store-screenshot frames.
 
 ## Phase 3 — Admin and Operator Batches
-These batches feed Phase 3 (Weeks 33–44). They introduce admin-specific patterns: data tables, bulk action bars, master calendar, command palette, destructive-confirm modals, role-denied states.
+These batches feed Phase 3 (Weeks 35–46). They introduce admin-specific patterns: data tables, bulk action bars, master calendar, command palette, destructive-confirm modals, role-denied states.
 
-### Batch M — Owner Home, Tenant Settings, Billing, Connect, Payouts (Required by Week 25 — Wave 2 start, delivered by Week 32, consumed Weeks 33–34)
+### Batch M — Owner Home, Tenant Settings, Billing, Connect, Payouts (Required by Week 25 — Wave 2 start, delivered by Week 32, consumed Weeks 35–36)
 1. Owner home / KPI dashboard
 2. Operator notification center (booking/payment/payout/AI alerts)
 3. Tenant settings shell (sectioned navigation)
@@ -390,8 +392,10 @@ For every batch:
 Each batch is tracked as a card in [PROGRAM_TRACKING_BOARD.md](PROGRAM_TRACKING_BOARD.md) with prefix `[DESIGN-BATCH-A]` … `[DESIGN-BATCH-S]`. Move through Backlog → Ready → In Progress (with design team) → Review and QA (acceptance checklist) → Done.
 
 ## Cross-References
-- Phase 2 plan: [PHASE2_CONSUMER_UI_PLAN_WEEKS_21_TO_28.md](PHASE2_CONSUMER_UI_PLAN_WEEKS_21_TO_28.md)
-- Phase 3 plan: [PHASE3_ADMIN_UI_PLAN_WEEKS_33_TO_44.md](PHASE3_ADMIN_UI_PLAN_WEEKS_33_TO_44.md)
+- Phase 2 plan: [PHASE2_CONSUMER_UI_PLAN_WEEKS_21_TO_32.md](PHASE2_CONSUMER_UI_PLAN_WEEKS_21_TO_32.md)
+- Phase 3 plan: [PHASE3_ADMIN_UI_PLAN_WEEKS_38_TO_49.md](PHASE3_ADMIN_UI_PLAN_WEEKS_38_TO_49.md)
 - Handoff playbook: [FIGMA_HANDOFF_TO_DEVELOPMENT_PLAYBOOK.md](FIGMA_HANDOFF_TO_DEVELOPMENT_PLAYBOOK.md)
 - Tokens and existing components: `design-handoff/`
 - Admin UI interim rules: [new-platform/ADMIN_UI_INTERPRETATION_GUIDELINES.md](new-platform/ADMIN_UI_INTERPRETATION_GUIDELINES.md)
+
+

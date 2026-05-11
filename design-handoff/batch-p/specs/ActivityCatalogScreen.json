@@ -1,0 +1,178 @@
+{
+  "screen": "ActivityCatalogScreen",
+  "route": "/admin/activities",
+  "description": "Manage activities and challenges with participation tracking",
+  "dimensions": {
+    "width": 390,
+    "height": "auto-scroll"
+  },
+  "states": [
+    "default",
+    "loading",
+    "empty",
+    "error"
+  ],
+  "accessibility": {
+    "screenReaderLabel": "strings.activityCatalog.screenTitle",
+    "semanticRoles": [
+      {"element": "filterRow", "role": "tablist"},
+      {"element": "activityList", "role": "list"},
+      {"element": "activityRow", "role": "listitem"},
+      {"element": "addFab", "role": "button"}
+    ]
+  },
+  "rtl": "deferred",
+  "darkMode": "deferred",
+  "layout": {
+    "header": {
+      "height": 64,
+      "title": "strings.activityCatalog.title"
+    },
+    "filterRow": {
+      "height": 48,
+      "paddingHorizontal": 16,
+      "gap": 8,
+      "filters": [
+        {"label": "strings.activityCatalog.filterAll", "key": "all"},
+        {"label": "strings.activityCatalog.filterActive", "key": "active"},
+        {"label": "strings.activityCatalog.filterScheduled", "key": "scheduled"},
+        {"label": "strings.activityCatalog.filterArchived", "key": "archived"}
+      ]
+    },
+    "activityList": {
+      "rowHeight": 80,
+      "paddingHorizontal": 16,
+      "gap": 12,
+      "dividerColor": "semantic.cardBorder",
+      "dividerThickness": 0.5
+    },
+    "activityRow": {
+      "height": 80,
+      "paddingHorizontal": 12,
+      "paddingVertical": 12,
+      "columns": [
+        {
+          "component": "icon",
+          "width": 40,
+          "height": 40
+        },
+        {
+          "component": "info",
+          "flex": 1,
+          "children": [
+            "title",
+            "typeBadge",
+            "stats"
+          ]
+        },
+        {
+          "component": "statusBadge",
+          "width": "auto"
+        },
+        {
+          "component": "chevron",
+          "width": 24
+        }
+      ]
+    },
+    "activityDetail": {
+      "paddingHorizontal": 16,
+      "paddingVertical": 24,
+      "fields": [
+        "name",
+        "type",
+        "description",
+        "triggerRules",
+        "rewardPoints",
+        "startDate",
+        "endDate",
+        "analyticsChart"
+      ]
+    },
+    "addFab": {
+      "position": "fixed",
+      "bottom": 24,
+      "right": 24,
+      "size": 56,
+      "icon": "plus",
+      "label": "strings.activityCatalog.addActivity"
+    }
+  },
+  "components": [
+    {
+      "id": "navigationHeader",
+      "ref": "navigation-header",
+      "props": {
+        "showBack": true,
+        "title": "strings.activityCatalog.title"
+      }
+    },
+    {
+      "id": "filterChips",
+      "ref": "chip-group",
+      "props": {
+        "chips": [
+          {"label": "strings.activityCatalog.filterAll", "selected": true},
+          {"label": "strings.activityCatalog.filterActive", "selected": false},
+          {"label": "strings.activityCatalog.filterScheduled", "selected": false},
+          {"label": "strings.activityCatalog.filterArchived", "selected": false}
+        ]
+      }
+    },
+    {
+      "id": "activityRow",
+      "ref": "list-row",
+      "props": {
+        "icon": "{{activityIcon}}",
+        "title": "{{activityTitle}}",
+        "typeBadge": "{{activityType}}",
+        "statusBadge": "{{activityStatus}}",
+        "participationCount": "{{participationCount}}",
+        "completionRate": "{{completionRate}}%"
+      }
+    },
+    {
+      "id": "addFab",
+      "ref": "fab",
+      "props": {
+        "icon": "plus",
+        "label": "strings.activityCatalog.addActivity"
+      }
+    }
+  ],
+  "interactions": [
+    {
+      "trigger": "activityRow.tap",
+      "action": "navigate",
+      "target": "/admin/activities/:id"
+    },
+    {
+      "trigger": "filterChip.tap",
+      "action": "filterActivities"
+    },
+    {
+      "trigger": "addFab.tap",
+      "action": "navigate",
+      "target": "/admin/activities/new"
+    }
+  ],
+  "tokens": {
+    "used": [
+      "semantic.pageBackground",
+      "semantic.surface",
+      "semantic.cardBorder",
+      "semantic.foreground",
+      "semantic.secondaryText",
+      "semantic.primary"
+    ]
+  },
+  "redlines": {
+    "filterRowGap": 8,
+    "activityRowHeight": 80,
+    "iconSize": 40,
+    "fabSize": 56,
+    "fabBottom": 24,
+    "fabRight": 24,
+    "gap": 12
+  }
+}

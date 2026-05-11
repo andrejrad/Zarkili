@@ -1,0 +1,241 @@
+{
+  "component": "TierBadge",
+  "description": "Pill-shaped tier indicator with optional icon and uppercase label",
+  "purpose": "Communicate a member's loyalty tier (bronze, silver, gold, platinum) or a locked state in lists, cards, and headers, always pairing color with label and optional icon",
+  "source": {
+    "batch": "E",
+    "screen": "E.1 Loyalty Landing",
+    "promotedFrom": "documentation/figma-prompts/BATCH_E_LOYALTY_ACTIVITIES_REVIEWS.md",
+    "figmaFrames": [
+      "E-component-tier-badge-bronze",
+      "E-component-tier-badge-silver",
+      "E-component-tier-badge-gold",
+      "E-component-tier-badge-platinum",
+      "E-component-tier-badge-locked",
+      "E-component-tier-badge-selected",
+      "E-component-tier-badge-pressed"
+    ],
+    "lockedAt": "2026-04-28"
+  },
+  "variants": {
+    "tier": {
+      "options": ["bronze", "silver", "gold", "platinum", "locked"],
+      "default": "bronze"
+    },
+    "withIcon": {
+      "options": [true, false],
+      "default": true
+    },
+    "state": {
+      "options": ["default", "selected", "pressed", "disabled"],
+      "default": "default"
+    }
+  },
+  "states": {
+    "default": {
+      "bronze": {
+        "background": "#C77A50",
+        "foreground": "#FFFFFF",
+        "iconColor": "#FFFFFF"
+      },
+      "silver": {
+        "background": "#9AA3A8",
+        "foreground": "#FFFFFF",
+        "iconColor": "#FFFFFF"
+      },
+      "gold": {
+        "background": "#D4A24C",
+        "foreground": "#1A1A1A",
+        "iconColor": "#1A1A1A"
+      },
+      "platinum": {
+        "background": "#5E6B6E",
+        "foreground": "#FFFFFF",
+        "iconColor": "#FFFFFF"
+      },
+      "locked": {
+        "background": "#F5F5F5",
+        "foreground": "#6B6B6B",
+        "iconColor": "#6B6B6B",
+        "iconRequired": true
+      }
+    },
+    "selected": {
+      "ring": {
+        "width": 1,
+        "color": "#1A1A1A",
+        "offset": 2
+      },
+      "inheritColors": true
+    },
+    "pressed": {
+      "bronze": {
+        "background": "#B46A42",
+        "foreground": "#FFFFFF",
+        "iconColor": "#FFFFFF"
+      },
+      "silver": {
+        "background": "#8A9398",
+        "foreground": "#FFFFFF",
+        "iconColor": "#FFFFFF"
+      },
+      "gold": {
+        "background": "#C49244",
+        "foreground": "#1A1A1A",
+        "iconColor": "#1A1A1A"
+      },
+      "platinum": {
+        "background": "#515D60",
+        "foreground": "#FFFFFF",
+        "iconColor": "#FFFFFF"
+      },
+      "locked": {
+        "background": "#E5E5E5",
+        "foreground": "#6B6B6B",
+        "iconColor": "#6B6B6B"
+      },
+      "transform": "scale(0.98)"
+    },
+    "disabled": {
+      "useTier": "locked"
+    }
+  },
+  "layout": {
+    "height": 24,
+    "paddingHorizontal": 8,
+    "paddingVertical": 0,
+    "borderRadius": 9999,
+    "gap": 4,
+    "flexDirection": "row",
+    "alignItems": "center",
+    "justifyContent": "center"
+  },
+  "anatomy": {
+    "container": {
+      "display": "flex",
+      "flexDirection": "row",
+      "alignItems": "center",
+      "gap": 4,
+      "height": 24,
+      "paddingHorizontal": 8,
+      "borderRadius": 9999
+    },
+    "icon": {
+      "size": 12,
+      "name": {
+        "bronze": "crown",
+        "silver": "crown",
+        "gold": "crown",
+        "platinum": "crown",
+        "locked": "lock"
+      },
+      "optional": {
+        "bronze": true,
+        "silver": true,
+        "gold": true,
+        "platinum": true,
+        "locked": false
+      }
+    },
+    "label": {
+      "style": "label-small",
+      "textTransform": "uppercase",
+      "letterSpacing": 0.5,
+      "content": {
+        "bronze": "BRONZE",
+        "silver": "SILVER",
+        "gold": "GOLD",
+        "platinum": "PLATINUM",
+        "locked": "LOCKED"
+      }
+    }
+  },
+  "colorCalculations": {
+    "pressed": {
+      "method": "darken",
+      "lightnessAdjustment": -8,
+      "note": "Reduce HSL lightness by 8 percentage points"
+    }
+  },
+  "accessibility": {
+    "role": "text",
+    "label": {
+      "bronze": "Bronze tier",
+      "silver": "Silver tier",
+      "gold": "Gold tier",
+      "platinum": "Platinum tier",
+      "locked": "Locked tier"
+    },
+    "hint": "Membership tier indicator",
+    "isAccessibilityElement": true,
+    "contrast": {
+      "bronze": "4.51:1 (AA compliant)",
+      "silver": "4.52:1 (AA compliant)",
+      "gold": "8.12:1 (AAA compliant)",
+      "platinum": "6.24:1 (AAA compliant)",
+      "locked": "4.54:1 (AA compliant)"
+    },
+    "touchTarget": {
+      "minSize": 44,
+      "implementation": "Visual height is 24px; ensure >=44x44 hit area via hitSlop or surrounding padding (12px vertical extension recommended)"
+    }
+  },
+  "transitions": {
+    "onPress": {
+      "duration": 100,
+      "easing": "ease-out",
+      "properties": ["background", "transform"]
+    },
+    "onFocus": {
+      "duration": 150,
+      "easing": "ease-in-out",
+      "properties": ["ring"]
+    }
+  },
+  "usage": {
+    "context": [
+      "User profile tier display",
+      "Salon membership badge",
+      "Tier selector in rewards screen",
+      "Service card member indicator"
+    ],
+    "rules": [
+      "Icon is optional for bronze/silver/gold/platinum, required for locked",
+      "Color is paired with label - never rely on color alone",
+      "Use locked variant for disabled state",
+      "Selected state adds focus ring, does not change tier colors",
+      "Pressed state darkens background by 8 percent lightness"
+    ]
+  },
+  "examples": {
+    "profileBadge": {
+      "tier": "gold",
+      "withIcon": true,
+      "state": "default"
+    },
+    "salonCardMember": {
+      "tier": "platinum",
+      "withIcon": false,
+      "state": "default"
+    },
+    "tierSelectorActive": {
+      "tier": "silver",
+      "withIcon": true,
+      "state": "selected"
+    },
+    "tierSelectorLocked": {
+      "tier": "locked",
+      "withIcon": true,
+      "state": "default"
+    }
+  },
+  "implementationNotes": [
+    "Icons use crown.svg (12x12) for bronze/silver/gold/platinum and lock.svg for locked.",
+    "Silver uses #9AA3A8 instead of #B0B0B0 to achieve AA contrast compliance.",
+    "Pressed state lowers HSL lightness by 8 points (e.g. Bronze #C77A50 -> #B46A42).",
+    "Selected focus ring is additive: 1px stroke #1A1A1A at 2px offset, total bounding box ~28px tall.",
+    "Disabled state explicitly maps to the locked tier variant.",
+    "Letter-spacing 0.5 on uppercase label-small for legibility.",
+    "Visual height stays 24px; engineers must enforce >=44x44 touch target via hitSlop when interactive."
+  ]
+}

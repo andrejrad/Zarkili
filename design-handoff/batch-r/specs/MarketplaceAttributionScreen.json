@@ -1,0 +1,54 @@
+{
+  "screen": "MarketplaceAttributionScreen",
+  "route": "/admin/analytics/marketplace",
+  "description": "Revenue and booking volume attributed to marketplace vs other channels",
+  "platform": "admin-desktop",
+  "dimensions": { "width": 1280, "contentWidth": "calc(1280 - 240px sidebar)" },
+  "states": ["default", "loading", "empty", "error"],
+  "accessibility": {
+    "screenReaderLabel": "strings.marketplaceAttribution.screenTitle",
+    "semanticRoles": [
+      { "element": "listingTable", "role": "table" },
+      { "element": "chartCard", "role": "img" }
+    ]
+  },
+  "rtl": "deferred",
+  "darkMode": "deferred",
+  "layout": {
+    "header": {
+      "component": "AdminHeader",
+      "title": "strings.marketplaceAttribution.title",
+      "rightActions": ["DateRangePicker", "Export SecondaryButton"]
+    },
+    "body": {
+      "padding": 24,
+      "kpiRow": {
+        "tiles": 4,
+        "metrics": ["Marketplace Revenue ($)", "Marketplace Bookings", "Attribution Rate % (of total bookings)", "Avg Marketplace Listing Rating"]
+      },
+      "row2": {
+        "layout": "2 columns equal",
+        "left": { "component": "BarChartCard", "title": "Revenue by Channel", "stacked": true, "channels": ["marketplace", "direct", "search", "referral", "social"] },
+        "right": { "component": "LineChartCard", "title": "Marketplace Bookings Over Time" }
+      },
+      "listingTable": {
+        "width": "full",
+        "component": "DataTable",
+        "title": "Per-Listing Performance",
+        "sortable": true,
+        "columns": ["Listing Name", "Views", "Bookings", "Conversion %", "Revenue", "Avg Rating", "Status (marketplace.* tokens)"]
+      },
+      "topServicesChart": {
+        "width": "full",
+        "component": "BarChartCard",
+        "title": "Top 10 Services Booked via Marketplace",
+        "orientation": "horizontal"
+      }
+    }
+  },
+  "components": [
+    { "id": "channelChart", "ref": "BarChartCard", "props": { "title": "strings.marketplaceAttribution.chartByChannel", "stacked": true, "data": "{{channelData}}" } },
+    { "id": "listingTable", "ref": "DataTable", "props": { "title": "strings.marketplaceAttribution.tablePerListing", "columns": "{{listingColumns}}", "data": "{{listingData}}" } }
+  ],
+  "strings": "See strings/en-us.json for marketplaceAttribution keys"
+}

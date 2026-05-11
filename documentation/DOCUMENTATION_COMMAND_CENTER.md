@@ -1,4 +1,4 @@
-# Zarkili Documentation Command Center
+﻿# Zarkili Documentation Command Center
 
 > **This is the single master document for the entire Zarkili project.**
 > If you only open one file, open this one. Every other document is linked here, grouped by purpose, with a one-line description and clear "use when…" guidance.
@@ -41,9 +41,9 @@ The doc you are reading sits at the top of this layer.
 | Doc | Status | Purpose |
 |---|---|---|
 | [DOCUMENTATION_COMMAND_CENTER.md](DOCUMENTATION_COMMAND_CENTER.md) (this file) | 🟢 | Single master index across the entire project. Start every session here. |
-| [MULTITENANT_MASTER_INDEX.md](MULTITENANT_MASTER_INDEX.md) | 🟢 | Focused index for the 52-week multi-tenant program (strategy + week packs + phase plans). |
+| [MULTITENANT_MASTER_INDEX.md](MULTITENANT_MASTER_INDEX.md) | 🟢 | Focused index for the 57-week multi-tenant program (strategy + week packs + phase plans). |
 | [PROGRAM_TRACKING_BOARD.md](PROGRAM_TRACKING_BOARD.md) | 🟢 | Kanban-style backlog/in-progress/blocked/done across all weeks. The day-to-day source of "what's next". |
-| [PROJECT_GANTT_AGILE_PLAN.md](PROJECT_GANTT_AGILE_PLAN.md) | 🟢 | 52-week Gantt + parallel work streams + dependencies. Use for sprint planning and re-baselining. |
+| [PROJECT_GANTT_AGILE_PLAN.md](PROJECT_GANTT_AGILE_PLAN.md) | 🟢 | 57-week Gantt + parallel work streams + dependencies. Use for sprint planning and re-baselining. |
 
 **Use when**: orienting yourself, picking the next task, replanning, or onboarding a collaborator.
 
@@ -63,17 +63,19 @@ The doc you are reading sits at the top of this layer.
 
 ---
 
-## Group 3 — Phase plans (52-week build) 🟢
+## Group 3 — Phase plans (54-week build) 🟢
 
-These are the dated long-form plans that own each calendar window. Total length: 52 weeks. US is launch market.
+These are the dated long-form plans that own each calendar window. Total length: 57 weeks. US is launch market.
 
 | Doc | Window | Status | Purpose |
 |---|---|---|---|
 | [MULTITENANT_COMPANION_EXECUTION_BLUEPRINT.md](MULTITENANT_COMPANION_EXECUTION_BLUEPRINT.md) | W1–W20 | 🟢 | Phase 1 (foundation, monetization, marketplace v1, AI v1) embedded in the blueprint. |
-| [PHASE2_CONSUMER_UI_PLAN_WEEKS_21_TO_28.md](PHASE2_CONSUMER_UI_PLAN_WEEKS_21_TO_28.md) | W21–W32 | 🟢 | Phase 2.0 consumer UI build (W21–28) + Phase 2.1 completeness, edge cases, i18n, store readiness (W29–32). |
-| [PHASE3_ADMIN_UI_PLAN_WEEKS_33_TO_44.md](PHASE3_ADMIN_UI_PLAN_WEEKS_33_TO_44.md) | W33–W44 | 🟢 | Owner, location-manager, marketing, and platform super-admin console build. |
-| [PHASE3_5_RELEASE_READINESS_PLAN_WEEKS_45_TO_48.md](PHASE3_5_RELEASE_READINESS_PLAN_WEEKS_45_TO_48.md) | W45–W49 | 🟢 | Observability, SLOs, pentest, DR drill, AI eval, marketing site, self-serve checkout, in-app support surfaces (W48), commercial GA at end of W49. *(Filename retains `45_TO_48`; window is 45–49.)* |
-| [PHASE4_AI_SUPPORT_SYSTEM_PLAN_WEEKS_49_TO_52.md](PHASE4_AI_SUPPORT_SYSTEM_PLAN_WEEKS_49_TO_52.md) | W50–W52 | 🟢 | AI router on top of W48 support surfaces: confidence-scored auto-respond/escalate (W50), eval/CSAT/tagging (W51), threshold tuning (W52). *(Filename retains `49_TO_52`; window is 50–52.)* |
+| [PHASE2_CONSUMER_UI_PLAN_WEEKS_21_TO_32.md](PHASE2_CONSUMER_UI_PLAN_WEEKS_21_TO_32.md) | W21–W32 | 🟢 | Phase 2.0 consumer UI build (W21–28) + Phase 2.1 completeness, edge cases, i18n, store readiness (W29–32). |
+| [PHASE2_2_NAVIGATION_WIRING_WEEKS_33_TO_34.md](PHASE2_2_NAVIGATION_WIRING_WEEKS_33_TO_34.md) | W33–W34 | 🟢 | Phase 2.2: wire all 49 consumer routes into AppNavigatorShell; build 8 W22 discovery screens; replace onboarding placeholder. |
+| [PHASE2_3_CONSUMER_FIREBASE_INTEGRATION_WEEKS_35_TO_37.md](PHASE2_3_CONSUMER_FIREBASE_INTEGRATION_WEEKS_35_TO_37.md) | W35–W37 | 🟢 | Phase 2.3: W35 manual QA with mock data (68 test cases, iOS + Android), W36–W37 Firebase service integration per domain. Retires mockData.ts. |
+| [PHASE3_ADMIN_UI_PLAN_WEEKS_38_TO_49.md](PHASE3_ADMIN_UI_PLAN_WEEKS_38_TO_49.md) | W38–W49 | 🟢 | Owner, location-manager, marketing, and platform super-admin console build. |
+| [PHASE3_5_RELEASE_READINESS_PLAN_WEEKS_50_TO_54.md](PHASE3_5_RELEASE_READINESS_PLAN_WEEKS_50_TO_54.md) | W50–W54 | 🟢 | Observability, SLOs, pentest, DR drill, AI eval, marketing site, self-serve checkout, in-app support surfaces (W53), commercial GA at end of W54. |
+| [PHASE4_AI_SUPPORT_SYSTEM_PLAN_WEEKS_55_TO_57.md](PHASE4_AI_SUPPORT_SYSTEM_PLAN_WEEKS_55_TO_57.md) | W55–W57 | 🟢 | AI router on top of W53 support surfaces: confidence-scored auto-respond/escalate (W55), eval/CSAT/tagging (W56), threshold tuning (W57). |
 
 **Use when**: weekly planning, sprint kickoff, scope check, or re-estimating a phase.
 
@@ -304,8 +306,8 @@ If you are working on… you must also keep open…
 
 | Working on | Pair with |
 |---|---|
-| Phase 2 consumer screens | [PHASE2_CONSUMER_UI_PLAN_WEEKS_21_TO_28.md](PHASE2_CONSUMER_UI_PLAN_WEEKS_21_TO_28.md) + matching [figma-prompts/](figma-prompts/README.md) batch + relevant feature spec (Group 4) + [US_PRIMARY_MARKET_ADDENDUM.md](US_PRIMARY_MARKET_ADDENDUM.md) |
-| Phase 3 admin screens | [PHASE3_ADMIN_UI_PLAN_WEEKS_33_TO_44.md](PHASE3_ADMIN_UI_PLAN_WEEKS_33_TO_44.md) + matching [figma-prompts/](figma-prompts/README.md) batch (M–S) + [new-platform/ADMIN_UI_INTERPRETATION_GUIDELINES.md](new-platform/ADMIN_UI_INTERPRETATION_GUIDELINES.md) |
+| Phase 2 consumer screens | [PHASE2_CONSUMER_UI_PLAN_WEEKS_21_TO_32.md](PHASE2_CONSUMER_UI_PLAN_WEEKS_21_TO_32.md) + matching [figma-prompts/](figma-prompts/README.md) batch + relevant feature spec (Group 4) + [US_PRIMARY_MARKET_ADDENDUM.md](US_PRIMARY_MARKET_ADDENDUM.md) |
+| Phase 3 admin screens | [PHASE3_ADMIN_UI_PLAN_WEEKS_38_TO_49.md](PHASE3_ADMIN_UI_PLAN_WEEKS_38_TO_49.md) + matching [figma-prompts/](figma-prompts/README.md) batch (M–S) + [new-platform/ADMIN_UI_INTERPRETATION_GUIDELINES.md](new-platform/ADMIN_UI_INTERPRETATION_GUIDELINES.md) |
 | Any Stripe / billing work | [PAYMENT_FEATURE_SPECS.md](PAYMENT_FEATURE_SPECS.md) + [US_PRIMARY_MARKET_ADDENDUM.md](US_PRIMARY_MARKET_ADDENDUM.md) (Stripe Tax, Connect Express, ACH) + [FREE_TRIAL_SPECS.md](FREE_TRIAL_SPECS.md) |
 | Any AI feature | [AI_FEATURES_SPECS.md](AI_FEATURES_SPECS.md) + [new-platform/AI_RUNTIME_AND_COST_POLICY.md](new-platform/AI_RUNTIME_AND_COST_POLICY.md) + [new-platform/AI_DATA_CONTRACTS.md](new-platform/AI_DATA_CONTRACTS.md) + [new-platform/AI_FEATURES_IMPLEMENTATION_COVERAGE_MATRIX.md](new-platform/AI_FEATURES_IMPLEMENTATION_COVERAGE_MATRIX.md) |
 | Any Firestore rule change | [new-platform/SECURITY_RULES_FINAL.md](new-platform/SECURITY_RULES_FINAL.md) + relevant domain ref (Group 7d) |
@@ -336,3 +338,5 @@ If you are working on… you must also keep open…
 - **When a doc moves status** (e.g., ACTIVE → ARCHIVE), change only the status emoji here. Do not move the row to a different group unless the purpose itself changed.
 - **When a doc becomes obsolete**, mark it ⚪ ARCHIVE here and add a one-line note explaining what replaces it. Do not delete the file.
 - **Never duplicate content**: this file links — it does not restate.
+
+

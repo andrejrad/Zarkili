@@ -1,0 +1,117 @@
+{
+  "screen": "ReviewQueueScreen",
+  "route": "AdminReviewQueue",
+  "device": {
+    "primary": "iPad 1024×768",
+    "secondary": "iPhone 14 390×844"
+  },
+  "stateNames": [
+    "default",
+    "loading",
+    "empty",
+    "error",
+    "bulkSelected"
+  ],
+  "layout": {
+    "header": {
+      "title": "strings.reviewQueue.title",
+      "right": {
+        "type": "button",
+        "label": "strings.reviewQueue.exportButton",
+        "variant": "secondary"
+      }
+    },
+    "filterBar": {
+      "chips": [
+        {
+          "type": "dropdown",
+          "key": "rating",
+          "options": [1, 2, 3, 4, 5]
+        },
+        {
+          "type": "dateRangePicker",
+          "format": "US"
+        },
+        {
+          "type": "dropdown",
+          "key": "status",
+          "options": [
+            { "value": "pending", "label": "strings.reviewQueue.status.pending" },
+            { "value": "replied", "label": "strings.reviewQueue.status.replied" },
+            { "value": "flagged", "label": "strings.reviewQueue.status.flagged" },
+            { "value": "hidden", "label": "strings.reviewQueue.status.hidden" }
+          ]
+        },
+        {
+          "type": "dropdown",
+          "key": "sentiment",
+          "options": [
+            { "value": "positive", "label": "strings.reviewQueue.sentiment.positive" },
+            { "value": "neutral", "label": "strings.reviewQueue.sentiment.neutral" },
+            { "value": "negative", "label": "strings.reviewQueue.sentiment.negative" }
+          ]
+        }
+      ]
+    },
+    "bulkActionBar": {
+      "visibleWhen": "state.bulkSelected",
+      "left": {
+        "type": "label",
+        "text": "strings.reviewQueue.bulk.selected",
+        "interpolation": "N"
+      },
+      "actions": [
+        { "type": "button", "label": "strings.reviewQueue.bulk.replyWithTemplate", "variant": "secondary" },
+        { "type": "button", "label": "strings.reviewQueue.bulk.flag", "variant": "secondary" },
+        { "type": "button", "label": "strings.reviewQueue.bulk.hide", "variant": "secondary-destructive" }
+      ],
+      "clearSelection": {
+        "type": "link",
+        "label": "strings.reviewQueue.bulk.clearSelection"
+      }
+    },
+    "table": {
+      "type": "data-table-v1",
+      "columns": [
+        { "key": "select", "type": "checkbox" },
+        { "key": "client", "avatar": { "size": 36 }, "name": { "variant": "body" } },
+        { "key": "service", "variant": "caption" },
+        { "key": "rating", "type": "stars", "size": "components.ratingStarSize", "filledColor": "primary", "emptyColor": "muted" },
+        { "key": "sentiment", "type": "pill", "background": "sentiment.[value]Bg", "color": "sentiment.[value]" },
+        { "key": "status", "type": "pill", "background": "review.[status]Bg", "color": "review.[status]" },
+        {
+          "key": "menu",
+          "type": "kebab",
+          "options": [
+            { "label": "strings.reviewQueue.menu.reply", "action": "reply" },
+            { "label": "strings.reviewQueue.menu.flag", "action": "flag" },
+            { "label": "strings.reviewQueue.menu.hide", "action": "hide" },
+            { "label": "strings.reviewQueue.menu.viewDetail", "action": "viewDetail" }
+          ]
+        }
+      ],
+      "onRowTap": {
+        "navigate": "ReplyComposerScreen",
+        "context": "reviewId"
+      }
+    }
+  },
+  "states": {
+    "empty": {
+      "illustration": true,
+      "message": "strings.reviewQueue.emptyMessage",
+      "cta": {
+        "label": "strings.reviewQueue.requestReviewsCTA",
+        "variant": "primary"
+      }
+    },
+    "bulkSelected": {
+      "bulkActionBar": { "visible": true },
+      "checkboxes": { "checked": true }
+    }
+  },
+  "accessibility": {
+    "table": { "role": "grid" },
+    "ratingStars": { "accessibilityLabel": "{N} out of 5 stars" }
+  }
+}

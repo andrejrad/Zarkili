@@ -1,0 +1,87 @@
+{
+  "schemaVersion": "1.0.0",
+  "description": "Admin console color delta — extends Zarkili core token set with Phase 3 admin-specific tokens. All existing consumer tokens remain unchanged.",
+  "notes": "Admin surface uses a warmer off-white to visually separate admin views from consumer views. Danger and warning follow WCAG AA contrast on admin.surface. Status pill tokens map to semantic booking/payment states.",
+  "additions": {
+    "admin": {
+      "surface":       { "value": "#FAFAF8", "description": "Admin panel background — slightly warmer than pure white" },
+      "surfaceRaised":  { "value": "#FFFFFF", "description": "Cards, modals, dropdowns on top of admin.surface" },
+      "border":        { "value": "#E5E0D1", "description": "Dividers and table borders on admin surfaces" },
+      "borderStrong":  { "value": "#C8C0B0", "description": "Input focus rings, active row highlight" },
+      "text": {
+        "primary":     { "value": "#1A1411", "description": "Primary label — same as global text.primary" },
+        "secondary":   { "value": "#3D3530", "description": "Secondary / meta label" },
+        "muted":       { "value": "#6B6B6B", "description": "Placeholder, disabled, timestamps" },
+        "onDanger":    { "value": "#FFFFFF", "description": "Text on danger-filled surfaces" },
+        "onWarning":   { "value": "#1A1411", "description": "Text on warning-filled surfaces" }
+      },
+      "icon": {
+        "default":     { "value": "#3D3530", "description": "Default icon fill" },
+        "muted":       { "value": "#9E9E8E", "description": "Muted / decorative icon" }
+      },
+      "danger":        { "value": "#C62828", "description": "Destructive actions, error states — WCAG AA on admin.surface" },
+      "dangerSubtle":  { "value": "#FFEBEE", "description": "Danger background tint — error state fill" },
+      "warning":       { "value": "#F57F17", "description": "Warning indicators — WCAG AA on admin.surface" },
+      "warningSubtle": { "value": "#FFF8E1", "description": "Warning background tint" },
+      "success":       { "value": "#2E7D32", "description": "Success / confirmed states" },
+      "successSubtle": { "value": "#E8F5E9", "description": "Success background tint" },
+      "info":          { "value": "#1565C0", "description": "Informational — links, notes" },
+      "infoSubtle":    { "value": "#E3F2FD", "description": "Info background tint" }
+    },
+    "kpiTile": {
+      "background":    { "value": "#FFFFFF", "description": "KPI tile card background" },
+      "border":        { "value": "#E5E0D1", "description": "KPI tile card border" },
+      "valueLarge":    { "value": "#1A1411", "description": "KPI primary numeral" },
+      "trendUp":       { "value": "#2E7D32", "description": "Positive trend arrow + delta label" },
+      "trendDown":     { "value": "#C62828", "description": "Negative trend arrow + delta label" },
+      "trendFlat":     { "value": "#6B6B6B", "description": "Flat / no movement trend" }
+    },
+    "statusPill": {
+      "active": {
+        "background":  { "value": "#BBEDDA", "description": "Active / live tenant or listing" },
+        "text":        { "value": "#1B5E20", "description": "Active pill label" }
+      },
+      "restricted": {
+        "background":  { "value": "#E3A9A0", "description": "Stripe Connect restricted" },
+        "text":        { "value": "#6D1500", "description": "Restricted pill label" }
+      },
+      "pending": {
+        "background":  { "value": "#D1BFB3", "description": "Pending review / verification" },
+        "text":        { "value": "#3E2723", "description": "Pending pill label" }
+      },
+      "error": {
+        "background":  { "value": "#FFCDD2", "description": "Error / action required" },
+        "text":        { "value": "#B71C1C", "description": "Error pill label" }
+      },
+      "disabled": {
+        "background":  { "value": "#EEEEEE", "description": "Disabled / archived" },
+        "text":        { "value": "#6B6B6B", "description": "Disabled pill label" }
+      },
+      "info": {
+        "background":  { "value": "#BBDEFB", "description": "Informational status" },
+        "text":        { "value": "#0D47A1", "description": "Info pill label" }
+      }
+    },
+    "dataTable": {
+      "headerBackground": { "value": "#F5F0E8", "description": "Table header row fill" },
+      "rowAlternate":     { "value": "#FAFAF8", "description": "Alternating row tint on white" },
+      "rowHover":         { "value": "#F0EAE0", "description": "Row hover highlight" },
+      "rowSelected":      { "value": "#E8E0D5", "description": "Selected row highlight" },
+      "selectionBar":     { "value": "#3D3530", "description": "Bulk-action bar background (selected rows)" },
+      "selectionBarText": { "value": "#FFFFFF", "description": "Text on bulk-action bar" }
+    },
+    "roleDenied": {
+      "surface":       { "value": "#FFF8E1", "description": "Role-denied empty state panel fill" },
+      "icon":          { "value": "#F57F17", "description": "Lock icon on role-denied state" },
+      "text":          { "value": "#3E2723", "description": "Role-denied body text" }
+    },
+    "coachMark": {
+      "overlay":       { "value": "rgba(26, 20, 17, 0.55)", "description": "Coach-mark backdrop scrim" },
+      "popoverBg":     { "value": "#3D3530", "description": "Coach-mark popover background" },
+      "popoverText":   { "value": "#FFFFFF", "description": "Coach-mark popover text" },
+      "popoverArrow":  { "value": "#3D3530", "description": "Coach-mark arrow tip" },
+      "stepIndicator": { "value": "#9E9E8E", "description": "Inactive step dot" },
+      "stepActive":    { "value": "#FFFFFF", "description": "Active step dot" }
+    }
+  }
+}

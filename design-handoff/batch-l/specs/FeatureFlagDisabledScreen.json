@@ -1,0 +1,124 @@
+{
+  "screenId": "L.5",
+  "name": "FeatureFlagDisabledScreen",
+  "device": "iPhone 14",
+  "dimensions": {
+    "width": 390,
+    "height": 844
+  },
+  "description": "Inline area replacement for features disabled by feature flags or in beta waitlist",
+  "formFactor": "inline-area",
+  "layout": {
+    "type": "vertical-flex",
+    "background": "#F2EDDD",
+    "padding": 32,
+    "gap": 16,
+    "alignment": "center"
+  },
+  "elements": [
+    {
+      "id": "beta-badge",
+      "type": "pill",
+      "text": "{betaBadge}",
+      "visibility": "state:beta-waitlist",
+      "background": "#BBEDDA",
+      "color": "#2D4A42",
+      "paddingHorizontal": 12,
+      "paddingVertical": 6,
+      "borderRadius": 8,
+      "style": "label-small",
+      "fontWeight": 600
+    },
+    {
+      "id": "hero-illustration",
+      "type": "illustration",
+      "width": 120,
+      "height": 120,
+      "motif": "lock + sparkle",
+      "alignment": "center",
+      "colors": ["#E3A9A0", "#D1BFB3", "#BBEDDA"]
+    },
+    {
+      "id": "heading",
+      "type": "text",
+      "style": "heading-3",
+      "text": "{featureHeading}",
+      "fontWeight": 600,
+      "color": "#1A1A1A",
+      "alignment": "center"
+    },
+    {
+      "id": "body-message",
+      "type": "text",
+      "style": "body",
+      "text": "{featureMessage}",
+      "fontWeight": 400,
+      "color": "#6B6B6B",
+      "alignment": "center",
+      "maxWidth": 260
+    },
+    {
+      "id": "notify-cta",
+      "type": "button",
+      "variant": "tertiary",
+      "label": "{notifyCta}",
+      "visibility": "state:disabled",
+      "action": "requestNotification",
+      "height": 44,
+      "labelWeight": 500,
+      "labelColor": "#E3A9A0",
+      "accessibility": {
+        "label": "Notify me when this feature is ready",
+        "hint": "You'll receive a push notification"
+      }
+    }
+  ],
+  "states": [
+    {
+      "name": "disabled",
+      "description": "Feature is in development and not yet available",
+      "visibility": {
+        "beta-badge": false,
+        "hero-illustration": true,
+        "heading": true,
+        "body-message": true,
+        "notify-cta": true
+      },
+      "strings": {
+        "featureHeading": "Coming soon",
+        "featureMessage": "This feature is still in development.",
+        "notifyCta": "Notify me when it's ready"
+      }
+    },
+    {
+      "name": "beta-waitlist",
+      "description": "User is on waitlist for beta access",
+      "visibility": {
+        "beta-badge": true,
+        "hero-illustration": true,
+        "heading": true,
+        "body-message": true,
+        "notify-cta": false
+      },
+      "strings": {
+        "betaBadge": "BETA",
+        "featureHeading": "You're on the waitlist",
+        "featureMessage": "We'll notify you when access opens."
+      }
+    }
+  ],
+  "accessibility": {
+    "role": "status",
+    "announceOnAppear": "{featureHeading}. {featureMessage}"
+  },
+  "frames": [
+    {
+      "name": "L-5-disabled",
+      "state": "disabled"
+    },
+    {
+      "name": "L-5-beta-waitlist",
+      "state": "beta-waitlist"
+    }
+  ]
+}

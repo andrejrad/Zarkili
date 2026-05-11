@@ -1,0 +1,182 @@
+{
+  "schemaVersion": "1.0.0",
+  "screenId": "M.15",
+  "screenName": "StripeConnectOnboardingScreen",
+  "route": "admin/connect/onboarding",
+  "designSystem": "Zarkili v1.0.0",
+  "device": "iPad 768x1024",
+  "engineeringStatus": "designed",
+  "description": "Multi-step Stripe Connect onboarding stepper collecting business info, owner identity, bank account details, and verification documents.",
+  "layout": {
+    "type": "stepper",
+    "padding": {
+      "top": 24,
+      "right": 32,
+      "bottom": 40,
+      "left": 32
+    },
+    "maxContentWidth": 960,
+    "gap": 24,
+    "totalSteps": 4
+  },
+  "sections": [
+    {
+      "id": "step-1-business-info",
+      "type": "form-section",
+      "title": "Business Info",
+      "component": null,
+      "step": 1,
+      "fields": [
+        {
+          "id": "legalName",
+          "type": "text-input",
+          "label": "Legal name"
+        },
+        {
+          "id": "ein",
+          "type": "text-input",
+          "label": "EIN",
+          "masked": true
+        },
+        {
+          "id": "businessAddress",
+          "type": "address-input",
+          "label": "Business address",
+          "format": "US"
+        },
+        {
+          "id": "businessType",
+          "type": "picker",
+          "label": "Business type",
+          "options": [
+            "Sole Proprietorship",
+            "LLC",
+            "Corporation"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "step-2-owner-identity",
+      "type": "form-section",
+      "title": "Owner Identity",
+      "component": null,
+      "step": 2,
+      "fields": [
+        {
+          "id": "ownerName",
+          "type": "text-input",
+          "label": "Owner name"
+        },
+        {
+          "id": "dob",
+          "type": "date-picker",
+          "label": "Date of birth",
+          "format": "MM/DD/YYYY"
+        },
+        {
+          "id": "ssnLast4",
+          "type": "text-input",
+          "label": "SSN last 4",
+          "maxLength": 4,
+          "masked": true
+        },
+        {
+          "id": "address",
+          "type": "address-input",
+          "label": "Address",
+          "format": "US"
+        }
+      ]
+    },
+    {
+      "id": "step-3-bank-account",
+      "type": "form-section",
+      "title": "Bank Account",
+      "component": null,
+      "step": 3,
+      "fields": [
+        {
+          "id": "routingNumber",
+          "type": "text-input",
+          "label": "Routing number",
+          "maxLength": 9
+        },
+        {
+          "id": "accountNumber",
+          "type": "text-input",
+          "label": "Account number",
+          "masked": true
+        },
+        {
+          "id": "accountType",
+          "type": "picker",
+          "label": "Account type",
+          "options": [
+            "Checking",
+            "Savings"
+          ]
+        }
+      ],
+      "upload": {
+        "component": "MC.4",
+        "label": "Voided check (optional)"
+      }
+    },
+    {
+      "id": "step-4-verification",
+      "type": "upload-list",
+      "title": "Verification",
+      "component": "MC.4",
+      "step": 4,
+      "uploads": [
+        {
+          "label": "Government-issued ID",
+          "required": true
+        },
+        {
+          "label": "EIN letter",
+          "required": true
+        }
+      ],
+      "progressBar": {
+        "label": "Verification progress",
+        "target": "Active"
+      }
+    },
+    {
+      "id": "trust-badge",
+      "type": "status-banner",
+      "title": null,
+      "component": null,
+      "text": "Payment infrastructure handled by Stripe",
+      "shownOnAllSteps": true
+    },
+    {
+      "id": "action-required-banner",
+      "type": "status-banner",
+      "title": null,
+      "component": null,
+      "condition": "state === action-required",
+      "text": "Stripe requires additional information.",
+      "ctaLabel": "Complete in Stripe",
+      "ctaLink": "{{stripeConnectOnboardingUrl}}"
+    }
+  ],
+  "stateNames": [
+    "step-1",
+    "step-2",
+    "step-3",
+    "step-4",
+    "awaiting-stripe-review",
+    "action-required",
+    "active",
+    "error-step-1",
+    "error-step-2",
+    "error-step-3",
+    "error-step-4"
+  ],
+  "accessibility": {
+    "screenReaderLabel": "Stripe Connect onboarding"
+  }
+}

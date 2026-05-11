@@ -1,0 +1,331 @@
+{
+  "component": "RatingSelector",
+  "description": "Interactive 5-star rating component with optional label feedback",
+  "purpose": "Capture a 0-5 star rating with optional descriptive label, supporting hover preview, clear-on-retap, accessibility adjustable role, and read-only display",
+  "source": {
+    "batch": "E",
+    "screen": "E.7 Review Prompt / E.8 Review Detail",
+    "promotedFrom": "documentation/figma-prompts/BATCH_E_LOYALTY_ACTIVITIES_REVIEWS.md",
+    "figmaFrames": [
+      "E-component-rating-selector-default-32",
+      "E-component-rating-selector-default-24",
+      "E-component-rating-selector-hovered",
+      "E-component-rating-selector-selected-3",
+      "E-component-rating-selector-selected-5",
+      "E-component-rating-selector-pressed",
+      "E-component-rating-selector-disabled",
+      "E-component-rating-selector-error",
+      "E-component-rating-selector-readonly"
+    ],
+    "lockedAt": "2026-04-28"
+  },
+  "variants": {
+    "size": {
+      "options": ["default", "compact"],
+      "default": "default"
+    },
+    "showLabel": {
+      "options": [true, false],
+      "default": true
+    },
+    "readOnly": {
+      "options": [true, false],
+      "default": false
+    },
+    "state": {
+      "options": ["default", "hovered", "selected", "pressed", "disabled", "error"],
+      "default": "default"
+    }
+  },
+  "states": {
+    "default": {
+      "stars": {
+        "fill": "none",
+        "stroke": "#6B6B6B",
+        "strokeWidth": 2
+      },
+      "label": {
+        "visible": false
+      }
+    },
+    "hovered": {
+      "previewStars": {
+        "fill": "#E3A9A0",
+        "fillOpacity": 0.5,
+        "stroke": "#E3A9A0",
+        "strokeOpacity": 0.5
+      },
+      "inactiveStars": {
+        "fill": "none",
+        "stroke": "#6B6B6B"
+      },
+      "label": {
+        "visible": true,
+        "color": "#6B6B6B"
+      }
+    },
+    "selected": {
+      "activeStars": {
+        "fill": "#E3A9A0",
+        "stroke": "#E3A9A0",
+        "strokeWidth": 2
+      },
+      "inactiveStars": {
+        "fill": "none",
+        "stroke": "#6B6B6B",
+        "strokeWidth": 2
+      },
+      "label": {
+        "visible": true,
+        "color": "#6B6B6B"
+      }
+    },
+    "pressed": {
+      "targetStar": {
+        "fill": "#E3A9A0",
+        "stroke": "#E3A9A0",
+        "transform": "scale(1.1)",
+        "transitionDuration": 80
+      },
+      "reduceMotion": {
+        "transform": "scale(1.0)"
+      }
+    },
+    "disabled": {
+      "stars": {
+        "fill": {
+          "active": "#B0B0B0",
+          "inactive": "none"
+        },
+        "stroke": "#B0B0B0",
+        "strokeWidth": 2
+      },
+      "label": {
+        "color": "#B0B0B0"
+      },
+      "pointerEvents": "none"
+    },
+    "error": {
+      "stars": {
+        "fill": "none",
+        "stroke": "#6B6B6B",
+        "strokeWidth": 2
+      },
+      "helperText": {
+        "visible": true,
+        "content": "Please rate your visit",
+        "color": "#F44336",
+        "style": "body-small"
+      }
+    }
+  },
+  "layout": {
+    "default": {
+      "starSize": 32,
+      "gap": 8,
+      "touchTarget": 44,
+      "hitSlop": 6,
+      "totalWidth": 192
+    },
+    "compact": {
+      "starSize": 24,
+      "gap": 8,
+      "touchTarget": 44,
+      "hitSlop": 10,
+      "totalWidth": 152
+    },
+    "container": {
+      "display": "flex",
+      "flexDirection": "column",
+      "alignItems": "center",
+      "gap": 8
+    },
+    "starsRow": {
+      "display": "flex",
+      "flexDirection": "row",
+      "alignItems": "center",
+      "gap": 8
+    }
+  },
+  "anatomy": {
+    "container": {
+      "flexDirection": "column",
+      "alignItems": "center",
+      "gap": 8
+    },
+    "starsRow": {
+      "flexDirection": "row",
+      "alignItems": "center",
+      "gap": 8,
+      "count": 5
+    },
+    "star": {
+      "icon": "star",
+      "size": {
+        "default": 32,
+        "compact": 24
+      },
+      "touchTarget": {
+        "width": 44,
+        "height": 44
+      },
+      "interactive": true
+    },
+    "label": {
+      "style": "body-small",
+      "textAlign": "center",
+      "marginTop": 8,
+      "content": {
+        "0": "",
+        "1": "Not for me",
+        "2": "Meh",
+        "3": "OK",
+        "4": "Great",
+        "5": "Loved it!"
+      }
+    },
+    "helperText": {
+      "style": "body-small",
+      "textAlign": "center",
+      "marginTop": 8
+    }
+  },
+  "interactions": {
+    "tap": {
+      "action": "selectRating",
+      "feedback": "scale",
+      "duration": 80,
+      "note": "Tapping the same star again clears to 0"
+    },
+    "hover": {
+      "action": "previewRating",
+      "visual": "fill stars up to hover position at 50 percent opacity"
+    },
+    "increment": {
+      "action": "increase rating by 1",
+      "max": 5
+    },
+    "decrement": {
+      "action": "decrease rating by 1",
+      "min": 0
+    }
+  },
+  "accessibility": {
+    "role": "adjustable",
+    "value": {
+      "min": 0,
+      "max": 5,
+      "now": "{{rating}}",
+      "text": "{{rating}} of 5 stars"
+    },
+    "label": "Rate your experience",
+    "hint": "Double tap to activate, then swipe up or down to adjust rating",
+    "actions": [
+      {
+        "name": "increment",
+        "label": "Increase rating"
+      },
+      {
+        "name": "decrement",
+        "label": "Decrease rating"
+      }
+    ],
+    "isAccessibilityElement": true,
+    "touchTarget": {
+      "minWidth": 44,
+      "minHeight": 44,
+      "hitSlop": {
+        "default": 6,
+        "compact": 10
+      }
+    },
+    "reduceMotion": {
+      "disableScale": true,
+      "note": "When prefers-reduced-motion is enabled, pressed scale animation is suppressed"
+    }
+  },
+  "labelMapping": {
+    "0": "",
+    "1": "Not for me",
+    "2": "Meh",
+    "3": "OK",
+    "4": "Great",
+    "5": "Loved it!"
+  },
+  "transitions": {
+    "onPress": {
+      "duration": 80,
+      "easing": "ease-out",
+      "properties": ["transform"],
+      "respectReducedMotion": true
+    },
+    "onHover": {
+      "duration": 100,
+      "easing": "ease-in-out",
+      "properties": ["fill", "stroke", "opacity"]
+    },
+    "onSelect": {
+      "duration": 150,
+      "easing": "ease-out",
+      "properties": ["fill", "stroke"]
+    }
+  },
+  "usage": {
+    "context": [
+      "Post-booking review screen",
+      "Service feedback form",
+      "Salon rating in search results",
+      "Read-only rating display"
+    ],
+    "rules": [
+      "Each star has 44x44 touch target regardless of visual size",
+      "Hover preview shows fill at 50 percent opacity for stars up to cursor position",
+      "Selected stars show full opacity #E3A9A0 fill",
+      "Tapping the same star again clears rating to 0",
+      "Label updates dynamically based on rating value",
+      "readOnly variant suppresses all interaction states",
+      "Error state shows helper text below stars",
+      "Disabled state uses #B0B0B0 for all star strokes/fills",
+      "Pressed state scales current star to 1.1 for 80ms",
+      "Respect prefers-reduced-motion by disabling scale animation"
+    ]
+  },
+  "examples": {
+    "reviewForm": {
+      "size": "default",
+      "showLabel": true,
+      "readOnly": false,
+      "value": 0
+    },
+    "compactFeedback": {
+      "size": "compact",
+      "showLabel": false,
+      "readOnly": false,
+      "value": 0
+    },
+    "displayRating": {
+      "size": "default",
+      "showLabel": false,
+      "readOnly": true,
+      "value": 4
+    },
+    "errorState": {
+      "size": "default",
+      "showLabel": true,
+      "readOnly": false,
+      "value": 0,
+      "state": "error",
+      "helperText": "Please rate your visit"
+    }
+  },
+  "implementationNotes": [
+    "Each star uses star.svg from icons/. Stroke-only = empty; stroke+fill = selected.",
+    "Touch target is always 44x44 via hitSlop (6px for size 32, 10px for size 24).",
+    "Hover/focus shows preview fill at 50% opacity up to the cursor position.",
+    "Tapping the currently selected star clears the rating to 0.",
+    "Pressed star scales to 1.1 for 80ms; suppressed under prefers-reduced-motion.",
+    "Error state renders body-small helper text in #F44336 below the row.",
+    "Read-only suppresses hover/pressed/focus and removes increment/decrement actions.",
+    "Accessibility role 'adjustable' exposes min=0 max=5 now=value text='{n} of 5 stars'."
+  ]
+}

@@ -1,0 +1,60 @@
+{
+  "screen": "ScheduledReportScreen",
+  "route": "/admin/analytics/scheduled-reports",
+  "description": "Create and manage automated report delivery schedules",
+  "platform": "admin-desktop",
+  "dimensions": { "width": 1280, "contentWidth": "calc(1280 - 240px sidebar)" },
+  "states": ["default", "loading", "empty", "drawer-open", "saving", "saved"],
+  "accessibility": {
+    "screenReaderLabel": "strings.scheduledReport.screenTitle",
+    "semanticRoles": [
+      { "element": "scheduleTable", "role": "table" },
+      { "element": "drawer", "role": "dialog" }
+    ]
+  },
+  "rtl": "deferred",
+  "darkMode": "deferred",
+  "layout": {
+    "header": {
+      "component": "AdminHeader",
+      "title": "strings.scheduledReport.title",
+      "rightActions": [{ "component": "PrimaryButton", "label": "strings.scheduledReport.newScheduledReport" }]
+    },
+    "body": {
+      "padding": 24,
+      "scheduleTable": {
+        "width": "full",
+        "component": "DataTable",
+        "sortable": true,
+        "sortBy": "Next Run",
+        "columns": ["Report Name", "Frequency", "Next Run", "Recipients (count + avatar stack)", "Last Sent", "Status (Active/Paused badge)", "Actions (Edit icon, Pause/Resume toggle, Delete icon)"]
+      }
+    },
+    "drawer": {
+      "width": 480,
+      "position": "right overlay",
+      "header": { "title": "strings.scheduledReport.drawerTitle", "closeX": true },
+      "form": {
+        "fields": [
+          { "label": "strings.scheduledReport.selectReport", "component": "dropdown" },
+          { "label": "strings.scheduledReport.nameLabel", "component": "text input" },
+          { "label": "strings.scheduledReport.frequencyLabel", "component": "radio", "options": ["strings.scheduledReport.frequencyDaily", "strings.scheduledReport.frequencyWeekly", "strings.scheduledReport.frequencyMonthly"] },
+          { "label": "strings.scheduledReport.dayLabel", "component": "conditional", "conditions": { "Weekly": "day-of-week picker", "Monthly": "day-of-month 1-28" } },
+          { "label": "strings.scheduledReport.timeLabel", "component": "time picker", "intervals": "15-min", "showTimezone": true },
+          { "label": "strings.scheduledReport.formatLabel", "component": "toggle", "options": ["PDF", "CSV"] },
+          { "label": "strings.scheduledReport.recipientsLabel", "component": "email tag input", "validation": "email format" }
+        ]
+      },
+      "footer": {
+        "buttons": [
+          { "label": "strings.scheduledReport.cancel", "component": "SecondaryButton" },
+          { "label": "strings.scheduledReport.save", "component": "PrimaryButton" }
+        ]
+      }
+    }
+  },
+  "components": [
+    { "id": "scheduleTable", "ref": "DataTable", "props": { "columns": "{{scheduleColumns}}", "data": "{{scheduleData}}", "sortable": true } }
+  ],
+  "strings": "See strings/en-us.json for scheduledReport keys"
+}

@@ -1,0 +1,76 @@
+{
+  "schemaVersion": "1.0.0",
+  "screenId": "M.13",
+  "screenName": "AdminPaymentMethodScreen",
+  "route": "admin/billing/payment-methods",
+  "designSystem": "Zarkili v1.0.0",
+  "device": "iPad 768x1024",
+  "engineeringStatus": "designed",
+  "description": "Billing screen for owners to manage saved credit cards and ACH bank accounts, set defaults, and add new payment methods via Stripe Elements.",
+  "layout": {
+    "type": "scrollable-column",
+    "padding": {
+      "top": 24,
+      "right": 32,
+      "bottom": 40,
+      "left": 32
+    },
+    "maxContentWidth": 960,
+    "gap": 24
+  },
+  "sections": [
+    {
+      "id": "saved-cards",
+      "type": "list-section",
+      "title": "Saved cards",
+      "component": null,
+      "rowComponent": "card-list-row",
+      "rowFields": [
+        "last4",
+        "brand",
+        "expiry",
+        "defaultToggle",
+        "removeButton"
+      ]
+    },
+    {
+      "id": "bank-accounts",
+      "type": "list-section",
+      "title": "Bank accounts (ACH)",
+      "component": null,
+      "rowComponent": "bank-account-row",
+      "rowFields": [
+        "accountType",
+        "last4",
+        "bankName",
+        "defaultToggle",
+        "removeButton"
+      ],
+      "accountTypeOptions": [
+        "Checking",
+        "Savings"
+      ]
+    },
+    {
+      "id": "add-payment-cta",
+      "type": "form-section",
+      "title": null,
+      "component": null,
+      "cta": {
+        "label": "Add payment method",
+        "variant": "primary",
+        "action": "open-stripe-elements-sheet"
+      }
+    }
+  ],
+  "stateNames": [
+    "default",
+    "adding",
+    "default-changed",
+    "removing",
+    "error"
+  ],
+  "accessibility": {
+    "screenReaderLabel": "Payment methods"
+  }
+}

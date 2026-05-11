@@ -1,0 +1,118 @@
+{
+  "schemaVersion": "1.0.0",
+  "screenId": "M.16",
+  "screenName": "ConnectHealthStatusScreen",
+  "route": "admin/connect/health",
+  "designSystem": "Zarkili v1.0.0",
+  "device": "iPad 768x1024",
+  "engineeringStatus": "designed",
+  "description": "Dashboard screen showing Stripe Connect account health, capability statuses, and required actions for owners to resolve restrictions.",
+  "layout": {
+    "type": "scrollable-column",
+    "padding": {
+      "top": 24,
+      "right": 32,
+      "bottom": 40,
+      "left": 32
+    },
+    "maxContentWidth": 960,
+    "gap": 24
+  },
+  "sections": [
+    {
+      "id": "connect-status-banner",
+      "type": "status-banner",
+      "title": null,
+      "component": null,
+      "variants": [
+        {
+          "state": "active",
+          "tokenBg": "accent.fresh",
+          "label": "Payouts active"
+        },
+        {
+          "state": "pending",
+          "tokenBg": "admin.warning",
+          "label": "Verification pending"
+        },
+        {
+          "state": "action-required",
+          "tokenBg": "error",
+          "label": "Action required"
+        },
+        {
+          "state": "restricted",
+          "tokenBg": "admin.danger",
+          "label": "Payouts restricted"
+        },
+        {
+          "state": "disabled",
+          "tokenBg": "disabled.bg",
+          "label": "Connect disabled"
+        }
+      ]
+    },
+    {
+      "id": "capability-grid",
+      "type": "kpi-tile-grid",
+      "title": null,
+      "component": null,
+      "gridCols": {
+        "iPad": 2,
+        "iPhone": 1
+      },
+      "items": [
+        {
+          "key": "charges",
+          "label": "Charges",
+          "statusPill": true,
+          "badge": true
+        },
+        {
+          "key": "payouts",
+          "label": "Payouts",
+          "statusPill": true,
+          "badge": true
+        }
+      ]
+    },
+    {
+      "id": "required-actions-list",
+      "type": "list-section",
+      "title": "Required actions",
+      "component": null,
+      "condition": "state === action-required || state === restricted",
+      "rowFields": [
+        {
+          "key": "description",
+          "type": "text"
+        },
+        {
+          "key": "cta",
+          "label": "Fix in Stripe",
+          "type": "link-button",
+          "href": "{{stripeActionUrl}}"
+        }
+      ]
+    },
+    {
+      "id": "verified-timestamp",
+      "type": "list-section",
+      "title": null,
+      "component": null,
+      "label": "Last verified {{verifiedAt}} {{timezone}}",
+      "format": "12h US"
+    }
+  ],
+  "stateNames": [
+    "active",
+    "pending",
+    "action-required",
+    "restricted",
+    "disabled",
+    "error"
+  ],
+  "accessibility": {
+    "screenReaderLabel": "Connect health status"
+  }
+}

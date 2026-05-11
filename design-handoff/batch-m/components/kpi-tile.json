@@ -1,0 +1,117 @@
+{
+  "schemaVersion": "1.0.0",
+  "componentId": "MC.2",
+  "componentName": "KpiTile",
+  "exportedAs": "KpiTile",
+  "category": "admin-data-display",
+  "description": "Single KPI metric card with value, trend delta chip, and optional sparkline. Null-safe with configurable placeholder.",
+  "props": {
+    "label": {
+      "type": "string",
+      "required": true,
+      "description": "Metric display name shown above the value"
+    },
+    "value": {
+      "type": "number | null",
+      "required": true,
+      "description": "Numeric value to display; null triggers nullLabel display"
+    },
+    "format": {
+      "type": "'integer' | 'currency' | 'percent'",
+      "required": false,
+      "default": "integer",
+      "description": "Controls how value is formatted for display"
+    },
+    "currencyCode": {
+      "type": "string",
+      "required": false,
+      "default": "USD",
+      "description": "ISO 4217 currency code used when format is currency"
+    },
+    "nullLabel": {
+      "type": "string | null",
+      "required": false,
+      "default": null,
+      "description": "Shown when value is null; null shows a dash"
+    },
+    "trend": {
+      "type": "'up' | 'down' | 'flat' | null",
+      "required": false,
+      "default": null,
+      "description": "Trend direction driving icon and color of delta chip"
+    },
+    "deltaLabel": {
+      "type": "string | null",
+      "required": false,
+      "default": null,
+      "description": "Human-readable delta string e.g. '+12%' or '+3 vs yesterday'"
+    },
+    "sparklineData": {
+      "type": "number[] | null",
+      "required": false,
+      "default": null,
+      "description": "7-point array for micro-chart in the trend row"
+    },
+    "loading": {
+      "type": "boolean",
+      "required": false,
+      "default": false,
+      "description": "Shows skeleton shimmer when true"
+    },
+    "onPress": {
+      "type": "(() => void) | null",
+      "required": false,
+      "default": null,
+      "description": "Makes tile tappable and shows a trailing chevron"
+    },
+    "testID": {
+      "type": "string",
+      "required": false,
+      "description": "Test identifier for automated testing"
+    }
+  },
+  "tokens": {
+    "background": "kpiTile.background",
+    "valueLarge": "text.primary",
+    "label": "admin.text.muted",
+    "trendUp": "kpiTile.trendUp",
+    "trendDown": "kpiTile.trendDown",
+    "trendFlat": "kpiTile.trendFlat",
+    "deltaChipPosBg": "accent.fresh",
+    "deltaChipNegBg": "pill.error.bg",
+    "nullLabel": "admin.text.muted"
+  },
+  "anatomy": [
+    "tile-container (radius large 16, padding 16, shadow-sm)",
+    "label-text (label-small muted, row 1)",
+    "value-text (heading-1, row 2)",
+    "null-label-text (body-small muted italic, shown when value null)",
+    "trend-row (delta-chip left + sparkline 80x24 right, row 3)",
+    "touch-ripple (shown when onPress provided)"
+  ],
+  "sizes": [
+    {
+      "name": "default",
+      "width": "fill-grid-col",
+      "height": 120
+    },
+    {
+      "name": "compact",
+      "width": "fill-grid-col",
+      "height": 96,
+      "note": "omits sparkline row"
+    }
+  ],
+  "stateNames": [
+    "loading",
+    "valuePresent",
+    "valueNull",
+    "interactive",
+    "error"
+  ],
+  "accessibility": {
+    "role": "region",
+    "ariaLabel": "{{label}}: {{formattedValue}}",
+    "trendAriaLabel": "Trend: {{trend}}, {{deltaLabel}}"
+  }
+}

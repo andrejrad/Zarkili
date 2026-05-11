@@ -1,0 +1,93 @@
+{
+  "screen": "IncidentResponseScreen",
+  "route": "SuperAdminIncidentResponse",
+  "device": { "primary": "Desktop 1280+", "secondary": "iPad 1024×768" },
+  "stateNames": ["default", "activeIncident", "resolved", "error"],
+  "layout": {
+    "incidentList": {
+      "layout": "left sidebar (width 360) + main detail",
+      "sidebar": {
+        "header": {
+          "title": { "text": "Incidents", "variant": "heading-2" },
+          "newIncidentCta": { "label": "New Incident", "type": "button", "variant": "filled", "icon": "add" }
+        },
+        "filters": {
+          "type": "filterChipRow",
+          "filters": [{ "key": "status", "options": ["active", "monitoring", "resolved"] }, { "key": "severity", "options": ["P1", "P2", "P3"] }]
+        },
+        "list": {
+          "item": {
+            "fields": [
+              { "key": "severity", "type": "pill", "colors": { "P1": "error", "P2": "warning", "P3": "surface-variant" } },
+              { "key": "title", "variant": "body-medium", "weight": "500" },
+              { "key": "status", "type": "pill" },
+              { "key": "duration", "type": "monoClock", "font": "mono", "variant": "caption" }
+            ]
+          }
+        }
+      },
+      "main": {
+        "incidentDetail": {
+          "header": {
+            "fields": [
+              { "key": "severity", "type": "pill" },
+              { "key": "title", "variant": "heading-3" },
+              { "key": "status", "type": "pill" },
+              { "key": "startedAt", "type": "relative", "variant": "caption" },
+              { "key": "duration", "type": "monoClock", "font": "mono" }
+            ],
+            "actions": [
+              { "label": "strings.incidentResponse.resolveCta", "variant": "filled", "color": "success", "showWhen": "status !== resolved" },
+              { "label": "strings.incidentResponse.sendCommsCta", "variant": "outlined", "icon": "mail" }
+            ]
+          },
+          "tabs": {
+            "type": "tabBar",
+            "tabs": ["Timeline", "Affected Services", "Communications", "Postmortem"]
+          },
+          "timeline": {
+            "type": "verticalStepper",
+            "item": {
+              "fields": [
+                { "key": "timestamp", "font": "mono", "variant": "caption" },
+                { "key": "actor", "type": "userPill" },
+                { "key": "event", "variant": "body-medium" },
+                { "key": "notes", "type": "markdown", "variant": "body-medium" }
+              ]
+            },
+            "addEntry": {
+              "type": "inlineComposer",
+              "placeholder": "Add timeline entry...",
+              "cta": { "label": "Add", "variant": "filled", "size": "compact" }
+            }
+          },
+          "commsTab": {
+            "type": "messageList",
+            "filters": { "channel": ["status-page", "email", "slack"] },
+            "composer": {
+              "template": true,
+              "channels": { "type": "checkboxList", "options": ["Status Page", "Email all tenants", "Internal Slack"] }
+            }
+          }
+        }
+      }
+    }
+  },
+  "states": {
+    "activeIncident": {
+      "sidebar": { "selectedItem": { "background": "error-container" } },
+      "header": { "alertBanner": { "background": "error", "visible": true } }
+    },
+    "resolved": {
+      "header": { "status": "resolved" },
+      "resolveCta": { "visible": false }
+    },
+    "error": {
+      "inlineBanner": {
+        "background": "error 10%",
+        "borderLeft": { "width": 4, "color": "error" },
+        "message": "strings.incidentResponse.errorMessage"
+      }
+    }
+  }
+}

@@ -58,6 +58,9 @@ export type OnboardingAdminService = {
   ): Promise<{ event: OnboardingTimelineEvent; state: SalonOnboardingState }>;
 
   listTimeline(tenantId: string): Promise<OnboardingTimelineEvent[]>;
+
+  /** Read the current wizard state for a tenant. */
+  getOnboardingState(tenantId: string): Promise<SalonOnboardingState | null>;
 };
 
 export type OnboardingAdminDeps = {
@@ -168,5 +171,9 @@ export function createOnboardingAdminService(
     return repository.listTimeline(tenantId);
   }
 
-  return { extendTrial, resetStep, applyVerificationOverride, listTimeline };
+  async function getOnboardingState(tenantId: string): Promise<SalonOnboardingState | null> {
+    return repository.getOnboardingState(tenantId);
+  }
+
+  return { extendTrial, resetStep, applyVerificationOverride, listTimeline, getOnboardingState };
 }

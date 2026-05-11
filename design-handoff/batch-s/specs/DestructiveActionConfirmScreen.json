@@ -1,0 +1,64 @@
+{
+  "screen": "DestructiveActionConfirmScreen",
+  "route": "DestructiveActionConfirm",
+  "device": { "primary": "Mobile 375×812", "secondary": "Desktop 1280+" },
+  "stateNames": ["idle", "submitting", "error"],
+  "layout": {
+    "type": "modal",
+    "maxWidth": 440,
+    "header": {
+      "icon": { "name": "errorFilled", "size": 48, "color": "error" },
+      "title": { "text": "{actionTitle}", "variant": "heading-4", "align": "center" },
+      "body": { "text": "{actionDescription}", "variant": "body-medium", "align": "center", "color": "on-surface-variant" }
+    },
+    "form": {
+      "fields": [
+        {
+          "id": "typedValue",
+          "type": "textInput",
+          "label": "strings.destructiveConfirm.typedValueLabel",
+          "hint": "Must match exactly: {confirmWord}",
+          "validation": { "mustEqual": "{confirmWord}" }
+        },
+        {
+          "id": "reason",
+          "type": "select",
+          "label": "strings.destructiveConfirm.reasonLabel",
+          "required": true,
+          "options": "dynamic from action config"
+        },
+        {
+          "id": "explanation",
+          "type": "textArea",
+          "label": "strings.destructiveConfirm.explanationLabel",
+          "helperText": "strings.destructiveConfirm.explanationHelper",
+          "rows": 4,
+          "minChars": 20,
+          "required": true,
+          "showWhen": "reason !== null"
+        }
+      ]
+    },
+    "footer": {
+      "ctaGroup": [
+        { "label": "strings.destructiveConfirm.cancelCta", "variant": "outlined" },
+        { "label": "{actionCta}", "variant": "filled", "tone": "destructive", "disabledWhen": "typedValue !== confirmWord || explanation.length < 20" }
+      ]
+    },
+    "errorMessage": {
+      "showWhen": "state === error",
+      "type": "text",
+      "color": "error",
+      "text": "strings.destructiveConfirm.errorMessage"
+    }
+  },
+  "states": {
+    "submitting": {
+      "form": { "disabled": true },
+      "footer": { "actionCta": { "loading": true, "disabled": true } }
+    },
+    "error": {
+      "errorMessage": { "visible": true }
+    }
+  }
+}

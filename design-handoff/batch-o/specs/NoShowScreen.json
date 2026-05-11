@@ -1,0 +1,125 @@
+{
+  "screen": "NoShowScreen",
+  "route": "AdminMarkNoShow",
+  "device": {
+    "type": "modal-sheet",
+    "width": 390,
+    "maxHeight": "70vh",
+    "radius": 20
+  },
+  "stateNames": [
+    "default",
+    "charging",
+    "charged",
+    "chargeFailed",
+    "error"
+  ],
+  "layout": {
+    "handle": {
+      "width": 36,
+      "height": 4
+    },
+    "header": {
+      "title": "strings.noShow.title"
+    },
+    "bookingRow": {
+      "height": 56,
+      "background": "surface",
+      "radius": "medium",
+      "border": {
+        "width": 1,
+        "color": "cardBorder"
+      },
+      "content": {
+        "avatar": {
+          "size": 32
+        },
+        "clientName": true,
+        "service": true,
+        "time": {
+          "format": "h:mm AM",
+          "position": "right"
+        }
+      }
+    },
+    "policyCard": {
+      "background": "surface",
+      "border": {
+        "width": 1,
+        "color": "cardBorder"
+      },
+      "radius": 12,
+      "padding": 16,
+      "body": {
+        "text": "strings.noShow.policyBody",
+        "interpolation": "feeAmount USD"
+      }
+    },
+    "toggles": [
+      {
+        "key": "chargeFee",
+        "label": "strings.noShow.chargeFeeLabel",
+        "description": "strings.noShow.chargeFeeDescription",
+        "interpolation": "feeAmount USD",
+        "defaultOn": "policyExists AND cardOnFile",
+        "disabled": {
+          "when": "noCardOnFile",
+          "icon": "lock",
+          "helper": "strings.noShow.noCardOnFileHelper"
+        }
+      },
+      {
+        "key": "notifyClient",
+        "label": "strings.noShow.notifyClientLabel",
+        "defaultOn": true
+      }
+    ],
+    "chargeFailedBanner": {
+      "background": "error 10%",
+      "borderLeft": {
+        "width": 4,
+        "color": "error"
+      },
+      "label": "strings.noShow.chargeFailedBanner",
+      "visibleWhen": "state.chargeFailed",
+      "position": "above footer"
+    },
+    "footer": {
+      "actions": [
+        {
+          "type": "button",
+          "label": "strings.noShow.cancel",
+          "variant": "secondary"
+        },
+        {
+          "type": "button",
+          "label": "strings.noShow.confirm",
+          "variant": "destructive-primary"
+        }
+      ]
+    }
+  },
+  "states": {
+    "charging": {
+      "ctaButton": {
+        "spinner": true
+      },
+      "toggles": {
+        "locked": true
+      }
+    },
+    "charged": {
+      "toast": "strings.noShow.chargedToast",
+      "action": "dismiss"
+    },
+    "chargeFailed": {
+      "banner": {
+        "visible": true
+      },
+      "ctaButton": {
+        "enabled": true,
+        "action": "mark without fee"
+      }
+    }
+  }
+}

@@ -1,0 +1,140 @@
+{
+  "schemaVersion": "1.0.0",
+  "screenId": "M.17",
+  "screenName": "PayoutHistoryScreen",
+  "route": "admin/connect/payouts",
+  "designSystem": "Zarkili v1.0.0",
+  "device": "iPad 768x1024",
+  "engineeringStatus": "designed",
+  "description": "Screen for owners to view payout balances, configure the payout schedule, and review paginated payout transaction history.",
+  "layout": {
+    "type": "scrollable-column",
+    "padding": {
+      "top": 24,
+      "right": 32,
+      "bottom": 40,
+      "left": 32
+    },
+    "maxContentWidth": 960,
+    "gap": 24
+  },
+  "sections": [
+    {
+      "id": "balance-card",
+      "type": "list-section",
+      "title": null,
+      "component": null,
+      "card": {
+        "background": "surface",
+        "radius": "large",
+        "padding": 24
+      },
+      "rows": [
+        {
+          "label": "Pending",
+          "valueKey": "pendingBalance",
+          "format": "currency"
+        },
+        {
+          "label": "Available",
+          "valueKey": "availableBalance",
+          "format": "currency"
+        },
+        {
+          "label": "On the way",
+          "valueKey": "inTransitBalance",
+          "format": "currency"
+        }
+      ]
+    },
+    {
+      "id": "schedule-controls",
+      "type": "form-section",
+      "title": "Payout schedule",
+      "component": null,
+      "controls": [
+        {
+          "id": "scheduleFrequency",
+          "type": "segmented-control",
+          "options": [
+            "Daily",
+            "Weekly",
+            "Monthly"
+          ],
+          "conditional": {
+            "Weekly": {
+              "type": "weekday-picker",
+              "id": "payoutWeekday"
+            },
+            "Monthly": {
+              "type": "day-of-month-picker",
+              "id": "payoutDayOfMonth",
+              "min": 1,
+              "max": 28
+            }
+          }
+        }
+      ],
+      "cta": {
+        "label": "Save schedule",
+        "variant": "primary"
+      }
+    },
+    {
+      "id": "on-hold-banner",
+      "type": "status-banner",
+      "title": null,
+      "component": null,
+      "condition": "onHold === true",
+      "text": "Payouts on hold: {{holdReason}}.",
+      "variant": "admin.warning"
+    },
+    {
+      "id": "payout-history-table",
+      "type": "data-table",
+      "title": null,
+      "component": "MC.1",
+      "columns": [
+        {
+          "key": "arrivalDate",
+          "label": "Arrival date",
+          "type": "date",
+          "format": "MM/DD/YYYY"
+        },
+        {
+          "key": "amount",
+          "label": "Amount",
+          "type": "currency",
+          "currencyCode": "USD",
+          "align": "right"
+        },
+        {
+          "key": "method",
+          "label": "Method",
+          "type": "text",
+          "template": "···· {{last4}}"
+        },
+        {
+          "key": "status",
+          "label": "Status",
+          "type": "status-pill"
+        },
+        {
+          "key": "receipt",
+          "label": "Receipt",
+          "type": "link-button"
+        }
+      ]
+    }
+  ],
+  "stateNames": [
+    "default",
+    "no-balance",
+    "on-hold",
+    "schedule-saved",
+    "error"
+  ],
+  "accessibility": {
+    "screenReaderLabel": "Payout history and schedule"
+  }
+}

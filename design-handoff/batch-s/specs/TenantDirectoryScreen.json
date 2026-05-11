@@ -1,0 +1,113 @@
+{
+  "screen": "TenantDirectoryScreen",
+  "route": "SuperAdminTenants",
+  "device": {
+    "primary": "Desktop 1280+",
+    "secondary": "iPad 1024×768"
+  },
+  "stateNames": ["default", "suspended", "churned", "error"],
+  "layout": {
+    "header": {
+      "searchInput": {
+        "position": "left",
+        "width": 280,
+        "placeholder": "strings.tenantDirectory.searchPlaceholder"
+      },
+      "filterStrip": {
+        "position": "right",
+        "filters": [
+          { "type": "dropdown", "key": "plan", "label": "strings.tenantDirectory.filterPlan" },
+          { "type": "multiSelect", "key": "status", "label": "strings.tenantDirectory.filterStatus" },
+          { "type": "dropdown", "key": "region", "label": "strings.tenantDirectory.filterRegion" }
+        ]
+      }
+    },
+    "table": {
+      "type": "data-table-v1",
+      "fullWidth": true,
+      "columns": [
+        { "key": "tenantName", "variant": "body-medium", "weight": "bold", "tappable": true, "action": "open drawer" },
+        { "key": "plan", "type": "category-pill" },
+        {
+          "key": "status",
+          "type": "pill",
+          "states": {
+            "active": { "color": "platform.healthGreen", "background": "platform.healthGreenBg" },
+            "suspended": { "color": "platform.healthRed", "background": "platform.healthRedBg" },
+            "churned": { "color": "platform.healthGrey", "background": "platform.healthGreyBg" }
+          }
+        },
+        { "key": "mrrUSD", "format": "$X,XXX", "align": "right" },
+        { "key": "createdDate", "format": "MM/DD/YYYY", "font": "mono" },
+        {
+          "key": "actions",
+          "type": "kebab",
+          "menu": [
+            { "label": "strings.tenantDirectory.viewDetail", "action": "viewDetail" },
+            { "label": "strings.tenantDirectory.impersonateCta", "action": "impersonate" },
+            { "label": "strings.tenantDirectory.suspendCta", "action": "suspend" },
+            { "label": "strings.tenantDirectory.exportDataCta", "action": "exportData" }
+          ]
+        }
+      ]
+    },
+    "detailDrawer": {
+      "width": 480,
+      "position": "fixed right",
+      "height": "100vh",
+      "background": "surface",
+      "borderLeft": { "width": 1, "color": "border" },
+      "shadow": "-4px 0 16px rgba(0,0,0,0.08)",
+      "contents": {
+        "header": {
+          "tenantName": { "variant": "heading-3" },
+          "subtitle": { "planPill": true, "statusPill": true }
+        },
+        "kpiChips": {
+          "count": 4,
+          "type": "row",
+          "items": [
+            { "label": "MRR", "format": "USD" },
+            { "label": "Active seats" },
+            { "label": "Active bookings" },
+            { "label": "Churn risk", "type": "pill", "levels": ["low", "medium", "high"] }
+          ]
+        },
+        "planCard": {
+          "background": "surface",
+          "border": { "width": 1, "color": "border" },
+          "radius": "large",
+          "padding": 16,
+          "fields": [
+            { "key": "planName", "variant": "heading-4" },
+            { "key": "price", "format": "USD/mo" },
+            { "key": "billingCycle" },
+            { "key": "includedFeatures", "type": "list" }
+          ]
+        },
+        "stripeConnectHealth": { "type": "pill" },
+        "recentIssues": {
+          "max": 3,
+          "row": { "icon": true, "description": true, "timestamp": { "variant": "caption" } }
+        },
+        "cta": {
+          "type": "button",
+          "label": "strings.tenantDirectory.drawerImpersonateCta",
+          "variant": "primary",
+          "fullWidth": true
+        }
+      }
+    }
+  },
+  "states": {
+    "suspended": {
+      "row": { "background": "platform.healthRedBg" },
+      "statusCell": { "color": "platform.healthRed" }
+    },
+    "churned": {
+      "row": { "background": "platform.healthGreyBg" },
+      "statusCell": { "color": "platform.healthGrey" }
+    },
+    "error": { "message": "strings.tenantDirectory.errorMessage" }
+  }
+}

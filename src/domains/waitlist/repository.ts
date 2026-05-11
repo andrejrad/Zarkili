@@ -78,6 +78,11 @@ export type WaitlistRepository = {
    * Update the lastNotifiedAt timestamp after sending a notification.
    */
   updateLastNotifiedAt(entryId: string, tenantId: string, iso: string): Promise<void>;
+
+  /**
+   * List all active waitlist entries for a specific user within a tenant.
+   */
+  listUserWaitlistEntries(tenantId: string, userId: string): Promise<WaitlistEntry[]>;
 };
 
 function waitlistCollectionPath(tenantId: string) {
@@ -239,6 +244,20 @@ export function createWaitlistRepository(db: Firestore): WaitlistRepository {
     });
   }
 
+  async function listUserWaitlistEntries(
+    tenantId: string,
+    userId: string,
+  ): Promise<WaitlistEntry[]> {
+    const colRef = collection(db, waitlistCollectionPath(tenantId));
+    const q = query(
+      colRef,
+      where("userId", "==", userId),
+      where("status", "==", "active"),
+    );
+    const snap = await getDocs(q);
+    return snap.docs.map((d) => d.data() as WaitlistEntry);
+  }
+
   return {
     joinWaitlist,
     leaveWaitlist,
@@ -246,5 +265,6 @@ export function createWaitlistRepository(db: Firestore): WaitlistRepository {
     findMatchingWaitlistEntries,
     markMatched,
     updateLastNotifiedAt,
+    listUserWaitlistEntries,
   };
 }

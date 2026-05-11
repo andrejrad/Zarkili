@@ -1,0 +1,189 @@
+{
+  "screen": "BlockTimeScreen",
+  "route": "AdminBlockTime",
+  "device": {
+    "iPad": {
+      "type": "right-panel",
+      "width": 640
+    },
+    "iPhone": {
+      "type": "modal-sheet",
+      "width": 390,
+      "radius": 20
+    }
+  },
+  "states": [
+    "default",
+    "conflictWarning",
+    "confirmed",
+    "error"
+  ],
+  "layout": {
+    "header": {
+      "left": {
+        "type": "button",
+        "icon": "x",
+        "action": "close"
+      },
+      "center": {
+        "type": "label",
+        "text": "strings.blockTime.title"
+      }
+    },
+    "form": {
+      "fields": [
+        {
+          "type": "dropdown",
+          "key": "location",
+          "label": "strings.blockTime.locationLabel",
+          "required": true
+        },
+        {
+          "type": "multiSelect",
+          "key": "staff",
+          "label": "strings.blockTime.staffLabel",
+          "variant": "chip picker",
+          "required": true,
+          "helper": "strings.blockTime.staffHelper"
+        },
+        {
+          "type": "multiSelect",
+          "key": "resource",
+          "label": "strings.blockTime.resourceLabel",
+          "variant": "chip picker",
+          "required": false,
+          "helper": "strings.blockTime.resourceOptional"
+        },
+        {
+          "type": "dateRangePicker",
+          "key": "dateRange",
+          "label": "strings.blockTime.dateRangeLabel",
+          "format": "US",
+          "default": "singleDay",
+          "rangeable": true
+        },
+        {
+          "type": "timePickers",
+          "key": "timeRange",
+          "label": "strings.blockTime.timeLabel",
+          "layout": "side-by-side",
+          "format": "12h",
+          "increment": "15min",
+          "fields": [
+            {
+              "key": "start",
+              "label": "Start"
+            },
+            {
+              "key": "end",
+              "label": "End",
+              "autoAdvance": "+1h from start"
+            }
+          ]
+        },
+        {
+          "type": "dropdown",
+          "key": "reason",
+          "label": "strings.blockTime.reasonLabel",
+          "required": true,
+          "options": [
+            {
+              "value": "lunch",
+              "label": "strings.blockTime.reasonLunch"
+            },
+            {
+              "value": "training",
+              "label": "strings.blockTime.reasonTraining"
+            },
+            {
+              "value": "sick",
+              "label": "strings.blockTime.reasonSick"
+            },
+            {
+              "value": "maintenance",
+              "label": "strings.blockTime.reasonMaintenance"
+            },
+            {
+              "value": "other",
+              "label": "strings.blockTime.reasonOther"
+            }
+          ]
+        },
+        {
+          "type": "radio",
+          "key": "recurrence",
+          "label": "strings.blockTime.recurrenceLabel",
+          "options": [
+            {
+              "value": "oneTime",
+              "label": "strings.blockTime.recurrenceNone",
+              "default": true
+            },
+            {
+              "value": "daily",
+              "label": "strings.blockTime.recurrenceDaily"
+            },
+            {
+              "value": "weekly",
+              "label": "strings.blockTime.recurrenceWeekly"
+            }
+          ],
+          "conditional": {
+            "when": "daily or weekly",
+            "show": [
+              {
+                "type": "datePicker",
+                "key": "until",
+                "label": "strings.blockTime.recurrenceUntilLabel"
+              }
+            ]
+          },
+          "conditionalWeekly": {
+            "when": "weekly",
+            "show": [
+              {
+                "type": "checkboxes",
+                "key": "daysOfWeek",
+                "options": [
+                  "Mon",
+                  "Tue",
+                  "Wed",
+                  "Thu",
+                  "Fri",
+                  "Sat",
+                  "Sun"
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "conflictBanner": {
+      "background": "warning 15%",
+      "borderLeft": {
+        "width": 4,
+        "color": "warning"
+      },
+      "label": "strings.blockTime.conflictBanner",
+      "interpolation": "N",
+      "link": {
+        "label": "See affected bookings",
+        "action": "showConflicts"
+      },
+      "visibleWhen": "conflictCount > 0"
+    },
+    "footer": {
+      "submitButton": {
+        "variant": "primary",
+        "label": "strings.blockTime.submit",
+        "fullWidth": true,
+        "spinner": "on submit"
+      }
+    }
+  },
+  "onSuccess": {
+    "toast": "strings.blockTime.successMessage",
+    "action": "dismissPanel"
+  }
+}

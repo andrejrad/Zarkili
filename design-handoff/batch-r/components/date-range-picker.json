@@ -1,0 +1,54 @@
+{
+  "component": "DateRangePicker",
+  "description": "Date range selection control with presets and dual-month calendar",
+  "props": {
+    "value": { "type": "object", "required": false, "description": "{ startDate: ISO, endDate: ISO } or null" },
+    "onChange": { "type": "function", "required": true, "description": "Callback with new value" },
+    "presets": { "type": "array", "required": false, "description": "Array of { label, getValue() }. Defaults: Today, Yesterday, Last 7 days, Last 30 days, This month, Last month, Last quarter, Custom" },
+    "minDate": { "type": "string", "required": false, "description": "ISO date string" },
+    "maxDate": { "type": "string", "required": false, "description": "ISO date string" },
+    "disabled": { "type": "boolean", "required": false, "description": "Disabled state" },
+    "placeholder": { "type": "string", "required": false, "description": "Default: Select date range" },
+    "align": { "type": "string", "required": false, "description": "left or right (default left)" }
+  },
+  "variants": [
+    "collapsed",
+    "open-presets",
+    "open-calendar-selecting-start",
+    "open-calendar-selecting-end",
+    "applied"
+  ],
+  "layout": {
+    "trigger": { "height": 40, "border": "semantic.cardBorder", "chevron": "right" },
+    "dropdown": {
+      "width": 320,
+      "shadow": "elevation 3",
+      "leftColumn": "120px preset list",
+      "rightColumn": "dual month calendar",
+      "footer": "Apply and Cancel buttons"
+    },
+    "calendar": {
+      "cellSize": 36,
+      "weeksStartMonday": true,
+      "todayRing": "primary",
+      "selectedRangeFill": "primary 20% opacity",
+      "startEndCaps": "primary solid"
+    }
+  },
+  "tokens": {
+    "triggerBg": "semantic.surface",
+    "triggerBorder": "semantic.cardBorder",
+    "dropdownBg": "semantic.surface",
+    "presetHoverBg": "admin.tableHeaderBg",
+    "rangeCapBg": "primary",
+    "rangeFillBg": "primary at 20%",
+    "todayRing": "primary",
+    "disabledText": "semantic.muted"
+  },
+  "accessibility": {
+    "trigger": "role=combobox",
+    "dropdown": "role=dialog",
+    "calendar": "role=grid",
+    "dayCells": "role=gridcell"
+  }
+}

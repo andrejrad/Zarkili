@@ -1,0 +1,435 @@
+{
+  "screen": "LoyaltyLanding",
+  "source": {
+    "batch": "E",
+    "prompt": "E.1",
+    "figmaFrames": [
+      "E-1-loyalty-landing-default",
+      "E-1-loyalty-landing-zero-balance",
+      "E-1-loyalty-landing-tier-up",
+      "E-1-loyalty-landing-loading",
+      "E-1-loyalty-landing-error"
+    ],
+    "lockedAt": "2026-04-28"
+  },
+  "device": {
+    "model": "iPhone 14",
+    "width": 390,
+    "height": 844,
+    "safeAreaTop": 47,
+    "safeAreaBottom": 34
+  },
+  "layout": {
+    "type": "scroll",
+    "header": {
+      "height": 56,
+      "title": "Loyalty",
+      "titleStyle": "heading-3",
+      "background": "#F2EDDD",
+      "borderBottom": "none"
+    },
+    "heroCard": {
+      "marginHorizontal": 16,
+      "marginTop": 16,
+      "borderRadius": 24,
+      "background": "linear-gradient(135deg, #BBEDDA 0%, #F2EDDD 100%)",
+      "padding": 20,
+      "height": 160,
+      "children": [
+        {
+          "id": "tier-badge",
+          "component": "TierBadge",
+          "ref": "components/tier-badge.json",
+          "position": "top-left",
+          "marginBottom": 8
+        },
+        {
+          "id": "balance-label",
+          "style": "heading-1",
+          "color": "#1A1A1A",
+          "content": "{points} pts",
+          "marginBottom": 4
+        },
+        {
+          "id": "tier-progress-label",
+          "style": "body-small",
+          "color": "#6B6B6B",
+          "content": "{currentTier} — {pointsToNextTier} pts to {nextTier}"
+        },
+        {
+          "id": "progress-ring",
+          "component": "ProgressRing",
+          "ref": "components/progress-ring.json",
+          "size": 96,
+          "position": "absolute",
+          "top": 20,
+          "right": 20
+        }
+      ]
+    },
+    "earnSection": {
+      "marginTop": 24,
+      "paddingHorizontal": 16,
+      "header": {
+        "style": "heading-3",
+        "content": "Earn more",
+        "color": "#1A1A1A",
+        "marginBottom": 12
+      },
+      "earnCards": {
+        "type": "list",
+        "itemCount": 3,
+        "items": [
+          {
+            "id": "earn-book",
+            "icon": "calendar",
+            "label": "Book a service",
+            "points": "+50 pts",
+            "action": "navigate → Booking flow"
+          },
+          {
+            "id": "earn-refer",
+            "icon": "user-plus",
+            "label": "Refer a friend",
+            "points": "+200 pts",
+            "action": "navigate → E.9 Referral"
+          },
+          {
+            "id": "earn-review",
+            "icon": "star",
+            "label": "Leave a review",
+            "points": "+25 pts",
+            "action": "navigate → E.7 Review Prompt"
+          }
+        ],
+        "itemHeight": 64,
+        "itemRadius": 12,
+        "itemBackground": "#FFFFFF",
+        "itemBorder": "1px solid #E5E0D1",
+        "gap": 8
+      }
+    },
+    "historySection": {
+      "marginTop": 24,
+      "paddingHorizontal": 16,
+      "header": {
+        "style": "heading-3",
+        "content": "History",
+        "color": "#1A1A1A",
+        "marginBottom": 12
+      },
+      "historyList": {
+        "type": "FlashList",
+        "estimatedItemSize": 56,
+        "virtualized": true,
+        "itemHeight": 56,
+        "columns": [
+          {
+            "id": "date",
+            "style": "body-small",
+            "color": "#6B6B6B",
+            "format": "MM/DD/YYYY"
+          },
+          {
+            "id": "description",
+            "style": "body",
+            "color": "#1A1A1A",
+            "flex": 1
+          },
+          {
+            "id": "points",
+            "style": "label",
+            "colorPositive": "#4CAF50",
+            "colorNegative": "#F44336",
+            "format": "+{n} pts / -{n} pts"
+          }
+        ],
+        "divider": "1px solid #E5E0D1"
+      }
+    },
+    "stickyFooter": {
+      "height": 80,
+      "paddingHorizontal": 16,
+      "paddingBottom": 16,
+      "background": "#F2EDDD",
+      "borderTop": "1px solid #E5E0D1",
+      "cta": {
+        "label": "Browse rewards",
+        "variant": "primary",
+        "height": 48,
+        "borderRadius": 12,
+        "background": "#E3A9A0",
+        "labelColor": "#FFFFFF",
+        "action": "navigate → E.2 Reward Catalog"
+      }
+    }
+  },
+  "states": {
+    "default": {
+      "frameId": "E-1-loyalty-landing-default",
+      "description": "Signed-in user with loyalty points balance",
+      "data": {
+        "points": 1240,
+        "currentTier": "Silver",
+        "nextTier": "Gold",
+        "pointsToNextTier": 260,
+        "tierProgress": 0.65
+      },
+      "heroCard": "visible",
+      "earnSection": "visible",
+      "historySection": "populated"
+    },
+    "zero-balance": {
+      "frameId": "E-1-loyalty-landing-zero-balance",
+      "description": "New user with 0 points — no history yet",
+      "heroCard": {
+        "balanceLabel": "0 pts",
+        "tierProgressLabel": "Earn your first points",
+        "progressRing": "empty state (ref: components/progress-ring.json#empty)"
+      },
+      "earnSection": {
+        "header": "How to earn"
+      },
+      "historySection": {
+        "empty": true,
+        "emptyState": {
+          "icon": "gift",
+          "iconSize": 48,
+          "iconColor": "#6B6B6B",
+          "heading": "No activity yet",
+          "headingStyle": "heading-3",
+          "body": "Complete your first booking to earn points",
+          "bodyStyle": "body",
+          "bodyColor": "#6B6B6B"
+        }
+      },
+      "stickyFooter": "visible"
+    },
+    "tier-up": {
+      "frameId": "E-1-loyalty-landing-tier-up",
+      "description": "Celebration overlay when user reaches a new tier",
+      "underlay": "default state visible beneath overlay",
+      "modal": {
+        "type": "overlay",
+        "backdrop": "rgba(0,0,0,0.5)",
+        "card": {
+          "background": "#FFFFFF",
+          "borderRadius": 24,
+          "padding": 32,
+          "width": 358,
+          "alignment": "center"
+        },
+        "confetti": {
+          "type": "lottie",
+          "file": "confetti-burst.json",
+          "duration": 2000,
+          "loop": false,
+          "reduceMotionFallback": {
+            "type": "static",
+            "icon": "check-circle",
+            "iconSize": 64,
+            "iconColor": "#4CAF50"
+          }
+        },
+        "tierBadge": {
+          "component": "TierBadge",
+          "ref": "components/tier-badge.json",
+          "marginBottom": 16
+        },
+        "heading": {
+          "style": "heading-2",
+          "content": "You reached {newTier}!",
+          "color": "#1A1A1A",
+          "marginBottom": 8
+        },
+        "body": {
+          "style": "body",
+          "content": "Unlock exclusive rewards with your new tier.",
+          "color": "#6B6B6B",
+          "marginBottom": 24
+        },
+        "cta": {
+          "label": "Explore rewards",
+          "variant": "primary",
+          "height": 48,
+          "borderRadius": 12,
+          "background": "#E3A9A0",
+          "labelColor": "#FFFFFF",
+          "action": "dismiss + navigate → E.2 Reward Catalog"
+        },
+        "dismiss": {
+          "label": "Maybe later",
+          "variant": "tertiary",
+          "marginTop": 12,
+          "action": "dismiss overlay"
+        }
+      }
+    },
+    "loading": {
+      "frameId": "E-1-loyalty-landing-loading",
+      "description": "Skeleton placeholder while loyalty data fetches",
+      "skeleton": {
+        "heroCard": {
+          "type": "shimmer",
+          "borderRadius": 24,
+          "height": 160,
+          "marginHorizontal": 16
+        },
+        "earnCards": [
+          { "type": "shimmer", "height": 64, "borderRadius": 12 },
+          { "type": "shimmer", "height": 64, "borderRadius": 12 },
+          { "type": "shimmer", "height": 64, "borderRadius": 12 }
+        ],
+        "historyItems": [
+          { "type": "shimmer", "height": 56 },
+          { "type": "shimmer", "height": 56 },
+          { "type": "shimmer", "height": 56 },
+          { "type": "shimmer", "height": 56 },
+          { "type": "shimmer", "height": 56 }
+        ],
+        "shimmerColors": ["#F5F5F5", "#E5E0D1", "#F5F5F5"],
+        "shimmerDuration": 1200,
+        "reduceMotion": "static-placeholder (no animation)"
+      },
+      "stickyFooter": "hidden"
+    },
+    "error": {
+      "frameId": "E-1-loyalty-landing-error",
+      "description": "Full-page error state when loyalty data fails to load",
+      "errorView": {
+        "icon": "alert-circle",
+        "iconSize": 48,
+        "iconColor": "#F44336",
+        "heading": {
+          "style": "heading-3",
+          "content": "Couldn\u2019t load loyalty data",
+          "color": "#1A1A1A"
+        },
+        "body": {
+          "style": "body",
+          "content": "Check your connection and try again.",
+          "color": "#6B6B6B"
+        },
+        "cta": {
+          "label": "Retry",
+          "variant": "primary",
+          "height": 48,
+          "borderRadius": 12,
+          "background": "#E3A9A0",
+          "labelColor": "#FFFFFF"
+        }
+      },
+      "heroCard": "hidden",
+      "earnSection": "hidden",
+      "historySection": "hidden",
+      "stickyFooter": "hidden"
+    }
+  },
+  "dataModel": {
+    "loyaltyProfile": {
+      "points": "number",
+      "currentTier": "\"Bronze\" | \"Silver\" | \"Gold\" | \"Platinum\"",
+      "nextTier": "\"Silver\" | \"Gold\" | \"Platinum\" | null",
+      "tierProgress": "number (0\u20131)",
+      "pointsToNextTier": "number | null"
+    },
+    "earnActions": {
+      "type": "Array<{ id: string; icon: string; label: string; points: number; route: string }>",
+      "maxItems": 3
+    },
+    "history": {
+      "type": "Array<{ id: string; date: string; description: string; delta: number }>",
+      "dateFormat": "ISO 8601 input",
+      "displayFormat": "MM/DD/YYYY",
+      "virtualized": true
+    }
+  },
+  "usLocale": {
+    "points": "{n, plural, one {# point} other {# points}}",
+    "tierProgress": "{currentTier} \u2014 {n} pts to {nextTier}",
+    "earnBooking": "Book a service",
+    "earnReferral": "Refer a friend",
+    "earnReview": "Leave a review",
+    "browseRewards": "Browse rewards",
+    "tierUpHeading": "You reached {newTier}!",
+    "tierUpBody": "Unlock exclusive rewards with your new tier.",
+    "exploreRewards": "Explore rewards",
+    "maybeLater": "Maybe later",
+    "noActivityHeading": "No activity yet",
+    "noActivityBody": "Complete your first booking to earn points",
+    "errorHeading": "Couldn\u2019t load loyalty data",
+    "errorBody": "Check your connection and try again.",
+    "retry": "Retry"
+  },
+  "accessibility": {
+    "screenLabel": "Loyalty \u2014 {currentTier}, {points} points",
+    "heroCard": {
+      "accessibilityRole": "none",
+      "accessibilityLabel": "{points} points. {currentTier} tier. {pointsToNextTier} points to {nextTier}."
+    },
+    "progressRing": {
+      "ref": "components/progress-ring.json (accessibility block)",
+      "accessibilityRole": "progressbar",
+      "accessibilityValue": {
+        "min": 0,
+        "max": 100,
+        "now": "{tierProgressPercent}",
+        "text": "{tierProgressPercent}% to {nextTier}"
+      }
+    },
+    "earnCards": {
+      "accessibilityRole": "button",
+      "accessibilityLabel": "{label} \u2014 earn {points}"
+    },
+    "historyList": {
+      "accessibilityRole": "list",
+      "itemLabel": "{description}, {date}, {sign}{points} points"
+    },
+    "tierUpModal": {
+      "accessibilityViewIsModal": true,
+      "accessibilityLabel": "Tier upgrade celebration. You reached {newTier}.",
+      "focusOnOpen": "cta"
+    },
+    "stickyFooter": {
+      "accessibilityRole": "button",
+      "accessibilityLabel": "Browse rewards"
+    }
+  },
+  "transitions": {
+    "screenEnter": {
+      "type": "fade",
+      "duration": 200,
+      "reduceMotion": "instant"
+    },
+    "heroCardMount": {
+      "type": "slide-up",
+      "distance": 16,
+      "duration": 300,
+      "delay": 50,
+      "reduceMotion": "instant"
+    },
+    "tierUpOverlay": {
+      "enter": {
+        "type": "fade-scale",
+        "scaleFrom": 0.92,
+        "duration": 300,
+        "easing": "ease-out"
+      },
+      "dismiss": {
+        "type": "fade",
+        "duration": 200
+      },
+      "confetti": {
+        "type": "lottie",
+        "duration": 2000,
+        "reduceMotion": "replace-with-static-check-circle"
+      },
+      "reduceMotion": "instant-no-animation"
+    },
+    "skeletonShimmer": {
+      "duration": 1200,
+      "loop": true,
+      "reduceMotion": "static-placeholder"
+    }
+  }
+}

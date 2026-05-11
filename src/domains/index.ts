@@ -17,3 +17,4 @@ export * from "./campaigns";
 export * from "./templates";
 export * from "./activities";
 export * from "./marketplace";
+export * from "./payments";

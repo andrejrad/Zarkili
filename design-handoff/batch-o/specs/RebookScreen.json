@@ -1,0 +1,125 @@
+{
+  "screen": "RebookScreen",
+  "route": "AdminRebook",
+  "device": {
+    "iPad": {
+      "type": "panel",
+      "width": 720
+    },
+    "iPhone": {
+      "type": "full-screen",
+      "width": 390
+    }
+  },
+  "stateNames": [
+    "default",
+    "conflict",
+    "submitting",
+    "success",
+    "error"
+  ],
+  "layout": {
+    "header": {
+      "left": {
+        "type": "button",
+        "action": "backOrClose"
+      },
+      "center": {
+        "type": "label",
+        "text": "strings.rebook.title"
+      }
+    },
+    "originalCard": {
+      "background": "surface",
+      "border": {
+        "width": 1,
+        "color": "cardBorder"
+      },
+      "radius": 12,
+      "padding": 12,
+      "marginBottom": 16,
+      "label": {
+        "text": "strings.rebook.originalLabel",
+        "variant": "label-small",
+        "color": "muted",
+        "transform": "uppercase"
+      },
+      "fields": [
+        {
+          "key": "date",
+          "format": "MM/DD/YYYY"
+        },
+        {
+          "key": "time",
+          "format": "h:mm AM"
+        },
+        {
+          "key": "service"
+        },
+        {
+          "key": "staff"
+        }
+      ]
+    },
+    "changeStaffLink": {
+      "type": "tertiary",
+      "label": "strings.rebook.changeStaff",
+      "position": "below originalCard"
+    },
+    "datePicker": {
+      "type": "inlineMonthCalendar",
+      "todayDate": {
+        "style": "outlined"
+      },
+      "originalDate": {
+        "style": "soft primary ring"
+      },
+      "selectedDate": {
+        "style": "primary filled"
+      }
+    },
+    "timeSlotGrid": {
+      "type": "chips",
+      "for": "staff × date × duration",
+      "slotCountCaption": {
+        "text": "strings.rebook.slotsAvailable",
+        "interpolation": "N",
+        "position": "above grid"
+      }
+    },
+    "conflictBanner": {
+      "background": "warning 15%",
+      "borderLeft": {
+        "width": 4,
+        "color": "warning"
+      },
+      "label": "strings.rebook.conflictBanner"
+    },
+    "footer": {
+      "notifyClientToggle": {
+        "defaultOn": true
+      },
+      "paymentNoteCaption": {
+        "text": "strings.rebook.paymentNote"
+      },
+      "confirmButton": {
+        "variant": "primary",
+        "label": "strings.rebook.confirm"
+      }
+    }
+  },
+  "states": {
+    "submitting": {
+      "ctaButton": {
+        "spinner": true
+      }
+    },
+    "success": {
+      "toast": "strings.rebook.successToast",
+      "navigate": {
+        "screen": "BookingDetailAdminScreen",
+        "params": "updated booking"
+      }
+    }
+  }
+}

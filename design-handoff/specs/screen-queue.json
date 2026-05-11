@@ -1,0 +1,603 @@
+{
+  "source": {
+    "screen":      "Walk-in Queue",
+    "framePrefix": "G-3",
+    "version":     "1.0.0",
+    "designSystem":"Zarkili v1.0.0",
+    "author":      "Zarkili Design",
+    "updatedAt":   "2026-04-29",
+    "frames": ["G-3-default", "G-3-empty", "G-3-fully-booked", "G-3-loading", "G-3-error"]
+  },
+
+  "device": {
+    "name":         "iPhone 14",
+    "canvasWidth":  390,
+    "canvasHeight": 844,
+    "safeAreaTop":  47,
+    "safeAreaBottom": 34
+  },
+
+  "tokens": {
+    "colors": {
+      "primary":   "#E3A9A0",
+      "accent":    "#BBEDDA",
+      "accentFg":  "#2D4A42",
+      "bg":        "#F2EDDD",
+      "surface":   "#FFFFFF",
+      "fg":        "#1A1A1A",
+      "muted":     "#6B6B6B",
+      "border":    "#E5E0D1",
+      "skeleton":  "#F5F5F5",
+      "warning":   "#F59E0B",
+      "error":     "#F44336",
+      "success":   "#4CAF50"
+    },
+    "typography": {
+      "heading-2":    { "size": 24, "lineHeight": 32, "weight": 600 },
+      "heading-3":    { "size": 20, "lineHeight": 28, "weight": 600 },
+      "body":         { "size": 14, "lineHeight": 20, "weight": 400 },
+      "body-medium":  { "size": 14, "lineHeight": 20, "weight": 500 },
+      "body-semibold":{ "size": 14, "lineHeight": 20, "weight": 600 },
+      "label-small":  { "size": 12, "lineHeight": 16, "weight": 500 },
+      "body-small":   { "size": 12, "lineHeight": 16, "weight": 400 }
+    },
+    "radii": {
+      "small":  8,
+      "medium": 12,
+      "large":  16,
+      "xl":     24,
+      "full":   9999
+    },
+    "spacing": [0,4,8,12,16,20,24,32,48,64]
+  },
+
+  "states": {
+    "G-3-default": {
+      "description": "Waiting tab active, 4 clients in queue, stats 4|2|7",
+      "activeTab":   "waiting",
+      "stats":       { "waiting": 4, "inService": 2, "completedToday": 7 }
+    },
+    "G-3-empty": {
+      "description": "Waiting tab, queue is completely empty",
+      "activeTab":   "waiting",
+      "stats":       { "waiting": 0, "inService": 0, "completedToday": 0 }
+    },
+    "G-3-fully-booked": {
+      "description": "Salon at 8/8 capacity — alert banner shown, FAB disabled",
+      "activeTab":   "waiting",
+      "stats":       { "waiting": 8, "inService": 2, "completedToday": 5 }
+    },
+    "G-3-loading": {
+      "description": "Async fetch in-flight — shimmer skeletons replace content",
+      "activeTab":   "waiting"
+    },
+    "G-3-error": {
+      "description": "Network / server error — stats hidden, retry CTA shown",
+      "activeTab":   "waiting"
+    }
+  },
+
+  "layout": {
+    "background": "#F2EDDD",
+
+    "header": {
+      "height":          56,
+      "paddingH":        16,
+      "background":      "#F2EDDD",
+      "borderBottom":    { "width": 1, "color": "#E5E0D1" },
+      "zIndex":          20,
+      "left": {
+        "backButton": { "size": 44, "icon": "chevron-left", "iconSize": 24, "color": "#1A1A1A" },
+        "title":      { "text": "Walk-in Queue", "style": "heading-3", "color": "#1A1A1A" }
+      },
+      "right": {
+        "addButton": {
+          "touchTarget": 44,
+          "icon":        "plus",
+          "iconSize":    24,
+          "color":       "#E3A9A0",
+          "disabledOpacity": 0.4
+        }
+      }
+    },
+
+    "statsDashboard": {
+      "display":     "flex",
+      "direction":   "row",
+      "paddingH":    16,
+      "paddingV":    12,
+      "gap":         8,
+      "background":  "#F2EDDD",
+      "hiddenOn":    ["G-3-error"],
+      "skeletonOn":  ["G-3-loading"],
+      "card": {
+        "flex":         1,
+        "background":   "#FFFFFF",
+        "borderRadius": 16,
+        "padding":      12,
+        "value": { "style": "heading-2", "color": "#1A1A1A" },
+        "label": { "style": "body-small", "color": "#6B6B6B", "marginTop": 2 }
+      },
+      "cards": ["Waiting", "In Service", "Completed Today"]
+    },
+
+    "tabBar": {
+      "height":       44,
+      "background":   "#FFFFFF",
+      "borderBottom": { "width": 1, "color": "#E5E0D1" },
+      "paddingH":     16,
+      "tabs": ["Waiting", "In Service", "Completed Today"],
+      "badge": {
+        "height":       20,
+        "minWidth":     20,
+        "paddingH":     6,
+        "borderRadius": 9999,
+        "background":   "#E3A9A0",
+        "color":        "#FFFFFF",
+        "style":        "label-small",
+        "ariaLive":     "polite"
+      },
+      "selected": {
+        "borderBottom": { "width": 2, "color": "#E3A9A0" },
+        "labelColor":   "#1A1A1A",
+        "labelWeight":  600
+      },
+      "unselected": {
+        "labelColor": "#6B6B6B",
+        "labelWeight": 400
+      }
+    },
+
+    "queueList": {
+      "scrollable":  true,
+      "paddingTop":  8,
+      "paddingBottom": 96
+    },
+
+    "fab": {
+      "position":     "absolute",
+      "bottom":       24,
+      "right":        16,
+      "size":         56,
+      "borderRadius": 28,
+      "background":   "#E3A9A0",
+      "icon":         "plus",
+      "iconSize":     24,
+      "iconColor":    "#FFFFFF",
+      "shadow":       "0px 4px 12px rgba(227,169,160,0.4)",
+      "disabled": {
+        "background": "#E5E0D1",
+        "shadow":     "none"
+      },
+      "disabledOn": ["G-3-loading", "G-3-error", "G-3-fully-booked"]
+    }
+  },
+
+  "components": {
+    "queueCard": {
+      "marginH":      16,
+      "marginBottom": 8,
+      "background":   "#FFFFFF",
+      "borderRadius": 16,
+      "padding":      16,
+      "defaultBorder": { "width": 0, "color": "transparent" },
+      "dragState":     { "border": "2px dashed #E3A9A0", "opacity": 0.7 },
+      "dragOverState": { "border": "2px dashed #E3A9A0", "background": "rgba(227,169,160,0.05)" },
+      "row": {
+        "display":     "flex",
+        "alignItems":  "center",
+        "gap":         10,
+        "elements": {
+          "gripHandle": {
+            "visibleOn": ["waiting"],
+            "icon":       "grip-vertical",
+            "iconSize":   20,
+            "iconColor":  "#6B6B6B",
+            "touchTarget": 44
+          },
+          "positionBadge": {
+            "size":         28,
+            "borderRadius": 9999,
+            "background":   "#E3A9A0",
+            "text":         "position number",
+            "textStyle":    "label-small",
+            "textColor":    "#FFFFFF",
+            "textWeight":   600
+          },
+          "avatar": {
+            "size":         44,
+            "borderRadius": 9999,
+            "background":   "nameHash → AVATAR_PALETTE",
+            "text":         "initials",
+            "textStyle":    "body",
+            "textColor":    "#FFFFFF",
+            "notesDot": {
+              "visibleWhen":  "hasNotes === true",
+              "position":     "top-right of avatar",
+              "size":         8,
+              "borderRadius": 9999,
+              "background":   "#E3A9A0",
+              "border":       "1.5px solid #F2EDDD"
+            }
+          },
+          "body": {
+            "flex": 1,
+            "minWidth": 0,
+            "clientName": { "style": "body-medium", "color": "#1A1A1A", "truncate": true },
+            "serviceRow": {
+              "display":   "flex",
+              "gap":        6,
+              "marginTop":  2,
+              "categoryIcon": { "size": 14, "color": "#6B6B6B" },
+              "serviceName":  { "style": "body-small", "color": "#6B6B6B", "truncate": true }
+            },
+            "metaRow": {
+              "display":   "flex",
+              "gap":        6,
+              "marginTop":  6,
+              "waiting": {
+                "icon":  "clock",
+                "iconSize": 12,
+                "text":  "~{estimatedWaitMinutes} min wait",
+                "style": "body-small",
+                "color": "#6B6B6B"
+              },
+              "inService": {
+                "icon":  "play-circle",
+                "iconSize": 12,
+                "text":  "Started {startedAt}",
+                "style": "body-small",
+                "color": "#6B6B6B"
+              },
+              "completed": {
+                "icon":      "check-circle-2",
+                "iconSize":   12,
+                "iconColor": "#BBEDDA",
+                "text":      "Completed {completedAt}",
+                "style":     "body-small",
+                "color":     "#6B6B6B"
+              }
+            }
+          },
+          "menuButton": {
+            "icon":        "more-horizontal",
+            "iconSize":    20,
+            "iconColor":   "#6B6B6B",
+            "touchTarget": 44
+          }
+        }
+      },
+      "progressBar": {
+        "visibleOn":    ["in-service"],
+        "marginTop":    10,
+        "height":       4,
+        "borderRadius": 2,
+        "background":   "#F5F5F5",
+        "fill": {
+          "background": "#E3A9A0",
+          "width":      "{progressPercent}%",
+          "borderRadius": 2
+        }
+      }
+    },
+
+    "emptyState": {
+      "visibleOn": ["G-3-empty"],
+      "illustration": {
+        "icon":      "calendar-x",
+        "size":      80,
+        "color":     "#6B6B6B",
+        "strokeWidth": 1.25
+      },
+      "title": {
+        "text":   "No one in the queue",
+        "style":  "heading-2",
+        "color":  "#1A1A1A",
+        "marginTop": 24
+      },
+      "body": {
+        "text":   "Add a walk-in client to get started.",
+        "style":  "body",
+        "color":  "#6B6B6B",
+        "marginTop": 8
+      },
+      "cta": {
+        "text":         "+ Add first walk-in",
+        "background":   "#E3A9A0",
+        "color":        "#FFFFFF",
+        "paddingH":     24,
+        "paddingV":     14,
+        "borderRadius": 14,
+        "marginTop":    24,
+        "minHeight":    44,
+        "style":        "body-semibold"
+      }
+    },
+
+    "fullyBookedBanner": {
+      "visibleOn":    ["G-3-fully-booked"],
+      "marginH":      16,
+      "marginTop":    12,
+      "borderRadius": 12,
+      "background":   "rgba(245,158,11,0.10)",
+      "border":       { "width": 1, "color": "#F59E0B" },
+      "padding":      12,
+      "layout":       "flex-row",
+      "gap":          12,
+      "ariaLive":     "assertive",
+      "icon":         { "name": "alert-triangle", "size": 20, "color": "#F59E0B" },
+      "content": {
+        "title": { "text": "Queue is full (8/8)", "style": "body-medium", "color": "#1A1A1A" },
+        "body":  { "text": "No new walk-ins can be added until a slot opens.", "style": "body-small", "color": "#6B6B6B" }
+      },
+      "dismiss": { "icon": "x", "size": 20, "touchTarget": 44 }
+    },
+
+    "errorState": {
+      "visibleOn": ["G-3-error"],
+      "statsHidden": true,
+      "illustration": {
+        "icon":      "wifi-off",
+        "size":      64,
+        "color":     "#6B6B6B",
+        "strokeWidth": 1.25
+      },
+      "title": {
+        "text":   "Couldn't load queue",
+        "style":  "heading-2",
+        "color":  "#1A1A1A",
+        "marginTop": 24
+      },
+      "body": {
+        "text":   "Check your connection and try again.",
+        "style":  "body",
+        "color":  "#6B6B6B",
+        "marginTop": 8
+      },
+      "retry": {
+        "text":         "Retry",
+        "background":   "#E3A9A0",
+        "color":        "#FFFFFF",
+        "paddingH":     24,
+        "paddingV":     14,
+        "borderRadius": 14,
+        "marginTop":    24,
+        "minHeight":    44,
+        "style":        "body-semibold"
+      }
+    },
+
+    "loadingState": {
+      "visibleOn": ["G-3-loading"],
+      "statsArea": {
+        "cards": 3,
+        "cardHeight":   64,
+        "cardRadius":   16,
+        "background":   "#F5F5F5",
+        "shimmer":      true
+      },
+      "listCards": {
+        "count":        4,
+        "height":       88,
+        "radius":       16,
+        "marginH":      16,
+        "marginBottom": 8,
+        "background":   "#F5F5F5",
+        "shimmer": {
+          "gradient": "linear-gradient(90deg, #F5F5F5 0%, #E5E0D1 50%, #F5F5F5 100%)",
+          "bgSize":   "800px 100%",
+          "duration": "1.5s",
+          "timing":   "linear",
+          "iteration":"infinite"
+        }
+      }
+    },
+
+    "addWalkInSheet": {
+      "background":        "#FFFFFF",
+      "borderRadiusTop":   24,
+      "shadow":            "0 -4px 24px rgba(0,0,0,0.12)",
+      "handle": { "width": 36, "height": 4, "borderRadius": 2, "background": "#E5E0D1", "centered": true, "marginBottom": 20 },
+      "title":  { "text": "Add Walk-in Client", "style": "heading-3", "color": "#1A1A1A" },
+      "fields": {
+        "clientName": {
+          "label":     "Client Name",
+          "type":      "text",
+          "height":    52,
+          "radius":    12,
+          "border":    { "default": "1px solid #E5E0D1", "focus": "1px solid #E3A9A0" },
+          "paddingH":  16
+        },
+        "service": {
+          "label":     "Service",
+          "type":      "select",
+          "height":    52,
+          "radius":    12,
+          "border":    { "default": "1px solid #E5E0D1", "focus": "1px solid #E3A9A0" },
+          "paddingH":  16,
+          "marginTop": 16
+        },
+        "notes": {
+          "label":     "Notes (optional)",
+          "type":      "textarea",
+          "height":    88,
+          "radius":    12,
+          "border":    { "default": "1px solid #E5E0D1", "focus": "1px solid #E3A9A0" },
+          "paddingH":  16,
+          "marginTop": 16
+        }
+      },
+      "submit": {
+        "text":         "Add to Queue",
+        "background":   "#E3A9A0",
+        "color":        "#FFFFFF",
+        "height":       52,
+        "borderRadius": 14,
+        "marginTop":    24,
+        "fullWidth":    true,
+        "disabled": { "background": "#E5E0D1", "color": "#6B6B6B" }
+      }
+    },
+
+    "clientActionSheet": {
+      "background":      "#FFFFFF",
+      "borderRadiusTop": 24,
+      "shadow":          "0 -4px 24px rgba(0,0,0,0.12)",
+      "handle": { "width": 36, "height": 4, "borderRadius": 2, "background": "#E5E0D1", "centered": true },
+      "clientPreview": {
+        "avatar":  { "size": 44, "borderRadius": 9999, "background": "nameHash" },
+        "name":    { "style": "body", "weight": 600, "color": "#1A1A1A" },
+        "service": { "style": "body-small", "color": "#6B6B6B" }
+      },
+      "actionHeight":    52,
+      "actionRadius":    14,
+      "actionGap":       8,
+      "actions": {
+        "waiting":   ["Start Service (#E3A9A0, white)", "Call Client (#F5F5F5, #1A1A1A)", "Send Message (#F5F5F5, #1A1A1A)", "Remove from Queue (text #F44336)"],
+        "inService": ["Mark Complete (#BBEDDA, #2D4A42)", "Call Client (#F5F5F5, #1A1A1A)", "Send Message (#F5F5F5, #1A1A1A)", "Remove from Queue (text #F44336)"],
+        "completed": ["Call Client (#F5F5F5, #1A1A1A)", "Send Message (#F5F5F5, #1A1A1A)"]
+      }
+    }
+  },
+
+  "interactions": {
+    "dragToReorder": {
+      "trigger":   "longPress (300ms) on grip-vertical icon",
+      "availableOn": ["waiting tab"],
+      "behavior":  "swap positions on drop, renumber positions 1…N",
+      "dragVisual":     { "opacity": 0.7, "border": "2px dashed #E3A9A0" },
+      "dropTargetVisual": { "border": "2px dashed #E3A9A0", "background": "rgba(227,169,160,0.05)" }
+    },
+    "menuTap": {
+      "trigger": "tap ⋯ icon",
+      "action":  "open Client Action Sheet for that entry"
+    },
+    "fabTap": {
+      "trigger": "tap FAB",
+      "action":  "open Add Walk-in Sheet",
+      "disabled": "when frame=fully-booked, loading, or error"
+    },
+    "startService": {
+      "trigger": "tap 'Start Service' in action sheet",
+      "action":  "move entry from waiting → inService list, set startedAt=now"
+    },
+    "markComplete": {
+      "trigger": "tap 'Mark Complete' in action sheet",
+      "action":  "move entry from inService → completed list, set completedAt=now"
+    },
+    "removeFromQueue": {
+      "trigger": "tap 'Remove from Queue' in action sheet",
+      "action":  "delete entry from current list, renumber"
+    },
+    "tabSwitch": {
+      "trigger": "tap tab label",
+      "action":  "switch active list, update selected-tab styles, live-count badges"
+    },
+    "dismissBanner": {
+      "trigger": "tap × on fully-booked banner",
+      "action":  "hide banner for session"
+    }
+  },
+
+  "dataModel": {
+    "queueEntry": {
+      "id":                       "string (uuid)",
+      "position":                 "number",
+      "status":                   "waiting | inService | completed",
+      "clientName":               "string",
+      "initials":                 "string (2 chars, derived)",
+      "service": {
+        "id":                     "string",
+        "name":                   "string",
+        "category":               "nails | hair | skin | lashes | brows | other",
+        "estimatedDurationMinutes":"number"
+      },
+      "hasNotes":                 "boolean",
+      "notes":                    "string | undefined",
+      "addedAt":                  "ISO 8601 timestamp",
+      "startedAt":                "ISO 8601 timestamp | null",
+      "completedAt":              "ISO 8601 timestamp | null",
+      "estimatedWaitMinutes":     "number",
+      "progressPercent":          "number 0–100 (inService only)"
+    },
+    "queueMeta": {
+      "capacity":             8,
+      "currentCount":         "number",
+      "waitingCount":         "number",
+      "inServiceCount":       "number",
+      "completedTodayCount":  "number"
+    }
+  },
+
+  "sampleData": {
+    "G-3-default": {
+      "waiting": [
+        { "position":1, "name":"Maria Chen",    "service":"Gel Manicure",    "category":"nails",  "estimatedWaitMinutes":5,   "addedAt":"2:25 PM" },
+        { "position":2, "name":"Taylor Brooks", "service":"Balayage",        "category":"hair",   "estimatedWaitMinutes":45,  "addedAt":"2:10 PM" },
+        { "position":3, "name":"Sam Rivera",    "service":"Facial",          "category":"skin",   "estimatedWaitMinutes":90,  "addedAt":"1:50 PM" },
+        { "position":4, "name":"Jordan Kim",    "service":"Lash extensions", "category":"lashes", "estimatedWaitMinutes":120, "addedAt":"1:30 PM", "hasNotes":true }
+      ],
+      "inService": [
+        { "position":1, "name":"Jade Monroe",  "service":"Balayage",    "category":"hair",  "startedAt":"1:45 PM", "progressPercent":65 },
+        { "position":2, "name":"Ashley Park",  "service":"Gel Manicure","category":"nails", "startedAt":"2:20 PM", "progressPercent":35 }
+      ],
+      "completedTodayCount": 7
+    },
+    "G-3-fully-booked": {
+      "waitingCount":   8,
+      "inServiceCount": 2,
+      "completedCount": 5
+    }
+  },
+
+  "usLocale": {
+    "timeFormat":    "h:mm A",
+    "waitFormat":    "~{N} min wait",
+    "startedFormat": "Started {h:mm A}",
+    "doneFormat":    "Completed {h:mm A}",
+    "capacity":      "{current}/{max}",
+    "currency":      "USD"
+  },
+
+  "accessibility": {
+    "standard":        "WCAG 2.1 AA",
+    "minTouchTarget":  "44×44 px",
+    "touchSlop":       8,
+    "ariaRoles": {
+      "tabList":        "role=tablist",
+      "tab":            "role=tab aria-selected={bool}",
+      "tabPanel":       "role=tabpanel",
+      "queueList":      "role=list",
+      "queueCard":      "role=listitem aria-label='{name}, {service}, position {n}'",
+      "fullyBookedBanner": "role=alert aria-live=assertive",
+      "tabBadge":       "aria-live=polite aria-label='{n} {tabLabel}'",
+      "fabButton":      "aria-label='Add walk-in client'",
+      "addSheetDialog": "role=dialog aria-modal=true",
+      "actionSheet":    "role=dialog aria-modal=true"
+    },
+    "decorativeIcons":  "aria-hidden=true on all decorative icons",
+    "focusOrder":       "header back → header add → tabs → queue cards (grip → menu) → FAB",
+    "reducedMotion":    "replace shimmer animation with opacity pulse at 100ms crossfade"
+  },
+
+  "calculations": {
+    "estimatedWait":     "sum of estimatedDurationMinutes for all entries ahead in queue",
+    "progressPercent":   "((currentTime - startedAt) / estimatedDurationMinutes) × 100, clamped 0–100",
+    "avatarColor":       "djb2 hash of clientName → index into AVATAR_PALETTE[0..7]"
+  },
+
+  "transitions": {
+    "tabSwitch":     { "type": "cross-fade", "duration": "150ms", "easing": "ease-out" },
+    "cardDrag":      { "type": "opacity + border", "duration": "150ms" },
+    "sheetOpen":     { "type": "slide-up", "duration": "300ms", "easing": "cubic-bezier(0.32,0.72,0,1)", "reducedMotion": "cross-fade 100ms" },
+    "bannerShow":    { "type": "fade-in", "duration": "200ms" },
+    "skeletonShimmer": { "duration": "1500ms", "timing": "linear", "iteration": "infinite" }
+  },
+
+  "usage": {
+    "audience":   "Salon staff (front-desk / manager)",
+    "scenario":   "Staff member manages walk-in clients during operating hours. They add clients, reorder the queue by dragging, start services, and mark completions.",
+    "navigation": "Profile → Staff Tools → Walk-in Queue",
+    "relatedScreens": ["G-1 Staff Today", "G-2 Staff Calendar"]
+  }
+}

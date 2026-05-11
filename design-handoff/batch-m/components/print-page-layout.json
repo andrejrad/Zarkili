@@ -1,0 +1,70 @@
+{
+  "schemaVersion": "1.0.0",
+  "componentId": "MC.10",
+  "componentName": "PrintPageLayout",
+  "exportedAs": "PrintPageLayout",
+  "category": "admin-print",
+  "description": "US Letter portrait print template wrapper for M.19 invoice, payout statement, and refund receipt PDFs.",
+  "props": {
+    "documentTitle": {
+      "type": "string",
+      "required": true,
+      "description": "Title of the document rendered in the header and used in ARIA label"
+    },
+    "tenantLegalName": {
+      "type": "string",
+      "required": true,
+      "description": "Legal business name displayed in the footer"
+    },
+    "merchantId": {
+      "type": "string",
+      "required": true,
+      "description": "Merchant identifier displayed in the footer center"
+    },
+    "children": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Content rendered between the header and footer zones"
+    },
+    "pageNumber": {
+      "type": "number",
+      "required": true,
+      "description": "Current page number for the footer pagination string"
+    },
+    "totalPages": {
+      "type": "number",
+      "required": true,
+      "description": "Total page count for the footer pagination string"
+    }
+  },
+  "tokens": {
+    "bg": "surface",
+    "text": "text.primary",
+    "footerText": "admin.text.muted",
+    "footerRule": "admin.border"
+  },
+  "anatomy": [
+    "canvas (816x1056px at 96dpi, margins 48px all sides)",
+    "header-zone (88px: logo-slot left 120x40 + docTitle heading-2 right)",
+    "content-zone (flex between header and footer)",
+    "footer-zone (40px: hairline-rule above + tenantLegalName body-small left + 'Page n of m' body-small right)"
+  ],
+  "sizes": [
+    {
+      "name": "default",
+      "width": 816,
+      "height": 1056,
+      "note": "px at 96dpi; dpi: 96; unit: px"
+    }
+  ],
+  "stateNames": [
+    "preview",
+    "downloading",
+    "downloaded",
+    "error"
+  ],
+  "accessibility": {
+    "role": "document",
+    "ariaLabel": "Printable {{documentTitle}}"
+  }
+}

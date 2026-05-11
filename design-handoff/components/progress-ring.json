@@ -1,0 +1,290 @@
+{
+  "component": "ProgressRing",
+  "description": "Circular progress indicator with center label, supporting determinate and indeterminate states",
+  "purpose": "Visualize loyalty tier progress, completion percentages, and other 0–100% metrics with a center label and optional sublabel",
+  "source": {
+    "batch": "E",
+    "screen": "E.1 Loyalty Landing",
+    "promotedFrom": "documentation/figma-prompts/BATCH_E_LOYALTY_ACTIVITIES_REVIEWS.md",
+    "figmaFrames": [
+      "E-component-progress-ring-default-64",
+      "E-component-progress-ring-default-96",
+      "E-component-progress-ring-default-128",
+      "E-component-progress-ring-loading",
+      "E-component-progress-ring-empty",
+      "E-component-progress-ring-error",
+      "E-component-progress-ring-disabled"
+    ],
+    "lockedAt": "2026-04-28"
+  },
+  "variants": {
+    "size": {
+      "options": [64, 96, 128],
+      "default": 96
+    },
+    "color": {
+      "options": ["loyalty-tier", "primary"],
+      "default": "loyalty-tier"
+    },
+    "withSublabel": {
+      "options": [true, false],
+      "default": true
+    },
+    "state": {
+      "options": ["default", "loading", "empty", "error", "disabled"],
+      "default": "default"
+    }
+  },
+  "states": {
+    "default": {
+      "track": {
+        "stroke": "#E5E0D1",
+        "opacity": 1
+      },
+      "progress": {
+        "stroke": {
+          "loyalty-tier": "#BBEDDA",
+          "primary": "#E3A9A0"
+        },
+        "opacity": 1
+      },
+      "label": {
+        "color": "#1A1A1A"
+      },
+      "sublabel": {
+        "color": "#6B6B6B"
+      }
+    },
+    "loading": {
+      "track": {
+        "stroke": "#E5E0D1",
+        "opacity": 1
+      },
+      "progress": {
+        "stroke": {
+          "loyalty-tier": "#BBEDDA",
+          "primary": "#E3A9A0"
+        },
+        "opacity": 1,
+        "indeterminate": true,
+        "arcLengthDegrees": 270,
+        "animation": {
+          "type": "rotate",
+          "duration": 1000,
+          "easing": "ease-in-out",
+          "iterations": "infinite"
+        }
+      },
+      "label": {
+        "content": "...",
+        "color": "#1A1A1A"
+      },
+      "sublabel": {
+        "visible": false
+      }
+    },
+    "empty": {
+      "track": {
+        "stroke": "#E5E0D1",
+        "opacity": 1
+      },
+      "progress": {
+        "value": 0,
+        "opacity": 0
+      },
+      "label": {
+        "color": "#1A1A1A"
+      },
+      "sublabel": {
+        "color": "#6B6B6B"
+      }
+    },
+    "error": {
+      "track": {
+        "stroke": "#E5E0D1",
+        "opacity": 1
+      },
+      "progress": {
+        "stroke": "#F44336",
+        "opacity": 1,
+        "value": 0.2
+      },
+      "icon": {
+        "name": "alert-circle",
+        "size": 24,
+        "color": "#F44336"
+      },
+      "label": {
+        "visible": false
+      },
+      "sublabel": {
+        "visible": false
+      }
+    },
+    "disabled": {
+      "track": {
+        "stroke": "#F5F5F5",
+        "opacity": 1
+      },
+      "progress": {
+        "stroke": "#D1BFB3",
+        "opacity": 1
+      },
+      "label": {
+        "color": "#B0B0B0"
+      },
+      "sublabel": {
+        "color": "#B0B0B0"
+      }
+    }
+  },
+  "anatomy": {
+    "sizes": {
+      "64": {
+        "width": 64,
+        "height": 64,
+        "radius": 24,
+        "strokeWidth": 8,
+        "centerStackGap": 0
+      },
+      "96": {
+        "width": 96,
+        "height": 96,
+        "radius": 40,
+        "strokeWidth": 8,
+        "centerStackGap": 0
+      },
+      "128": {
+        "width": 128,
+        "height": 128,
+        "radius": 56,
+        "strokeWidth": 8,
+        "centerStackGap": 0
+      }
+    },
+    "svg": {
+      "viewBox": "0 0 {{size}} {{size}}",
+      "transform": "rotate(-90)",
+      "transformOrigin": "center",
+      "comment": "Rotated -90 so the progress arc starts at the 12 o'clock position and fills clockwise"
+    },
+    "trackCircle": {
+      "cx": "{{size / 2}}",
+      "cy": "{{size / 2}}",
+      "r": "{{radius}}",
+      "fill": "none",
+      "strokeWidth": 8,
+      "strokeLinecap": "square"
+    },
+    "progressCircle": {
+      "cx": "{{size / 2}}",
+      "cy": "{{size / 2}}",
+      "r": "{{radius}}",
+      "fill": "none",
+      "strokeWidth": 8,
+      "strokeLinecap": "square",
+      "strokeDasharray": "{{circumference * progress}} {{circumference}}",
+      "strokeDashoffset": 0
+    },
+    "centerStack": {
+      "position": "absolute",
+      "top": "50%",
+      "left": "50%",
+      "transform": "translate(-50%, -50%)",
+      "flexDirection": "column",
+      "alignItems": "center",
+      "gap": 0
+    },
+    "label": {
+      "style": "heading-3",
+      "textAlign": "center"
+    },
+    "sublabel": {
+      "style": "body-small",
+      "textAlign": "center"
+    },
+    "icon": {
+      "position": "absolute",
+      "top": "50%",
+      "left": "50%",
+      "transform": "translate(-50%, -50%)"
+    }
+  },
+  "calculations": {
+    "circumference": "2 * pi * radius",
+    "progressArcLength": "circumference * progress",
+    "indeterminateArcLength": "circumference * 0.75",
+    "circumferenceBySize": {
+      "64": 150.8,
+      "96": 251.2,
+      "128": 351.9
+    }
+  },
+  "accessibility": {
+    "role": "progressbar",
+    "ariaValueMin": 0,
+    "ariaValueMax": 1,
+    "ariaValueNow": "{{progress}}",
+    "ariaValueText": {
+      "default": "{{label}} {{sublabel}}",
+      "loading": "Loading",
+      "empty": "No progress",
+      "error": "Error loading progress",
+      "disabled": "Progress unavailable"
+    },
+    "ariaLive": "polite",
+    "reduceMotion": {
+      "loading": {
+        "disableAnimation": true,
+        "staticArc": true,
+        "arcPositionDegrees": 0
+      }
+    }
+  },
+  "transitions": {
+    "progressChange": {
+      "duration": 300,
+      "easing": "ease-out",
+      "properties": ["stroke-dasharray"]
+    },
+    "stateChange": {
+      "duration": 200,
+      "easing": "ease-in-out",
+      "properties": ["stroke", "opacity"]
+    }
+  },
+  "examples": {
+    "loyaltyProgress": {
+      "size": 96,
+      "color": "loyalty-tier",
+      "progress": 0.65,
+      "label": "650",
+      "sublabel": "pts to Gold",
+      "withSublabel": true
+    },
+    "taskCompletion": {
+      "size": 64,
+      "color": "primary",
+      "progress": 0.4,
+      "label": "40%",
+      "sublabel": "complete",
+      "withSublabel": true
+    },
+    "simplePercentage": {
+      "size": 128,
+      "color": "primary",
+      "progress": 0.85,
+      "label": "85%",
+      "withSublabel": false
+    }
+  },
+  "implementationNotes": [
+    "Circumference = 2 * pi * r. For size 96 (radius 40) circumference ~= 251.2. Progress arc = circumference * progress value.",
+    "SVG rotated -90 so progress starts at top (12 o'clock) and moves clockwise.",
+    "Loading animation respects prefers-reduced-motion: reduce -> fallback shows static 270 deg arc at 0 deg position.",
+    "Color mapping: loyalty-tier uses #BBEDDA (mint-fresh), primary uses #E3A9A0 (coral-blossom).",
+    "Label format is developer responsibility. Common patterns: percentage (\"40%\"), absolute (\"650\"), fraction (\"2/5\").",
+    "Stroke linecap is square (not round) per Zarkili system for precise geometric alignment.",
+    "Error state overrides progress display. Disabled state maintains last known progress value but muted."
+  ]
+}

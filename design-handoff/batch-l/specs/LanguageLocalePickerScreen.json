@@ -1,0 +1,413 @@
+{
+  "screenId": "L.11",
+  "name": "LanguageLocalePickerScreen",
+  "device": "iPhone 14 + iPad",
+  "dimensions": {
+    "iPhone": {
+      "width": 390,
+      "height": 844
+    },
+    "iPad": {
+      "width": 768,
+      "height": 1024
+    }
+  },
+  "description": "Language and locale selection with format preview and reload prompt",
+  "component": "locale-picker",
+  "layout": {
+    "type": "vertical-flex",
+    "background": "#F2EDDD"
+  },
+  "elements": [
+    {
+      "id": "nav-bar",
+      "type": "navigation-bar",
+      "height": 44,
+      "background": "#F2EDDD",
+      "paddingTop": "safe-area-inset",
+      "children": [
+        {
+          "id": "back-button",
+          "type": "button",
+          "variant": "icon",
+          "icon": "chevron-left",
+          "action": "goBack",
+          "size": 24,
+          "color": "#1A1A1A"
+        },
+        {
+          "id": "nav-title",
+          "type": "text",
+          "style": "heading-4",
+          "text": "{navTitle}",
+          "fontWeight": 600,
+          "color": "#1A1A1A",
+          "alignment": "center"
+        }
+      ]
+    },
+    {
+      "id": "error-banner",
+      "type": "banner",
+      "visibility": "state:error",
+      "background": "#F4433610",
+      "borderColor": "#F44336",
+      "borderWidth": 1,
+      "borderRadius": 12,
+      "padding": 12,
+      "marginHorizontal": 16,
+      "marginTop": 8,
+      "children": [
+        {
+          "type": "text",
+          "style": "body-small",
+          "text": "{errorMessage}",
+          "color": "#F44336"
+        }
+      ]
+    },
+    {
+      "id": "locale-list",
+      "type": "scrollable-list",
+      "sections": [
+        {
+          "id": "supported-section",
+          "header": {
+            "text": "{supportedHeader}",
+            "style": "label-small",
+            "fontWeight": 600,
+            "color": "#6B6B6B",
+            "textTransform": "uppercase",
+            "paddingHorizontal": 16,
+            "paddingVertical": 8
+          },
+          "items": [
+            {
+              "id": "en-us",
+              "locale": "en-US",
+              "name": "English",
+              "nativeName": "English (US)",
+              "flag": "🇺🇸",
+              "selected": true
+            },
+            {
+              "id": "en-gb",
+              "locale": "en-GB",
+              "name": "English",
+              "nativeName": "English (UK)",
+              "flag": "🇬🇧",
+              "selected": false
+            },
+            {
+              "id": "es-us",
+              "locale": "es-US",
+              "name": "Spanish",
+              "nativeName": "Español (US)",
+              "flag": "🇺🇸",
+              "selected": false
+            },
+            {
+              "id": "hr-hr",
+              "locale": "hr-HR",
+              "name": "Croatian",
+              "nativeName": "Hrvatski",
+              "flag": "🇭🇷",
+              "selected": false
+            }
+          ]
+        },
+        {
+          "id": "coming-soon-section",
+          "header": {
+            "text": "{comingSoonHeader}",
+            "style": "label-small",
+            "fontWeight": 600,
+            "color": "#6B6B6B",
+            "textTransform": "uppercase",
+            "paddingHorizontal": 16,
+            "paddingVertical": 8
+          },
+          "items": [
+            {
+              "id": "fr-ca",
+              "locale": "fr-CA",
+              "name": "French",
+              "nativeName": "Français (CA)",
+              "flag": "🇨🇦",
+              "disabled": true
+            },
+            {
+              "id": "de-de",
+              "locale": "de-DE",
+              "name": "German",
+              "nativeName": "Deutsch",
+              "flag": "🇩🇪",
+              "disabled": true
+            },
+            {
+              "id": "it-it",
+              "locale": "it-IT",
+              "name": "Italian",
+              "nativeName": "Italiano",
+              "flag": "🇮🇹",
+              "disabled": true
+            }
+          ]
+        }
+      ],
+      "rowHeight": 56,
+      "rowPaddingHorizontal": 16,
+      "separatorColor": "#E5E0D1",
+      "separatorHeight": 1
+    },
+    {
+      "id": "format-preview-card",
+      "type": "card",
+      "background": "#FFFFFF",
+      "borderRadius": 16,
+      "padding": 16,
+      "marginHorizontal": 16,
+      "marginVertical": 16,
+      "shadow": "medium",
+      "gap": 12,
+      "children": [
+        {
+          "id": "date-row",
+          "type": "horizontal-flex",
+          "justifyContent": "space-between",
+          "children": [
+            {
+              "type": "text",
+              "style": "label-small",
+              "text": "{dateLabel}",
+              "color": "#6B6B6B"
+            },
+            {
+              "type": "text",
+              "style": "body",
+              "text": "{dateExample}",
+              "color": "#1A1A1A"
+            }
+          ]
+        },
+        {
+          "id": "time-row",
+          "type": "horizontal-flex",
+          "justifyContent": "space-between",
+          "children": [
+            {
+              "type": "text",
+              "style": "label-small",
+              "text": "{timeLabel}",
+              "color": "#6B6B6B"
+            },
+            {
+              "type": "text",
+              "style": "body",
+              "text": "{timeExample}",
+              "color": "#1A1A1A"
+            }
+          ]
+        },
+        {
+          "id": "currency-row",
+          "type": "horizontal-flex",
+          "justifyContent": "space-between",
+          "children": [
+            {
+              "type": "text",
+              "style": "label-small",
+              "text": "{currencyLabel}",
+              "color": "#6B6B6B"
+            },
+            {
+              "type": "text",
+              "style": "body",
+              "text": "{currencyExample}",
+              "color": "#1A1A1A"
+            }
+          ]
+        },
+        {
+          "id": "number-row",
+          "type": "horizontal-flex",
+          "justifyContent": "space-between",
+          "children": [
+            {
+              "type": "text",
+              "style": "label-small",
+              "text": "{numberLabel}",
+              "color": "#6B6B6B"
+            },
+            {
+              "type": "text",
+              "style": "body",
+              "text": "{numberExample}",
+              "color": "#1A1A1A"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "reload-prompt-sheet",
+      "type": "bottom-sheet",
+      "visibility": "state:changed",
+      "background": "#FFFFFF",
+      "borderRadiusTop": 24,
+      "padding": 24,
+      "gap": 16,
+      "children": [
+        {
+          "id": "reload-heading",
+          "type": "text",
+          "style": "heading-3",
+          "text": "{reloadHeading}",
+          "fontWeight": 600,
+          "color": "#1A1A1A"
+        },
+        {
+          "id": "reload-message",
+          "type": "text",
+          "style": "body",
+          "text": "{reloadMessage}",
+          "color": "#6B6B6B"
+        },
+        {
+          "id": "cta-row",
+          "type": "horizontal-flex",
+          "gap": 12,
+          "children": [
+            {
+              "id": "later-btn",
+              "type": "button",
+              "variant": "tertiary",
+              "label": "{laterCta}",
+              "action": "dismiss",
+              "height": 52,
+              "labelWeight": 500,
+              "labelColor": "#6B6B6B",
+              "flex": 1
+            },
+            {
+              "id": "restart-btn",
+              "type": "button",
+              "variant": "primary",
+              "label": "{restartCta}",
+              "action": "restartApp",
+              "height": 52,
+              "borderRadius": 12,
+              "background": "#E3A9A0",
+              "labelWeight": 600,
+              "labelColor": "#FFFFFF",
+              "flex": 1
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "states": [
+    {
+      "name": "default",
+      "description": "Initial state with current locale selected",
+      "visibility": {
+        "error-banner": false,
+        "reload-prompt-sheet": false
+      },
+      "strings": {
+        "navTitle": "Language & Region",
+        "supportedHeader": "Supported",
+        "comingSoonHeader": "Coming soon",
+        "dateLabel": "Date",
+        "dateExample": "05/10/2026",
+        "timeLabel": "Time",
+        "timeExample": "2:30 PM",
+        "currencyLabel": "Currency",
+        "currencyExample": "$42.00",
+        "numberLabel": "Number",
+        "numberExample": "1,234.56"
+      }
+    },
+    {
+      "name": "changed",
+      "description": "User selected new locale, format card updates, reload prompt shown",
+      "visibility": {
+        "error-banner": false,
+        "reload-prompt-sheet": true
+      },
+      "strings": {
+        "navTitle": "Language & Region",
+        "supportedHeader": "Supported",
+        "comingSoonHeader": "Coming soon",
+        "dateLabel": "Date",
+        "dateExample": "10.05.2026.",
+        "timeLabel": "Time",
+        "timeExample": "14:30",
+        "currencyLabel": "Currency",
+        "currencyExample": "42,00 €",
+        "numberLabel": "Number",
+        "numberExample": "1.234,56",
+        "reloadHeading": "Restart Required",
+        "reloadMessage": "Restart Zarkili to apply this language.",
+        "laterCta": "Later",
+        "restartCta": "Restart now"
+      }
+    },
+    {
+      "name": "error",
+      "description": "Error occurred while changing locale",
+      "visibility": {
+        "error-banner": true,
+        "reload-prompt-sheet": false
+      },
+      "strings": {
+        "navTitle": "Language & Region",
+        "errorMessage": "Failed to update language. Please try again.",
+        "supportedHeader": "Supported",
+        "comingSoonHeader": "Coming soon",
+        "dateLabel": "Date",
+        "dateExample": "05/10/2026",
+        "timeLabel": "Time",
+        "timeExample": "2:30 PM",
+        "currencyLabel": "Currency",
+        "currencyExample": "$42.00",
+        "numberLabel": "Number",
+        "numberExample": "1,234.56"
+      }
+    }
+  ],
+  "accessibility": {
+    "localeRow": {
+      "label": "{name} ({nativeName})",
+      "hint": "Select to change language",
+      "selected": "Currently selected"
+    },
+    "disabledRow": {
+      "label": "{name} - Coming soon",
+      "hint": "Not yet available"
+    }
+  },
+  "frames": [
+    {
+      "name": "L-11-default-iPhone",
+      "state": "default",
+      "device": "iPhone 14"
+    },
+    {
+      "name": "L-11-default-iPad",
+      "state": "default",
+      "device": "iPad"
+    },
+    {
+      "name": "L-11-changed-iPhone",
+      "state": "changed",
+      "device": "iPhone 14"
+    },
+    {
+      "name": "L-11-error-iPhone",
+      "state": "error",
+      "device": "iPhone 14"
+    }
+  ]
+}

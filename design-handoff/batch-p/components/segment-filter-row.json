@@ -1,0 +1,82 @@
+{
+  "component": "SegmentFilterRow",
+  "description": "Draggable filter row with attribute, operator, and value pickers for segment builder",
+  "props": {
+    "attribute": {
+      "type": "string",
+      "required": true,
+      "description": "Selected attribute (Location, Last visit, Total spend, etc.)",
+      "options": ["location", "lastVisit", "totalSpend", "loyaltyTier", "serviceUsed", "noShowCount", "tag"]
+    },
+    "operator": {
+      "type": "string",
+      "required": true,
+      "description": "Comparison operator",
+      "options": ["equals", "notEquals", "greaterThan", "lessThan", "contains", "within"]
+    },
+    "value": {
+      "type": "string | number",
+      "required": true,
+      "description": "Filter value or values"
+    },
+    "onRemove": {
+      "type": "function",
+      "required": true,
+      "description": "Callback when remove button clicked"
+    },
+    "onDrag": {
+      "type": "function",
+      "required": false,
+      "description": "Callback for drag reorder"
+    },
+    "isDragging": {
+      "type": "boolean",
+      "required": false,
+      "description": "Visual state during drag"
+    },
+    "hasError": {
+      "type": "boolean",
+      "required": false,
+      "description": "Validation error state"
+    }
+  },
+  "states": [
+    "default",
+    "editing",
+    "error",
+    "dragging"
+  ],
+  "variants": [],
+  "tokens": {
+    "background": "semantic.surface",
+    "border": "semantic.cardBorder",
+    "borderError": "semantic.error",
+    "text": "semantic.foreground",
+    "iconColor": "semantic.secondaryText",
+    "removeIconColor": "semantic.error"
+  },
+  "accessibility": {
+    "role": "listitem",
+    "label": "Filter rule",
+    "hint": "Drag to reorder, tap to edit, tap X to remove"
+  },
+  "dimensions": {
+    "height": 48,
+    "minWidth": 320,
+    "gap": 8,
+    "padding": 12,
+    "removeButtonSize": 44
+  },
+  "examples": [
+    {
+      "attribute": "totalSpend",
+      "operator": "greaterThan",
+      "value": "500"
+    },
+    {
+      "attribute": "loyaltyTier",
+      "operator": "equals",
+      "value": "Gold"
+    }
+  ]
+}

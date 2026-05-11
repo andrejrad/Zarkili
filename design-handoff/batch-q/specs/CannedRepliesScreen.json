@@ -1,0 +1,47 @@
+{
+  "screen": "CannedRepliesScreen",
+  "route": "AdminCannedReplies",
+  "device": {
+    "primary": "iPad 1024×768",
+    "secondary": "iPhone 14 390×844"
+  },
+  "stateNames": [
+    "default",
+    "editing",
+    "saved",
+    "error"
+  ],
+  "layout": {
+    "header": {
+      "title": "strings.cannedReplies.title",
+      "right": { "type": "button", "label": "strings.cannedReplies.addReply", "variant": "primary" }
+    },
+    "filterBar": {
+      "searchBar": { "fullWidth": true },
+      "tagFilterChips": {
+        "options": ["Bookings", "Reviews", "Waitlist", "General"],
+        "customTags": true
+      }
+    },
+    "list": {
+      "component": "canned-reply-editor",
+      "mode": "listView",
+      "rowHeight": "components.cannedReplyRowHeight",
+      "selectedRow": { "background": "primary 10%" },
+      "editLink": { "action": "open editSheet" }
+    },
+    "editSheet": {
+      "iPad": { "type": "side-panel", "width": 480 },
+      "iPhone": { "type": "sheet", "width": 390, "radius": 20 },
+      "component": "canned-reply-editor",
+      "mode": "editView"
+    }
+  },
+  "states": {
+    "saved": { "toast": "strings.cannedReplies.savedToast" },
+    "error": { "inlineBanner": { "position": "inside editSheet" } }
+  },
+  "accessibility": {
+    "row": { "accessibilityLabel": "{replyName}, {tagCount} tags" }
+  }
+}

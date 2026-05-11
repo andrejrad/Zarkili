@@ -3,6 +3,27 @@ import type { LocationRepository } from "../../domains/locations/repository";
 import type { Tenant } from "../../domains/tenants";
 import type { TenantRepository } from "../../domains/tenants/repository";
 
+// ---------------------------------------------------------------------------
+// W38 — input types for update operations
+// ---------------------------------------------------------------------------
+
+export type UpdateBusinessProfileInput = {
+  name: string;
+  country: string;
+  timezone: string;
+};
+
+export type UpdateBrandSettingsInput = {
+  logoUrl: string | null;
+  primary: string;
+  secondary: string;
+  accent: string;
+};
+
+export type UpdateCurrencySettingsInput = {
+  defaultCurrency: string;
+};
+
 type UiResult<T> =
   | { ok: true; data: T }
   | { ok: false; message: string };
@@ -121,10 +142,87 @@ export function createTenantLocationAdminService(input: {
     }
   }
 
+  // -------------------------------------------------------------------------
+  // W38 — update operations
+  // -------------------------------------------------------------------------
+
+  async function updateBusinessProfile(
+    tenantId: string,
+    updateInput: UpdateBusinessProfileInput,
+  ): Promise<UiResult<TenantProfileSummary>> {
+    try {
+      if (!updateInput.name.trim()) {
+        return { ok: false, message: "Business name is required." };
+      }
+      await input.tenantRepository.updateTenant(tenantId, {
+        name: updateInput.name.trim(),
+        country: updateInput.country.trim() || undefined,
+        timezone: updateInput.timezone.trim() || undefined,
+      });
+      // Re-read so the caller gets the persisted state.
+      return readTenantProfile(tenantId);
+    } catch (error) {
+      return {
+        ok: false,
+        message: normalizeErrorMessage(error, "Unable to save business profile right now."),
+      };
+    }
+  }
+
+  async function updateBrandSettings(
+    tenantId: string,
+    updateInput: UpdateBrandSettingsInput,
+  ): Promise<UiResult<void>> {
+    try {
+      const tenant = await input.tenantRepository.getTenantById(tenantId);
+      if (!tenant) {
+        return { ok: false, message: "Tenant profile was not found." };
+      }
+      await input.tenantRepository.updateTenant(tenantId, {
+        branding: {
+          ...tenant.branding,
+          logoUrl: updateInput.logoUrl,
+          primary: updateInput.primary,
+          secondary: updateInput.secondary,
+          accent: updateInput.accent,
+        },
+      });
+      return { ok: true, data: undefined };
+    } catch (error) {
+      return {
+        ok: false,
+        message: normalizeErrorMessage(error, "Unable to save brand settings right now."),
+      };
+    }
+  }
+
+  async function updateCurrencySettings(
+    tenantId: string,
+    updateInput: UpdateCurrencySettingsInput,
+  ): Promise<UiResult<void>> {
+    try {
+      if (!updateInput.defaultCurrency.trim()) {
+        return { ok: false, message: "Currency code is required." };
+      }
+      await input.tenantRepository.updateTenant(tenantId, {
+        defaultCurrency: updateInput.defaultCurrency.trim().toUpperCase(),
+      });
+      return { ok: true, data: undefined };
+    } catch (error) {
+      return {
+        ok: false,
+        message: normalizeErrorMessage(error, "Unable to save currency settings right now."),
+      };
+    }
+  }
+
   return {
     readTenantProfile,
     readTenantLocations,
     createLocationForTenant,
+    updateBusinessProfile,
+    updateBrandSettings,
+    updateCurrencySettings,
   };
 }
 

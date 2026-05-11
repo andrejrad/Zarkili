@@ -53,7 +53,7 @@ describe("AppNavigatorShell web routing", () => {
   });
 
   it("redirects unauthorized web path to safe public route", async () => {
-    window.history.replaceState(null, "", "/app");
+    window.history.replaceState(null, "", "/app/tenant-profile");
 
     render(
       <AppProviders>
@@ -64,8 +64,8 @@ describe("AppNavigatorShell web routing", () => {
       </AppProviders>
     );
 
-    expect(await screen.findByText("Current route: Landing")).toBeTruthy();
-    expect(window.location.pathname).toBe("/");
+    expect(await screen.findByText("Current route: AppShell")).toBeTruthy();
+    expect(window.location.pathname).toBe("/app");
   });
 
   it("syncs URL when navigation changes route", async () => {
@@ -78,11 +78,11 @@ describe("AppNavigatorShell web routing", () => {
       </AppProviders>
     );
 
-    fireEvent.press(screen.getByText("Discover businesses"));
+    fireEvent.press(screen.getByText("Already have an account? Sign In"));
 
     await waitFor(() => {
-      expect(screen.getByText("Current route: DiscoverBusinesses")).toBeTruthy();
-      expect(window.location.pathname).toBe("/discover");
+      expect(screen.getByText("Current route: SignIn")).toBeTruthy();
+      expect(window.location.pathname).toBe("/auth/sign-in");
     });
   });
 
@@ -96,8 +96,8 @@ describe("AppNavigatorShell web routing", () => {
       </AppProviders>
     );
 
-    fireEvent.press(screen.getByText("Discover businesses"));
-    await screen.findByText("Current route: DiscoverBusinesses");
+    fireEvent.press(screen.getByText("Already have an account? Sign In"));
+    await screen.findByText("Current route: SignIn");
 
     await act(async () => {
       window.history.pushState(null, "", "/login");

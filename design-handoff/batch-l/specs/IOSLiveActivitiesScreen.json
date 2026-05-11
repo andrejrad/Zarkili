@@ -1,0 +1,281 @@
+{
+  "screenId": "L.14",
+  "name": "IOSLiveActivitiesScreen",
+  "device": "iPhone 14 Pro",
+  "dimensions": {
+    "width": 393,
+    "height": 852,
+    "dynamicIsland": true
+  },
+  "description": "iOS Live Activities for Dynamic Island and Lock Screen during active bookings",
+  "variants": [
+    {
+      "id": "dynamic-island-compact",
+      "name": "Dynamic Island Compact",
+      "width": 126,
+      "height": 37,
+      "background": "#1A1A1A",
+      "elements": [
+        {
+          "id": "coral-dot",
+          "type": "indicator",
+          "size": 8,
+          "color": "#E3A9A0",
+          "position": "leading",
+          "marginLeading": 12
+        },
+        {
+          "id": "countdown",
+          "type": "text",
+          "style": "mono",
+          "fontSize": 12,
+          "text": "{countdownTime}",
+          "color": "#FFFFFF",
+          "position": "center",
+          "interpolation": {
+            "countdownTime": "15m"
+          }
+        },
+        {
+          "id": "staff-avatar",
+          "type": "avatar",
+          "size": 20,
+          "borderRadius": 9999,
+          "position": "trailing",
+          "marginTrailing": 12
+        }
+      ]
+    },
+    {
+      "id": "dynamic-island-expanded",
+      "name": "Dynamic Island Expanded (Long Press)",
+      "width": 371,
+      "height": 160,
+      "background": "#1A1A1A",
+      "borderRadius": 44,
+      "padding": 16,
+      "elements": [
+        {
+          "id": "service-name",
+          "type": "text",
+          "style": "heading-4",
+          "text": "{serviceName}",
+          "color": "#FFFFFF",
+          "fontWeight": 600,
+          "alignment": "center",
+          "interpolation": {
+            "serviceName": "Balayage Highlights"
+          }
+        },
+        {
+          "id": "staff-name",
+          "type": "text",
+          "style": "body-small",
+          "text": "{staffName}",
+          "color": "#B0B0B0",
+          "fontWeight": 400,
+          "alignment": "center",
+          "marginTop": 4,
+          "interpolation": {
+            "staffName": "with Sarah M."
+          }
+        },
+        {
+          "id": "countdown-large",
+          "type": "text",
+          "style": "heading-2",
+          "text": "{countdownTime}",
+          "color": "#FFFFFF",
+          "fontWeight": 600,
+          "alignment": "center",
+          "marginTop": 16,
+          "interpolation": {
+            "countdownTime": "15:30"
+          }
+        },
+        {
+          "id": "im-here-cta",
+          "type": "button",
+          "variant": "pill",
+          "label": "{imHereCta}",
+          "background": "#E3A9A0",
+          "labelColor": "#FFFFFF",
+          "height": 40,
+          "borderRadius": 9999,
+          "paddingHorizontal": 24,
+          "fontWeight": 600,
+          "alignment": "center",
+          "marginTop": 12,
+          "action": "checkIn"
+        }
+      ]
+    },
+    {
+      "id": "lock-screen-widget",
+      "name": "Lock Screen Widget",
+      "width": 371,
+      "height": 44,
+      "background": "#1A1A1A",
+      "borderRadius": 12,
+      "padding": 12,
+      "elements": [
+        {
+          "id": "service-icon",
+          "type": "icon",
+          "name": "spa",
+          "size": 32,
+          "color": "#E3A9A0",
+          "position": "leading"
+        },
+        {
+          "id": "service-name",
+          "type": "text",
+          "style": "body",
+          "text": "{serviceName}",
+          "color": "#FFFFFF",
+          "position": "leading",
+          "marginLeading": 12,
+          "interpolation": {
+            "serviceName": "Balayage"
+          }
+        },
+        {
+          "id": "countdown-center",
+          "type": "text",
+          "style": "heading-3",
+          "text": "{countdownTime}",
+          "color": "#FFFFFF",
+          "fontWeight": 600,
+          "position": "center",
+          "interpolation": {
+            "countdownTime": "15:30"
+          }
+        },
+        {
+          "id": "staff-avatar",
+          "type": "avatar",
+          "size": 40,
+          "borderRadius": 9999,
+          "position": "trailing"
+        }
+      ]
+    }
+  ],
+  "states": [
+    {
+      "name": "pre-appointment",
+      "description": "More than 15 minutes before appointment",
+      "countdownFormat": "MM:SS or HHh MMm",
+      "pulseRing": false,
+      "strings": {
+        "countdownTime": "45m",
+        "serviceName": "Balayage Highlights",
+        "staffName": "with Sarah M.",
+        "imHereCta": "I'm here"
+      }
+    },
+    {
+      "name": "imminent",
+      "description": "Less than 15 minutes before appointment",
+      "countdownFormat": "MM:SS",
+      "pulseRing": true,
+      "pulseRingColor": "#FF9800",
+      "strings": {
+        "countdownTime": "12:24",
+        "serviceName": "Balayage Highlights",
+        "staffName": "with Sarah M.",
+        "imHereCta": "I'm here"
+      }
+    },
+    {
+      "name": "in-progress",
+      "description": "Appointment started, timer counts up",
+      "countdownFormat": "MM:SS elapsed",
+      "timerDirection": "count-up",
+      "strings": {
+        "countdownTime": "23:15",
+        "serviceName": "In progress",
+        "staffName": "with Sarah M.",
+        "imHereCta": "In progress"
+      }
+    },
+    {
+      "name": "completed",
+      "description": "Appointment finished, prompting for review",
+      "strings": {
+        "countdownTime": "Done!",
+        "serviceName": "Appointment complete",
+        "staffName": "with Sarah M.",
+        "imHereCta": "⭐ Rate your visit"
+      }
+    }
+  ],
+  "accessibility": {
+    "compact": {
+      "label": "{serviceName} appointment in {countdownTime}",
+      "hint": "Long press for details"
+    },
+    "expanded": {
+      "label": "{serviceName} with {staffName}. Starting in {countdownTime}.",
+      "imHereCta": {
+        "label": "Check in for appointment",
+        "hint": "Notifies salon you've arrived"
+      }
+    },
+    "lockScreen": {
+      "label": "{serviceName} appointment in {countdownTime} with {staffName}"
+    }
+  },
+  "frames": [
+    {
+      "name": "L-14-compact-pre-appointment",
+      "variant": "dynamic-island-compact",
+      "state": "pre-appointment"
+    },
+    {
+      "name": "L-14-compact-imminent",
+      "variant": "dynamic-island-compact",
+      "state": "imminent"
+    },
+    {
+      "name": "L-14-expanded-pre-appointment",
+      "variant": "dynamic-island-expanded",
+      "state": "pre-appointment"
+    },
+    {
+      "name": "L-14-expanded-imminent",
+      "variant": "dynamic-island-expanded",
+      "state": "imminent"
+    },
+    {
+      "name": "L-14-expanded-in-progress",
+      "variant": "dynamic-island-expanded",
+      "state": "in-progress"
+    },
+    {
+      "name": "L-14-expanded-completed",
+      "variant": "dynamic-island-expanded",
+      "state": "completed"
+    },
+    {
+      "name": "L-14-lockscreen-pre-appointment",
+      "variant": "lock-screen-widget",
+      "state": "pre-appointment"
+    },
+    {
+      "name": "L-14-lockscreen-imminent",
+      "variant": "lock-screen-widget",
+      "state": "imminent"
+    },
+    {
+      "name": "L-14-lockscreen-in-progress",
+      "variant": "lock-screen-widget",
+      "state": "in-progress"
+    },
+    {
+      "name": "L-14-lockscreen-completed",
+      "variant": "lock-screen-widget",
+      "state": "completed"
+    }
+  ]
+}

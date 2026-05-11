@@ -5,7 +5,9 @@ web-build/
 coverage/
 .env
 .env.local
+.env.development
 .env.development.local
+.env.production
 .env.production.local
 firebase-debug.log
 ui-debug.log

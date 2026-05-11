@@ -1,0 +1,178 @@
+{
+  "screen": "TransactionalTemplateEditorScreen",
+  "route": "/admin/campaigns/transactional",
+  "description": "Editor for automated transactional message templates with channel tabs and variable insertion",
+  "dimensions": {
+    "width": 390,
+    "height": "auto-scroll"
+  },
+  "states": [
+    "default",
+    "loading",
+    "error",
+    "saving"
+  ],
+  "accessibility": {
+    "screenReaderLabel": "strings.transactionalTemplates.screenTitle",
+    "semanticRoles": [
+      {"element": "templateSidebar", "role": "list"},
+      {"element": "templateItem", "role": "listitem"},
+      {"element": "channelTabs", "role": "tablist"},
+      {"element": "editorPanel", "role": "group"}
+    ]
+  },
+  "rtl": "deferred",
+  "darkMode": "deferred",
+  "layout": {
+    "header": {
+      "height": 64,
+      "title": "strings.transactionalTemplates.title"
+    },
+    "templateSidebar": {
+      "width": "100%",
+      "paddingHorizontal": 16,
+      "paddingVertical": 16,
+      "gap": 8,
+      "templates": [
+        {"id": "bookingConfirmation", "label": "strings.transactionalTemplates.bookingConfirmation"},
+        {"id": "reminder24h", "label": "strings.transactionalTemplates.reminder24h"},
+        {"id": "reminder1h", "label": "strings.transactionalTemplates.reminder1h"},
+        {"id": "noShow", "label": "strings.transactionalTemplates.noShow"},
+        {"id": "cancellation", "label": "strings.transactionalTemplates.cancellation"},
+        {"id": "receipt", "label": "strings.transactionalTemplates.receipt"},
+        {"id": "passwordReset", "label": "strings.transactionalTemplates.passwordReset"}
+      ]
+    },
+    "channelTabs": {
+      "height": 48,
+      "tabs": [
+        {"label": "strings.transactionalTemplates.tabPush", "icon": "bell"},
+        {"label": "strings.transactionalTemplates.tabEmail", "icon": "mail"},
+        {"label": "strings.transactionalTemplates.tabSms", "icon": "message"}
+      ]
+    },
+    "editorPanel": {
+      "paddingHorizontal": 16,
+      "paddingVertical": 24,
+      "fields": [
+        {"id": "body", "height": 240, "richText": true},
+        {"id": "variableToolbar", "height": 48}
+      ]
+    },
+    "sendTestButton": {
+      "height": 48,
+      "marginHorizontal": 16,
+      "marginBottom": 16,
+      "label": "strings.transactionalTemplates.sendTest",
+      "style": "outlined"
+    },
+    "activeToggle": {
+      "height": 48,
+      "marginHorizontal": 16,
+      "marginBottom": 16,
+      "label": "strings.transactionalTemplates.activeToggleLabel"
+    },
+    "lastEdited": {
+      "marginHorizontal": 16,
+      "marginBottom": 24,
+      "text": "strings.transactionalTemplates.lastEdited",
+      "variant": "body-small",
+      "color": "semantic.secondaryText"
+    }
+  },
+  "components": [
+    {
+      "id": "navigationHeader",
+      "ref": "navigation-header",
+      "props": {
+        "showBack": true,
+        "title": "strings.transactionalTemplates.title"
+      }
+    },
+    {
+      "id": "templateListItem",
+      "ref": "list-row",
+      "props": {
+        "label": "{{templateLabel}}",
+        "selected": "{{isSelected}}"
+      }
+    },
+    {
+      "id": "channelTabs",
+      "ref": "tabs",
+      "props": {
+        "tabs": [
+          {"label": "strings.transactionalTemplates.tabPush", "icon": "bell"},
+          {"label": "strings.transactionalTemplates.tabEmail", "icon": "mail"},
+          {"label": "strings.transactionalTemplates.tabSms", "icon": "message"}
+        ]
+      }
+    },
+    {
+      "id": "variablePickerToolbar",
+      "ref": "variable-picker-toolbar",
+      "props": {
+        "variables": [
+          {"key": "first_name", "label": "{{first_name}}"},
+          {"key": "salon_name", "label": "{{salon_name}}"},
+          {"key": "booking_date", "label": "{{booking_date}}"},
+          {"key": "service_name", "label": "{{service_name}}"},
+          {"key": "staff_name", "label": "{{staff_name}}"}
+        ]
+      }
+    },
+    {
+      "id": "activeToggle",
+      "ref": "switch",
+      "props": {
+        "label": "strings.transactionalTemplates.activeToggleLabel"
+      }
+    }
+  ],
+  "interactions": [
+    {
+      "trigger": "templateItem.tap",
+      "action": "selectTemplate"
+    },
+    {
+      "trigger": "channelTab.tap",
+      "action": "switchChannel"
+    },
+    {
+      "trigger": "body.change",
+      "action": "autoSave",
+      "debounce": 1000
+    },
+    {
+      "trigger": "variableChip.tap",
+      "action": "insertVariable"
+    },
+    {
+      "trigger": "sendTestButton.tap",
+      "action": "sendTestMessage"
+    },
+    {
+      "trigger": "activeToggle.change",
+      "action": "toggleTemplateActive"
+    }
+  ],
+  "tokens": {
+    "used": [
+      "semantic.pageBackground",
+      "semantic.surface",
+      "semantic.cardBorder",
+      "semantic.foreground",
+      "semantic.secondaryText",
+      "semantic.primary"
+    ]
+  },
+  "redlines": {
+    "sidebarItemHeight": 48,
+    "tabHeight": 48,
+    "editorHeight": 240,
+    "toolbarHeight": 48,
+    "toggleHeight": 48,
+    "buttonHeight": 48,
+    "gap": 16
+  }
+}

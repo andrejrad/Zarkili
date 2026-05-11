@@ -1,0 +1,78 @@
+{
+  "screen": "SecurityEventsScreen",
+  "route": "SuperAdminSecurityEvents",
+  "device": { "primary": "Desktop 1280+", "secondary": "iPad 1024×768" },
+  "stateNames": ["default", "alertActive", "detailPanel", "error"],
+  "layout": {
+    "alertBanner": {
+      "showWhen": "criticalAlertCount > 0",
+      "background": "error",
+      "icon": "errorFilled",
+      "message": "strings.securityEvents.alertBanner",
+      "color": "on-error",
+      "cta": { "label": "View", "variant": "text", "color": "on-error" }
+    },
+    "kpiRow": {
+      "type": "chips",
+      "count": 4,
+      "items": [
+        { "key": "failedLogins", "label": "strings.securityEvents.kpiFailedLogins", "value": { "variant": "heading-3", "font": "mono" }, "colorWhen": { "high": "error" } },
+        { "key": "mfaChallenges", "label": "strings.securityEvents.kpiMFAChallenges", "value": { "variant": "heading-3", "font": "mono" } },
+        { "key": "suspicious", "label": "strings.securityEvents.kpiSuspicious", "value": { "variant": "heading-3", "font": "mono" }, "colorWhen": { "nonZero": "warning" } },
+        { "key": "blocked", "label": "strings.securityEvents.kpiBlocked", "value": { "variant": "heading-3", "font": "mono" } }
+      ]
+    },
+    "filters": {
+      "type": "filterRow",
+      "filters": [
+        { "key": "severity", "type": "filterChip", "options": ["critical", "high", "medium", "low"] },
+        { "key": "eventType", "type": "select", "options": ["failed-login", "mfa-challenge", "suspicious-ip", "password-reset", "api-abuse", "blocked-ip"] },
+        { "key": "dateRange", "type": "datePicker", "range": true },
+        { "key": "ipFilter", "type": "textInput", "placeholder": "Filter by IP..." }
+      ]
+    },
+    "eventTable": {
+      "virtualScroll": true,
+      "columns": [
+        { "key": "timestamp", "format": "ISO8601 local", "font": "mono", "variant": "caption", "width": 180 },
+        { "key": "severityPill", "type": "pill", "values": ["critical", "high", "medium", "low"], "colors": { "critical": "error", "high": "error 60%", "medium": "warning", "low": "surface-variant" } },
+        { "key": "eventType", "variant": "body-medium", "font": "mono" },
+        { "key": "ipAddress", "font": "mono", "variant": "caption" },
+        { "key": "tenantName", "variant": "body-medium" },
+        { "key": "actor", "type": "userPill" },
+        { "key": "geoLocation", "variant": "caption", "color": "on-surface-variant" },
+        { "key": "actions", "type": "overflow-menu", "items": [
+          { "label": "strings.securityEvents.blockIpCta", "icon": "block", "tone": "destructive" },
+          "View Detail"
+        ]}
+      ],
+      "rowAction": { "type": "open-detail-panel" }
+    },
+    "detailPanel": {
+      "position": "right",
+      "width": 480,
+      "fields": [
+        { "key": "timestamp" }, { "key": "eventType" }, { "key": "severity" },
+        { "key": "ipAddress", "font": "mono" }, { "key": "geoLocation" },
+        { "key": "tenantName" }, { "key": "actor" },
+        { "key": "userAgent", "maxLines": 2 },
+        { "key": "rawPayload", "type": "codeBlock", "language": "json" }
+      ]
+    }
+  },
+  "states": {
+    "alertActive": {
+      "alertBanner": { "visible": true }
+    },
+    "detailPanel": {
+      "detailPanel": { "open": true }
+    },
+    "error": {
+      "inlineBanner": {
+        "background": "error 10%",
+        "borderLeft": { "width": 4, "color": "error" },
+        "message": "strings.securityEvents.errorMessage"
+      }
+    }
+  }
+}

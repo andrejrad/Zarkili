@@ -1,0 +1,65 @@
+{
+  "screen": "AdminDeviceManagementScreen",
+  "route": "SuperAdminDeviceManagement",
+  "device": { "primary": "Desktop 1280+", "secondary": "Mobile 375×812" },
+  "stateNames": ["default", "revokeConfirm", "error"],
+  "layout": {
+    "header": {
+      "title": { "text": "Trusted Devices", "variant": "heading-2" },
+      "subtitle": { "text": "strings.adminDevices.subtitle", "variant": "body-medium", "color": "on-surface-variant" }
+    },
+    "deviceList": {
+      "layout": "single column, full width",
+      "maxWidth": 640,
+      "item": {
+        "padding": 16,
+        "shape": "rounded-2",
+        "border": { "width": 1, "color": "outline-variant" },
+        "fields": [
+          {
+            "key": "deviceIcon",
+            "type": "icon",
+            "iconSet": { "mobile": "smartphone", "desktop": "computer", "tablet": "tabletMac" },
+            "size": 32,
+            "position": "left"
+          },
+          { "key": "deviceName", "variant": "body-large", "weight": "600" },
+          { "key": "os", "variant": "caption", "color": "on-surface-variant" },
+          { "key": "lastSeen", "type": "relative", "variant": "caption" },
+          { "key": "location", "variant": "caption", "color": "on-surface-variant" },
+          {
+            "key": "thisDeviceBadge",
+            "type": "pill",
+            "label": "strings.adminDevices.thisDeviceBadge",
+            "showWhen": "isCurrentDevice",
+            "background": "primary-container",
+            "color": "on-primary-container"
+          }
+        ],
+        "actions": [
+          { "label": "strings.adminDevices.markTrustedCta", "variant": "outlined", "showWhen": "trusted === false" },
+          { "label": "Revoke", "variant": "outlined", "tone": "destructive", "onPress": "open-revoke-confirm" }
+        ]
+      }
+    },
+    "revokeConfirmModal": {
+      "type": "modal",
+      "title": "strings.adminDevices.revokeConfirmTitle",
+      "body": "strings.adminDevices.revokeConfirmBody",
+      "cta": { "label": "Revoke Device", "variant": "filled", "tone": "destructive" },
+      "cancelLabel": "Cancel"
+    }
+  },
+  "states": {
+    "revokeConfirm": {
+      "revokeConfirmModal": { "open": true }
+    },
+    "error": {
+      "inlineBanner": {
+        "background": "error 10%",
+        "borderLeft": { "width": 4, "color": "error" },
+        "message": "strings.adminDevices.errorMessage"
+      }
+    }
+  }
+}

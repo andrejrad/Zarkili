@@ -1,0 +1,191 @@
+{
+  "screenId": "L.4",
+  "name": "ServerErrorFallbackScreen",
+  "device": "iPhone 14",
+  "dimensions": {
+    "width": 390,
+    "height": 844
+  },
+  "description": "Server error fallback states for 500, 503, and network errors. Available as full-screen or inline card variant.",
+  "template": "full-screen-gate-template",
+  "formFactors": ["full-screen", "inline-card"],
+  "layout": {
+    "type": "vertical-center-flex",
+    "background": "#F2EDDD",
+    "paddingTop": "safe-area-inset + 80",
+    "paddingBottom": "safe-area-inset + 32",
+    "paddingHorizontal": 32,
+    "gap": 24
+  },
+  "inlineCardLayout": {
+    "type": "vertical-flex",
+    "background": "#FFFFFF",
+    "borderRadius": 24,
+    "padding": 24,
+    "gap": 16,
+    "shadow": "large"
+  },
+  "elements": [
+    {
+      "id": "hero-illustration",
+      "type": "illustration",
+      "width": 160,
+      "height": 160,
+      "motif": "broken-link or cloud-x",
+      "alignment": "center",
+      "colors": ["#E3A9A0", "#D1BFB3", "#6B6B6B"]
+    },
+    {
+      "id": "heading",
+      "type": "text",
+      "style": "heading-3",
+      "text": "{errorHeading}",
+      "fontWeight": 600,
+      "color": "#1A1A1A",
+      "alignment": "center"
+    },
+    {
+      "id": "body-message",
+      "type": "text",
+      "style": "body",
+      "text": "{errorMessage}",
+      "fontWeight": 400,
+      "color": "#6B6B6B",
+      "alignment": "center",
+      "maxWidth": 280
+    },
+    {
+      "id": "reference-id",
+      "type": "text",
+      "style": "label-small",
+      "text": "{referenceId}",
+      "fontFamily": "monospace",
+      "fontWeight": 400,
+      "color": "#6B6B6B",
+      "alignment": "center",
+      "visibility": "state:500,503",
+      "marginTop": 8
+    },
+    {
+      "id": "cta-row",
+      "type": "horizontal-flex",
+      "gap": 12,
+      "justifyContent": "center",
+      "children": [
+        {
+          "id": "primary-cta",
+          "type": "button",
+          "variant": "primary",
+          "label": "{retryCta}",
+          "action": "retry",
+          "height": 52,
+          "minWidth": 120,
+          "borderRadius": 12,
+          "background": "#E3A9A0",
+          "labelWeight": 600,
+          "labelColor": "#FFFFFF"
+        },
+        {
+          "id": "report-cta",
+          "type": "button",
+          "variant": "tertiary",
+          "label": "{reportCta}",
+          "action": "reportIssue",
+          "visibility": "state:500,503",
+          "height": 52,
+          "labelWeight": 500,
+          "labelColor": "#6B6B6B"
+        }
+      ]
+    }
+  ],
+  "states": [
+    {
+      "name": "500",
+      "description": "Internal server error with reference ID for support",
+      "strings": {
+        "errorHeading": "Something went wrong",
+        "errorMessage": "Our servers hit an unexpected error. This has been logged.",
+        "referenceId": "Ref: {refId}",
+        "retryCta": "Retry",
+        "reportCta": "Report this"
+      },
+      "visibility": {
+        "reference-id": true,
+        "report-cta": true
+      },
+      "interpolation": {
+        "refId": "XXXXXXXX"
+      }
+    },
+    {
+      "name": "503",
+      "description": "Service unavailable due to capacity",
+      "strings": {
+        "errorHeading": "Service Unavailable",
+        "errorMessage": "We're temporarily over capacity. Please try again.",
+        "referenceId": "Ref: {refId}",
+        "retryCta": "Retry",
+        "reportCta": "Report this"
+      },
+      "visibility": {
+        "reference-id": true,
+        "report-cta": true
+      },
+      "interpolation": {
+        "refId": "XXXXXXXX"
+      }
+    },
+    {
+      "name": "network",
+      "description": "Network connectivity error",
+      "strings": {
+        "errorHeading": "Can't reach Zarkili",
+        "errorMessage": "Check your connection and try again.",
+        "retryCta": "Retry"
+      },
+      "visibility": {
+        "reference-id": false,
+        "report-cta": false
+      }
+    }
+  ],
+  "accessibility": {
+    "announceOnAppear": "Error: {errorHeading}",
+    "retryCta": {
+      "label": "Retry connection",
+      "hint": "Attempts to reload"
+    },
+    "reportCta": {
+      "label": "Report this issue",
+      "hint": "Opens support form"
+    }
+  },
+  "frames": [
+    {
+      "name": "L-4-500-full-screen",
+      "state": "500",
+      "formFactor": "full-screen"
+    },
+    {
+      "name": "L-4-503-full-screen",
+      "state": "503",
+      "formFactor": "full-screen"
+    },
+    {
+      "name": "L-4-network-full-screen",
+      "state": "network",
+      "formFactor": "full-screen"
+    },
+    {
+      "name": "L-4-500-inline-card",
+      "state": "500",
+      "formFactor": "inline-card"
+    },
+    {
+      "name": "L-4-network-inline-card",
+      "state": "network",
+      "formFactor": "inline-card"
+    }
+  ]
+}

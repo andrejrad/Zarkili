@@ -1,0 +1,58 @@
+{
+  "batch": "S",
+  "phase": 3,
+  "week": 44,
+  "title": "Platform Super-Admin & Cross-Cutting Admin",
+  "version": "1.0.0",
+  "designSystem": "Zarkili v1.0.0",
+  "scope": {
+    "screens": 25,
+    "components": 5,
+    "strings": 1,
+    "tokenDeltas": 1
+  },
+  "newComponents": [
+    "impersonation-banner",
+    "feature-flag-toggle-row",
+    "migration-runner-step-view",
+    "command-palette-overlay",
+    "destructive-confirm-with-reason"
+  ],
+  "screens": {
+    "tenants": [
+      "TenantDirectoryScreen",
+      "SuspendTenantScreen",
+      "ImpersonationFlowScreen"
+    ],
+    "analytics": [
+      "CrossTenantAnalyticsScreen"
+    ],
+    "platform": [
+      "PlatformHealthDashboardScreen",
+      "PricingPlanManagementScreen",
+      "FeatureFlagConsoleScreen",
+      "PlatformAuditLogScreen",
+      "MarketplaceModerationScreen",
+      "AIBudgetOverridesScreen",
+      "MigrationRunnerScreen",
+      "BackupRestoreScreen",
+      "SupportInboxScreen"
+    ],
+    "compliance": [
+      "GeneralAuditLogScreen",
+      "SecurityEventsScreen",
+      "DataExportRequestScreen",
+      "ConsentPolicyVersionLogScreen",
+      "IncidentResponseScreen"
+    ],
+    "admin": [
+      "AdminSignInScreen",
+      "AdminDeviceManagementScreen",
+      "RoleDeniedScreen",
+      "BulkActionConfirmScreen",
+      "DestructiveActionConfirmScreen",
+      "CommandPaletteScreen",
+      "ViewAsClientScreen"
+    ]
+  }
+}

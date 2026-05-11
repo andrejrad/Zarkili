@@ -1,0 +1,76 @@
+{
+  "screen": "MarketplacePostComposerScreen",
+  "route": "/admin/marketplace/compose",
+  "description": "Create or edit a marketplace listing with compliance checklist and live preview",
+  "platform": "admin-desktop",
+  "dimensions": { "width": 1280, "contentWidth": "calc(1280 - 240px sidebar)" },
+  "states": ["default", "dirty", "publishing", "published", "draft-saved", "compliance-blocked"],
+  "accessibility": {
+    "screenReaderLabel": "strings.postComposer.screenTitle",
+    "semanticRoles": [
+      { "element": "composerForm", "role": "form" },
+      { "element": "previewPanel", "role": "complementary" },
+      { "element": "complianceChecklist", "role": "list" }
+    ]
+  },
+  "rtl": "deferred",
+  "darkMode": "deferred",
+  "layout": {
+    "header": {
+      "component": "AdminHeader",
+      "title": { "new": "strings.postComposer.newTitle", "edit": "strings.postComposer.editTitle" },
+      "rightActions": [
+        { "component": "SecondaryButton", "label": "strings.postComposer.preview" },
+        { "component": "SecondaryButton", "label": "strings.postComposer.saveDraft" },
+        { "component": "PrimaryButton", "label": "strings.postComposer.publish", "disabled": "complianceBlocked", "tooltip": "strings.postComposer.publishBlockedTooltip" }
+      ]
+    },
+    "body": {
+      "layout": "2 columns",
+      "left": {
+        "overflowY": "scroll",
+        "form": [
+          { "label": "strings.postComposer.fieldTitle", "component": "TextInput", "maxLength": 80 },
+          { "label": "strings.postComposer.fieldCategory", "component": "Dropdown", "required": true },
+          { "label": "strings.postComposer.fieldDescription", "component": "RichTextEditor", "minLength": 100, "maxLength": 800, "toolbar": "PostComposerToolbar" },
+          {
+            "component": "Card",
+            "title": "strings.postComposer.mediaTitle",
+            "mediaGrid": "3-column, up to 10 slots, primary radio, drag-to-reorder, optional video URL"
+          },
+          { "labels": ["strings.postComposer.fieldPrice", "strings.postComposer.fieldDuration"], "layout": "side by side" },
+          { "label": "strings.postComposer.fieldTags", "component": "Tag input", "max": 10 },
+          { "label": "strings.postComposer.availabilityToggle", "component": "Toggle" },
+          {
+            "component": "ComplianceChecklist",
+            "label": "strings.postComposer.complianceTitle",
+            "checks": [
+              "Title length ≤ 80 chars",
+              "Price set",
+              "At least 1 photo",
+              "Description ≥ 100 chars",
+              "Category selected"
+            ]
+          }
+        ]
+      },
+      "right": {
+        "width": 320,
+        "position": "sticky top",
+        "bg": "admin.tableHeaderBg",
+        "sections": [
+          { "label": "strings.postComposer.previewTitle" },
+          { "component": "ChannelPreviewTile", "mode": "marketplace" },
+          { "component": "CharacterCountBar", "current": "n", "max": 800 },
+          { "component": "ComplianceSummary", "passing": "n/5 strings.postComposer.complianceSummary" }
+        ]
+      }
+    }
+  },
+  "components": [
+    { "id": "composerForm", "ref": "Form" },
+    { "id": "postComposerToolbar", "ref": "PostComposerToolbar" },
+    { "id": "previewPanel", "ref": "ChannelPreviewTile", "props": { "mode": "marketplace" } }
+  ],
+  "strings": "See strings/en-us.json for postComposer keys"
+}

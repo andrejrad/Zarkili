@@ -1,0 +1,104 @@
+{
+  "screenId": "L.12",
+  "name": "RTLLayoutExamplesScreen",
+  "device": "iPhone 14",
+  "dimensions": {
+    "width": 390,
+    "height": 844
+  },
+  "description": "Side-by-side LTR and RTL layout examples for Home, Explore, and Booking confirmation screens",
+  "screens": ["Home", "Explore", "Booking confirmation"],
+  "rtlMirroringRules": {
+    "chevrons": "flip horizontally",
+    "arrows": "flip horizontally",
+    "paddingStartEnd": "swap start and end values",
+    "tabBarIconOrder": "reverse order",
+    "horizontalScrollDirection": "reverse direction",
+    "leadingTrailingElements": "swap positions",
+    "starRating": "render right-to-left"
+  },
+  "placeholderText": {
+    "ltr": "en-US English text",
+    "rtl": "ar-SA Arabic script"
+  },
+  "frames": [
+    {
+      "id": "L.12.1",
+      "name": "Home-LTR",
+      "screen": "Home",
+      "direction": "LTR",
+      "locale": "en-US",
+      "annotations": {
+        "searchBar": "Leading search icon, trailing filter icon",
+        "salonCards": "Heart icon top-right, chevron trailing",
+        "tabBar": "Order: Home, Explore, Book, Loyalty, Profile"
+      }
+    },
+    {
+      "id": "L.12.2",
+      "name": "Home-RTL",
+      "screen": "Home",
+      "direction": "RTL",
+      "locale": "ar-SA",
+      "annotations": {
+        "searchBar": "Trailing search icon (mirrored), leading filter icon (mirrored)",
+        "salonCards": "Heart icon top-left, chevron leading",
+        "tabBar": "Order: Profile, Loyalty, Book, Explore, Home (reversed)"
+      }
+    },
+    {
+      "id": "L.12.3",
+      "name": "Explore-LTR",
+      "screen": "Explore",
+      "direction": "LTR",
+      "locale": "en-US",
+      "annotations": {
+        "categoryPills": "Scroll left-to-right",
+        "serviceCards": "Price trailing, bookmark icon top-right",
+        "backButton": "Leading chevron-left"
+      }
+    },
+    {
+      "id": "L.12.4",
+      "name": "Explore-RTL",
+      "screen": "Explore",
+      "direction": "RTL",
+      "locale": "ar-SA",
+      "annotations": {
+        "categoryPills": "Scroll right-to-left (reversed)",
+        "serviceCards": "Price leading, bookmark icon top-left",
+        "backButton": "Trailing chevron-right (mirrored)"
+      }
+    },
+    {
+      "id": "L.12.5",
+      "name": "BookingConfirmation-LTR",
+      "screen": "Booking confirmation",
+      "direction": "LTR",
+      "locale": "en-US",
+      "annotations": {
+        "checkmarkIcon": "Center top",
+        "detailRows": "Icon leading, value trailing",
+        "starRating": "Renders left-to-right",
+        "ctaButton": "Full-width centered"
+      }
+    },
+    {
+      "id": "L.12.6",
+      "name": "BookingConfirmation-RTL",
+      "screen": "Booking confirmation",
+      "direction": "RTL",
+      "locale": "ar-SA",
+      "annotations": {
+        "checkmarkIcon": "Center top (no change)",
+        "detailRows": "Icon trailing, value leading (swapped)",
+        "starRating": "Renders right-to-left (reversed)",
+        "ctaButton": "Full-width centered (no change)"
+      }
+    }
+  ],
+  "accessibility": {
+    "rtlAnnouncement": "Layout direction changed to right-to-left",
+    "ltrAnnouncement": "Layout direction changed to left-to-right"
+  }
+}

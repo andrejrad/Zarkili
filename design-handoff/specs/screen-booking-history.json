@@ -1,0 +1,269 @@
+{
+  "screen": "BookingHistory",
+  "batchId": "D.5",
+  "description": "Paginated, searchable, filterable list of the consumer's bookings. Segmented into Upcoming / Past / Cancelled tabs. Each row tap navigates to Receipt (completed/confirmed) or RefundStatus (cancelled).",
+  "purpose": "Give consumers a complete record of their booking activity. Pull-to-refresh + infinite scroll for large histories.",
+  "sourceFile": "src/app/payments/BookingHistoryScreen.tsx",
+  "hierarchy": {
+    "container": {
+      "background": "#F2EDDD",
+      "safeArea": true,
+      "flex": 1
+    },
+    "scroll": {
+      "type": "ScrollView",
+      "contentContainerPadding": 16,
+      "contentContainerGap": 8,
+      "refreshControl": "pull-to-refresh via onRefresh prop"
+    }
+  },
+  "sections": {
+    "header": {
+      "type": "fixed",
+      "background": "#FFFFFF",
+      "paddingHorizontal": 16,
+      "paddingVertical": 12,
+      "borderBottomWidth": 1,
+      "borderBottomColor": "#E5E0D1",
+      "layout": "row",
+      "gap": 8,
+      "children": ["backButton", "searchBar", "filterButton"]
+    },
+    "backButton": {
+      "type": "iconButton",
+      "glyph": "←",
+      "size": 44,
+      "color": "#1A1A1A",
+      "optional": true,
+      "accessibility": { "role": "button", "label": "Back" }
+    },
+    "searchBar": {
+      "type": "TextInput",
+      "placeholder": "Search bookings",
+      "placeholderColor": "#6B6B6B",
+      "background": "#F2EDDD",
+      "borderRadius": 12,
+      "height": 44,
+      "paddingHorizontal": 12,
+      "flex": 1,
+      "accessibility": { "label": "Search bookings" }
+    },
+    "filterButton": {
+      "type": "pressable",
+      "width": 44,
+      "height": 44,
+      "borderRadius": 12,
+      "borderWidth": 1,
+      "borderColor": "#E5E0D1",
+      "background": "#FFFFFF",
+      "children": ["filterGlyph", "filterActiveBadge"],
+      "accessibility": {
+        "role": "button",
+        "label": "Filters",
+        "labelWhenActive": "Filters ({count} active)"
+      }
+    },
+    "filterGlyph": {
+      "type": "text",
+      "content": "≡",
+      "fontSize": 20,
+      "color": "#1A1A1A"
+    },
+    "filterActiveBadge": {
+      "type": "view",
+      "showWhen": "activeFilterCount > 0",
+      "width": 16,
+      "height": 16,
+      "borderRadius": 8,
+      "background": "#E3A9A0",
+      "position": "absolute",
+      "top": 6,
+      "right": 6,
+      "children": [
+        { "type": "text", "content": "{activeFilterCount}", "fontSize": 10, "fontWeight": "600", "color": "#FFFFFF", "textAlign": "center" }
+      ]
+    },
+    "tabsRow": {
+      "type": "SegmentedControl",
+      "paddingHorizontal": 16,
+      "paddingVertical": 8,
+      "background": "#FFFFFF",
+      "options": [
+        { "value": "upcoming", "label": "Upcoming" },
+        { "value": "past", "label": "Past" },
+        { "value": "cancelled", "label": "Cancelled" }
+      ],
+      "selectedBackground": "#E3A9A0",
+      "selectedTextColor": "#FFFFFF",
+      "unselectedTextColor": "#6B6B6B"
+    },
+    "refreshingIndicator": {
+      "type": "text",
+      "content": "Refreshing…",
+      "fontSize": 12,
+      "color": "#6B6B6B",
+      "textAlign": "center",
+      "showWhen": "refreshing === true"
+    },
+    "errorBanner": {
+      "type": "Banner",
+      "variant": "error",
+      "showWhen": "errorMessage is set"
+    },
+    "loadingSkeletons": {
+      "type": "skeleton",
+      "count": 3,
+      "height": 88,
+      "borderRadius": 12,
+      "background": "#E5E0D1",
+      "showWhen": "loading === true"
+    },
+    "emptyState": {
+      "type": "view",
+      "paddingVertical": 48,
+      "alignItems": "center",
+      "gap": 16,
+      "showWhen": "filteredList is empty and not loading",
+      "children": ["emptyTitle", "findSalonButton"]
+    },
+    "emptyTitle": {
+      "type": "text",
+      "content": "No upcoming bookings | No past bookings yet | No cancelled bookings",
+      "fontSize": 16,
+      "fontWeight": "500",
+      "color": "#6B6B6B",
+      "textAlign": "center",
+      "note": "Text varies by active tab"
+    },
+    "findSalonButton": {
+      "type": "Button",
+      "variant": "primary",
+      "label": "Find a salon",
+      "showWhen": "tab === 'upcoming' and onPressFindSalon is provided"
+    },
+    "bookingList": {
+      "type": "list",
+      "showWhen": "filteredList is non-empty and not loading",
+      "itemComponent": "BookingHistoryRow",
+      "gap": 8
+    },
+    "bookingRow": {
+      "type": "pressable",
+      "minHeight": 88,
+      "background": "#FFFFFF",
+      "borderRadius": 12,
+      "borderWidth": 1,
+      "borderColor": "#E5E0D1",
+      "paddingHorizontal": 16,
+      "paddingVertical": 12,
+      "layout": "row",
+      "justifyContent": "space-between",
+      "children": ["rowMain", "rowSide"],
+      "accessibility": {
+        "role": "button",
+        "label": "{salonName}, {serviceName}, {status}"
+      }
+    },
+    "rowMain": {
+      "type": "view",
+      "flex": 1,
+      "gap": 2,
+      "children": ["salonNameText", "serviceNameText", "dateTimeText"]
+    },
+    "salonNameText": {
+      "type": "text",
+      "content": "{salonName}",
+      "fontSize": 15,
+      "lineHeight": 20,
+      "fontWeight": "600",
+      "color": "#1A1A1A"
+    },
+    "serviceNameText": {
+      "type": "text",
+      "content": "{serviceName}",
+      "fontSize": 14,
+      "lineHeight": 20,
+      "color": "#6B6B6B"
+    },
+    "dateTimeText": {
+      "type": "text",
+      "content": "{MM/DD/YYYY} · {h:mm AM/PM}",
+      "fontSize": 13,
+      "lineHeight": 18,
+      "color": "#6B6B6B"
+    },
+    "rowSide": {
+      "type": "view",
+      "alignItems": "flex-end",
+      "gap": 6,
+      "children": ["statusPill", "amountText"]
+    },
+    "statusPill": {
+      "type": "view",
+      "borderRadius": 9999,
+      "paddingHorizontal": 8,
+      "paddingVertical": 3,
+      "variants": {
+        "confirmed": { "background": "#E8F5E9", "textColor": "#2E7D32" },
+        "completed": { "background": "#E8F5E9", "textColor": "#2E7D32" },
+        "cancelled": { "background": "#FFEBEE", "textColor": "#C62828" },
+        "noShow": { "background": "#FFEBEE", "textColor": "#C62828" },
+        "pending": { "background": "#FFF8E1", "textColor": "#F57F17" }
+      }
+    },
+    "amountText": {
+      "type": "text",
+      "content": "{totalUsd}",
+      "fontSize": 14,
+      "lineHeight": 20,
+      "fontWeight": "600",
+      "color": "#1A1A1A"
+    },
+    "loadMoreButton": {
+      "type": "pressable",
+      "height": 44,
+      "borderRadius": 12,
+      "borderWidth": 1,
+      "borderColor": "#E5E0D1",
+      "showWhen": "hasMore === true and not loading and list is non-empty",
+      "children": [
+        { "type": "text", "content": "Load more", "fontSize": 14, "color": "#6B6B6B" }
+      ]
+    }
+  },
+  "overlays": {
+    "filterSheet": {
+      "type": "FilterSheet",
+      "title": "Filter bookings",
+      "trigger": "filterButton tap",
+      "applyLabel": "Apply",
+      "resetAction": "resets all filters to {}",
+      "note": "Filter content (salon, date range, status, price range) wired by caller"
+    }
+  },
+  "tokens": {
+    "background": "#F2EDDD",
+    "surface": "#FFFFFF",
+    "border": "#E5E0D1",
+    "foreground": "#1A1A1A",
+    "textMuted": "#6B6B6B",
+    "primary": "#E3A9A0",
+    "error": "#D9534F",
+    "pageHorizontalPadding": 16,
+    "cornerRadius": { "md": 12, "full": 9999 }
+  },
+  "interactions": {
+    "tapRecord": "calls onPressRecord(id) — shell routes to Receipt or RefundStatus based on booking status",
+    "changeTab": "updates state.tab; re-filters list",
+    "typeSearch": "updates state.searchQuery; client-side filter on salonName/serviceName",
+    "tapFilterButton": "opens filterSheet (state.filterSheetOpen = true)",
+    "pullToRefresh": "calls onRefresh",
+    "tapLoadMore": "calls onPressLoadMore"
+  },
+  "accessibility": {
+    "searchInput": "accessibilityLabel='Search bookings'",
+    "filterButton": "dynamic label includes active count when non-zero",
+    "tabControl": "SegmentedControl handles its own keyboard nav",
+    "bookingRow": "role='button'; label = '{salonName}, {serviceName}, {status}'"
+  }
+}

@@ -20,8 +20,61 @@ describe("navigation route guards", () => {
       "Landing",
       "Login",
       "Register",
+      "SignIn",
+      "SignUp",
+      "SocialSignIn",
+      "ForgotPassword",
+      "ResetPassword",
+      "EmailVerification",
+      "OtpVerification",
+      "AccountMerge",
       "DiscoverBusinesses",
       "TenantPublicProfile",
+      "DiscoverHome",
+      "DiscoverFeed",
+      "ExploreResults",
+      "ExploreMap",
+      "DiscoverFilters",
+      "SalonProfile",
+      "ServiceDetail",
+      "StaffDetail",
+      "BookingService",
+      "BookingStaff",
+      "BookingDate",
+      "BookingReview",
+      "BookingPolicies",
+      "BookingPayment",
+      "BookingConfirmation",
+      "ManageBooking",
+      "GuestContact",
+      "PostBookingUpgrade",
+      "SavedPaymentMethods",
+      "AddPaymentMethod",
+      "Tipping",
+      "Receipt",
+      "BookingHistory",
+      "RefundStatus",
+      "LoyaltyLanding",
+      "RewardCatalog",
+      "RewardRedemption",
+      "Activities",
+      "ActivityDetail",
+      "ClaimActivityReward",
+      "ReviewPrompt",
+      "ReviewDetail",
+      "Referral",
+      "Inbox",
+      "Thread",
+      "Compose",
+      "NotificationCenter",
+      "NotificationPreferences",
+      "EditProfile",
+      "SettingsShell",
+      "LegalPage",
+      "Waitlist",
+      "WaitlistJoin",
+      "WaitlistPosition",
+      "AppShell",
     ]);
   });
 
@@ -53,17 +106,17 @@ describe("navigation route guards", () => {
     expect(preferred.name).toBe("AppShell");
   });
 
-  it("returns landing as preferred route when anonymous", () => {
+  it("returns app shell as preferred route when anonymous", () => {
     const preferred = resolvePreferredRoute({ userId: null });
 
-    expect(preferred.name).toBe("Landing");
+    expect(preferred.name).toBe("AppShell");
   });
 
-  it("canAccessRoute enforces authenticated guard", () => {
+  it("canAccessRoute allows AppShell for all users", () => {
     const appShellRoute = appRoutes.find((route) => route.name === "AppShell");
     expect(appShellRoute).toBeTruthy();
 
-    expect(canAccessRoute(appShellRoute!, { userId: null })).toBe(false);
+    expect(canAccessRoute(appShellRoute!, { userId: null })).toBe(true);
     expect(canAccessRoute(appShellRoute!, { userId: "u1" })).toBe(true);
   });
 
@@ -78,7 +131,7 @@ describe("navigation route guards", () => {
   });
 
   it("canAccessPath enforces guards for deep links", () => {
-    expect(canAccessPath("/app", { userId: null })).toBe(false);
+    expect(canAccessPath("/app", { userId: null })).toBe(true);
     expect(canAccessPath("/app", { userId: "u1" })).toBe(true);
     expect(canAccessPath("/app/tenant-profile", { userId: null })).toBe(false);
     expect(canAccessPath("/app/tenant-profile", { userId: "u1" })).toBe(true);
@@ -94,10 +147,10 @@ describe("navigation route guards", () => {
   });
 
   it("resolveRouteFromPath redirects unauthorized paths to preferred route", () => {
-    const resolution = resolveRouteFromPath("/app", { userId: null });
+    const resolution = resolveRouteFromPath("/app/tenant-profile", { userId: null });
 
     expect(resolution.reason).toBe("redirect-unauthorized");
-    expect(resolution.resolvedRoute.name).toBe("Landing");
+    expect(resolution.resolvedRoute.name).toBe("AppShell");
   });
 
   it("resolveRouteFromPath redirects unknown paths to preferred route", () => {

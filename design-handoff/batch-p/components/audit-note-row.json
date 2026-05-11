@@ -1,0 +1,57 @@
+{
+  "component": "AuditNoteRow",
+  "description": "Timeline row showing actor, action, and timestamp for audit logs",
+  "props": {
+    "actorName": {
+      "type": "string",
+      "required": true,
+      "description": "Name of user who performed action"
+    },
+    "actionDescription": {
+      "type": "string",
+      "required": true,
+      "description": "Human-readable action description"
+    },
+    "timestamp": {
+      "type": "string",
+      "required": true,
+      "description": "ISO 8601 timestamp or relative time"
+    },
+    "icon": {
+      "type": "string",
+      "required": false,
+      "description": "Optional icon name (default: clock)"
+    }
+  },
+  "states": [
+    "default"
+  ],
+  "variants": [],
+  "tokens": {
+    "background": "#FAF8F4",
+    "iconColor": "semantic.secondaryText",
+    "actorText": "semantic.foreground",
+    "actionText": "semantic.secondaryText",
+    "timestampText": "semantic.muted"
+  },
+  "accessibility": {
+    "role": "listitem",
+    "label": "{actorName} {actionDescription} at {timestamp}",
+    "hint": null
+  },
+  "dimensions": {
+    "height": 48,
+    "paddingHorizontal": 16,
+    "paddingVertical": 12,
+    "iconSize": 16,
+    "gap": 12
+  },
+  "examples": [
+    {
+      "actorName": "Sarah Johnson",
+      "actionDescription": "added 100 loyalty points",
+      "timestamp": "2 hours ago",
+      "icon": "clock"
+    }
+  ]
+}

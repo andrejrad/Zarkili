@@ -1,0 +1,68 @@
+{
+  "screen": "AiTogglesScreen",
+  "route": "/admin/ai/toggles",
+  "description": "Enable or disable each AI feature in bulk per group with live-change warnings",
+  "platform": "admin-desktop",
+  "dimensions": { "width": 1280, "contentWidth": "calc(1280 - 240px sidebar)" },
+  "states": ["default", "pending-changes", "saving", "saved"],
+  "accessibility": {
+    "screenReaderLabel": "strings.aiToggles.screenTitle",
+    "semanticRoles": [
+      { "element": "toggleList", "role": "list" }
+    ]
+  },
+  "rtl": "deferred",
+  "darkMode": "deferred",
+  "layout": {
+    "header": {
+      "component": "AdminHeader",
+      "title": "strings.aiToggles.title",
+      "rightActions": [{ "component": "PrimaryButton", "label": "strings.aiToggles.saveAll", "disabled": "when no pending changes" }]
+    },
+    "body": {
+      "padding": 24,
+      "warningBanner": {
+        "bg": "warning 15% opacity",
+        "borderLeft": "4px solid warning",
+        "height": 48,
+        "text": "strings.aiToggles.pendingWarning",
+        "sticky": true
+      },
+      "featureGroups": [
+        {
+          "id": "groupBooking",
+          "title": "strings.aiToggles.groupBooking",
+          "features": ["<feature rows>"]
+        },
+        {
+          "id": "groupClient",
+          "title": "strings.aiToggles.groupClient",
+          "features": ["<feature rows>"]
+        },
+        {
+          "id": "groupCampaign",
+          "title": "strings.aiToggles.groupCampaign",
+          "features": ["<feature rows>"]
+        },
+        {
+          "id": "groupStaff",
+          "title": "strings.aiToggles.groupStaff",
+          "features": ["<feature rows>"]
+        },
+        {
+          "id": "groupSafety",
+          "title": "strings.aiToggles.groupSafety",
+          "features": ["<feature rows>"]
+        }
+      ],
+      "toggleRowLayout": {
+        "height": 64,
+        "divider": true,
+        "left": { "icon": "feature icon", "name": "bodyMedium", "description": "caption + muted color", "lastChanged": "micro + muted color" },
+        "right": { "statusBadge": "Active/Inactive", "toggle": "Switch", "pendingIndicator": "name bold + amber dot when changed" }
+      }
+    }
+  },
+  "components": [],
+  "strings": "See strings/en-us.json for aiToggles keys"
+}

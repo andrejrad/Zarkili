@@ -1,0 +1,80 @@
+{
+  "component": "ChannelPreviewTile",
+  "description": "Phone frame preview for push, email, SMS, and in-app message rendering",
+  "props": {
+    "channel": {
+      "type": "push | email | sms | inApp",
+      "required": true,
+      "description": "Message channel to preview"
+    },
+    "platform": {
+      "type": "ios | android",
+      "required": false,
+      "description": "Platform style (default: ios)"
+    },
+    "title": {
+      "type": "string",
+      "required": false,
+      "description": "Message title (push/in-app)"
+    },
+    "body": {
+      "type": "string",
+      "required": true,
+      "description": "Message body text"
+    },
+    "sender": {
+      "type": "string",
+      "required": false,
+      "description": "Sender name (email/SMS)"
+    },
+    "imageUrl": {
+      "type": "string",
+      "required": false,
+      "description": "Optional message image"
+    },
+    "actionLabel": {
+      "type": "string",
+      "required": false,
+      "description": "CTA button label"
+    }
+  },
+  "states": [
+    "default",
+    "loading"
+  ],
+  "variants": [
+    "push",
+    "email",
+    "sms",
+    "inApp"
+  ],
+  "tokens": {
+    "frameBorder": "semantic.cardBorder",
+    "frameBackground": "semantic.surface",
+    "screenBackground": "#000000",
+    "messageBackground": "semantic.surface",
+    "messageText": "semantic.foreground",
+    "senderText": "semantic.secondaryText"
+  },
+  "accessibility": {
+    "role": "img",
+    "label": "Message preview for {channel}",
+    "hint": "Visual preview only, not interactive"
+  },
+  "dimensions": {
+    "frameWidth": 360,
+    "frameHeight": 640,
+    "borderRadius": 24,
+    "borderWidth": 2,
+    "padding": 8
+  },
+  "examples": [
+    {
+      "channel": "push",
+      "platform": "ios",
+      "title": "Appointment Reminder",
+      "body": "Your haircut with Maya is tomorrow at 2pm",
+      "sender": "Zarkili"
+    }
+  ]
+}

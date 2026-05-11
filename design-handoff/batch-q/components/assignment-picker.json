@@ -1,0 +1,64 @@
+{
+  "component": "AssignmentPicker",
+  "description": "Reusable staff assignment popover/sheet",
+  "props": {
+    "currentAssigneeId": { "type": "string", "required": false },
+    "onAssign": { "type": "function", "required": true },
+    "showMessageField": { "type": "boolean", "default": true },
+    "threadId": { "type": "string", "required": true }
+  },
+  "variantNames": [
+    "default",
+    "assigning",
+    "assigned",
+    "error"
+  ],
+  "layout": {
+    "width": "components.assignmentPickerWidth",
+    "radius": 12,
+    "background": "surface",
+    "elevation": 4,
+    "shadow": true,
+    "padding": 16,
+    "header": { "text": "Assign conversation", "variant": "heading-4" },
+    "searchInput": { "fullWidth": true, "debounce": 300, "placeholder": "strings.assignmentPicker.searchPlaceholder" },
+    "staffList": {
+      "type": "FlatList",
+      "maxHeight": 240,
+      "row": {
+        "height": 56,
+        "avatar": { "size": 36 },
+        "name": { "variant": "body" },
+        "role": { "variant": "label-small", "color": "muted" },
+        "availabilityDot": { "size": 8, "available": "success", "busy": "grey" },
+        "currentAssignee": {
+          "background": "primary 10%",
+          "checkmarkIcon": { "size": 14, "position": "right" }
+        }
+      }
+    },
+    "optionalMessage": {
+      "type": "textarea",
+      "label": "strings.assignmentPicker.messageLabel",
+      "maxLength": 200,
+      "optional": true
+    },
+    "footer": {
+      "actions": [
+        { "type": "button", "label": "strings.assignmentPicker.cancel", "variant": "secondary" },
+        { "type": "button", "label": "strings.assignmentPicker.assign", "variant": "primary", "disabledWhen": "selection unchanged from current" }
+      ]
+    }
+  },
+  "variants": {
+    "assigning": {
+      "assignButton": { "spinner": true },
+      "list": { "locked": true }
+    },
+    "assigned": {
+      "toast": true,
+      "dismiss": true
+    }
+  },
+  "tokens": ["surface", "primary", "border", "muted", "success"]
+}

@@ -1,0 +1,66 @@
+{
+  "component": "AutoReplyScheduleEditor",
+  "props": {
+    "schedule": { "type": "object", "required": true },
+    "holidays": { "type": "array", "required": true },
+    "awayMessage": { "type": "string", "required": true },
+    "enabled": { "type": "boolean", "required": true },
+    "onScheduleChange": { "type": "function", "required": false },
+    "onHolidayChange": { "type": "function", "required": false },
+    "onAwayMessageChange": { "type": "function", "required": false }
+  },
+  "variantNames": ["enabled", "disabled"],
+  "layout": {
+    "weekGrid": {
+      "rows": 7,
+      "days": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+      "dayRow": {
+        "height": "components.autoReplyDayRowHeight",
+        "divider": { "width": 1, "color": "border" },
+        "dayLabel": { "variant": "label-small", "color": "muted", "width": 40 },
+        "enableToggle": { "size": "44×24" },
+        "startTimePicker": { "format": "12h", "width": 80 },
+        "separator": "–",
+        "endTimePicker": { "format": "12h", "width": 80 },
+        "disabledDay": { "pickers": { "opacity": 0.4 } }
+      },
+      "belowMonRow": { "type": "tertiary link", "label": "strings.autoReply.applyAllDays" }
+    },
+    "holidaySection": {
+      "sectionLabel": { "text": "strings.autoReply.holidayListLabel", "variant": "body-small", "color": "muted", "transform": "uppercase" },
+      "addHolidayButton": { "variant": "secondary", "size": "small" },
+      "holidayRow": {
+        "height": 48,
+        "datePicker": { "format": "US", "width": 140 },
+        "labelInput": { "flex": 1 },
+        "removeIconButton": { "size": "44×44" }
+      }
+    },
+    "awayMessage": {
+      "sectionLabel": { "text": "strings.autoReply.awayMessageLabel" },
+      "textArea": { "minHeight": 80, "placeholder": "strings.autoReply.awayMessagePlaceholder" },
+      "variablePicker": { "type": "iconButton" },
+      "counter": { "format": "NN / 280" }
+    },
+    "previewBubble": {
+      "label": { "text": "strings.autoReply.previewLabel", "variant": "label-small", "color": "muted" },
+      "chatBubble": {
+        "background": "surface",
+        "border": { "width": 1, "color": "border" },
+        "radius": 16,
+        "padding": "12×16",
+        "variant": "body",
+        "maxWidth": "components.previewBubbleMaxWidth",
+        "alignment": "left"
+      }
+    }
+  },
+  "variants": {
+    "disabled": {
+      "weekGrid": { "opacity": 0.4, "pointerEvents": "none" },
+      "holidaySection": { "opacity": 0.4, "pointerEvents": "none" },
+      "awayMessage": { "opacity": 0.4, "pointerEvents": "none" }
+    }
+  },
+  "tokens": ["surface", "border", "primary", "muted", "foreground", "success"]
+}

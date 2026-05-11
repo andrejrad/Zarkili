@@ -86,6 +86,45 @@ export type ParsedConnectEvent = {
 };
 
 // ---------------------------------------------------------------------------
+// Payment method + payment intent events (W24-DEBT-2)
+// ---------------------------------------------------------------------------
+
+export type ParsedPaymentEvent = {
+  id: string;
+  type:
+    | "payment_method.attached"
+    | "payment_method.detached"
+    | "payment_intent.succeeded"
+    | "payment_intent.payment_failed"
+    | "charge.refunded";
+  /** Present for payment_method.attached */
+  methodAttached?: {
+    userId: string;
+    methodId: string;
+    /** Non-sensitive metadata to upsert into clients/{userId}/paymentMethods/{methodId} */
+    methodData: Record<string, unknown>;
+  };
+  /** Present for payment_method.detached */
+  methodDetached?: {
+    userId: string;
+    methodId: string;
+  };
+  /** Present for payment_intent.* events */
+  paymentIntent?: {
+    tenantId: string;
+    stripePaymentIntentId: string;
+    failureCode: string | null;
+    failureMessage: string | null;
+  };
+  /** Present for charge.refunded events */
+  chargeRefunded?: {
+    tenantId: string;
+    stripeRefundId: string;
+    amountMinor: number;
+  };
+};
+
+// ---------------------------------------------------------------------------
 // Errors
 // ---------------------------------------------------------------------------
 
@@ -140,6 +179,14 @@ const SUPPORTED_CONNECT_TYPES: ReadonlySet<string> = new Set([
   "account.updated",
   "payout.failed",
   "payout.paid",
+]);
+
+const SUPPORTED_PAYMENT_TYPES: ReadonlySet<string> = new Set([
+  "payment_method.attached",
+  "payment_method.detached",
+  "payment_intent.succeeded",
+  "payment_intent.payment_failed",
+  "charge.refunded",
 ]);
 
 const PLAN_MAP: Record<string, "starter" | "professional" | "enterprise"> = {
@@ -207,6 +254,7 @@ function pickInterval(rawInterval: unknown): "monthly" | "annual" {
 export type ParsedEvent =
   | { kind: "billing"; event: ParsedSubscriptionEvent }
   | { kind: "connect"; event: ParsedConnectEvent }
+  | { kind: "payment"; event: ParsedPaymentEvent }
   | { kind: "ignored"; type: string; reason: string };
 
 /**
@@ -236,6 +284,9 @@ export async function parseStripeEvent(
   }
   if (SUPPORTED_CONNECT_TYPES.has(type)) {
     return { kind: "connect", event: await parseConnectEvent(event, id, type, resolveTenantId) };
+  }
+  if (SUPPORTED_PAYMENT_TYPES.has(type)) {
+    return { kind: "payment", event: parsePaymentEvent(event, id, type) };
   }
   return { kind: "ignored", type, reason: "unsupported event type" };
 }
@@ -374,6 +425,94 @@ async function parseConnectEvent(
       payoutId: (obj.id as string) ?? "",
       failureCode: (obj.failure_code as string) ?? null,
       failureMessage: (obj.failure_message as string) ?? null,
+    },
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Payment method + payment intent parser (W24-DEBT-2)
+// ---------------------------------------------------------------------------
+
+function parsePaymentEvent(
+  event: Record<string, unknown>,
+  id: string,
+  type: string,
+): ParsedPaymentEvent {
+  const data = (event.data ?? {}) as { object?: Record<string, unknown> };
+  const obj = data.object ?? {};
+
+  if (type === "payment_method.attached") {
+    const methodId = (obj.id as string) ?? "";
+    const customer = (obj.customer as string) ?? "";
+    const metadata = (obj.metadata as Record<string, unknown>) ?? {};
+    const userId = (metadata.userId as string) ?? "";
+    const card = (obj.card as Record<string, unknown> | undefined) ?? {};
+    const billing = (obj.billing_details as Record<string, unknown> | undefined) ?? {};
+    return {
+      id,
+      type: "payment_method.attached",
+      methodAttached: {
+        userId,
+        methodId,
+        methodData: {
+          methodId,
+          userId,
+          stripeCustomerId: customer,
+          type: (obj.type as string) ?? "card",
+          brand: (card.brand as string) ?? "unknown",
+          last4: (card.last4 as string) ?? "",
+          expMonth: (card.exp_month as number) ?? 0,
+          expYear: (card.exp_year as number) ?? 0,
+          cardholderName: (billing.name as string | null) ?? null,
+          isDefault: false,
+        },
+      },
+    };
+  }
+
+  if (type === "payment_method.detached") {
+    const methodId = (obj.id as string) ?? "";
+    const metadata = (obj.metadata as Record<string, unknown>) ?? {};
+    const userId = (metadata.userId as string) ?? "";
+    return {
+      id,
+      type: "payment_method.detached",
+      methodDetached: { userId, methodId },
+    };
+  }
+
+  // payment_intent.succeeded | payment_intent.payment_failed
+  const metadata = (obj.metadata as Record<string, unknown>) ?? {};
+  const tenantId = (metadata.tenantId as string) ?? "";
+  const stripePaymentIntentId = (obj.id as string) ?? "";
+  const lastErr = obj.last_payment_error as Record<string, unknown> | null | undefined;
+
+  if (type === "charge.refunded") {
+    // event.data.object is the Charge; the latest refund is in refunds.data[0].
+    const refundsList = (obj.refunds as Record<string, unknown> | undefined) ?? {};
+    const refundsData = (refundsList.data as Array<Record<string, unknown>> | undefined) ?? [];
+    const latestRefund = refundsData[0] ?? {};
+    const stripeRefundId = (latestRefund.id as string) ?? "";
+    const amountMinor = typeof obj.amount_refunded === "number" ? obj.amount_refunded : 0;
+    return {
+      id,
+      type: "charge.refunded",
+      chargeRefunded: {
+        tenantId,
+        stripeRefundId,
+        amountMinor,
+      },
+    };
+  }
+
+  return {
+    id,
+    type: type as "payment_intent.succeeded" | "payment_intent.payment_failed",
+    paymentIntent: {
+      tenantId,
+      stripePaymentIntentId,
+      failureCode: lastErr ? ((lastErr.code as string) ?? null) : null,
+      failureMessage: lastErr ? ((lastErr.message as string) ?? null) : null,
     },
   };
 }

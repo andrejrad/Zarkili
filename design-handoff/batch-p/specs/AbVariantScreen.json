@@ -1,0 +1,175 @@
+{
+  "screen": "AbVariantScreen",
+  "route": "/admin/campaigns/:id/ab-test",
+  "description": "A/B test configuration with split percentage and winner evaluation criteria",
+  "dimensions": {
+    "width": 390,
+    "height": "auto-scroll"
+  },
+  "states": [
+    "default",
+    "loading",
+    "error",
+    "evaluating",
+    "complete"
+  ],
+  "accessibility": {
+    "screenReaderLabel": "strings.abVariant.screenTitle",
+    "semanticRoles": [
+      {"element": "variantCard", "role": "group"},
+      {"element": "splitSlider", "role": "slider"},
+      {"element": "criteriaRadio", "role": "radiogroup"}
+    ]
+  },
+  "rtl": "deferred",
+  "darkMode": "deferred",
+  "layout": {
+    "header": {
+      "height": 64,
+      "title": "strings.abVariant.title"
+    },
+    "variantCards": {
+      "paddingHorizontal": 16,
+      "paddingVertical": 24,
+      "gap": 16,
+      "cards": [
+        {
+          "id": "variantA",
+          "component": "ab-variant-card",
+          "variantLabel": "A"
+        },
+        {
+          "id": "variantB",
+          "component": "ab-variant-card",
+          "variantLabel": "B"
+        }
+      ]
+    },
+    "winnerCriteria": {
+      "paddingHorizontal": 16,
+      "paddingVertical": 16,
+      "title": "strings.abVariant.winnerCriteriaTitle",
+      "options": [
+        {"label": "strings.abVariant.criteriaOpenRate", "value": "openRate"},
+        {"label": "strings.abVariant.criteriaClickRate", "value": "clickRate"},
+        {"label": "strings.abVariant.criteriaConversion", "value": "conversion"}
+      ]
+    },
+    "evaluationWindow": {
+      "paddingHorizontal": 16,
+      "paddingVertical": 16,
+      "title": "strings.abVariant.evaluationWindowTitle",
+      "options": [
+        {"label": "strings.abVariant.window4h", "value": 4},
+        {"label": "strings.abVariant.window8h", "value": 8},
+        {"label": "strings.abVariant.window24h", "value": 24}
+      ]
+    },
+    "autoSendWinner": {
+      "paddingHorizontal": 16,
+      "paddingVertical": 16,
+      "toggle": {
+        "label": "strings.abVariant.autoSendWinnerLabel",
+        "height": 48
+      }
+    },
+    "saveButton": {
+      "height": 48,
+      "marginHorizontal": 16,
+      "marginBottom": 24,
+      "label": "strings.abVariant.save",
+      "style": "primary"
+    }
+  },
+  "components": [
+    {
+      "id": "navigationHeader",
+      "ref": "navigation-header",
+      "props": {
+        "showBack": true,
+        "title": "strings.abVariant.title"
+      }
+    },
+    {
+      "id": "variantCardA",
+      "ref": "ab-variant-card",
+      "props": {
+        "variantLabel": "A",
+        "subject": "{{subjectA}}",
+        "bodySnippet": "{{bodySnippetA}}",
+        "splitPercentage": 50,
+        "winnerStatus": "{{winnerStatusA}}"
+      }
+    },
+    {
+      "id": "variantCardB",
+      "ref": "ab-variant-card",
+      "props": {
+        "variantLabel": "B",
+        "subject": "{{subjectB}}",
+        "bodySnippet": "{{bodySnippetB}}",
+        "splitPercentage": 50,
+        "winnerStatus": "{{winnerStatusB}}"
+      }
+    },
+    {
+      "id": "criteriaRadio",
+      "ref": "radio-group",
+      "props": {
+        "label": "strings.abVariant.winnerCriteriaTitle",
+        "options": [
+          "strings.abVariant.criteriaOpenRate",
+          "strings.abVariant.criteriaClickRate",
+          "strings.abVariant.criteriaConversion"
+        ]
+      }
+    },
+    {
+      "id": "windowRadio",
+      "ref": "radio-group",
+      "props": {
+        "label": "strings.abVariant.evaluationWindowTitle",
+        "options": [
+          "strings.abVariant.window4h",
+          "strings.abVariant.window8h",
+          "strings.abVariant.window24h"
+        ]
+      }
+    },
+    {
+      "id": "autoSendToggle",
+      "ref": "switch",
+      "props": {
+        "label": "strings.abVariant.autoSendWinnerLabel"
+      }
+    }
+  ],
+  "interactions": [
+    {
+      "trigger": "splitSlider.change",
+      "action": "updateSplitPercentage"
+    },
+    {
+      "trigger": "saveButton.tap",
+      "action": "saveAbTest"
+    }
+  ],
+  "tokens": {
+    "used": [
+      "semantic.pageBackground",
+      "semantic.surface",
+      "semantic.cardBorder",
+      "semantic.foreground",
+      "semantic.secondaryText",
+      "semantic.primary"
+    ]
+  },
+  "redlines": {
+    "cardGap": 16,
+    "cardMinHeight": 140,
+    "sliderHeight": 44,
+    "toggleHeight": 48,
+    "buttonHeight": 48,
+    "sectionGap": 16
+  }
+}

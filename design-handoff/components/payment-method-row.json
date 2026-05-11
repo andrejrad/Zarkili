@@ -1,0 +1,145 @@
+{
+  "component": "PaymentMethodRow",
+  "batchId": "D.1",
+  "description": "Single row representing a saved payment method. Height 64. Left: card-brand icon/glyph (32×20). Center: brand + last4 title, expiry subtitle. Right: optional 'Default' mint badge. Far-right: optional kebab menu trigger.",
+  "sourceFile": "src/shared/ui/PaymentMethodRow.tsx",
+  "variants": {
+    "state": {
+      "options": ["default", "selected", "expired", "pressed"],
+      "default": "default"
+    },
+    "defaultBadge": {
+      "options": [true, false],
+      "default": false
+    },
+    "hasMenu": {
+      "options": [true, false],
+      "default": true
+    }
+  },
+  "dimensions": {
+    "minHeight": 64,
+    "paddingHorizontal": 16,
+    "iconWrap": { "width": 40, "height": 20, "justifyContent": "center", "alignItems": "center" },
+    "centerFlex": 1,
+    "kebabTouchTarget": 44,
+    "kebabHitSlop": 8
+  },
+  "states": {
+    "default": {
+      "background": "#FFFFFF",
+      "borderColor": "#E5E0D1",
+      "borderWidth": 1,
+      "borderRadius": 12,
+      "titleColor": "#1A1A1A",
+      "subtitleColor": "#6B6B6B"
+    },
+    "selected": {
+      "background": "#FFFFFF",
+      "borderColor": "#E3A9A0",
+      "borderWidth": 2,
+      "titleColor": "#1A1A1A"
+    },
+    "pressed": {
+      "background": "#F5F5F5",
+      "transform": "scale(0.99)"
+    },
+    "expired": {
+      "opacity": 0.6,
+      "titleColor": "#6B6B6B",
+      "subtitleColor": "#D9534F",
+      "subtitleContent": "Expired — {expiryLabel}",
+      "disabled": true
+    }
+  },
+  "elements": {
+    "leadingIcon": {
+      "type": "text or ReactNode",
+      "fallbackGlyphs": {
+        "Visa": "VISA",
+        "Mastercard": "MC",
+        "Amex": "AMEX",
+        "Discover": "DISC",
+        "Diners": "DC",
+        "JCB": "JCB",
+        "UnionPay": "UP",
+        "default": "CARD"
+      },
+      "fontSize": 11,
+      "fontWeight": "700",
+      "color": "#1A1A1A"
+    },
+    "title": {
+      "type": "text",
+      "content": "{brandLabel} {last4Label}",
+      "example": "Visa •••• 4242",
+      "fontSize": 15,
+      "lineHeight": 20,
+      "fontWeight": "500",
+      "color": "#1A1A1A",
+      "numberOfLines": 1
+    },
+    "subtitle": {
+      "type": "text",
+      "content": "{expiryLabel}",
+      "example": "Expires 12/28",
+      "showWhen": "not expired and expiryLabel is provided",
+      "fontSize": 13,
+      "lineHeight": 18,
+      "color": "#6B6B6B",
+      "numberOfLines": 1
+    },
+    "expiredLabel": {
+      "type": "text",
+      "content": "Expired — {expiryLabel}",
+      "showWhen": "expired === true",
+      "fontSize": 13,
+      "lineHeight": 18,
+      "color": "#D9534F"
+    },
+    "defaultBadge": {
+      "type": "view",
+      "showWhen": "isDefault === true",
+      "background": "#E6F5F0",
+      "borderRadius": 9999,
+      "paddingHorizontal": 8,
+      "paddingVertical": 3,
+      "children": [
+        { "type": "text", "content": "Default", "fontSize": 11, "fontWeight": "600", "color": "#2E7D32" }
+      ]
+    },
+    "kebabButton": {
+      "type": "Pressable",
+      "showWhen": "onPressMenu is provided",
+      "glyph": "⋮",
+      "fontSize": 20,
+      "color": "#6B6B6B",
+      "width": 44,
+      "height": 44,
+      "hitSlop": 8,
+      "accessibility": { "role": "button", "label": "More options for {brandLabel} {last4Label}" }
+    }
+  },
+  "tokens": {
+    "surface": "#FFFFFF",
+    "border": "#E5E0D1",
+    "borderSelected": "#E3A9A0",
+    "foreground": "#1A1A1A",
+    "textMuted": "#6B6B6B",
+    "defaultBadgeBackground": "#E6F5F0",
+    "defaultBadgeText": "#2E7D32",
+    "error": "#D9534F",
+    "cornerRadius": 12,
+    "minHeight": 64
+  },
+  "interactions": {
+    "tapRow": "calls onPress(id) — optional; if omitted row is non-interactive",
+    "tapKebab": "calls onPressMenu — opens card actions sheet in parent"
+  },
+  "accessibility": {
+    "rowRole": "button (when onPress provided)",
+    "rowLabel": "{brandLabel} {last4Label}{expired ? ', expired' : ''}{isDefault ? ', default' : ''}",
+    "rowAccessibilityState": "{ selected: isSelected, disabled: isExpired }",
+    "kebabLabel": "More options for {brandLabel} {last4Label}"
+  }
+}

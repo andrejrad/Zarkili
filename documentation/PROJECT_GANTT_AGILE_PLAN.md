@@ -1,4 +1,4 @@
-# Project Gantt Plan (Agile, Parallel Streams)
+﻿# Project Gantt Plan (Agile, Parallel Streams)
 
 ## Purpose
 This Gantt chart gives an execution order and parallelization map for the full 20-week program.
@@ -13,7 +13,7 @@ Assumptions:
 
 ```mermaid
 gantt
-  title Zarkili Multi-Tenant Program - 52 Week Agile Plan
+  title Zarkili Multi-Tenant Program - 57 Week Agile Plan
   dateFormat  YYYY-MM-DD
   axisFormat  %d %b
   excludes    weekends
@@ -70,31 +70,40 @@ gantt
   W31 AI, messaging, notifications, marketplace ext :ui11, after ui10, 7d
   W32 Cross-cutting, i18n, store readiness, RC      :crit, ui12, after ui11, 7d
 
-  section Phase 3 Admin and Operator UI (Weeks 33-44)
-  W33 Owner home, tenant settings, brand, legal     :crit, adm1, after ui12, 7d
-  W34 Subscription, billing, Connect, payouts       :crit, adm2, after adm1, 7d
-  W35 Locations, dashboards, resources              :adm3, after adm2, 7d
-  W36 Staff administration                          :adm4, after adm3, 7d
-  W37 Service catalog depth                         :adm5, after adm4, 7d
-  W38 Booking operations and master calendar        :crit, adm6, after adm5, 7d
-  W39 Client and CRM admin                          :adm7, after adm6, 7d
-  W40 Loyalty, activities, campaigns admin          :adm8, after adm7, 7d
-  W41 Reviews, messaging, waitlist admin            :adm9, after adm8, 7d
-  W42 Analytics, reporting, exports                 :adm10, after adm9, 7d
-  W43 AI admin and marketplace tenant tools         :adm11, after adm10, 7d
-  W44 Platform super-admin, compliance, RC          :crit, adm12, after adm11, 7d
+  section Phase 2.2 Navigation Wiring (Weeks 33-34)
+  W33 Wire auth, booking, payments, loyalty routes   :crit, nav1, after ui12, 7d
+  W34 Discovery screens + wire, onboarding wiring    :crit, nav2, after nav1, 7d
 
-  section Phase 3.5 Release Readiness (Weeks 45-49)
-  W45 Observability, SLOs, performance gates        :crit, rr1, after adm12, 7d
-  W46 Pentest, DR drill, security hardening         :crit, rr2, after rr1, 7d
-  W47 AI evaluation, marketing site, self-serve     :rr3, after rr2, 7d
-  W48 Support skeleton (tickets, KB, dashboard) no AI :crit, rr4, after rr3, 7d
-  W49 Compliance pack, BI export, GA launch         :crit, rr5, after rr4, 7d
+  section Phase 2.3 Manual QA and Firebase Integration (Weeks 35-37)
+  W35 Manual QA with mock data (68 TCs, iOS+Android) :crit, qa1, after nav2, 7d
+  W36 Firebase tier 1: Auth, Discovery, Booking, Pay :crit, fir1, after qa1, 7d
+  W37 Firebase tier 2: Loyalty, Msg, Notif, Waitlist :crit, fir2, after fir1, 7d
 
-  section Phase 4 AI Support Router (Weeks 50-52)
-  W50 AI router, context injection, escalation      :crit, p4w1, after rr5, 7d
-  W51 Eval, analytics, CSAT, tagging                :p4w2, after p4w1, 7d
-  W52 Hardening, threshold tuning, KB iteration     :p4w3, after p4w2, 7d
+  section Phase 3 Admin and Operator UI (Weeks 38-49)
+  W38 Owner home, tenant settings, brand, legal     :crit, adm1, after fir2, 7d
+  W39 Subscription, billing, Connect, payouts       :crit, adm2, after adm1, 7d
+  W40 Locations, dashboards, resources              :adm3, after adm2, 7d
+  W41 Staff administration                          :adm4, after adm3, 7d
+  W42 Service catalog depth                         :adm5, after adm4, 7d
+  W43 Booking operations and master calendar        :crit, adm6, after adm5, 7d
+  W44 Client and CRM admin                          :adm7, after adm6, 7d
+  W45 Loyalty, activities, campaigns admin          :adm8, after adm7, 7d
+  W46 Reviews, messaging, waitlist admin            :adm9, after adm8, 7d
+  W47 Analytics, reporting, exports                 :adm10, after adm9, 7d
+  W48 AI admin and marketplace tenant tools         :adm11, after adm10, 7d
+  W49 Platform super-admin, compliance, RC          :crit, adm12, after adm11, 7d
+
+  section Phase 3.5 Release Readiness (Weeks 50-54)
+  W50 Observability, SLOs, performance gates        :crit, rr1, after adm12, 7d
+  W51 Pentest, DR drill, security hardening         :crit, rr2, after rr1, 7d
+  W52 AI evaluation, marketing site, self-serve     :rr3, after rr2, 7d
+  W53 Support skeleton (tickets, KB, dashboard) no AI :crit, rr4, after rr3, 7d
+  W54 Compliance pack, BI export, GA launch         :crit, rr5, after rr4, 7d
+
+  section Phase 4 AI Support Router (Weeks 55-57)
+  W55 AI router, context injection, escalation      :crit, p4w1, after rr5, 7d
+  W56 Eval, analytics, CSAT, tagging                :p4w2, after p4w1, 7d
+  W57 Hardening, threshold tuning, KB iteration     :p4w3, after p4w2, 7d
 
   section Design Supply (Parallel to Phase 2)
   Batch A Auth and onboarding screens               :des1, 2026-08-10, 21d
@@ -144,16 +153,19 @@ gantt
 3. Marketplace launch (Week 17) should precede AI personalization (Weeks 19-20).
 4. Phase 2.0 (Weeks 21-28) consumer UI depends on Stripe (W13-14) being live for Week 23 booking + payments wiring, and on the design supply lane delivering each batch at least two sprints before the consuming week.
 5. Phase 2.1 (Weeks 29-32) closes legal, edge-case, internationalization, and store-readiness gaps. Public consumer release candidate is produced in Week 32.
-6. Phase 3 (Weeks 33-44) builds the full operator/admin/platform-super-admin console on top of Phase 2 tokens and design system. Operator-ready release candidate is produced in Week 44.
-7. Phase 3.5 (Weeks 45-49) makes the platform commercially launch-ready: observability, SLOs, pentest + DR drill, AI evaluation harness, marketing site, self-serve checkout, **in-app support surfaces and platform-owner support dashboard (W48, no AI router yet)**, BI export, compliance pack. Commercial GA release in Week 49 includes the in-app support tab and admin support dashboard.
-8. Phase 4 (Weeks 50-52) adds the AI router on top of the live support surfaces shipped in W48: confidence-scored auto-respond vs escalate, eval, analytics, CSAT, tagging, threshold tuning. AI Support System v1 declared operational at end of Week 52.
-9. Security, QA, and docs remain continuous and release-critical.
+6. Phase 2.2 (Weeks 33-34) wires all 49 consumer routes into the live navigator with mock data.
+7. Phase 2.3 (Weeks 35-37) validates all consumer flows via 68 manual QA test cases (W35), then connects each screen to its real Firebase service domain (W36–W37). Phase 2 exit condition #1 ("wired to real services") is satisfied at W37 close.
+8. Phase 3 (Weeks 38-49) builds the full operator/admin/platform-super-admin console on top of Phase 2 tokens and design system. Operator-ready release candidate is produced in Week 49.
+9. Phase 3.5 (Weeks 50-54) makes the platform commercially launch-ready: observability, SLOs, pentest + DR drill, AI evaluation harness, marketing site, self-serve checkout, **in-app support surfaces and platform-owner support dashboard (W53, no AI router yet)**, BI export, compliance pack. Commercial GA release in Week 54 includes the in-app support tab and admin support dashboard.
+10. Phase 4 (Weeks 55-57) adds the AI router on top of the live support surfaces shipped in W53: confidence-scored auto-respond vs escalate, eval, analytics, CSAT, tagging, threshold tuning. AI Support System v1 declared operational at end of Week 57.
 
 ## Phase Cross-References
-Phase 2 plan (Weeks 21-32): [PHASE2_CONSUMER_UI_PLAN_WEEKS_21_TO_28.md](PHASE2_CONSUMER_UI_PLAN_WEEKS_21_TO_28.md)
-Phase 3 plan (Weeks 33-44): [PHASE3_ADMIN_UI_PLAN_WEEKS_33_TO_44.md](PHASE3_ADMIN_UI_PLAN_WEEKS_33_TO_44.md)
-Phase 3.5 plan (Weeks 45-48): [PHASE3_5_RELEASE_READINESS_PLAN_WEEKS_45_TO_48.md](PHASE3_5_RELEASE_READINESS_PLAN_WEEKS_45_TO_48.md)
-Phase 4 plan (Weeks 49-52): [PHASE4_AI_SUPPORT_SYSTEM_PLAN_WEEKS_49_TO_52.md](PHASE4_AI_SUPPORT_SYSTEM_PLAN_WEEKS_49_TO_52.md)
+Phase 2 plan (Weeks 21-32): [PHASE2_CONSUMER_UI_PLAN_WEEKS_21_TO_32.md](PHASE2_CONSUMER_UI_PLAN_WEEKS_21_TO_32.md)
+Phase 2.2 plan (Weeks 33-34): [PHASE2_2_NAVIGATION_WIRING_WEEKS_33_TO_34.md](PHASE2_2_NAVIGATION_WIRING_WEEKS_33_TO_34.md)
+Phase 2.3 plan (Weeks 35-37): [PHASE2_3_CONSUMER_FIREBASE_INTEGRATION_WEEKS_35_TO_37.md](PHASE2_3_CONSUMER_FIREBASE_INTEGRATION_WEEKS_35_TO_37.md)
+Phase 3 plan (Weeks 38-49): [PHASE3_ADMIN_UI_PLAN_WEEKS_38_TO_49.md](PHASE3_ADMIN_UI_PLAN_WEEKS_38_TO_49.md)
+Phase 3.5 plan (Weeks 50-54): [PHASE3_5_RELEASE_READINESS_PLAN_WEEKS_50_TO_54.md](PHASE3_5_RELEASE_READINESS_PLAN_WEEKS_50_TO_54.md)
+Phase 4 plan (Weeks 55-57): [PHASE4_AI_SUPPORT_SYSTEM_PLAN_WEEKS_55_TO_57.md](PHASE4_AI_SUPPORT_SYSTEM_PLAN_WEEKS_55_TO_57.md)
 Design supply request list (Batches A-S): [FIGMA_SCREEN_REQUEST_PRIORITY_LIST.md](FIGMA_SCREEN_REQUEST_PRIORITY_LIST.md)
 
 ## Trello Sync Code Legend
@@ -185,3 +197,4 @@ Category code map:
 
 Automation script used:
 - scripts/trello-gantt-prefix-sync.ps1
+

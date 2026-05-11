@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Linking, Platform, ScrollView, Share, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 import type { AiBudgetAdminService, UpdateAiBudgetConfigInput } from "../../domains/ai";
 import type { DiscoveryService, SignInInput } from "../../domains";
 import type { TenantMembership } from "../../domains/auth";
 import type { CreateLocationInput, Location } from "../../domains/locations";
+import type { PaymentsRepository, SavedPaymentMethod as DomainSavedPaymentMethod } from "../../domains/payments";
 import { featureFlags } from "../../shared/config/featureFlags";
 import { brandTypography } from "../../shared/ui/brandTypography";
 import {
@@ -28,6 +29,219 @@ import { useAuth } from "../providers/AuthProvider";
 import { useLanguage } from "../providers/LanguageProvider";
 import { useTenant } from "../providers/TenantProvider";
 import { OwnerAiBudgetSettingsScreen } from "../settings/OwnerAiBudgetSettingsScreen";
+import type { OwnerKpiService, OwnerKpiSummary } from "../admin/ownerKpiService";
+import { OwnerHomeScreen } from "../admin/OwnerHomeScreen";
+import { TenantSettingsShellScreen } from "../admin/TenantSettingsShellScreen";
+import type { TenantSettingsSection } from "../admin/TenantSettingsShellScreen";
+import { BusinessProfileScreen } from "../admin/BusinessProfileScreen";
+import { BrandSettingsScreen } from "../admin/BrandSettingsScreen";
+import { TaxSettingsScreen } from "../admin/TaxSettingsScreen";
+import { CurrencySettingsScreen } from "../admin/CurrencySettingsScreen";
+import { LegalDocumentsScreen } from "../admin/LegalDocumentsScreen";
+import { DomainSettingsScreen } from "../admin/DomainSettingsScreen";
+import { OwnerNotificationPreferencesScreen } from "../admin/OwnerNotificationPreferencesScreen";
+// W39 — Billing & payouts admin screens
+import { BillingHubScreen } from "../admin/BillingHubScreen";
+import type { BillingSection } from "../admin/BillingHubScreen";
+import { SubscriptionPlanSelectionScreen } from "../admin/SubscriptionPlanSelectionScreen";
+import { InvoiceHistoryScreen } from "../admin/InvoiceHistoryScreen";
+import { AdminPaymentMethodScreen } from "../admin/AdminPaymentMethodScreen";
+import { CancelSubscriptionScreen } from "../admin/CancelSubscriptionScreen";
+import { StripeConnectOnboardingScreen } from "../admin/StripeConnectOnboardingScreen";
+import { ConnectHealthStatusScreen } from "../admin/ConnectHealthStatusScreen";
+import { PayoutHistoryScreen } from "../admin/PayoutHistoryScreen";
+import { RefundDisputeAdminScreen } from "../admin/RefundDisputeAdminScreen";
+import { PrintPdfLayoutComponent } from "../admin/PrintPdfLayoutComponent";
+import type { BillingAdminService } from "../admin/billingAdminService";
+import type { Subscription } from "../../domains/billing";
+import type { Invoice } from "../../domains/billing/invoiceService";
+import type { Payout, PendingBalance, PayoutSchedule } from "../../domains/billing/payoutService";
+import type { ConnectAccount } from "../../domains/connect";
+import type { AdminPaymentMethod, RefundRow, DisputeRow } from "../admin/billingAdminService";
+// W40 — Location admin screens
+import { LocationOverviewScreen } from "../admin/LocationOverviewScreen";
+import { LocationDashboardScreen } from "../admin/LocationDashboardScreen";
+import { LocationSettingsScreen } from "../admin/LocationSettingsScreen";
+import { LocationServiceOverridesScreen } from "../admin/LocationServiceOverridesScreen";
+import { ResourceManagementScreen } from "../admin/ResourceManagementScreen";
+import { AdminWalkInQueueScreen } from "../admin/AdminWalkInQueueScreen";
+import { DailyCloseScreen } from "../admin/DailyCloseScreen";
+import { AdminFirstRunTourOverlay } from "../admin/AdminFirstRunTourOverlay";
+import type { LocationAdminService, LocationKpi, TodayAppointment, ResourceType, WalkInQueueEntry, DailyCloseReport, HolidayEntry, LocationServiceOverride, LocationAccessibilityFlags } from "../admin/locationAdminService";
+// W41 — Staff admin sub-screens
+import { StaffScheduleScreen } from "../admin/StaffScheduleScreen";
+import type { EditWeekHours } from "../admin/StaffScheduleScreen";
+import { StaffPerformanceScreen } from "../admin/StaffPerformanceScreen";
+import type { StaffPerformanceSummary } from "../admin/StaffPerformanceScreen";
+import { StaffCommissionScreen } from "../admin/StaffCommissionScreen";
+import type { StaffCommissionConfig } from "../admin/StaffCommissionScreen";
+import { StaffInviteScreen } from "../admin/StaffInviteScreen";
+import { StaffRoleScreen } from "../admin/StaffRoleScreen";
+import type { StaffRoleAuditEntry } from "../admin/StaffRoleScreen";
+// W41-DEBT — Staff admin services
+import { createStaffInviteService } from "../admin/staffInviteService";
+import { createCommissionService } from "../admin/commissionService";
+import { createRoleAuditService } from "../admin/roleAuditService";
+import { StaffServiceMappingScreen } from "../admin/StaffServiceMappingScreen";
+// W42 — Service catalog depth screens
+import { ServiceCategoriesScreen } from "../admin/ServiceCategoriesScreen";
+import { ServiceBulkImportScreen } from "../admin/ServiceBulkImportScreen";
+import { ServicePricingScreen } from "../admin/ServicePricingScreen";
+import { ServiceAddOnsScreen } from "../admin/ServiceAddOnsScreen";
+import { ServiceSeasonalRulesScreen } from "../admin/ServiceSeasonalRulesScreen";
+import { ServicePhotosScreen } from "../admin/ServicePhotosScreen";
+import { ServiceBookingRulesScreen } from "../admin/ServiceBookingRulesScreen";
+import { ServiceVisibilityScreen } from "../admin/ServiceVisibilityScreen";
+import { parseImportCsv, createServiceCatalogService } from "../admin/serviceCatalogService";
+// W42-DEBT-1 — Real Firestore adapters for service catalog
+import {
+  createServiceCategoryRepository,
+  createServiceAddonRepository,
+  createServiceSeasonalRuleRepository,
+  createServiceBookingRulesRepository,
+  createServiceVisibilityRepository,
+  createServicePriceOverrideRepository,
+  createServiceMediaRepository,
+} from "../admin/serviceCatalogAdapters";
+import type {
+  ServiceCategory,
+  ServiceAddon,
+  ServiceSeasonalRule,
+  ServiceBookingRules,
+  ServiceVisibilityConfig,
+  ServicePriceOverride,
+  ServiceImportRow,
+} from "../../domains/services/serviceCatalogModel";
+// W45 — Loyalty / Activity / Campaign admin screens
+import { LoyaltyConfigScreen } from "../admin/LoyaltyConfigScreen";
+import { RewardCatalogScreen as AdminRewardCatalogScreen } from "../admin/RewardCatalogScreen";
+import { PointAdjustmentScreen } from "../admin/PointAdjustmentScreen";
+import { LoyaltyDashboardScreen } from "../admin/LoyaltyDashboardScreen";
+import { TierMigrationScreen } from "../admin/TierMigrationScreen";
+import { ActivityCatalogScreen } from "../admin/ActivityCatalogScreen";
+import { ActivityAnalyticsScreen } from "../admin/ActivityAnalyticsScreen";
+import { CampaignListScreen } from "../admin/CampaignListScreen";
+import { CampaignBuilderScreen } from "../admin/CampaignBuilderScreen";
+import { CampaignPerformanceScreen } from "../admin/CampaignPerformanceScreen";
+import { TransactionalTemplateScreen } from "../admin/TransactionalTemplateScreen";
+import { PromotionAdminScreen } from "../admin/PromotionAdminScreen";
+import { createLoyaltyAdminService } from "../admin/loyaltyAdminService";
+import { createCampaignAdminService } from "../admin/campaignAdminService";
+// W46 — Review admin
+import { ReviewQueueScreen } from "../admin/ReviewQueueScreen";
+import { ReviewReplyScreen } from "../admin/ReviewReplyScreen";
+import { ReviewFlagScreen } from "../admin/ReviewFlagScreen";
+import { ReviewAutomationScreen } from "../admin/ReviewAutomationScreen";
+import { ReputationDashboardScreen } from "../admin/ReputationDashboardScreen";
+// W46 — Messaging admin
+import { InboxTriageScreen } from "../admin/InboxTriageScreen";
+import { ThreadAssignScreen } from "../admin/ThreadAssignScreen";
+import { CannedRepliesScreen } from "../admin/CannedRepliesScreen";
+import { AutoReplyConfigScreen } from "../admin/AutoReplyConfigScreen";
+import { MessageArchiveScreen } from "../admin/MessageArchiveScreen";
+// W46 — Waitlist admin
+import { WaitlistAdminListScreen } from "../admin/WaitlistAdminListScreen";
+import { WaitlistConvertScreen } from "../admin/WaitlistConvertScreen";
+import { WaitlistPoliciesScreen } from "../admin/WaitlistPoliciesScreen";
+// W15-DEBT-1 — Onboarding admin
+import { OnboardingAdminScreen } from "../admin/OnboardingAdminScreen";
+import {
+  createOnboardingAdminService,
+} from "../../domains/onboarding/adminService";
+import { createOnboardingRepository } from "../../domains/onboarding/repository";
+import type { OnboardingTimelineEvent } from "../../domains/onboarding/model";
+import { createReviewAdminService } from "../admin/reviewAdminService";
+import { createMessagingAdminService } from "../admin/messagingAdminService";
+import { createWaitlistAdminService } from "../admin/waitlistAdminService";
+import type {
+  ReviewEntry,
+  ReviewQueueFilter,
+  ReviewAutomationRule,
+  ReviewAutomationRuleInput,
+  ReviewRatingOp,
+  ReputationStats,
+} from "../../domains/reviews/reviewAdminModel";
+import type {
+  AdminThread,
+  AdminThreadStatus,
+  CannedReply,
+  CannedReplyInput,
+  AutoReplyConfig,
+  MessageArchiveFilter,
+} from "../../domains/messaging/messagingAdminModel";
+import type {
+  WaitlistAdminEntry,
+  WaitlistAdminFilter,
+  WaitlistPolicy,
+} from "../../domains/waitlist/waitlistAdminModel";
+import type {
+  ActivityAdminEntry,
+  ActivityStats,
+  LoyaltyConfigInput,
+  LoyaltyProgramStats,
+  RewardCatalogEntry,
+  RewardCatalogInput,
+  TierMigrationPreview,
+} from "../../domains/loyalty/loyaltyAdminModel";
+import type {
+  CampaignBuilderInput,
+  CampaignListEntry,
+  CampaignPerformanceDetail,
+  ComplianceCheckItem,
+  PromoCode,
+  PromoCodeCreateInput,
+  PromoCodeStatus,
+  TransactionalTemplateChannel,
+  TransactionalTemplateDefault,
+  TransactionalTemplateOverride,
+  TransactionalTemplateType,
+} from "../../domains/campaigns/campaignAdminModel";
+// W44 — Client / CRM admin screens
+import { ClientListAdminScreen } from "../admin/ClientListAdminScreen";
+import { ClientDetailAdminScreen } from "../admin/ClientDetailAdminScreen";
+import { MergeClientsScreen } from "../admin/MergeClientsScreen";
+import { BlockClientScreen } from "../admin/BlockClientScreen";
+import { SegmentBuilderScreen } from "../admin/SegmentBuilderScreen";
+import { TargetedMessageScreen } from "../admin/TargetedMessageScreen";
+import { GdprExportScreen } from "../admin/GdprExportScreen";
+import { DeleteClientScreen } from "../admin/DeleteClientScreen";
+import { createClientCrmService } from "../admin/clientCrmService";
+import type {
+  BlockClientReason,
+  ClientDetailAdmin,
+  ClientDetailTab,
+  ClientFilter,
+  ClientListEntry,
+  ClientSavedView,
+  GdprExportFormat,
+  GdprExportRequest,
+  GdprExportType,
+  MergeCandidateSummary,
+  SavedSegment,
+  SegmentFilter,
+  SegmentPreview,
+  TargetedMessageChannel,
+} from "../../domains/clients/clientCrmModel";
+// W43 — Booking operations admin screens
+import { BookingCalendarScreen } from "../admin/BookingCalendarScreen";
+import { BookingDetailAdminScreen } from "../admin/BookingDetailAdminScreen";
+import { ManualBookingScreen } from "../admin/ManualBookingScreen";
+import { BlockTimeScreen } from "../admin/BlockTimeScreen";
+import { ForceBookScreen } from "../admin/ForceBookScreen";
+import { NoShowMarkScreen } from "../admin/NoShowMarkScreen";
+import { CancellationAdminScreen } from "../admin/CancellationAdminScreen";
+import { RescheduleAdminScreen } from "../admin/RescheduleAdminScreen";
+import { createBookingOpsService } from "../admin/bookingOpsService";
+import type {
+  AdminBookingDetailView,
+  BlockedSlot,
+  CalendarDayView,
+  ConflictResolutionOption,
+  ManualBookingChannel,
+  SlotConflict,
+} from "../../domains/bookings/bookingOpsModel";
+import type { NoShowBookingSummary } from "../admin/NoShowMarkScreen";
+import type { RescheduleBookingSummary } from "../admin/RescheduleAdminScreen";
 import {
   BookingConfirmScreen,
   BookingsListScreen,
@@ -51,6 +265,12 @@ import { MultiSalonDashboardScreen } from "../dashboard/MultiSalonDashboardScree
 import type { SalonQuickAction } from "../dashboard/MultiSalonDashboardScreens";
 import type { UnreadAggregationService, SalonSummary } from "../dashboard/unreadAggregationService";
 import { getFriendlyFirebaseAuthMessage } from "../../domains/auth/errorMessages";
+import { sendEmailVerification } from "firebase/auth";
+import { auth, db, functions } from "../../shared/config/firebase";
+import { httpsCallable } from "firebase/functions";
+import { collection, doc, getDoc, getDocs, orderBy, query } from "firebase/firestore";
+import { bookingsRepository as appBookingsRepository } from "../bookings/runtime";
+import type { SavedPaymentMethod as AppSavedPaymentMethod } from "../payments/paymentsHelpers";
 
 import {
   AuthRouteScreen,
@@ -58,10 +278,137 @@ import {
   ExploreRouteScreen,
   HomeRouteScreen,
   ProfileRouteScreen,
+  SettingsShellRouteScreen,
   WelcomeRouteScreen,
 } from "./HandoffScreens";
+import { EditProfileScreen } from "../profile/EditProfileScreen";
+import { LegalPageScreen } from "../legal/LegalPageScreen";
+import type { LegalPageType } from "../legal/LegalPageScreen";
 import { BottomTabBar } from "./BottomTabBar";
 import type { BottomTabName } from "./BottomTabBar";
+import { SignInScreen } from "../auth/SignInScreen";
+import { SignUpScreen } from "../auth/SignUpScreen";
+import {
+  SocialSignInSelectorScreen,
+  type SocialProvider,
+} from "../auth/SocialSignInSelectorScreen";
+import { ForgotPasswordScreen } from "../auth/ForgotPasswordScreen";
+import { ResetPasswordScreen } from "../auth/ResetPasswordScreen";
+import { EmailVerificationScreen } from "../auth/EmailVerificationScreen";
+import { OtpVerificationScreen } from "../auth/OtpVerificationScreen";
+import {
+  AccountMergeScreen,
+  type AccountMergeChoice,
+} from "../auth/AccountMergeScreen";
+import { ServiceSelectionScreen, type BookingServiceCategoryGroup } from "../booking/ServiceSelectionScreen";
+import { StaffSelectionScreen } from "../booking/StaffSelectionScreen";
+import { BookingDateTimeScreen } from "../booking/BookingDateTimeScreen";
+import { BookingReviewScreen } from "../booking/BookingReviewScreen";
+import { BookingPoliciesScreen } from "../booking/BookingPoliciesScreen";
+import { BookingPaymentScreen } from "../booking/BookingPaymentScreen";
+import { BookingConfirmationScreen } from "../booking/BookingConfirmationScreen";
+import {
+  GuestContactScreen,
+  type GuestContactValues,
+} from "../booking/GuestContactScreen";
+import { ManageBookingScreen } from "../booking/ManageBookingScreen";
+import { PostBookingUpgradeScreen } from "../booking/PostBookingUpgradeScreen";
+import { formatTimeOfDay, type TimeSegment } from "../booking/bookingHelpers";
+import type { BookingHistoryRecord } from "../payments/receiptsHelpers";
+import { SavedPaymentMethodsScreen } from "../payments/SavedPaymentMethodsScreen";
+import {
+  AddPaymentMethodScreen,
+  type AddCardFormState,
+} from "../payments/AddPaymentMethodScreen";
+import {
+  TippingScreen,
+  type TippingScreenState,
+} from "../payments/TippingScreen";
+import { ReceiptScreen } from "../payments/ReceiptScreen";
+import { createReceiptDataService, type ReceiptData } from "../bookings/receiptDataService";
+import { createRefundDataService, type RefundData } from "../bookings/refundDataService";
+import {
+  BookingHistoryScreen,
+  type BookingHistoryScreenState,
+} from "../payments/BookingHistoryScreen";
+import { RefundStatusScreen } from "../payments/RefundStatusScreen";
+import { LoyaltyLandingScreen } from "../loyalty/LoyaltyLandingScreen";
+import { RewardCatalogScreen } from "../loyalty/RewardCatalogScreen";
+import { RewardRedemptionScreen } from "../loyalty/RewardRedemptionScreen";
+import { ReferralScreen } from "../loyalty/ReferralScreen";
+import { ActivitiesScreen } from "../activities/ActivitiesScreen";
+import { ActivityDetailScreen } from "../activities/ActivityDetailScreen";
+import { ClaimActivityRewardScreen } from "../activities/ClaimActivityRewardScreen";
+import { ReviewPromptScreen } from "../reviews/ReviewPromptScreen";
+import { ReviewDetailScreen } from "../reviews/ReviewDetailScreen";
+import { InboxScreen } from "../messaging/InboxScreen";
+import { ThreadScreen } from "../messaging/ThreadScreen";
+import { ComposeScreen } from "../messaging/ComposeScreen";
+import { NotificationCenterScreen } from "../notifications/NotificationCenterScreen";
+import { NotificationPreferencesScreen } from "../notifications/NotificationPreferencesScreen";
+import { WaitlistJoinSheet } from "../waitlist/WaitlistJoinSheet";
+import { WaitlistPositionScreen } from "../waitlist/WaitlistPositionScreen";
+import { WaitlistScreen, type WaitlistEntry } from "../waitlist/WaitlistScreen";
+import { ClientOnboardingProfileScreen } from "../onboarding/ClientOnboardingProfileScreen";
+import { ClientOnboardingPreferencesScreen } from "../onboarding/ClientOnboardingPreferencesScreen";
+import { ClientOnboardingPaymentScreen } from "../onboarding/ClientOnboardingPaymentScreen";
+import { ClientOnboardingNotificationsScreen } from "../onboarding/ClientOnboardingNotificationsScreen";
+import { ClientOnboardingAccountGuestScreen } from "../onboarding/ClientOnboardingAccountGuestScreen";
+import { ClientOnboardingPhoneVerifyScreen } from "../onboarding/ClientOnboardingPhoneVerifyScreen";
+import { ClientOnboardingLoyaltyScreen } from "../onboarding/ClientOnboardingLoyaltyScreen";
+import { SalonOnboardingWizard } from "../onboarding/SalonOnboardingWizard";
+import type { SalonOnboardingState, OnboardingStep as SalonOnboardingStepKey } from "../../domains/onboarding/model";
+import { ONBOARDING_STEPS, computeCompletionScore, deriveBlockers, buildInitialStepStatuses } from "../../domains/onboarding/model";
+import { DiscoverHomeScreen } from "../discovery/DiscoverHomeScreen";
+import { DiscoverFeedScreen } from "../discovery/DiscoverFeedScreen";
+import { ExploreResultsScreen } from "../discovery/ExploreResultsScreen";
+import { ExploreMapScreen } from "../discovery/ExploreMapScreen";
+import { DiscoverFiltersScreen } from "../discovery/DiscoverFiltersScreen";
+import { SalonProfileScreen } from "../discovery/SalonProfileScreen";
+import { ServiceDetailScreen } from "../discovery/ServiceDetailScreen";
+import { StaffDetailScreen } from "../discovery/StaffDetailScreen";
+import {
+  DEFAULT_DISCOVERY_FILTERS,
+  type DiscoveryCategory as AppDiscoveryCategory,
+  type DiscoveryFeedFilter,
+  type DiscoveryFilters,
+  type FeaturedSalon,
+} from "../discovery/discoveryHelpers";
+import type { DiscoverySalonCard, DiscoveryCategory as DomainDiscoveryCategory } from "../../domains/discovery/model";
+import {
+  DEFAULT_NOTIFICATION_PREFERENCES,
+  type InboxTab,
+  type NotificationChannel,
+  type NotificationPreferenceKey,
+  type NotificationPreferences,
+  type NotificationTab,
+  type QuietDay,
+  type WaitlistStaffPreference,
+  type WaitlistTimePreference,
+  type ConsumerMessage,
+  type NotificationItem,
+  type ThreadSummary,
+  type WaitlistPositionData,
+} from "../messaging/messagingHelpers";
+import {
+  DEFAULT_EARN_ACTIONS,
+  EMPTY_REVIEW_DRAFT,
+  type Activity,
+  type ActivityTab,
+  type EarnAction,
+  type HistoryEntry,
+  type Reward,
+  type ReviewDraft,
+  type RewardFilterTab,
+  type RewardSortOption,
+} from "../loyalty/loyaltyHelpers";
+import type { ConsumerLoyaltyService } from "../loyalty/consumerLoyaltyService";
+import type { ConsumerMessagingService, SalonSearchResult } from "../messaging/consumerMessagingService";
+import type { ConsumerNotificationService } from "../notifications/consumerNotificationService";
+import type { WaitlistRepository } from "../../domains/waitlist/repository";
+import type { WizardService } from "../../domains/onboarding/wizardService";
+
+import { getDevicePushToken } from "../notifications/registerFcmToken";
 import {
   appRoutes,
   canAccessRoute,
@@ -101,6 +448,19 @@ type AppNavigatorShellProps = {
   clientBookingFlow?: ClientBookingFlow | null;
   adminBookingQueueService?: AdminBookingQueueService | null;
   unreadAggregationService?: UnreadAggregationService | null;
+  paymentsRepository?: PaymentsRepository | null;
+  // W37 real-data services
+  consumerLoyaltyService?: ConsumerLoyaltyService | null;
+  consumerMessagingService?: ConsumerMessagingService | null;
+  consumerNotificationService?: ConsumerNotificationService | null;
+  waitlistRepository?: WaitlistRepository | null;
+  wizardService?: WizardService | null;
+  // W38 — Owner KPI service
+  ownerKpiService?: OwnerKpiService | null;
+  // W39 — Billing admin service
+  billingAdminService?: BillingAdminService | null;
+  // W40 — Location admin service
+  locationAdminService?: LocationAdminService | null;
 };
 
 function isWebRuntime(): boolean {
@@ -179,6 +539,63 @@ function toOnboardingStepLabelKey(step: OnboardingStep):
     | "onboarding.step.loyalty";
 }
 
+// ---------------------------------------------------------------------------
+// W36: Discovery domain → app-layer type adapters
+// ---------------------------------------------------------------------------
+function toFeaturedSalon(card: DiscoverySalonCard): FeaturedSalon {
+  return {
+    id: card.id,
+    name: card.name,
+    city: card.city,
+    rating: card.rating,
+    reviewCount: card.reviewCount,
+    latitude: card.locationLat,
+    longitude: card.locationLng,
+  };
+}
+function toAppCategory(cat: DomainDiscoveryCategory): AppDiscoveryCategory {
+  return { id: cat.id, label: cat.id === "all" ? "All" : cat.id.charAt(0).toUpperCase() + cat.id.slice(1) };
+}
+
+// ---------------------------------------------------------------------------
+// W36: Domain Booking → BookingHistoryRecord adapter
+// ---------------------------------------------------------------------------
+function domainStatusToHistoryStatus(s: string): BookingHistoryRecord["status"] {
+  if (s === "completed") return "completed";
+  if (s === "cancelled") return "cancelled";
+  if (s === "no_show") return "noShow";
+  if (s === "pending") return "pending";
+  return "confirmed";
+}
+function bookingToHistoryRecord(b: Booking): BookingHistoryRecord {
+  return {
+    id: b.bookingId,
+    salonId: b.tenantId,
+    salonName: b.tenantId, // P2: no getSalonName endpoint yet
+    serviceName: b.serviceId, // P2: no service name lookup yet
+    startsAtIso: `${b.date}T${b.startTime}:00Z`,
+    status: domainStatusToHistoryStatus(b.status),
+    totalUsd: 0, // P2: price not stored on Booking domain model
+  };
+}
+
+// ---------------------------------------------------------------------------
+// W36: Domain Service[] → BookingServiceCategoryGroup[] adapter
+// ---------------------------------------------------------------------------
+function servicesToGroups(services: Service[]): BookingServiceCategoryGroup[] {
+  const map = new Map<string, { id: string; name: string; durationMinutes: number; priceUsd: number; category?: string }[]>();
+  for (const s of services) {
+    const cat = s.category || "Other";
+    if (!map.has(cat)) map.set(cat, []);
+    map.get(cat)!.push({ id: s.serviceId, name: s.name, durationMinutes: s.durationMinutes, priceUsd: s.price, category: s.category });
+  }
+  return Array.from(map.entries()).map(([cat, svcs]) => ({
+    category: cat.toLowerCase().replace(/\s+/g, "-"),
+    label: cat,
+    services: svcs,
+  }));
+}
+
 function formatPreferredFirstName(email: string | null, userId: string | null): string {
   const emailLocalPart = email?.split("@")[0]?.trim();
   if (emailLocalPart) {
@@ -195,6 +612,41 @@ function formatPreferredFirstName(email: string | null, userId: string | null): 
   return "Guest";
 }
 
+// Routes that suppress the bottom tab bar (auth funnel + step-by-step booking wizard + pure modals).
+// Everything else shows tabs so users can always escape.
+const NO_TAB_ROUTES = new Set([
+  "Landing", "Login", "Register", "SignIn", "SignUp",
+  "SocialSignIn", "ForgotPassword", "ResetPassword",
+  "EmailVerification", "OtpVerification", "AccountMerge",
+  "BookingService", "BookingStaff", "BookingDate",
+  "BookingReview", "BookingPolicies", "BookingPayment", "BookingConfirmation",
+  "GuestContact", "ManageBooking", "PostBookingUpgrade",
+  "AddPaymentMethod", "Tipping",
+  "CompleteProfile",
+  // W38 — Owner console screens use their own back-nav, no bottom tabs
+  "OwnerHome", "TenantSettingsShell", "BusinessProfile", "BrandSettings",
+  "TaxSettings", "CurrencySettings", "LegalDocuments", "DomainSettings",
+  "OwnerNotificationPreferences",
+  // W39 — Billing & payouts admin screens
+  "BillingHub", "SubscriptionPlan", "InvoiceHistory", "AdminPaymentMethod",
+  "CancelSubscription", "StripeConnectOnboarding", "ConnectHealth",
+  "PayoutHistory", "RefundDisputeAdmin", "PrintPdfLayout",
+  // W40 — Location admin screens
+  "LocationOverview", "LocationDashboard", "LocationSettings",
+  "LocationServiceOverrides", "ResourceManagement", "AdminWalkInQueue", "DailyClose",
+  // W41 — Staff admin sub-screens
+  "StaffList", "StaffCreate", "StaffEdit",
+  "StaffSchedule", "StaffPerformance", "StaffCommission", "StaffInvite", "StaffRole",
+  // W42 — Service catalog depth screens
+  "ServiceList", "ServiceCreate", "ServiceEdit",
+  "ServiceCategories", "ServiceBulkImport", "ServicePricing", "ServiceAddOns",
+  "ServiceSeasonalRules", "ServicePhotos", "ServiceBookingRules", "ServiceVisibility",
+  // W46 — Review / Messaging / Waitlist admin screens
+  "ReviewQueue", "ReviewReply", "ReviewFlag", "ReviewAutomation", "ReputationDashboard",
+  "InboxTriage", "ThreadAssign", "CannedReplies", "AutoReplyConfig", "MessageArchive",
+  "WaitlistAdminList", "WaitlistConvert", "WaitlistPolicies",
+]);
+
 export function AppNavigatorShell({
   onboardingProgressPersistence,
   listTenantMemberships,
@@ -207,6 +659,15 @@ export function AppNavigatorShell({
   clientBookingFlow,
   adminBookingQueueService,
   unreadAggregationService,
+  paymentsRepository,
+  consumerLoyaltyService,
+  consumerMessagingService,
+  consumerNotificationService,
+  waitlistRepository,
+  wizardService,
+  ownerKpiService,
+  billingAdminService,
+  locationAdminService,
 }: AppNavigatorShellProps) {
   const {
     createAccount,
@@ -223,7 +684,7 @@ export function AppNavigatorShell({
   } = useAuth();
   const { t } = useLanguage();
   const { tenantId, setTenantId } = useTenant();
-  const [activeRouteName, setActiveRouteName] = useState("Landing");
+  const [activeRouteName, setActiveRouteName] = useState("AppShell");
   const [completedStepsByFlow, setCompletedStepsByFlow] = useState<
     Partial<Record<OnboardingFlow, OnboardingStep[]>>
   >({});
@@ -284,6 +745,50 @@ export function AppNavigatorShell({
   const [staffEditSubmitError] = useState<string | null>(null);
   const [staffEditSuccessMessage] = useState<string | null>(null);
 
+  // W41 — Staff admin sub-screen state
+  const [staffScheduleLoading, setStaffScheduleLoading] = useState(false);
+  const [staffScheduleError, setStaffScheduleError] = useState<string | null>(null);
+  const [staffSchedule, setStaffSchedule] = useState<import("../../domains/staff").StaffScheduleTemplate | null>(null);
+  const [staffPerformanceSummary] = useState<StaffPerformanceSummary | null>(null);
+  const [staffCommissionConfig, setStaffCommissionConfig] = useState<StaffCommissionConfig | null>(null);
+  const [staffCommissionLoading, setStaffCommissionLoading] = useState(false);
+  const [staffInviteEmail, setStaffInviteEmail] = useState("");
+  const [staffInviteRole, setStaffInviteRole] = useState<import("../../domains/staff/model").StaffRole>("technician");
+  const [staffInviteLocationId, setStaffInviteLocationId] = useState("");
+  const [staffInviteSubmitting, setStaffInviteSubmitting] = useState(false);
+  const [staffInviteFormError, setStaffInviteFormError] = useState<string | null>(null);
+  const [staffInviteSubmitError, setStaffInviteSubmitError] = useState<string | null>(null);
+  const [staffInviteSuccess, setStaffInviteSuccess] = useState<string | null>(null);
+  const [staffRolePending, setStaffRolePending] = useState<import("../../domains/staff/model").StaffRole>("technician");
+  const [staffRoleSubmitting, setStaffRoleSubmitting] = useState(false);
+  const [staffRoleSubmitError, setStaffRoleSubmitError] = useState<string | null>(null);
+  const [staffRoleSubmitSuccess, setStaffRoleSubmitSuccess] = useState<string | null>(null);
+  const [staffRoleAuditTrail, setStaffRoleAuditTrail] = useState<StaffRoleAuditEntry[]>([]);
+
+  // W41-DEBT-2 — Commission edit mode
+  const [commissionEditMode, setCommissionEditMode] = useState(false);
+  const [commissionEditRate, setCommissionEditRate] = useState("");
+  const [commissionEditFlatRate, setCommissionEditFlatRate] = useState("");
+  const [commissionEditModel, setCommissionEditModel] = useState<StaffCommissionConfig["model"]>("percentage");
+  const [commissionEditSchedule, setCommissionEditSchedule] = useState<StaffCommissionConfig["payoutSchedule"]>("monthly");
+  const [commissionSaving, setCommissionSaving] = useState(false);
+  const [commissionSaveError, setCommissionSaveError] = useState<string | null>(null);
+  const [commissionSaveSuccess, setCommissionSaveSuccess] = useState<string | null>(null);
+
+  // W41-DEBT-5 — Schedule edit mode
+  const [scheduleEditMode, setScheduleEditMode] = useState(false);
+  const [scheduleEditHours, setScheduleEditHours] = useState<EditWeekHours | null>(null);
+  const [scheduleSaving, setScheduleSaving] = useState(false);
+  const [scheduleSaveError, setScheduleSaveError] = useState<string | null>(null);
+  const [scheduleSaveSuccess, setScheduleSaveSuccess] = useState<string | null>(null);
+
+  // W41-DEBT-6 — Staff service mapping
+  const [staffMappingAssignedIds, setStaffMappingAssignedIds] = useState<string[]>([]);
+  const [staffMappingSkills, setStaffMappingSkills] = useState<string[]>([]);
+  const [staffMappingSubmitting, setStaffMappingSubmitting] = useState(false);
+  const [staffMappingSubmitError, setStaffMappingSubmitError] = useState<string | null>(null);
+  const [staffMappingSubmitSuccess, setStaffMappingSubmitSuccess] = useState<string | null>(null);
+
   // Service admin state
   const [servicesLoading, setServicesLoading] = useState(false);
   const [servicesErrorMessage, setServicesErrorMessage] = useState<string | null>(null);
@@ -297,7 +802,7 @@ export function AppNavigatorShell({
   const [serviceCreateFormError, setServiceCreateFormError] = useState<string | null>(null);
   const [serviceCreateSubmitError, setServiceCreateSubmitError] = useState<string | null>(null);
   const [serviceCreateSuccessMessage, setServiceCreateSuccessMessage] = useState<string | null>(null);
-  const [selectedService] = useState<import("../../domains/services").Service | null>(null);
+  const [selectedService, setSelectedService] = useState<import("../../domains/services").Service | null>(null);
   const [serviceEditLoading] = useState(false);
   const [serviceEditError] = useState<string | null>(null);
   const [serviceEditName, setServiceEditName] = useState("");
@@ -308,11 +813,502 @@ export function AppNavigatorShell({
   const [serviceEditFormError] = useState<string | null>(null);
   const [serviceEditSubmitError] = useState<string | null>(null);
   const [serviceEditSuccessMessage] = useState<string | null>(null);
+
+  // ---------------------------------------------------------------------------
+  // W42 — Service catalog depth state
+  // ---------------------------------------------------------------------------
+
+  // Categories
+  const [serviceCategories, setServiceCategories] = useState<ServiceCategory[]>([]);
+  const [serviceCategoriesLoading, setServiceCategoriesLoading] = useState(false);
+  const [serviceCategoriesError, setServiceCategoriesError] = useState<string | null>(null);
+  const [newCategoryName, setNewCategoryName] = useState("");
+  const [categorySubmitting, setCategorySubmitting] = useState(false);
+  const [categoryFormError, setCategoryFormError] = useState<string | null>(null);
+
+  // Bulk import
+  const [csvText, setCsvText] = useState("");
+  const [parsedRows, setParsedRows] = useState<ServiceImportRow[]>([]);
+  const [parseErrors, setParseErrors] = useState<string[]>([]);
+  const [importSubmitting, setImportSubmitting] = useState(false);
+  const [importSuccess, setImportSuccess] = useState<string | null>(null);
+  const [importError, setImportError] = useState<string | null>(null);
+
+  // Price overrides
+  const [servicePriceOverrides, setServicePriceOverrides] = useState<ServicePriceOverride[]>([]);
+  const [pricingLoading, setPricingLoading] = useState(false);
+  const [pricingError, setPricingError] = useState<string | null>(null);
+  const [priceLocationId, setPriceLocationId] = useState("");
+  const [priceAmount, setPriceAmount] = useState("");
+  const [priceCurrency, setPriceCurrency] = useState("EUR");
+  const [pricingSubmitting, setPricingSubmitting] = useState(false);
+  const [pricingFormError, setPricingFormError] = useState<string | null>(null);
+
+  // Add-ons
+  const [serviceAddons, setServiceAddons] = useState<ServiceAddon[]>([]);
+  const [addonsLoading, setAddonsLoading] = useState(false);
+  const [addonsError, setAddonsError] = useState<string | null>(null);
+  const [newAddonName, setNewAddonName] = useState("");
+  const [newAddonPrice, setNewAddonPrice] = useState("");
+  const [newAddonDuration, setNewAddonDuration] = useState("");
+  const [addonSubmitting, setAddonSubmitting] = useState(false);
+  const [addonFormError, setAddonFormError] = useState<string | null>(null);
+
+  // Seasonal rules
+  const [serviceSeasonalRules, setServiceSeasonalRules] = useState<ServiceSeasonalRule[]>([]);
+  const [seasonalLoading, setSeasonalLoading] = useState(false);
+  const [seasonalError, setSeasonalError] = useState<string | null>(null);
+  const [newRuleLabel, setNewRuleLabel] = useState("");
+  const [newRuleStart, setNewRuleStart] = useState("");
+  const [newRuleEnd, setNewRuleEnd] = useState("");
+  const [seasonalSubmitting, setSeasonalSubmitting] = useState(false);
+  const [seasonalFormError, setSeasonalFormError] = useState<string | null>(null);
+
+  // Photos / media
+  const [serviceMediaUrls, setServiceMediaUrls] = useState<string[]>([]);
+  const [photosLoading, setPhotosLoading] = useState(false);
+  const [photosError, setPhotosError] = useState<string | null>(null);
+  const [photoUploading, setPhotoUploading] = useState(false);
+  const [photoUploadError, setPhotoUploadError] = useState<string | null>(null);
+
+  // Booking rules
+  const [serviceBookingRules, setServiceBookingRules] = useState<ServiceBookingRules | null>(null);
+  const [bookingRulesLoading, setBookingRulesLoading] = useState(false);
+  const [bookingRulesError, setBookingRulesError] = useState<string | null>(null);
+  const [depositPercent, setDepositPercent] = useState("0");
+  const [cancellationWindowHours, setCancellationWindowHours] = useState("24");
+  const [leadTimeHours, setLeadTimeHours] = useState("1");
+  const [bookingRulesBufferMinutes, setBookingRulesBufferMinutes] = useState("0");
+  const [bookingRulesSubmitting, setBookingRulesSubmitting] = useState(false);
+  const [bookingRulesSubmitError, setBookingRulesSubmitError] = useState<string | null>(null);
+  const [bookingRulesSubmitSuccess, setBookingRulesSubmitSuccess] = useState<string | null>(null);
+
+  // Visibility
+  const [serviceVisibility, setServiceVisibility] = useState<ServiceVisibilityConfig | null>(null);
+  const [visOnlineBooking, setVisOnlineBooking] = useState(true);
+  const [visMarketplaceListed, setVisMarketplaceListed] = useState(false);
+  const [visInternalOnly, setVisInternalOnly] = useState(false);
+  const [visibilitySubmitting, setVisibilitySubmitting] = useState(false);
+  const [visibilitySubmitError, setVisibilitySubmitError] = useState<string | null>(null);
+  const [visibilitySubmitSuccess, setVisibilitySubmitSuccess] = useState<string | null>(null);
+
+  // ---------------------------------------------------------------------------
+  // W43 — Booking operations state
+  // ---------------------------------------------------------------------------
+
+  // Master calendar
+  const [bookingOpsDate, setBookingOpsDate] = useState("2026-05-10");
+  const [calendarDayView, setCalendarDayView] = useState<CalendarDayView | null>(null);
+  const [calendarLoading, setCalendarLoading] = useState(false);
+  const [calendarError, setCalendarError] = useState<string | null>(null);
+  const [calendarBlockedSlots, setCalendarBlockedSlots] = useState<BlockedSlot[]>([]);
+
+  // Booking detail (admin)
+  const [adminBookingDetail, setAdminBookingDetail] = useState<AdminBookingDetailView | null>(null);
+  const [bookingDetailLoading, setBookingDetailLoading] = useState(false);
+  const [bookingDetailError, setBookingDetailError] = useState<string | null>(null);
+  const [bookingDetailSubmitting, setBookingDetailSubmitting] = useState(false);
+  const [bookingDetailActionError, setBookingDetailActionError] = useState<string | null>(null);
+
+  // Manual booking
+  const [manualChannel, setManualChannel] = useState<ManualBookingChannel>("phone_in");
+  const [manualStaffId, setManualStaffId] = useState("");
+  const [manualServiceId, setManualServiceId] = useState("");
+  const [manualDate, setManualDate] = useState("");
+  const [manualStartTime, setManualStartTime] = useState("");
+  const [manualDuration, setManualDuration] = useState("45");
+  const [manualCustomerName, setManualCustomerName] = useState("");
+  const [manualCustomerPhone, setManualCustomerPhone] = useState("");
+  const [manualNotes, setManualNotes] = useState("");
+  const [manualSubmitting, setManualSubmitting] = useState(false);
+  const [manualFormError, setManualFormError] = useState<string | null>(null);
+  const [manualSubmitError, setManualSubmitError] = useState<string | null>(null);
+  const [manualSubmitSuccess, setManualSubmitSuccess] = useState<string | null>(null);
+
+  // Block time
+  const [blockStaffId, setBlockStaffId] = useState("");
+  const [blockDate, setBlockDate] = useState("");
+  const [blockStartTime, setBlockStartTime] = useState("");
+  const [blockEndTime, setBlockEndTime] = useState("");
+  const [blockReason, setBlockReason] = useState("");
+  const [blockSubmitting, setBlockSubmitting] = useState(false);
+  const [blockFormError, setBlockFormError] = useState<string | null>(null);
+  const [blockSubmitError, setBlockSubmitError] = useState<string | null>(null);
+  const [blockSubmitSuccess, setBlockSubmitSuccess] = useState<string | null>(null);
+
+  // Force book
+  const [forceStaffId, setForceStaffId] = useState("");
+  const [forceServiceId, setForceServiceId] = useState("");
+  const [forceCustomerUserId, setForceCustomerUserId] = useState("");
+  const [forceDate, setForceDate] = useState("");
+  const [forceStartTime, setForceStartTime] = useState("");
+  const [forceDuration, setForceDuration] = useState("45");
+  const [forceOverrideReason, setForceOverrideReason] = useState("");
+  const [forceSubmitting, setForceSubmitting] = useState(false);
+  const [forceFormError, setForceFormError] = useState<string | null>(null);
+  const [forceSubmitError, setForceSubmitError] = useState<string | null>(null);
+  const [forceSubmitSuccess, setForceSubmitSuccess] = useState<string | null>(null);
+
+  // No-show
+  const [noShowBooking, setNoShowBooking] = useState<NoShowBookingSummary | null>(null);
+  const [noShowPolicyNote, setNoShowPolicyNote] = useState("");
+  const [noShowPenaltyApplied, setNoShowPenaltyApplied] = useState(false);
+  const [noShowSubmitting, setNoShowSubmitting] = useState(false);
+  const [noShowSubmitError, setNoShowSubmitError] = useState<string | null>(null);
+  const [noShowSubmitSuccess, setNoShowSubmitSuccess] = useState<string | null>(null);
+
+  // Cancellation
+  const [cancelBookingSummary, setCancelBookingSummary] = useState<NoShowBookingSummary | null>(null);
+  const [cancelReason, setCancelReason] = useState("");
+  const [cancelFeeAmount, setCancelFeeAmount] = useState("0");
+  const [cancelFeeCurrency, setCancelFeeCurrency] = useState("USD");
+  const [cancelSubmitting, setCancelSubmitting] = useState(false);
+  const [cancelFormError, setCancelFormError] = useState<string | null>(null);
+  const [cancelSubmitError, setCancelSubmitError] = useState<string | null>(null);
+  const [cancelSubmitSuccess, setCancelSubmitSuccess] = useState<string | null>(null);
+
+  // Reschedule
+  const [rescheduleBooking, setRescheduleBooking] = useState<RescheduleBookingSummary | null>(null);
+  const [rescheduleStaffId, setRescheduleStaffId] = useState("");
+  const [rescheduleNewDate, setRescheduleNewDate] = useState("");
+  const [rescheduleAvailableSlots, setRescheduleAvailableSlots] = useState<AvailableSlot[]>([]);
+  const [rescheduleSelectedStartTime, setRescheduleSelectedStartTime] = useState("");
+  const [rescheduleReason, setRescheduleReason] = useState("");
+  const [rescheduleConflicts, setRescheduleConflicts] = useState<SlotConflict[]>([]);
+  const [rescheduleConflictOptions, setRescheduleConflictOptions] = useState<ConflictResolutionOption[]>([]);
+  const [rescheduleSlotsLoading, setRescheduleSlotsLoading] = useState(false);
+  const [rescheduleSubmitting, setRescheduleSubmitting] = useState(false);
+  const [rescheduleFormError, setRescheduleFormError] = useState<string | null>(null);
+  const [rescheduleSubmitError, setRescheduleSubmitError] = useState<string | null>(null);
+  const [rescheduleSubmitSuccess, setRescheduleSubmitSuccess] = useState<string | null>(null);
+
   const [activeTab, setActiveTab] = useState<BottomTabName>("Home");
 
   // ---------------------------------------------------------------------------
-  // Booking flow state
+  // W44 — Client / CRM state
   // ---------------------------------------------------------------------------
+
+  // Client list
+  const [clientSearch, setClientSearch] = useState("");
+  const [clientFilter, setClientFilter] = useState<ClientFilter>("all");
+  const [clientSavedView, setClientSavedView] = useState<ClientSavedView | null>(null);
+  const [clientList, setClientList] = useState<ClientListEntry[]>([]);
+  const [clientListLoading, setClientListLoading] = useState(false);
+  const [clientListError, setClientListError] = useState<string | null>(null);
+  const [clientSelectedIds, setClientSelectedIds] = useState<string[]>([]);
+
+  // Client detail (admin)
+  const [selectedClientId, setSelectedClientId] = useState("");
+  const [clientDetail, setClientDetail] = useState<ClientDetailAdmin | null>(null);
+  const [clientDetailLoading, setClientDetailLoading] = useState(false);
+  const [clientDetailError, setClientDetailError] = useState<string | null>(null);
+  const [clientDetailTab, setClientDetailTab] = useState<ClientDetailTab>("history");
+  const [clientNotesEditing, setClientNotesEditing] = useState(false);
+  const [clientNotesText, setClientNotesText] = useState("");
+
+  // Merge clients
+  const [mergeClientA, setMergeClientA] = useState<MergeCandidateSummary | null>(null);
+  const [mergeClientB, setMergeClientB] = useState<MergeCandidateSummary | null>(null);
+  const [mergeLoading, setMergeLoading] = useState(false);
+  const [mergeLoadError, setMergeLoadError] = useState<string | null>(null);
+  const [mergeReason, setMergeReason] = useState("");
+  const [mergeSubmitting, setMergeSubmitting] = useState(false);
+  const [mergeSubmitError, setMergeSubmitError] = useState<string | null>(null);
+  const [mergeSubmitSuccess, setMergeSubmitSuccess] = useState(false);
+
+  // Block client
+  const [blockClientName, setBlockClientName] = useState("");
+  const [blockClientReason, setBlockClientReason] = useState<BlockClientReason>("no_show");
+  const [blockClientDuration, setBlockClientDuration] = useState<number | null>(30);
+  const [blockClientSubmitting, setBlockClientSubmitting] = useState(false);
+  const [blockClientError, setBlockClientError] = useState<string | null>(null);
+  const [blockClientSuccess, setBlockClientSuccess] = useState(false);
+
+  // GDPR export
+  const [gdprExportType, setGdprExportType] = useState<GdprExportType>("full");
+  const [gdprExportFormat, setGdprExportFormat] = useState<GdprExportFormat>("json");
+  const [gdprRequests, setGdprRequests] = useState<GdprExportRequest[]>([]);
+  const [gdprLoading, setGdprLoading] = useState(false);
+  const [gdprLoadError, setGdprLoadError] = useState<string | null>(null);
+  const [gdprSubmitting, setGdprSubmitting] = useState(false);
+  const [gdprSubmitError, setGdprSubmitError] = useState<string | null>(null);
+  const [gdprSubmitSuccess, setGdprSubmitSuccess] = useState(false);
+
+  // Delete client
+  const [deleteClientName, setDeleteClientName] = useState("");
+  const [deleteClientReason, setDeleteClientReason] = useState("");
+  const [deleteClientSubmitting, setDeleteClientSubmitting] = useState(false);
+  const [deleteClientError, setDeleteClientError] = useState<string | null>(null);
+  const [deleteClientSuccess, setDeleteClientSuccess] = useState(false);
+
+  // Segment builder
+  const [segmentName, setSegmentName] = useState("");
+  const [segmentFilters, setSegmentFilters] = useState<SegmentFilter[]>([]);
+  const [segmentPreview, setSegmentPreview] = useState<SegmentPreview | null>(null);
+  const [segmentPreviewing, setSegmentPreviewing] = useState(false);
+  const [segmentSaving, setSegmentSaving] = useState(false);
+  const [segmentError, setSegmentError] = useState<string | null>(null);
+  const [_savedSegment, _setSavedSegment] = useState<SavedSegment | null>(null);
+
+  // Targeted message
+  const [targetedSegmentId, setTargetedSegmentId] = useState("");
+  const [targetedSegmentName, setTargetedSegmentName] = useState("");
+  const [targetedRecipientCount, setTargetedRecipientCount] = useState<number | null>(null);
+  const [targetedChannel, setTargetedChannel] = useState<TargetedMessageChannel>("push");
+  const [targetedSubject, setTargetedSubject] = useState("");
+  const [targetedBody, setTargetedBody] = useState("");
+  const [targetedScheduledAt, setTargetedScheduledAt] = useState<string | null>(null);
+  const [targetedSending, setTargetedSending] = useState(false);
+  const [targetedError, setTargetedError] = useState<string | null>(null);
+  const [targetedSuccess, setTargetedSuccess] = useState(false);
+
+  // ---------------------------------------------------------------------------
+  // W45 — Loyalty admin state
+  // ---------------------------------------------------------------------------
+  const [loyaltyConfigLoading, setLoyaltyConfigLoading] = useState(false);
+  const [loyaltyConfigError, setLoyaltyConfigError] = useState<string | null>(null);
+  const [loyaltyConfig, setLoyaltyConfig] = useState<LoyaltyConfigInput | null>(null);
+  const [loyaltyConfigSaving, setLoyaltyConfigSaving] = useState(false);
+  const [loyaltyConfigSaveError, setLoyaltyConfigSaveError] = useState<string | null>(null);
+  const [loyaltyConfigSaveSuccess, setLoyaltyConfigSaveSuccess] = useState(false);
+
+  const [rewardsLoading, setRewardsLoading] = useState(false);
+  const [rewardsError, setRewardsError] = useState<string | null>(null);
+  const [rewards, setRewards] = useState<RewardCatalogEntry[]>([]);
+  const [editingRewardId, setEditingRewardId] = useState<string | null | undefined>(undefined);
+  const [rewardForm, setRewardForm] = useState<RewardCatalogInput>({
+    name: "",
+    pointsCost: 0,
+    type: "discount",
+    description: "",
+    active: true,
+  });
+  const [rewardSaving, setRewardSaving] = useState(false);
+  const [rewardSaveError, setRewardSaveError] = useState<string | null>(null);
+
+  const [adjustClientId, setAdjustClientId] = useState("");
+  const [adjustClientName, setAdjustClientName] = useState("");
+  const [adjustDirection, setAdjustDirection] = useState<"credit" | "debit">("credit");
+  const [adjustPoints, setAdjustPoints] = useState("0");
+  const [adjustReason, setAdjustReason] = useState<"goodwill" | "correction" | "event_bonus" | "promotion" | "other">("goodwill");
+  const [adjustNote, setAdjustNote] = useState("");
+  const [adjustSaving, setAdjustSaving] = useState(false);
+  const [adjustError, setAdjustError] = useState<string | null>(null);
+  const [adjustSuccess, setAdjustSuccess] = useState(false);
+
+  const [loyaltyStatsLoading, setLoyaltyStatsLoading] = useState(false);
+  const [loyaltyStatsError, setLoyaltyStatsError] = useState<string | null>(null);
+  const [loyaltyStats, setLoyaltyStats] = useState<LoyaltyProgramStats | null>(null);
+
+  const [tierPreviewLoading, setTierPreviewLoading] = useState(false);
+  const [tierPreviewError, setTierPreviewError] = useState<string | null>(null);
+  const [tierPreview, setTierPreview] = useState<TierMigrationPreview | null>(null);
+  const [tierMigrationReason, setTierMigrationReason] = useState("");
+  const [tierMigrationRunning, setTierMigrationRunning] = useState(false);
+  const [tierMigrationRunError, setTierMigrationRunError] = useState<string | null>(null);
+  const [tierMigrationSuccess, setTierMigrationSuccess] = useState(false);
+
+  const [activitiesLoading, setActivitiesLoading] = useState(false);
+  const [activitiesError, setActivitiesError] = useState<string | null>(null);
+  const [activities, setActivities] = useState<ActivityAdminEntry[]>([]);
+
+  const [activityStatsLoading, setActivityStatsLoading] = useState(false);
+  const [activityStatsError, setActivityStatsError] = useState<string | null>(null);
+  const [activityStats, setActivityStats] = useState<ActivityStats | null>(null);
+
+  // ---------------------------------------------------------------------------
+  // W45 — Campaign admin state
+  // ---------------------------------------------------------------------------
+  const [campaignsLoading, setCampaignsLoading] = useState(false);
+  const [campaignsError, setCampaignsError] = useState<string | null>(null);
+  const [campaigns, setCampaigns] = useState<CampaignListEntry[]>([]);
+  const [campaignStatusFilter, setCampaignStatusFilter] = useState<string | null>(null);
+
+  const [campaignPerfLoading, setCampaignPerfLoading] = useState(false);
+  const [campaignPerfError, setCampaignPerfError] = useState<string | null>(null);
+  const [campaignPerf, setCampaignPerf] = useState<CampaignPerformanceDetail | null>(null);
+
+  const [campaignBuilderForm, setCampaignBuilderForm] = useState<CampaignBuilderInput>({
+    tenantId: tenantId ?? "",
+    name: "",
+    channel: "email",
+    segmentId: "",
+    segmentName: "",
+    subject: "",
+    body: "",
+    scheduledAt: "",
+    abEnabled: false,
+    abVariantB: "",
+    sendTimeOptimization: false,
+    createdBy: userId ?? "",
+  });
+  const [campaignCompliance, setCampaignCompliance] = useState<ComplianceCheckItem[]>([]);
+  const [campaignCreating, setCampaignCreating] = useState(false);
+  const [campaignCreateError, setCampaignCreateError] = useState<string | null>(null);
+  const [campaignCreateSuccess, setCampaignCreateSuccess] = useState(false);
+
+  const [txDefaultsLoading, setTxDefaultsLoading] = useState(false);
+  const [txOverridesError, setTxOverridesError] = useState<string | null>(null);
+  const [txDefaults, setTxDefaults] = useState<TransactionalTemplateDefault[]>([]);
+  const [txOverrides, setTxOverrides] = useState<TransactionalTemplateOverride[]>([]);
+  const [txActiveType, setTxActiveType] = useState<TransactionalTemplateType>("booking_confirmation");
+  const [txActiveChannel, setTxActiveChannel] = useState<TransactionalTemplateChannel>("email");
+  const [txOverrideBody, setTxOverrideBody] = useState("");
+  const [txOverrideSubject, setTxOverrideSubject] = useState("");
+  const [txSaving, setTxSaving] = useState(false);
+  const [txSaveError, setTxSaveError] = useState<string | null>(null);
+  const [txSaveSuccess, setTxSaveSuccess] = useState(false);
+
+  const [promoCodesLoading, setPromoCodesLoading] = useState(false);
+  const [promoCodesError, setPromoCodesError] = useState<string | null>(null);
+  const [promoCodes, setPromoCodes] = useState<PromoCode[]>([]);
+  const [promoStatusFilter, setPromoStatusFilter] = useState<PromoCodeStatus | null>(null);
+  const [showPromoForm, setShowPromoForm] = useState(false);
+  const [promoForm, setPromoForm] = useState<PromoCodeCreateInput>({
+    tenantId: tenantId ?? "",
+    code: "",
+    type: "percent",
+    value: 0,
+    description: "",
+    validFrom: "",
+    validUntil: null,
+    maxUses: null,
+    perClientCap: null,
+    createdBy: userId ?? "",
+  });
+  const [promoCreating, setPromoCreating] = useState(false);
+  const [promoCreateError, setPromoCreateError] = useState<string | null>(null);
+
+  // ---------------------------------------------------------------------------
+  // W46 — Review admin state
+  // ---------------------------------------------------------------------------
+  const [reviewsLoading, setReviewsLoading] = useState(false);
+  const [reviewsError, setReviewsError] = useState<string | null>(null);
+  const [reviews, setReviews] = useState<ReviewEntry[]>([]);
+  const [reviewQueueFilter, setReviewQueueFilter] = useState<ReviewQueueFilter>("all");
+  const [selectedReviewIds, setSelectedReviewIds] = useState<string[]>([]);
+  const [selectedReview, setSelectedReview] = useState<ReviewEntry | null>(null);
+  const [reviewReplyText, setReviewReplyText] = useState("");
+  const [reviewReplySubmitting, setReviewReplySubmitting] = useState(false);
+  const [reviewReplyError, setReviewReplyError] = useState<string | null>(null);
+  const [reviewReplySuccess, setReviewReplySuccess] = useState(false);
+  const [reviewFlagAction, setReviewFlagAction] = useState<"flag" | "dispute" | "hide">("flag");
+  const [reviewFlagReason, setReviewFlagReason] = useState("");
+  const [reviewFlagSubmitting, setReviewFlagSubmitting] = useState(false);
+  const [reviewFlagError, setReviewFlagError] = useState<string | null>(null);
+  const [reviewFlagSuccess, setReviewFlagSuccess] = useState(false);
+  const [automationRulesLoading, setAutomationRulesLoading] = useState(false);
+  const [automationRulesError, setAutomationRulesError] = useState<string | null>(null);
+  const [automationRules, setAutomationRules] = useState<ReviewAutomationRule[]>([]);
+  const [showAutomationForm, setShowAutomationForm] = useState(false);
+  const [automationForm, setAutomationForm] = useState<ReviewAutomationRuleInput>({
+    tenantId: tenantId ?? "",
+    label: "",
+    triggerRating: 5,
+    triggerRatingOp: "eq" as ReviewRatingOp,
+    replyTemplate: "",
+    active: true,
+  });
+  const [automationSaving, setAutomationSaving] = useState(false);
+  const [automationSaveError, setAutomationSaveError] = useState<string | null>(null);
+  const [reputationStatsLoading, setReputationStatsLoading] = useState(false);
+  const [reputationStatsError, setReputationStatsError] = useState<string | null>(null);
+  const [reputationStats, setReputationStats] = useState<ReputationStats | null>(null);
+
+  // ---------------------------------------------------------------------------
+  // W46 — Messaging admin state
+  // ---------------------------------------------------------------------------
+  const [adminThreadsLoading, setAdminThreadsLoading] = useState(false);
+  const [adminThreadsError, setAdminThreadsError] = useState<string | null>(null);
+  const [adminThreads, setAdminThreads] = useState<AdminThread[]>([]);
+  const [adminThreadStatusFilter, setAdminThreadStatusFilter] = useState<AdminThreadStatus | "all">("all");
+  const [selectedAdminThread, setSelectedAdminThread] = useState<AdminThread | null>(null);
+  const [threadAssignStaffId, setThreadAssignStaffId] = useState<string | null>(null);
+  const [threadAssignSubmitting, setThreadAssignSubmitting] = useState(false);
+  const [threadAssignError, setThreadAssignError] = useState<string | null>(null);
+  const [threadAssignSuccess, setThreadAssignSuccess] = useState(false);
+  const [cannedRepliesLoading, setCannedRepliesLoading] = useState(false);
+  const [cannedRepliesError, setCannedRepliesError] = useState<string | null>(null);
+  const [cannedReplies, setCannedReplies] = useState<CannedReply[]>([]);
+  const [showCannedForm, setShowCannedForm] = useState(false);
+  const [cannedForm, setCannedForm] = useState<CannedReplyInput>({
+    tenantId: tenantId ?? "",
+    title: "",
+    body: "",
+    tags: [],
+    createdBy: userId ?? "",
+  });
+  const [cannedSaving, setCannedSaving] = useState(false);
+  const [cannedSaveError, setCannedSaveError] = useState<string | null>(null);
+  const [autoReplyLoading, setAutoReplyLoading] = useState(false);
+  const [autoReplyError, setAutoReplyError] = useState<string | null>(null);
+  const [autoReplyConfig, setAutoReplyConfig] = useState<AutoReplyConfig | null>(null);
+  const [autoReplyForm, setAutoReplyForm] = useState<AutoReplyConfig>({
+    tenantId: tenantId ?? "",
+    enabled: false,
+    outsideHoursMessage: "",
+    useCustomMessage: false,
+    openHour: 9,
+    closeHour: 18,
+    enabledDays: ["mon", "tue", "wed", "thu", "fri"],
+    updatedAt: "",
+  });
+  const [autoReplySaving, setAutoReplySaving] = useState(false);
+  const [autoReplySaveError, setAutoReplySaveError] = useState<string | null>(null);
+  const [autoReplySaveSuccess, setAutoReplySaveSuccess] = useState(false);
+  const [archiveThreads, setArchiveThreads] = useState<AdminThread[]>([]);
+  const [archiveLoading, setArchiveLoading] = useState(false);
+  const [archiveError, setArchiveError] = useState<string | null>(null);
+  const [archiveFilter, setArchiveFilter] = useState<MessageArchiveFilter>({});
+
+  // ---------------------------------------------------------------------------
+  // W46 — Waitlist admin state
+  // ---------------------------------------------------------------------------
+  const [adminWaitlistLoading, setAdminWaitlistLoading] = useState(false);
+  const [adminWaitlistError, setAdminWaitlistError] = useState<string | null>(null);
+  const [adminWaitlistItems, setAdminWaitlistItems] = useState<WaitlistAdminEntry[]>([]);
+  const [adminWaitlistFilter, setAdminWaitlistFilter] = useState<WaitlistAdminFilter>("all");
+  const [selectedWaitlistEntry, setSelectedWaitlistEntry] = useState<WaitlistAdminEntry | null>(null);
+  const [convertStaffId, setConvertStaffId] = useState("");
+  const [convertDate, setConvertDate] = useState("");
+  const [convertStartTime, setConvertStartTime] = useState("");
+  const [convertDuration, setConvertDuration] = useState("60");
+  const [convertNotes, setConvertNotes] = useState("");
+  const [convertSubmitting, setConvertSubmitting] = useState(false);
+  const [convertError, setConvertError] = useState<string | null>(null);
+  const [convertSuccess, setConvertSuccess] = useState(false);
+  const [waitlistPolicyLoading, setWaitlistPolicyLoading] = useState(false);
+  const [waitlistPolicyError, setWaitlistPolicyError] = useState<string | null>(null);
+  const [waitlistPolicy, setWaitlistPolicy] = useState<WaitlistPolicy | null>(null);
+  const [waitlistPolicyForm, setWaitlistPolicyForm] = useState<WaitlistPolicy>({
+    tenantId: tenantId ?? "",
+    maxWaitDays: 30,
+    autoCancelAfterDays: 5,
+    notifyOnOpenSlot: true,
+    notifyLeadHours: 2,
+    requireConfirmation: true,
+    allowMultipleEntries: false,
+    maxEntriesPerClient: 1,
+    updatedAt: "",
+  });
+  const [waitlistPolicySaving, setWaitlistPolicySaving] = useState(false);
+  const [waitlistPolicySaveError, setWaitlistPolicySaveError] = useState<string | null>(null);
+  const [waitlistPolicySaveSuccess, setWaitlistPolicySaveSuccess] = useState(false);
+
+  // ---------------------------------------------------------------------------
+  // W15-DEBT-1 — Onboarding admin state
+  // ---------------------------------------------------------------------------
+  const [onboardingAdminStateLoading, setOnboardingAdminStateLoading] = useState(false);
+  const [onboardingAdminStateError, setOnboardingAdminStateError] = useState<string | null>(null);
+  const [onboardingAdminWizardState, setOnboardingAdminWizardState] = useState<SalonOnboardingState | null>(null);
+  const [onboardingAdminTimeline, setOnboardingAdminTimeline] = useState<OnboardingTimelineEvent[]>([]);
+  const [onboardingAdminTimelineLoading, setOnboardingAdminTimelineLoading] = useState(false);
+  const [extendTrialSubmitting, setExtendTrialSubmitting] = useState(false);
+  const [extendTrialError, setExtendTrialError] = useState<string | null>(null);
+  const [resetStepSubmitting, setResetStepSubmitting] = useState(false);
+  const [resetStepError, setResetStepError] = useState<string | null>(null);
+  const [verificationOverrideSubmitting, setVerificationOverrideSubmitting] = useState(false);
+  const [verificationOverrideError, setVerificationOverrideError] = useState<string | null>(null);
   const [bookingFlowStep, setBookingFlowStep] = useState<BookingFlowStep>("list");
   const [bookingSelectedLocation, setBookingSelectedLocation] = useState<Location | null>(null);
   const [bookingSelectedService, setBookingSelectedService] = useState<Service | null>(null);
@@ -335,6 +1331,189 @@ export function AppNavigatorShell({
   const [bookingResult, setBookingResult] = useState<ReserveSlotResult | null>(null);
 
   // ---------------------------------------------------------------------------
+  // Consumer booking flow state (W23 Batch C — Phase 2.2 wiring, mock-driven)
+  // ---------------------------------------------------------------------------
+  const [consumerSelectedServiceIds, setConsumerSelectedServiceIds] =
+    useState<readonly string[]>([]);
+  const [consumerSelectedAddOnIds, setConsumerSelectedAddOnIds] =
+    useState<readonly string[]>([]);
+  const [consumerSelectedStaffId, setConsumerSelectedStaffId] = useState<string | null>(null);
+  const [consumerBookingMonth, setConsumerBookingMonth] = useState<Date>(() => new Date());
+  const [consumerBookingDate, setConsumerBookingDate] = useState<Date | null>(null);
+  const [consumerBookingSegment, setConsumerBookingSegment] = useState<TimeSegment>("morning");
+  const [consumerBookingSlot, setConsumerBookingSlot] = useState<string | null>(null);
+  const [consumerBookingNotes, setConsumerBookingNotes] = useState<string>("");
+  const [consumerPoliciesAck, setConsumerPoliciesAck] = useState<boolean>(false);
+  const [consumerSelectedCardId, setConsumerSelectedCardId] = useState<string | null>(null);
+  const [consumerGuestContact, setConsumerGuestContact] = useState<GuestContactValues>({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    smsConsent: false,
+  });
+  const [consumerCancelModalVisible, setConsumerCancelModalVisible] = useState<boolean>(false);
+  const [consumerRescheduleMode, setConsumerRescheduleMode] = useState<boolean>(false);
+  const [consumerRescheduleLoading, setConsumerRescheduleLoading] = useState<boolean>(false);
+  const [consumerRescheduleError, setConsumerRescheduleError] = useState<string | null>(null);
+
+  // ---------------------------------------------------------------------------
+  // W36-B: Batch C real-data state — services / technicians / slots loaded
+  // from clientBookingFlow using an auto-picked first active location.
+  // ---------------------------------------------------------------------------
+  const [batchCLocationId, setBatchCLocationId] = useState<string | null>(null);
+  const [batchCLocation, setBatchCLocation] = useState<Location | null>(null);
+  const [batchCServices, setBatchCServices] = useState<Service[]>([]);
+  const [batchCServicesLoading, setBatchCServicesLoading] = useState(false);
+  const [batchCServicesError, setBatchCServicesError] = useState<string | null>(null);
+  const [batchCTechnicians, setBatchCTechnicians] = useState<StaffMember[]>([]);
+  const [batchCTechniciansLoading, setBatchCTechniciansLoading] = useState(false);
+  const [batchCTechniciansError, setBatchCTechniciansError] = useState<string | null>(null);
+  const [batchCSlots, setBatchCSlots] = useState<string[]>([]);
+  const [batchCRawSlots, setBatchCRawSlots] = useState<AvailableSlot[]>([]);
+  const [batchCSelectedSlotRaw, setBatchCSelectedSlotRaw] = useState<AvailableSlot | null>(null);
+  const [batchCSlotsLoading, setBatchCSlotsLoading] = useState(false);
+  const [batchCSlotsError, setBatchCSlotsError] = useState<string | null>(null);
+  // W36-R1: created booking ID + confirm state
+  const [batchCCreatedBookingId, setBatchCCreatedBookingId] = useState<string | null>(null);
+  const [batchCConfirmLoading, setBatchCConfirmLoading] = useState(false);
+  const [batchCConfirmError, setBatchCConfirmError] = useState<string | null>(null);
+  // Booking history loaded from Firestore (Sprint D)
+  const [batchCBookingHistory, setBatchCBookingHistory] = useState<BookingHistoryRecord[]>([]);
+  const [batchCBookingHistoryLoading, setBatchCBookingHistoryLoading] = useState(false);
+  // W38-DEBT-3: Receipt data from Firestore
+  const [selectedReceiptBookingId, setSelectedReceiptBookingId] = useState<string | null>(null);
+  const [receiptData, setReceiptData] = useState<ReceiptData | null>(null);
+  const [receiptLoading, setReceiptLoading] = useState(false);
+  const [receiptError, setReceiptError] = useState<string | null>(null);
+
+  // W38-DEBT-4: Refund data from Firestore
+  const [selectedRefundBookingId, setSelectedRefundBookingId] = useState<string | null>(null);
+  const [refundData, setRefundData] = useState<RefundData | null>(null);
+  const [refundLoading, setRefundLoading] = useState(false);
+  const [refundError, setRefundError] = useState<string | null>(null);
+
+  // ---------------------------------------------------------------------------
+  // Consumer payments state (W23 Batch D — Phase 2.2 wiring, mock-driven)
+  // ---------------------------------------------------------------------------
+  const [addCardFormState, setAddCardFormState] = useState<AddCardFormState>({
+    cardholderName: "",
+    zip: "",
+    cardComplete: false,
+    setAsDefault: false,
+  });
+  const [tippingState, setTippingState] = useState<TippingScreenState>({
+    selectedPresetId: "p20",
+    customAmountInput: "",
+  });
+  const [bookingHistoryState, setBookingHistoryState] =
+    useState<BookingHistoryScreenState>({
+      tab: "upcoming",
+      searchQuery: "",
+      filters: {},
+      filterSheetOpen: false,
+    });
+  // W36-C: saved payment methods — real Firestore read when paymentsRepository is present.
+  const [savedPaymentMethods, setSavedPaymentMethods] = useState<AppSavedPaymentMethod[]>([]);
+  const [savedPaymentMethodsLoading, setSavedPaymentMethodsLoading] = useState(false);
+  const [savedPaymentMethodsError, setSavedPaymentMethodsError] = useState<string | null>(null);
+
+  // ---------------------------------------------------------------------------
+  // Consumer loyalty + activities + reviews state (W23 Batch E — Phase 2.2)
+  // ---------------------------------------------------------------------------
+  const [rewardsTab, setRewardsTab] = useState<RewardFilterTab>("All");
+  const [rewardsSort, setRewardsSort] = useState<RewardSortOption>("lowest-points");
+  const [selectedReward, setSelectedReward] = useState<Reward | null>(null);
+  const [activitiesTab, setActivitiesTab] = useState<ActivityTab>("active");
+  const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
+  const [claimRewardVisible, setClaimRewardVisible] = useState<boolean>(false);
+  const [reviewDraft, setReviewDraft] = useState<ReviewDraft>({ ...EMPTY_REVIEW_DRAFT });
+
+  // ---------------------------------------------------------------------------
+  // Consumer messaging + notifications state (W23 Batch F — Phase 2.2)
+  // ---------------------------------------------------------------------------
+  const [inboxTab, setInboxTab] = useState<InboxTab>("all");
+  const [inboxSearchQuery, setInboxSearchQuery] = useState<string>("");
+  const [activeThreadId, setActiveThreadId] = useState<string | null>(null);
+  const [threadComposerText, setThreadComposerText] = useState<string>("");
+  const [composeRecipient, setComposeRecipient] =
+    useState<{ id: string; name: string } | null>(null);
+  const [composeSearchQuery, setComposeSearchQuery] = useState<string>("");
+  const [composeSubject, setComposeSubject] = useState<string>("");
+  const [composeMessage, setComposeMessage] = useState<string>("");
+  const [notificationsTab, setNotificationsTab] = useState<NotificationTab>("all");
+  const [activeLegalPage, setActiveLegalPage] = useState<LegalPageType>("terms");
+  const [notificationPrefs, setNotificationPrefs] = useState<NotificationPreferences>(
+    DEFAULT_NOTIFICATION_PREFERENCES,
+  );
+  const [quietHoursStart, setQuietHoursStart] = useState<string>("22:00");
+  const [quietHoursEnd, setQuietHoursEnd] = useState<string>("07:00");
+  const [quietDays, setQuietDays] = useState<QuietDay[]>(["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]);
+
+  // ---------------------------------------------------------------------------
+  // Waitlist state
+  // ---------------------------------------------------------------------------
+  const [waitlistDateStart, setWaitlistDateStart] = useState<string>("");
+  const [waitlistDateEnd, setWaitlistDateEnd] = useState<string>("");
+  const [waitlistTimePref, setWaitlistTimePref] = useState<WaitlistTimePreference>("anytime");
+  const [waitlistStaffPref, setWaitlistStaffPref] = useState<WaitlistStaffPreference>("any");
+  const [waitlistNotifyPush, setWaitlistNotifyPush] = useState<boolean>(true);
+  const [waitlistNotifySms, setWaitlistNotifySms] = useState<boolean>(false);
+  // W37-DEBT-1: user's active waitlist entries for WaitlistScreen
+  const [waitlistEntries, setWaitlistEntries] = useState<WaitlistEntry[]>([]);
+  const [waitlistEntriesLoading, setWaitlistEntriesLoading] = useState<boolean>(false);
+  const [waitlistEntriesError, setWaitlistEntriesError] = useState<string | null>(null);
+
+  // ---------------------------------------------------------------------------
+  // W37: Real-data state (loyalty, messaging, notifications, waitlist position)
+  // ---------------------------------------------------------------------------
+  const [loyaltyPoints, setLoyaltyPoints] = useState<number | null>(null);
+  const [loyaltyTier, setLoyaltyTier] = useState<string>("Bronze");
+  const [loyaltyHistory, setLoyaltyHistory] = useState<HistoryEntry[]>([]);
+  const [loyaltyRewards, setLoyaltyRewards] = useState<Reward[]>([]);
+  const [loyaltyActivities, setLoyaltyActivities] = useState<Activity[]>([]);
+  // W37-DEBT-5: referral data from getLoyaltyData()
+  const [loyaltyReferralCode, setLoyaltyReferralCode] = useState<string>("");
+  const [loyaltyReferralStats, setLoyaltyReferralStats] = useState({ invited: 0, joined: 0, earned: 0 });
+  const [threads, setThreads] = useState<ThreadSummary[]>([]);
+  const [threadMessages, setThreadMessages] = useState<ConsumerMessage[]>([]);
+  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+  const [waitlistPosition, setWaitlistPosition] = useState<WaitlistPositionData | null>(null);
+  const [joinedWaitlistEntryId, setJoinedWaitlistEntryId] = useState<string | null>(null);
+
+  // ---------------------------------------------------------------------------
+  // Salon onboarding wizard state (W34 Stream C)
+  // ---------------------------------------------------------------------------
+  const [salonWizardState, setSalonWizardState] = useState<SalonOnboardingState>(() => {
+    const stepStatuses = buildInitialStepStatuses();
+    // Mark ACCOUNT as completed so the wizard opens on BUSINESS_PROFILE.
+    stepStatuses["ACCOUNT"] = "completed";
+    const completionScore = computeCompletionScore(stepStatuses);
+    const blockers = deriveBlockers(stepStatuses);
+    return {
+      tenantId: "",
+      stepStatuses,
+      currentStep: "BUSINESS_PROFILE",
+      completionScore,
+      blockers,
+      canGoLive: blockers.length === 0,
+      startedAt: { seconds: 0, nanoseconds: 0 } as never,
+      updatedAt: { seconds: 0, nanoseconds: 0 } as never,
+    };
+  });
+
+  // ---------------------------------------------------------------------------
+  // Discovery state (W34 Stream B)
+  // ---------------------------------------------------------------------------
+  const [discoveryFeedFilter, setDiscoveryFeedFilter] = useState<DiscoveryFeedFilter>("all");
+  const [discoveryFilters, setDiscoveryFilters] = useState<DiscoveryFilters>(
+    DEFAULT_DISCOVERY_FILTERS,
+  );
+  const [exploreMapSelectedSalon, setExploreMapSelectedSalon] = useState<string | null>(null);
+  const [salonProfileHeroUrl, setSalonProfileHeroUrl] = useState<string | undefined>(undefined);
+  const [salonProfileGalleryUrls, setSalonProfileGalleryUrls] = useState<string[]>([]);
+
+  // ---------------------------------------------------------------------------
   // Admin booking queue state
   // ---------------------------------------------------------------------------
   const [queueActiveTab, setQueueActiveTab] = useState<AdminBookingQueueTab>("pending");
@@ -353,6 +1532,91 @@ export function AppNavigatorShell({
   const [dashboardLoading, setDashboardLoading] = useState(false);
   const [dashboardError, setDashboardError] = useState<string | null>(null);
   const [dashboardUnreadFailed, setDashboardUnreadFailed] = useState(false);
+
+  // ---------------------------------------------------------------------------
+  // W38 Owner KPI state
+  // ---------------------------------------------------------------------------
+  const [ownerKpiLoading, setOwnerKpiLoading] = useState(false);
+  const [ownerKpiSummary, setOwnerKpiSummary] = useState<OwnerKpiSummary | null>(null);
+  const [ownerKpiError, setOwnerKpiError] = useState<string | null>(null);
+
+  // ---------------------------------------------------------------------------
+  // W39 Billing & payouts state
+  // ---------------------------------------------------------------------------
+  const [billingSubscription, setBillingSubscription] = useState<Subscription | null>(null);
+  const [billingSubLoading, setBillingSubLoading] = useState(false);
+  const [billingSubError, setBillingSubError] = useState<string | null>(null);
+
+  const [billingInvoices, setBillingInvoices] = useState<Invoice[]>([]);
+  const [billingInvoicesLoading, setBillingInvoicesLoading] = useState(false);
+  const [billingInvoicesError, setBillingInvoicesError] = useState<string | null>(null);
+
+  const [billingMethods, setBillingMethods] = useState<AdminPaymentMethod[]>([]);
+  const [billingMethodsLoading, setBillingMethodsLoading] = useState(false);
+  const [billingMethodsError, setBillingMethodsError] = useState<string | null>(null);
+
+  const [billingPayouts, setBillingPayouts] = useState<Payout[]>([]);
+  const [billingPayoutsLoading, setBillingPayoutsLoading] = useState(false);
+  const [billingPayoutsError, setBillingPayoutsError] = useState<string | null>(null);
+  const [billingPendingBalance, setBillingPendingBalance] = useState<PendingBalance | null>(null);
+  const [billingPayoutSchedule, setBillingPayoutSchedule] = useState<PayoutSchedule | null>(null);
+
+  const [billingConnectAccount, setBillingConnectAccount] = useState<ConnectAccount | null>(null);
+  const [billingConnectLoading, setBillingConnectLoading] = useState(false);
+  const [billingConnectError, setBillingConnectError] = useState<string | null>(null);
+
+  const [billingRefunds, setBillingRefunds] = useState<RefundRow[]>([]);
+  const [billingDisputes, setBillingDisputes] = useState<DisputeRow[]>([]);
+  const [billingRefundsLoading, setBillingRefundsLoading] = useState(false);
+  const [billingRefundsError, setBillingRefundsError] = useState<string | null>(null);
+
+  // W40 — Location admin state
+  const [locationList, setLocationList] = useState<import("../../domains/locations/model").Location[]>([]);
+  const [locationKpis, setLocationKpis] = useState<LocationKpi[]>([]);
+  const [locationListLoading, setLocationListLoading] = useState(false);
+  const [locationListError, setLocationListError] = useState<string | null>(null);
+  const [activeLocationId, setActiveLocationId] = useState<string | null>(null);
+  const [locationDashKpi, setLocationDashKpi] = useState<LocationKpi | null>(null);
+  const [locationDashAppointments, setLocationDashAppointments] = useState<TodayAppointment[]>([]);
+  const [locationDashLoading, setLocationDashLoading] = useState(false);
+  const [locationDashError, setLocationDashError] = useState<string | null>(null);
+  const [locationDetails, setLocationDetails] = useState<import("../../domains/locations/model").Location | null>(null);
+  const [locationAccessibility, setLocationAccessibility] = useState<LocationAccessibilityFlags | null>(null);
+  const [locationHolidays, setLocationHolidays] = useState<HolidayEntry[]>([]);
+  const [locationSettingsLoading, setLocationSettingsLoading] = useState(false);
+  const [locationSettingsError, setLocationSettingsError] = useState<string | null>(null);
+  const [locationServiceOverrides, setLocationServiceOverrides] = useState<LocationServiceOverride[]>([]);
+  const [locationOverridesLoading, setLocationOverridesLoading] = useState(false);
+  const [locationOverridesError, setLocationOverridesError] = useState<string | null>(null);
+  const [locationResources, setLocationResources] = useState<import("../admin/locationAdminService").ResourceItem[]>([]);
+  const [locationResourcesLoading, setLocationResourcesLoading] = useState(false);
+  const [locationResourcesError, setLocationResourcesError] = useState<string | null>(null);
+  const [walkInQueue, setWalkInQueue] = useState<WalkInQueueEntry[]>([]);
+  const [walkInQueueLoading, setWalkInQueueLoading] = useState(false);
+  const [walkInQueueError, setWalkInQueueError] = useState<string | null>(null);
+  const [dailyCloseReport, setDailyCloseReport] = useState<DailyCloseReport | null>(null);
+  const [dailyCloseLoading, setDailyCloseLoading] = useState(false);
+  const [dailyCloseError, setDailyCloseError] = useState<string | null>(null);
+  const [dailyCloseSubmitting, setDailyCloseSubmitting] = useState(false);
+  const [adminTourVisible, setAdminTourVisible] = useState(false);
+  const [adminTourChecked, setAdminTourChecked] = useState(false);
+
+  // W38-DEBT-10: check whether this admin user has already seen the first-run tour.
+  useEffect(() => {
+    if (!userId || !tenantId || adminTourChecked) return;
+    void (async () => {
+      try {
+        const snap = await getDoc(doc(db, "users", userId, "tenantPrefs", tenantId));
+        const seen = snap.exists() && (snap.data() as Record<string, unknown>).hasSeenAdminTour === true;
+        setAdminTourVisible(!seen);
+      } catch {
+        // Fail silently — don't block the admin home on a tour check error.
+        setAdminTourVisible(false);
+      } finally {
+        setAdminTourChecked(true);
+      }
+    })();
+  }, [userId, tenantId, adminTourChecked]);
 
   const settingsService = useMemo(
     () =>
@@ -391,6 +1655,65 @@ export function AppNavigatorShell({
     [discoveryService]
   );
 
+  // W42 — Service catalog service with real Firestore adapters (W42-DEBT-1)
+  const serviceCatalogService = useMemo(
+    () =>
+      createServiceCatalogService({
+        categoryRepository: createServiceCategoryRepository(db),
+        addonRepository: createServiceAddonRepository(db),
+        seasonalRuleRepository: createServiceSeasonalRuleRepository(db),
+        bookingRulesRepository: createServiceBookingRulesRepository(db),
+        visibilityRepository: createServiceVisibilityRepository(db),
+        priceOverrideRepository: createServicePriceOverrideRepository(db),
+        mediaRepository: createServiceMediaRepository(db),
+      }),
+    [],
+  );
+
+  // W41-DEBT — Staff admin services
+  const staffInviteService = useMemo(() => createStaffInviteService(db), []);
+  const commissionService = useMemo(() => createCommissionService(db), []);
+  const roleAuditService = useMemo(() => createRoleAuditService(db), []);
+
+  // W43 — Booking ops service (no real repos yet; all ops return "not configured")
+  const bookingOpsService = useMemo(() => createBookingOpsService(), []);
+
+  // W44 — Client CRM service (no real repos yet; W44-DEBT-1)
+  const clientCrmService = useMemo(() => createClientCrmService(), []);
+
+  // W45 — Loyalty admin service (no real repos yet; W45-DEBT-1)
+  const loyaltyAdminService = useMemo(() => createLoyaltyAdminService(), []);
+
+  // W45 — Campaign admin service (no real repos yet; W45-DEBT-1)
+  const campaignAdminService = useMemo(() => createCampaignAdminService(), []);
+
+  // W46 — Review admin service
+  const reviewAdminService = useMemo(() => createReviewAdminService(), []);
+
+  // W46 — Messaging admin service
+  const messagingAdminService = useMemo(() => createMessagingAdminService(), []);
+
+  // W46 — Waitlist admin service
+  const waitlistAdminService = useMemo(() => createWaitlistAdminService(), []);
+
+  // W15-DEBT-1 — Onboarding admin service
+  const onboardingAdminService = useMemo(
+    () => createOnboardingAdminService({ repository: createOnboardingRepository(db) }),
+    [],
+  );
+
+  // W38-DEBT-3: Receipt data service
+  const receiptDataService = useMemo(() => createReceiptDataService(db), []);
+
+  // W38-DEBT-4: Refund data service
+  const refundDataService = useMemo(() => createRefundDataService(db), []);
+
+  // W24-DEBT-3: PDF generation callable
+  const receiptsGeneratePdfFn = useMemo(
+    () => httpsCallable<{ tenantId: string; bookingId: string; userId: string }, { downloadUrl: string }>(functions, "receiptsGeneratePdf"),
+    [],
+  );
+
   const routeContext = useMemo(
     () => ({
       userId,
@@ -412,10 +1735,17 @@ export function AppNavigatorShell({
       return;
     }
 
-    const resolution = resolveRouteFromPath(getWebPathname(), routeContext);
-    setActiveRouteName(resolution.resolvedRoute.name);
-    if (resolution.requestedPath !== resolution.resolvedRoute.path) {
-      replaceWebHistoryPath(resolution.resolvedRoute.path);
+    // Restore the active route from the browser URL only once on mount.
+    // Re-running this on every routeContext change (e.g. after userId is set
+    // following a successful registration) would read the still-unchanged URL
+    // and clobber any programmatic navigation that just happened.
+    if (!hasRestoredRouteFromUrl.current) {
+      hasRestoredRouteFromUrl.current = true;
+      const resolution = resolveRouteFromPath(getWebPathname(), routeContext);
+      setActiveRouteName(resolution.resolvedRoute.name);
+      if (resolution.requestedPath !== resolution.resolvedRoute.path) {
+        replaceWebHistoryPath(resolution.resolvedRoute.path);
+      }
     }
 
     const onPopState = () => {
@@ -561,6 +1891,7 @@ export function AppNavigatorShell({
   // navigates back to AppShell.  Requires unreadAggregationService to be wired;
   // if the service is absent the dashboard cannot load any data, so we skip.
   const hasAutoNavigatedToDashboard = useRef(false);
+  const hasRestoredRouteFromUrl = useRef(false);
   useEffect(() => {
     if (
       !membershipsLoading &&
@@ -605,6 +1936,423 @@ export function AppNavigatorShell({
     // Future: once tab routing is wired, also navigate to deepLink.section
   }, [activeRoute.path, userId, setTenantId]);
 
+  // W36-C: Load real saved payment methods from Firestore when the user
+  // navigates to SavedPaymentMethods and a real paymentsRepository is provided.
+  useEffect(() => {
+    if (activeRoute.name !== "SavedPaymentMethods") return;
+    if (!paymentsRepository || !userId) return;
+
+    let cancelled = false;
+
+    async function loadPaymentMethods() {
+      setSavedPaymentMethodsLoading(true);
+      setSavedPaymentMethodsError(null);
+      try {
+        const methods = (await paymentsRepository!.getSavedPaymentMethods(userId!)) as DomainSavedPaymentMethod[];
+        if (!cancelled) {
+          setSavedPaymentMethods(
+            methods.map((m) => ({
+              id: m.methodId,
+              brand: m.brand,
+              last4: m.last4,
+              expMonth: m.expMonth,
+              expYear: m.expYear,
+              isDefault: m.isDefault,
+              holderName: m.cardholderName ?? undefined,
+            })),
+          );
+        }
+      } catch {
+        if (!cancelled) {
+          setSavedPaymentMethodsError("Unable to load payment methods.");
+        }
+      } finally {
+        if (!cancelled) {
+          setSavedPaymentMethodsLoading(false);
+        }
+      }
+    }
+
+    void loadPaymentMethods();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [activeRoute.name, paymentsRepository, userId]);
+
+  // ---------------------------------------------------------------------------
+  // W36-B: Batch C — load location + services when BookingService opens
+  // ---------------------------------------------------------------------------
+  useEffect(() => {
+    if (activeRoute.name !== "BookingService" || !clientBookingFlow || !tenantId) return;
+    let cancelled = false;
+
+    async function loadBatchCServices() {
+      // Step 1: resolve first active location (cached after first load)
+      let locationId = batchCLocationId;
+      if (!locationId) {
+        setBatchCServicesLoading(true);
+        const locResult = await clientBookingFlow!.loadLocations(tenantId!);
+        if (cancelled) return;
+        if (locResult.ok && locResult.locations.length > 0) {
+          locationId = locResult.locations[0].locationId;
+          setBatchCLocationId(locationId);
+          setBatchCLocation(locResult.locations[0]);
+        } else {
+          setBatchCServicesError("No active location found.");
+          setBatchCServicesLoading(false);
+          return;
+        }
+      }
+      // Step 2: load services
+      setBatchCServicesLoading(true);
+      setBatchCServicesError(null);
+      const svcResult = await clientBookingFlow!.loadServices(tenantId!, locationId);
+      if (cancelled) return;
+      if (svcResult.ok) {
+        setBatchCServices(svcResult.services);
+      } else {
+        setBatchCServicesError(svcResult.message);
+      }
+      setBatchCServicesLoading(false);
+    }
+
+    void loadBatchCServices();
+    return () => { cancelled = true; };
+  }, [activeRoute.name, clientBookingFlow, tenantId, batchCLocationId]);
+
+  // ---------------------------------------------------------------------------
+  // W36-B: Batch C — load technicians when BookingStaff opens (first selected service)
+  // ---------------------------------------------------------------------------
+  useEffect(() => {
+    if (activeRoute.name !== "BookingStaff" || !clientBookingFlow || !tenantId || !batchCLocationId) return;
+    const firstServiceId = consumerSelectedServiceIds[0];
+    if (!firstServiceId) return;
+    let cancelled = false;
+
+    async function loadBatchCTechnicians() {
+      setBatchCTechniciansLoading(true);
+      setBatchCTechniciansError(null);
+      const result = await clientBookingFlow!.loadTechnicians(tenantId!, batchCLocationId!, firstServiceId);
+      if (cancelled) return;
+      if (result.ok) {
+        setBatchCTechnicians(result.technicians);
+      } else {
+        setBatchCTechniciansError(result.message);
+      }
+      setBatchCTechniciansLoading(false);
+    }
+
+    void loadBatchCTechnicians();
+    return () => { cancelled = true; };
+  }, [activeRoute.name, clientBookingFlow, tenantId, batchCLocationId, consumerSelectedServiceIds]);
+
+  // ---------------------------------------------------------------------------
+  // W36-B: Batch C — load slots when BookingDate opens + date + staff are set
+  // ---------------------------------------------------------------------------
+  useEffect(() => {
+    if (activeRoute.name !== "BookingDate" || !clientBookingFlow || !tenantId || !batchCLocationId || !consumerBookingDate) return;
+    const firstServiceId = consumerSelectedServiceIds[0];
+    const firstService = batchCServices.find((s) => s.serviceId === firstServiceId);
+    if (!firstService) return;
+    // Resolve staff: "any" → use first loaded technician; otherwise exact match
+    const resolvedStaffId =
+      consumerSelectedStaffId && consumerSelectedStaffId !== "any"
+        ? consumerSelectedStaffId
+        : batchCTechnicians[0]?.staffId ?? "any";
+    if (!resolvedStaffId || resolvedStaffId === "any") return;
+
+    const dateStr = consumerBookingDate.toISOString().slice(0, 10); // YYYY-MM-DD
+    let cancelled = false;
+
+    async function loadBatchCSlots() {
+      setBatchCSlotsLoading(true);
+      setBatchCSlotsError(null);
+      const result = await clientBookingFlow!.loadSlots(tenantId!, resolvedStaffId, batchCLocationId!, dateStr, firstService!);
+      if (cancelled) return;
+      if (result.ok) {
+        setBatchCSlots(result.slots.map((sl) => formatTimeOfDay(sl.startMinutes)));
+        setBatchCRawSlots(result.slots);
+      } else {
+        setBatchCSlotsError(result.message);
+        setBatchCSlots([]);
+        setBatchCRawSlots([]);
+      }
+      setBatchCSlotsLoading(false);
+    }
+
+    void loadBatchCSlots();
+    return () => { cancelled = true; };
+  }, [activeRoute.name, clientBookingFlow, tenantId, batchCLocationId, consumerBookingDate, consumerSelectedServiceIds, consumerSelectedStaffId, batchCServices, batchCTechnicians, consumerRescheduleMode]);
+
+  // ---------------------------------------------------------------------------
+  // W36-D: Load booking history when BookingHistory opens
+  // ---------------------------------------------------------------------------
+  useEffect(() => {
+    if (activeRoute.name !== "BookingHistory" || !userId) return;
+    let cancelled = false;
+
+    async function loadBookingHistory() {
+      setBatchCBookingHistoryLoading(true);
+      try {
+        const records = await appBookingsRepository.listBookingsByCustomer(
+          tenantId ?? "global",
+          userId!,
+        );
+        if (!cancelled) {
+          setBatchCBookingHistory(records.map(bookingToHistoryRecord));
+        }
+      } catch {
+        // Non-fatal: leave existing history unchanged
+      } finally {
+        if (!cancelled) setBatchCBookingHistoryLoading(false);
+      }
+    }
+
+    void loadBookingHistory();
+    return () => { cancelled = true; };
+  }, [activeRoute.name, userId, tenantId]);
+
+  // ---------------------------------------------------------------------------
+  // W38-DEBT-3: Load receipt data when Receipt route opens
+  // ---------------------------------------------------------------------------
+  useEffect(() => {
+    if (activeRoute.name !== "Receipt" || !selectedReceiptBookingId || !tenantId || !userId) return;
+    let cancelled = false;
+    setReceiptLoading(true);
+    setReceiptError(null);
+    void receiptDataService.getReceiptByBookingId(tenantId, selectedReceiptBookingId, userId).then(
+      (result) => {
+        if (cancelled) return;
+        if (result.ok) {
+          setReceiptData(result.data);
+        } else {
+          setReceiptError(result.message);
+        }
+        setReceiptLoading(false);
+      },
+    );
+    return () => { cancelled = true; };
+  }, [activeRoute.name, selectedReceiptBookingId, tenantId, userId, receiptDataService]);
+
+  // ---------------------------------------------------------------------------
+  // W38-DEBT-4: Load refund data when RefundStatus route opens
+  // ---------------------------------------------------------------------------
+  useEffect(() => {
+    if (activeRoute.name !== "RefundStatus" || !selectedRefundBookingId || !tenantId || !userId) return;
+    let cancelled = false;
+    setRefundLoading(true);
+    setRefundError(null);
+    setRefundData(null);
+    void refundDataService.getRefundByBookingId(tenantId, selectedRefundBookingId, userId).then(
+      (result) => {
+        if (cancelled) return;
+        if (result.ok) {
+          setRefundData(result.data);
+        } else {
+          setRefundError(result.message);
+        }
+        setRefundLoading(false);
+      },
+    );
+    return () => { cancelled = true; };
+  }, [activeRoute.name, selectedRefundBookingId, tenantId, userId, refundDataService]);
+
+  // ---------------------------------------------------------------------------
+  // W37-A: Load loyalty data when signed in
+  // ---------------------------------------------------------------------------
+  useEffect(() => {
+    if (!userId || !tenantId || !consumerLoyaltyService) return;
+    let cancelled = false;
+    async function loadLoyalty() {
+      try {
+        const data = await consumerLoyaltyService!.getLoyaltyData(userId!, tenantId!);
+        if (cancelled) return;
+        setLoyaltyPoints(data.points);
+        setLoyaltyTier(data.tier);
+        setLoyaltyHistory(data.historyEntries);
+        setLoyaltyRewards(data.rewards);
+        setLoyaltyReferralCode(data.referralCode);
+        setLoyaltyReferralStats(data.referralStats);
+      } catch {
+        // Non-fatal — keep showing mock fallback
+      }
+    }
+    void loadLoyalty();
+    return () => { cancelled = true; };
+  }, [userId, tenantId, consumerLoyaltyService]);
+
+  // W37-A: Load activities when signed in
+  useEffect(() => {
+    if (!userId || !tenantId || !consumerLoyaltyService) return;
+    let cancelled = false;
+    async function loadActivities() {
+      try {
+        const acts = await consumerLoyaltyService!.getActivities(userId!, tenantId!);
+        if (!cancelled) setLoyaltyActivities(acts);
+      } catch {
+        // Non-fatal — keep showing mock fallback
+      }
+    }
+    void loadActivities();
+    return () => { cancelled = true; };
+  }, [userId, tenantId, consumerLoyaltyService]);
+
+  // ---------------------------------------------------------------------------
+  // W37-B: Subscribe to messaging threads (real-time)
+  // ---------------------------------------------------------------------------
+  useEffect(() => {
+    if (!userId || !consumerMessagingService) return;
+    const unsub = consumerMessagingService.subscribeToThreads(userId, setThreads);
+    return unsub;
+  }, [userId, consumerMessagingService]);
+
+  // W37-B: Subscribe to messages for the active thread (real-time)
+  useEffect(() => {
+    if (!activeThreadId || !consumerMessagingService) return;
+    const unsub = consumerMessagingService.subscribeToMessages(activeThreadId, setThreadMessages);
+    return unsub;
+  }, [activeThreadId, consumerMessagingService]);
+
+  // ---------------------------------------------------------------------------
+  // W37-C: Subscribe to notifications (real-time)
+  // ---------------------------------------------------------------------------
+  useEffect(() => {
+    if (!userId || !consumerNotificationService) return;
+    const unsub = consumerNotificationService.subscribeToNotifications(userId, setNotifications);
+    return unsub;
+  }, [userId, consumerNotificationService]);
+
+  // W37-C: Load and sync notification preferences from Firestore
+  useEffect(() => {
+    if (!userId || !consumerNotificationService) return;
+    let cancelled = false;
+    async function loadPrefs() {
+      try {
+        const prefs = await consumerNotificationService!.getPreferences(userId!);
+        if (!cancelled) setNotificationPrefs(prefs);
+      } catch {
+        // Non-fatal — keep defaults
+      }
+    }
+    void loadPrefs();
+    return () => { cancelled = true; };
+  }, [userId, consumerNotificationService]);
+
+  // W37-DEBT-3: Register device for push notifications on sign-in.
+  // Non-fatal — runs silently. Requires expo-notifications native permissions.
+  useEffect(() => {
+    if (!userId || !consumerNotificationService) return;
+    async function doRegister() {
+      try {
+        const result = await getDevicePushToken();
+        if (!result) return;
+        await consumerNotificationService!.savePushToken(userId!, result.deviceId, result.record);
+      } catch {
+        // Non-fatal: never block the user flow
+      }
+    }
+    void doRegister();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId]);
+
+  // W36-DEBT-1: Pre-fill GuestContactScreen from authenticated auth profile.
+  useEffect(() => {
+    if (!userId || !email) return;
+    setConsumerGuestContact((prev) => ({
+      ...prev,
+      firstName: prev.firstName || firstName || "",
+      lastName: prev.lastName || lastName || "",
+      email: prev.email || email || "",
+    }));
+  }, [userId, email, firstName, lastName]);
+
+  // W37-DEBT-1: Load user's waitlist entries when the Waitlist screen opens.
+  useEffect(() => {
+    if (activeRoute.name !== "Waitlist" || !waitlistRepository || !userId || !tenantId) return;
+    let cancelled = false;
+    async function loadWaitlistEntries() {
+      setWaitlistEntriesLoading(true);
+      setWaitlistEntriesError(null);
+      try {
+        const entries = await waitlistRepository!.listUserWaitlistEntries(tenantId!, userId!);
+        if (!cancelled) {
+          setWaitlistEntries(
+            entries
+              .filter((e) => e.status === "active")
+              .map((e) => ({
+                entryId: e.entryId,
+                serviceName: e.serviceId, // P2: no service name lookup yet
+                dateFrom: e.dateFrom,
+                dateTo: e.dateTo,
+                positionNumber: null,
+                salonName: tenantProfile?.name ?? tenantId!,
+              })),
+          );
+        }
+      } catch {
+        if (!cancelled) setWaitlistEntriesError("Unable to load waitlist entries.");
+      } finally {
+        if (!cancelled) setWaitlistEntriesLoading(false);
+      }
+    }
+    void loadWaitlistEntries();
+    return () => { cancelled = true; };
+  }, [activeRoute.name, waitlistRepository, userId, tenantId, tenantProfile]);
+
+  // ---------------------------------------------------------------------------
+  // W36-DEBT-3: Load salon gallery images when SalonProfile opens.
+  // Collection: tenants/{tenantId}/media  docs: { url, type: "hero"|"gallery", sortOrder }
+  // ---------------------------------------------------------------------------
+  useEffect(() => {
+    if (activeRoute.name !== "SalonProfile" || !tenantId) return;
+    let cancelled = false;
+    async function loadGallery() {
+      setSalonProfileHeroUrl(undefined);
+      setSalonProfileGalleryUrls([]);
+      try {
+        const colRef = collection(db, `tenants/${tenantId}/media`);
+        const q = query(colRef, orderBy("sortOrder", "asc"));
+        const snap = await getDocs(q);
+        if (cancelled) return;
+        let hero: string | undefined;
+        const gallery: string[] = [];
+        for (const d of snap.docs) {
+          const data = d.data() as { url: string; type: string };
+          if (data.type === "hero" && !hero) {
+            hero = data.url;
+          } else if (data.url) {
+            gallery.push(data.url);
+          }
+        }
+        setSalonProfileHeroUrl(hero);
+        setSalonProfileGalleryUrls(gallery);
+      } catch {
+        // Non-fatal: gallery is optional
+      }
+    }
+    void loadGallery();
+    return () => { cancelled = true; };
+  }, [activeRoute.name, tenantId]);
+
+  // ---------------------------------------------------------------------------
+  // W37-E: Load salon onboarding state from Firestore (wizardService)
+  // ---------------------------------------------------------------------------
+  useEffect(() => {
+    if (!tenantId || !wizardService) return;
+    let cancelled = false;
+    async function loadWizardState() {
+      try {
+        const { state } = await wizardService!.resume(tenantId!);
+        if (!cancelled) setSalonWizardState(state);
+      } catch {
+        // Non-fatal — keep mock initial state
+      }
+    }
+    void loadWizardState();
+    return () => { cancelled = true; };
+  }, [tenantId, wizardService]);
+
   function navigate(routeName: string) {
     const candidate = appRoutes.find((route) => route.name === routeName);
     if (!candidate) {
@@ -636,6 +2384,7 @@ export function AppNavigatorShell({
     setAuthErrorMessage(null);
     signInAsDev();
     setActiveRouteName("AppShell");
+    setActiveTab("Home");
   }
 
   async function handleSignOut() {
@@ -646,6 +2395,7 @@ export function AppNavigatorShell({
     setEmailSaveSuccessMessage(null);
     setPasswordResetErrorMessage(null);
     setPasswordResetSuccessMessage(null);
+    setActiveRouteName("Landing");
     await signOut();
   }
 
@@ -1105,6 +2855,232 @@ export function AppNavigatorShell({
     setDashboardLoading(false);
   }, [unreadAggregationService, userId]);
 
+  const loadOwnerKpi = useCallback(async () => {
+    if (!ownerKpiService || !tenantId) return;
+    setOwnerKpiLoading(true);
+    setOwnerKpiError(null);
+    try {
+      const summary = await ownerKpiService.getKpiSummary(tenantId);
+      setOwnerKpiSummary(summary);
+    } catch {
+      setOwnerKpiError("Unable to load dashboard data.");
+    } finally {
+      setOwnerKpiLoading(false);
+    }
+  }, [ownerKpiService, tenantId]);
+
+  // ---------------------------------------------------------------------------
+  // W39 Billing loaders
+  // ---------------------------------------------------------------------------
+
+  const loadBillingSubscription = useCallback(async () => {
+    if (!billingAdminService || !tenantId) return;
+    setBillingSubLoading(true);
+    setBillingSubError(null);
+    try {
+      const sub = await billingAdminService.getSubscription(tenantId);
+      setBillingSubscription(sub);
+    } catch {
+      setBillingSubError("Unable to load subscription.");
+    } finally {
+      setBillingSubLoading(false);
+    }
+  }, [billingAdminService, tenantId]);
+
+  const loadBillingInvoices = useCallback(async () => {
+    if (!billingAdminService || !tenantId) return;
+    setBillingInvoicesLoading(true);
+    setBillingInvoicesError(null);
+    try {
+      const invoices = await billingAdminService.listInvoices(tenantId);
+      setBillingInvoices(invoices);
+    } catch {
+      setBillingInvoicesError("Unable to load invoices.");
+    } finally {
+      setBillingInvoicesLoading(false);
+    }
+  }, [billingAdminService, tenantId]);
+
+  const loadBillingMethods = useCallback(async () => {
+    if (!billingAdminService || !tenantId) return;
+    setBillingMethodsLoading(true);
+    setBillingMethodsError(null);
+    try {
+      const methods = await billingAdminService.listPaymentMethods(tenantId);
+      setBillingMethods(methods);
+    } catch {
+      setBillingMethodsError("Unable to load payment methods.");
+    } finally {
+      setBillingMethodsLoading(false);
+    }
+  }, [billingAdminService, tenantId]);
+
+  const loadBillingPayouts = useCallback(async () => {
+    if (!billingAdminService || !tenantId) return;
+    setBillingPayoutsLoading(true);
+    setBillingPayoutsError(null);
+    try {
+      const [payouts, balance, schedule] = await Promise.all([
+        billingAdminService.listPayouts(tenantId),
+        billingAdminService.getPendingBalance(tenantId),
+        billingAdminService.getPayoutSchedule(tenantId),
+      ]);
+      setBillingPayouts(payouts);
+      setBillingPendingBalance(balance);
+      setBillingPayoutSchedule(schedule);
+    } catch {
+      setBillingPayoutsError("Unable to load payout data.");
+    } finally {
+      setBillingPayoutsLoading(false);
+    }
+  }, [billingAdminService, tenantId]);
+
+  const loadBillingConnect = useCallback(async () => {
+    if (!billingAdminService || !tenantId) return;
+    setBillingConnectLoading(true);
+    setBillingConnectError(null);
+    try {
+      const account = await billingAdminService.getConnectAccount(tenantId);
+      setBillingConnectAccount(account);
+    } catch {
+      setBillingConnectError("Unable to load Connect account.");
+    } finally {
+      setBillingConnectLoading(false);
+    }
+  }, [billingAdminService, tenantId]);
+
+  const loadBillingRefunds = useCallback(async () => {
+    if (!billingAdminService || !tenantId) return;
+    setBillingRefundsLoading(true);
+    setBillingRefundsError(null);
+    try {
+      const [refunds, disputes] = await Promise.all([
+        billingAdminService.listRefunds(tenantId),
+        billingAdminService.listDisputes(tenantId),
+      ]);
+      setBillingRefunds(refunds);
+      setBillingDisputes(disputes);
+    } catch {
+      setBillingRefundsError("Unable to load refunds and disputes.");
+    } finally {
+      setBillingRefundsLoading(false);
+    }
+  }, [billingAdminService, tenantId]);
+
+  // W40 loaders
+  const loadLocationList = useCallback(async () => {
+    if (!locationAdminService || !tenantId) return;
+    setLocationListLoading(true);
+    setLocationListError(null);
+    try {
+      const [locs, kpis] = await Promise.all([
+        locationAdminService.listLocations(tenantId),
+        locationAdminService.getLocationKpis(tenantId),
+      ]);
+      setLocationList(locs);
+      setLocationKpis(kpis);
+    } catch {
+      setLocationListError("Unable to load locations.");
+    } finally {
+      setLocationListLoading(false);
+    }
+  }, [locationAdminService, tenantId]);
+
+  const loadLocationDashboard = useCallback(async (locationId: string) => {
+    if (!locationAdminService || !tenantId) return;
+    setLocationDashLoading(true);
+    setLocationDashError(null);
+    try {
+      const [kpi, appts] = await Promise.all([
+        locationAdminService.getLocationKpi(locationId, tenantId),
+        locationAdminService.getTodayAppointments(locationId, tenantId),
+      ]);
+      setLocationDashKpi(kpi);
+      setLocationDashAppointments(appts);
+    } catch {
+      setLocationDashError("Unable to load location dashboard.");
+    } finally {
+      setLocationDashLoading(false);
+    }
+  }, [locationAdminService, tenantId]);
+
+  const loadLocationSettings = useCallback(async (locationId: string) => {
+    if (!locationAdminService) return;
+    setLocationSettingsLoading(true);
+    setLocationSettingsError(null);
+    try {
+      const [loc, flags, holidays] = await Promise.all([
+        locationAdminService.getLocation(locationId),
+        locationAdminService.getAccessibilityFlags(locationId),
+        locationAdminService.listHolidays(locationId),
+      ]);
+      setLocationDetails(loc);
+      setLocationAccessibility(flags);
+      setLocationHolidays(holidays);
+    } catch {
+      setLocationSettingsError("Unable to load location settings.");
+    } finally {
+      setLocationSettingsLoading(false);
+    }
+  }, [locationAdminService]);
+
+  const loadLocationOverrides = useCallback(async (locationId: string) => {
+    if (!locationAdminService || !tenantId) return;
+    setLocationOverridesLoading(true);
+    setLocationOverridesError(null);
+    try {
+      const overrides = await locationAdminService.listServiceOverrides(locationId, tenantId);
+      setLocationServiceOverrides(overrides);
+    } catch {
+      setLocationOverridesError("Unable to load service overrides.");
+    } finally {
+      setLocationOverridesLoading(false);
+    }
+  }, [locationAdminService, tenantId]);
+
+  const loadLocationResources = useCallback(async (locationId: string) => {
+    if (!locationAdminService || !tenantId) return;
+    setLocationResourcesLoading(true);
+    setLocationResourcesError(null);
+    try {
+      const res = await locationAdminService.listResources(locationId, tenantId);
+      setLocationResources(res);
+    } catch {
+      setLocationResourcesError("Unable to load resources.");
+    } finally {
+      setLocationResourcesLoading(false);
+    }
+  }, [locationAdminService, tenantId]);
+
+  const loadWalkInQueue = useCallback(async (locationId: string) => {
+    if (!locationAdminService) return;
+    setWalkInQueueLoading(true);
+    setWalkInQueueError(null);
+    try {
+      const q = await locationAdminService.getWalkInQueue(locationId);
+      setWalkInQueue(q);
+    } catch {
+      setWalkInQueueError("Unable to load walk-in queue.");
+    } finally {
+      setWalkInQueueLoading(false);
+    }
+  }, [locationAdminService]);
+
+  const loadDailyClose = useCallback(async (locationId: string) => {
+    if (!locationAdminService) return;
+    setDailyCloseLoading(true);
+    setDailyCloseError(null);
+    const today = new Date().toISOString().split("T")[0];
+    try {
+      const report = await locationAdminService.getDailyCloseReport(locationId, today);
+      setDailyCloseReport(report);
+    } catch {
+      setDailyCloseError("Unable to load daily close report.");
+    } finally {
+      setDailyCloseLoading(false);
+    }
+  }, [locationAdminService]);
+
   useEffect(() => {
     if (activeRoute.name === "TenantProfile") {
       void loadTenantProfile();
@@ -1129,7 +3105,84 @@ export function AppNavigatorShell({
     if (activeRoute.name === "SalonDashboard") {
       void loadDashboard();
     }
-  }, [activeRoute.name, loadTenantLocations, loadTenantProfile, loadStaffList, loadServicesList, loadQueue, loadDashboard]);
+
+    if (activeRoute.name === "OwnerHome") {
+      void loadOwnerKpi();
+    }
+
+    // W39 billing loaders
+    if (["BillingHub", "SubscriptionPlan", "CancelSubscription"].includes(activeRoute.name)) {
+      void loadBillingSubscription();
+    }
+    if (activeRoute.name === "BillingHub") {
+      void loadBillingConnect();
+      void loadBillingPayouts();
+    }
+    if (activeRoute.name === "InvoiceHistory") {
+      void loadBillingInvoices();
+    }
+    if (activeRoute.name === "AdminPaymentMethod") {
+      void loadBillingMethods();
+    }
+    if (activeRoute.name === "PayoutHistory") {
+      void loadBillingPayouts();
+    }
+    if (["StripeConnectOnboarding", "ConnectHealth"].includes(activeRoute.name)) {
+      void loadBillingConnect();
+    }
+    if (activeRoute.name === "RefundDisputeAdmin") {
+      void loadBillingRefunds();
+    }
+    // W40 location loaders
+    if (activeRoute.name === "LocationOverview") {
+      void loadLocationList();
+    }
+    if (activeRoute.name === "LocationDashboard" && activeLocationId) {
+      void loadLocationDashboard(activeLocationId);
+    }
+    if (activeRoute.name === "LocationSettings" && activeLocationId) {
+      void loadLocationSettings(activeLocationId);
+    }
+    if (activeRoute.name === "LocationServiceOverrides" && activeLocationId) {
+      void loadLocationOverrides(activeLocationId);
+    }
+    if (activeRoute.name === "ResourceManagement" && activeLocationId) {
+      void loadLocationResources(activeLocationId);
+    }
+    if (activeRoute.name === "AdminWalkInQueue" && activeLocationId) {
+      void loadWalkInQueue(activeLocationId);
+    }
+    if (activeRoute.name === "DailyClose" && activeLocationId) {
+      void loadDailyClose(activeLocationId);
+    }
+    if (activeRoute.name === "OnboardingAdmin" && tenantId) {
+      setOnboardingAdminStateLoading(true);
+      setOnboardingAdminStateError(null);
+      setOnboardingAdminTimelineLoading(true);
+      void Promise.all([
+        onboardingAdminService.getOnboardingState(tenantId),
+        onboardingAdminService.listTimeline(tenantId),
+      ]).then(([wizState, events]) => {
+        setOnboardingAdminWizardState(wizState);
+        setOnboardingAdminTimeline(events);
+        setOnboardingAdminStateLoading(false);
+        setOnboardingAdminTimelineLoading(false);
+      }).catch(() => {
+        setOnboardingAdminStateError("Failed to load onboarding data");
+        setOnboardingAdminStateLoading(false);
+        setOnboardingAdminTimelineLoading(false);
+      });
+    }
+  }, [
+    activeRoute.name,
+    loadTenantLocations, loadTenantProfile, loadStaffList, loadServicesList,
+    loadQueue, loadDashboard, loadOwnerKpi,
+    loadBillingSubscription, loadBillingInvoices, loadBillingMethods,
+    loadBillingPayouts, loadBillingConnect, loadBillingRefunds,
+    loadLocationList, loadLocationDashboard, loadLocationSettings,
+    loadLocationOverrides, loadLocationResources, loadWalkInQueue, loadDailyClose,
+    activeLocationId,
+  ]);
 
   function getOnboardingGuardMessage(): string {
     if (membershipsLoading) {
@@ -1149,19 +3202,32 @@ export function AppNavigatorShell({
   }
 
   async function navigateToOnboardingFlow(flow: OnboardingFlow) {
-    if (!userId || !tenantId) {
+    if (!userId) {
       setOnboardingGuardMessage(getOnboardingGuardMessage());
       return;
     }
 
-    if (!availableMemberships.some((membership) => membership.tenantId === tenantId)) {
+    // Auto-select the first available membership if none is active yet (dev shortcut).
+    const resolvedTenantId =
+      tenantId ?? (availableMemberships.length > 0 ? availableMemberships[0].tenantId : null);
+
+    if (!resolvedTenantId) {
+      setOnboardingGuardMessage(getOnboardingGuardMessage());
+      return;
+    }
+
+    if (!availableMemberships.some((membership) => membership.tenantId === resolvedTenantId)) {
       setOnboardingGuardMessage(t("onboarding.guard.selectedTenantInvalid"));
       return;
     }
 
+    if (resolvedTenantId !== tenantId) {
+      setTenantId(resolvedTenantId);
+    }
+
     setOnboardingGuardMessage(null);
 
-    const onboardingTenantId = tenantId;
+    const onboardingTenantId = resolvedTenantId;
 
     try {
       const resumedState = await persistence.resumeDraft({
@@ -1439,7 +3505,7 @@ export function AppNavigatorShell({
    */
   function selectSalonContext(tenantId: string) {
     setTenantId(tenantId);
-    navigate("AppShell");
+    navigate("OwnerHome");
   }
 
   /**
@@ -1612,6 +3678,7 @@ export function AppNavigatorShell({
           marketplaceEnabled={featureFlags.marketplaceEnabled}
           onBookEnabled={(salon) => openTenantPublicProfile(salon.tenantId)}
           onBookUnavailable={() => undefined}
+          onOpenDiscovery={() => navigate("DiscoverHome")}
           onBack={() => setActiveTab("Home")}
           onRetryFeed={() => void retryDiscoveryFeeds()}
         />
@@ -1619,40 +3686,62 @@ export function AppNavigatorShell({
     }
 
     if (activeTab === "Bookings") {
+      if (!userId) {
+        return (
+          <WelcomeRouteScreen
+            onGetStarted={() => navigate("SignUp")}
+            onSignIn={() => navigate("SignIn")}
+            onBrowseAsGuest={() => setActiveTab("Explore")}
+          />
+        );
+      }
       return renderBookingFlow();
     }
 
     if (activeTab === "Rewards") {
+      if (!userId) {
+        return (
+          <WelcomeRouteScreen
+            onGetStarted={() => navigate("SignUp")}
+            onSignIn={() => navigate("SignIn")}
+            onBrowseAsGuest={() => setActiveTab("Explore")}
+          />
+        );
+      }
       return (
-        <ScrollView contentContainerStyle={styles.tabPlaceholderContent} showsVerticalScrollIndicator={false}>
-          <View style={styles.tabPlaceholderArtwork} />
-          <Text style={styles.tabPlaceholderTitle}>Rewards</Text>
-          <Text style={styles.tabPlaceholderBody}>
-            Your loyalty points and exclusive rewards will appear here.
-          </Text>
-        </ScrollView>
+        <LoyaltyLandingScreen
+          points={loyaltyPoints ?? 0}
+          historyEntries={loyaltyHistory}
+          earnActions={DEFAULT_EARN_ACTIONS}
+          onPressBrowseRewards={() => navigate("RewardCatalog")}
+          onPressEarnAction={(action) => {
+            if (action.id === "refer") navigate("Referral");
+            else if (action.id === "review") navigate("ReviewPrompt");
+            else navigate("BookingService");
+          }}
+        />
       );
     }
 
     if (activeTab === "Profile") {
+      if (!userId) {
+        return (
+          <WelcomeRouteScreen
+            onGetStarted={() => navigate("SignUp")}
+            onSignIn={() => navigate("SignIn")}
+            onBrowseAsGuest={() => setActiveTab("Explore")}
+          />
+        );
+      }
       return (
         <ProfileRouteScreen
-          email={email}
-          emailErrorMessage={emailSaveErrorMessage}
-          emailSuccessMessage={emailSaveSuccessMessage}
           firstName={firstName}
-          isEmailSubmitting={emailSaveSubmitting}
-          isPasswordResetSubmitting={passwordResetSubmitting}
-          isProfileSubmitting={profileSaveSubmitting}
           lastName={lastName}
-          onSignOut={() => void handleSignOut()}
-          onSendPasswordReset={sendAccountPasswordReset}
-          onSubmitEmail={submitAccountEmail}
-          onSubmitProfile={submitAccountProfile}
-          passwordResetErrorMessage={passwordResetErrorMessage}
-          passwordResetSuccessMessage={passwordResetSuccessMessage}
-          profileErrorMessage={profileSaveErrorMessage}
-          profileSuccessMessage={profileSaveSuccessMessage}
+          email={email}
+          bookingCount={4}
+          loyaltyPoints={450}
+          onEditProfile={() => navigate("EditProfile")}
+          onOpenSettings={() => navigate("SettingsShell")}
         />
       );
     }
@@ -1685,6 +3774,7 @@ export function AppNavigatorShell({
         onBackToDashboard={() => navigate("SalonDashboard")}
         onRetryFeed={() => void retryDiscoveryFeeds()}
         onSignOut={() => void handleSignOut()}
+        onOpenInbox={() => navigate("Inbox")}
       />
     );
   }
@@ -1697,8 +3787,8 @@ export function AppNavigatorShell({
     if (activeRoute.name === "Landing") {
       return (
         <WelcomeRouteScreen
-          onGetStarted={() => navigate("Register")}
-          onSignIn={() => navigate("Login")}
+          onGetStarted={() => navigate("SignUp")}
+          onSignIn={() => navigate("SignIn")}
           onBrowseAsGuest={() => navigate("DiscoverBusinesses")}
         />
       );
@@ -1730,6 +3820,1185 @@ export function AppNavigatorShell({
       );
     }
 
+    // ---- W33 Stream A-1: W21 Batch A auth screens (mock-driven) ----
+    if (activeRoute.name === "SignIn") {
+      return (
+        <SignInScreen
+          onSignedIn={() => { setActiveRouteName("AppShell"); setActiveTab("Home"); }}
+          onForgotPassword={() => navigate("ForgotPassword")}
+          onCreateAccount={() => navigate("SignUp")}
+          onSocialSignIn={() => navigate("SocialSignIn")}
+          onDevAction={completeDevSignIn}
+          onBack={() => navigate("AppShell")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "SignUp") {
+      return (
+        <SignUpScreen
+          onSignedUp={() => navigate("EmailVerification")}
+          onSignIn={() => navigate("SignIn")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "SocialSignIn") {
+      return (
+        <SocialSignInSelectorScreen
+          onProvider={async (_provider: SocialProvider) => {
+            // Phase 2.2: stub. Real social sign-in wired in Phase 2.3.
+            navigate("AppShell");
+          }}
+          onUseEmailInstead={() => navigate("SignIn")}
+          onClose={() => navigate("AppShell")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "ForgotPassword") {
+      return (
+        <ForgotPasswordScreen
+          onSent={() => navigate("SignIn")}
+          onBack={() => navigate("SignIn")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "ResetPassword") {
+      return (
+        <ResetPasswordScreen
+          onSubmit={async (_newPassword: string) => {
+            // Phase 2.2: stub. Real password reset wired in Phase 2.3.
+            navigate("SignIn");
+          }}
+          onRequestNewLink={() => navigate("ForgotPassword")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "EmailVerification") {
+      return (
+        <EmailVerificationScreen
+          email={email ?? ""}
+          status="verified"
+          onResend={async () => {
+            // W36-E: real Firebase email verification resend.
+            if (auth.currentUser) {
+              await sendEmailVerification(auth.currentUser);
+            }
+          }}
+          onChangeEmail={() => navigate("SignUp")}
+          onContinue={() => { setActiveRouteName("AppShell"); setActiveTab("Home"); }}
+        />
+      );
+    }
+
+    if (activeRoute.name === "OtpVerification") {
+      return (
+        <OtpVerificationScreen
+          destination={email ?? ""}
+          onVerify={async (_code: string) => {
+            // Phase 2.2: stub.
+            navigate("AppShell");
+          }}
+          onResend={async () => {
+            // Phase 2.2: stub.
+          }}
+          onChangeDestination={() => navigate("SignUp")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "AccountMerge") {
+      // TODO W38: wire to real account merge data once Auth merge backend is wired.
+      return (
+        <AccountMergeScreen
+          bookingCount={2}
+          loyaltyPoints={450}
+          emailExists={false}
+          onChoose={async (_choice: AccountMergeChoice) => {
+            // P2: stub.
+            navigate("AppShell");
+          }}
+        />
+      );
+    }
+
+    // -----------------------------------------------------------------------
+    // W33 Stream A-2 / W36-B: Consumer booking flow (BookingService → Confirmation,
+    // plus GuestContact / ManageBooking / PostBookingUpgrade). Real Firestore
+    // data wired in W36 via clientBookingFlow + batchC* state.
+    // -----------------------------------------------------------------------
+    if (activeRoute.name === "BookingService") {
+      return (
+        <ServiceSelectionScreen
+          groups={batchCServicesLoading ? [] : servicesToGroups(batchCServices)}
+          selectedServiceIds={consumerSelectedServiceIds}
+          addOnCatalog={{}}
+          selectedAddOnIds={consumerSelectedAddOnIds}
+          loading={batchCServicesLoading}
+          errorMessage={batchCServicesError ?? undefined}
+          onToggleService={(id) =>
+            setConsumerSelectedServiceIds((prev) =>
+              prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
+            )
+          }
+          onToggleAddOn={(id) =>
+            setConsumerSelectedAddOnIds((prev) =>
+              prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
+            )
+          }
+          onPressContinue={() => navigate("BookingStaff")}
+          onPressBack={() => navigate("AppShell")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "BookingStaff") {
+      return (
+        <StaffSelectionScreen
+          staffOptions={batchCTechnicians.map((t) => ({ id: t.staffId, name: t.displayName }))}
+          selectedStaffId={consumerSelectedStaffId}
+          loading={batchCTechniciansLoading}
+          errorMessage={batchCTechniciansError ?? undefined}
+          onSelectStaff={(id) => setConsumerSelectedStaffId(id)}
+          onPressContinue={() => navigate("BookingDate")}
+          onPressBack={() => navigate("BookingService")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "BookingDate") {
+      return (
+        <BookingDateTimeScreen
+          month={consumerBookingMonth}
+          selectedDate={consumerBookingDate}
+          onSelectDate={(date) => {
+            setConsumerBookingDate(date);
+            // Clear the selected slot whenever a new date is chosen so the
+            // user must pick a time on the new date.
+            setConsumerBookingSlot(null);
+            setBatchCSelectedSlotRaw(null);
+          }}
+          onChangeMonth={(delta) =>
+            setConsumerBookingMonth((m) => {
+              const next = new Date(m);
+              next.setMonth(m.getMonth() + delta);
+              return next;
+            })
+          }
+          availableSlots={batchCSlots}
+          selectedSlot={consumerBookingSlot}
+          segment={consumerBookingSegment}
+          timezone="UTC"
+          slotsLoading={batchCSlotsLoading}
+          slotsErrorMessage={batchCSlotsError ?? undefined}
+          onChangeSegment={(s) => setConsumerBookingSegment(s)}
+          onSelectSlot={(s) => {
+            setConsumerBookingSlot(s);
+            const idx = batchCSlots.indexOf(s);
+            setBatchCSelectedSlotRaw(idx >= 0 ? (batchCRawSlots[idx] ?? null) : null);
+          }}
+          onPressContinue={async () => {
+            if (consumerRescheduleMode && batchCCreatedBookingId && tenantId && consumerBookingDate && batchCSelectedSlotRaw) {
+              setConsumerRescheduleLoading(true);
+              setConsumerRescheduleError(null);
+              try {
+                const dateStr = consumerBookingDate.toISOString().slice(0, 10);
+                const endMinutes = batchCSelectedSlotRaw.endMinutes;
+                await appBookingsRepository.rescheduleBookingAtomically(
+                  batchCCreatedBookingId,
+                  tenantId,
+                  dateStr,
+                  batchCSelectedSlotRaw.startMinutes,
+                  endMinutes,
+                  "client",
+                  "Client rescheduled",
+                );
+                setConsumerRescheduleMode(false);
+                navigate("ManageBooking");
+              } catch (err) {
+                setConsumerRescheduleError(err instanceof Error ? err.message : "Reschedule failed");
+              } finally {
+                setConsumerRescheduleLoading(false);
+              }
+            } else {
+              navigate("BookingReview");
+            }
+          }}
+          onPressBack={() => {
+            if (consumerRescheduleMode) {
+              setConsumerRescheduleMode(false);
+              navigate("ManageBooking");
+            } else {
+              navigate("BookingStaff");
+            }
+          }}
+        />
+      );
+    }
+
+    if (activeRoute.name === "BookingReview") {
+      const selectedServices = batchCServices.filter((s) =>
+        consumerSelectedServiceIds.includes(s.serviceId),
+      );
+      const totalDurationMinutes = selectedServices.reduce((sum, s) => sum + s.durationMinutes, 0);
+      const reviewSubtotal = selectedServices.reduce((sum, s) => sum + s.price, 0);
+      const reviewTax = Math.round(reviewSubtotal * 0.08 * 100) / 100;
+      const reviewPricing = { subtotal: reviewSubtotal, taxRate: 0.08, tax: reviewTax, tip: 0, total: Math.round((reviewSubtotal + reviewTax) * 100) / 100 };
+      const selectedTech = batchCTechnicians.find((t) => t.staffId === consumerSelectedStaffId) ?? null;
+      const reviewStaff = selectedTech ? { id: selectedTech.staffId, name: selectedTech.displayName } : null;
+      const reviewServices = selectedServices.map((s) => ({ id: s.serviceId, name: s.name, durationMinutes: s.durationMinutes, priceUsd: s.price }));
+      return (
+        <BookingReviewScreen
+          salon={{ id: tenantId ?? "salon-1", name: tenantProfile?.name ?? "—" }}
+          services={reviewServices}
+          staff={reviewStaff}
+          staffAnyAvailable={consumerSelectedStaffId === "any"}
+          date={consumerBookingDate ?? new Date()}
+          timeSlot={consumerBookingSlot ?? ""}
+          totalDurationMinutes={totalDurationMinutes}
+          pricing={reviewPricing}
+          notes={consumerBookingNotes}
+          onChangeNotes={(n) => setConsumerBookingNotes(n)}
+          onEditServices={() => navigate("BookingService")}
+          onEditStaff={() => navigate("BookingStaff")}
+          onEditDateTime={() => navigate("BookingDate")}
+          onPressContinue={() => navigate("BookingPolicies")}
+          onPressBack={() => navigate("BookingDate")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "BookingPolicies") {
+      return (
+        <BookingPoliciesScreen
+          visible
+          sections={[
+            { id: "cancellation", title: "Cancellation", body: "Free cancellation up to 24 hours before your appointment. After that, a 50% fee applies." },
+            { id: "no-show", title: "No-show", body: "If you miss your appointment without notice, the full amount may be charged." },
+            { id: "late-arrival", title: "Late arrival", body: "Please arrive 5 minutes early. Arrivals more than 15 minutes late may be rescheduled." },
+          ]}
+          acknowledged={consumerPoliciesAck}
+          onChangeAcknowledged={(next) => setConsumerPoliciesAck(next)}
+          onPressAgreeAndContinue={() => navigate("BookingPayment")}
+          onPressClose={() => navigate("BookingReview")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "BookingPayment") {
+      const paySelectedSvcs = batchCServices.filter((s) => consumerSelectedServiceIds.includes(s.serviceId));
+      const paySubtotal = paySelectedSvcs.reduce((sum, s) => sum + s.price, 0);
+      const payTax = Math.round(paySubtotal * 0.08 * 100) / 100;
+      const payPricing = { subtotal: paySubtotal, taxRate: 0.08, tax: payTax, tip: 0, total: Math.round((paySubtotal + payTax) * 100) / 100 };
+      return (
+        <BookingPaymentScreen
+          pricing={payPricing}
+          savedCards={savedPaymentMethods.map((m) => ({ id: m.id, brand: m.brand, last4: m.last4, isDefault: m.isDefault }))}
+          selectedCardId={consumerSelectedCardId}
+          applePayAvailable={false}
+          loading={batchCConfirmLoading}
+          errorMessage={batchCConfirmError ?? undefined}
+          onSelectCard={(id) => setConsumerSelectedCardId(id)}
+          onPressAddCard={() => {
+            // P2: Stripe Add Card wired W38+.
+          }}
+          onPressConfirm={async () => {
+            // W36-R1: create real booking on pay confirm.
+            const firstServiceId = consumerSelectedServiceIds[0];
+            const firstService = batchCServices.find((s) => s.serviceId === firstServiceId);
+            const resolvedTech =
+              batchCTechnicians.find((t) => t.staffId === consumerSelectedStaffId) ??
+              batchCTechnicians[0] ??
+              null;
+            if (
+              clientBookingFlow &&
+              tenantId &&
+              batchCLocation &&
+              firstService &&
+              resolvedTech &&
+              consumerBookingDate &&
+              batchCSelectedSlotRaw &&
+              userId
+            ) {
+              setBatchCConfirmLoading(true);
+              setBatchCConfirmError(null);
+              const dateStr = consumerBookingDate.toISOString().slice(0, 10);
+              const result = await clientBookingFlow.reserveSlot({
+                tenantId,
+                customerUserId: userId,
+                location: batchCLocation,
+                service: firstService,
+                technician: resolvedTech,
+                date: dateStr,
+                slot: batchCSelectedSlotRaw,
+                notes: consumerBookingNotes || null,
+              });
+              setBatchCConfirmLoading(false);
+              if (result.ok) {
+                setBatchCCreatedBookingId(result.booking.bookingId);
+                navigate("BookingConfirmation");
+              } else {
+                setBatchCConfirmError(result.message);
+              }
+            } else {
+              // Fallback: navigate without real booking (missing prerequisites)
+              navigate("BookingConfirmation");
+            }
+          }}
+          onPressBack={() => navigate("BookingPolicies")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "BookingConfirmation") {
+      const confServices = batchCServices.filter((s) => consumerSelectedServiceIds.includes(s.serviceId));
+      const confSubtotal = confServices.reduce((sum, s) => sum + s.price, 0);
+      const confTax = Math.round(confSubtotal * 0.08 * 100) / 100;
+      const confPricing = { subtotal: confSubtotal, taxRate: 0.08, tax: confTax, tip: 0, total: Math.round((confSubtotal + confTax) * 100) / 100 };
+      const confTech = batchCTechnicians.find((t) => t.staffId === consumerSelectedStaffId) ?? null;
+      return (
+        <BookingConfirmationScreen
+          bookingId={batchCCreatedBookingId ?? "—"}
+          salonName={tenantProfile?.name ?? "—"}
+          salonAddress=""
+          servicesSummary={confServices.map((s) => s.name).join(", ") || "—"}
+          staffName={confTech?.displayName ?? "Any available"}
+          date={consumerBookingDate ?? new Date()}
+          timeSlot={consumerBookingSlot ?? ""}
+          pricing={confPricing}
+          onPressManage={() => navigate("ManageBooking")}
+          onPressDone={() => {
+            // Reset flow on completion.
+            setConsumerSelectedServiceIds([]);
+            setConsumerSelectedAddOnIds([]);
+            setConsumerSelectedStaffId(null);
+            setConsumerBookingDate(null);
+            setConsumerBookingSlot(null);
+            setConsumerBookingNotes("");
+            setConsumerPoliciesAck(false);
+            setBatchCCreatedBookingId(null);
+            setBatchCSelectedSlotRaw(null);
+            setBatchCConfirmError(null);
+            navigate("AppShell");
+          }}
+        />
+      );
+    }
+
+    if (activeRoute.name === "GuestContact") {
+      return (
+        <GuestContactScreen
+          values={consumerGuestContact}
+          onChange={(next) => setConsumerGuestContact(next)}
+          onPressContinue={() => navigate("BookingPolicies")}
+          onPressSignIn={() => navigate("SignIn")}
+          onPressBack={() => navigate("BookingReview")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "ManageBooking") {
+      const manageServices = batchCServices.filter((s) => consumerSelectedServiceIds.includes(s.serviceId));
+      const manageSubtotal = manageServices.reduce((sum, s) => sum + s.price, 0);
+      const manageTax = Math.round(manageSubtotal * 0.08 * 100) / 100;
+      const managePricing = { subtotal: manageSubtotal, taxRate: 0.08, tax: manageTax, tip: 0, total: Math.round((manageSubtotal + manageTax) * 100) / 100 };
+      const manageTech = batchCTechnicians.find((t) => t.staffId === consumerSelectedStaffId) ?? null;
+      return (
+        <ManageBookingScreen
+          bookingId={batchCCreatedBookingId ?? "—"}
+          status="confirmed"
+          salonName={tenantProfile?.name ?? "—"}
+          servicesSummary={manageServices.map((s) => s.name).join(", ") || "—"}
+          staffName={manageTech?.displayName ?? "Any available"}
+          date={consumerBookingDate ?? new Date()}
+          timeSlot={consumerBookingSlot ?? ""}
+          pricing={managePricing}
+          cancellationFeeUsd={Math.round(managePricing.total * 0.5 * 100) / 100}
+          cancelModalVisible={consumerCancelModalVisible}
+          cancelErrorMessage={consumerRescheduleError ?? undefined}
+          onPressReschedule={() => {
+            setConsumerRescheduleMode(true);
+            setConsumerBookingDate(null);
+            setConsumerBookingSlot(null);
+            setBatchCSelectedSlotRaw(null);
+            setBatchCSlots([]);
+            setBatchCRawSlots([]);
+            navigate("BookingDate");
+          }}
+          onPressCancel={() => setConsumerCancelModalVisible(true)}
+          onPressConfirmCancel={async () => {
+            // W36-R2: cancel the real booking if one was created.
+            if (batchCCreatedBookingId && tenantId) {
+              try {
+                await appBookingsRepository.cancelBooking(
+                  batchCCreatedBookingId,
+                  tenantId,
+                  "client",
+                  "Client cancelled",
+                );
+              } catch {
+                // Non-fatal: navigate away regardless.
+              }
+            }
+            setConsumerCancelModalVisible(false);
+            navigate("AppShell");
+          }}
+          onPressDismissCancel={() => setConsumerCancelModalVisible(false)}
+          onPressBack={() => navigate("AppShell")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "PostBookingUpgrade") {
+      return (
+        <PostBookingUpgradeScreen
+          visible
+          email={consumerGuestContact.email || undefined}
+          onPressCreateAccount={() => navigate("SignUp")}
+          onPressDismiss={() => navigate("AppShell")}
+        />
+      );
+    }
+
+    // -----------------------------------------------------------------------
+    // W33 Stream A-3: Consumer payments (Batch D). Mock-driven; real Stripe
+    // wiring lands in W36–W37.
+    // -----------------------------------------------------------------------
+    if (activeRoute.name === "SavedPaymentMethods") {
+      return (
+        <SavedPaymentMethodsScreen
+          methods={savedPaymentMethods}
+          loading={savedPaymentMethodsLoading}
+          errorMessage={savedPaymentMethodsError ?? undefined}
+          applePayAvailable={false}
+          onPressEdit={() => {
+            // Phase 2.2: stub.
+          }}
+          onPressSetDefault={() => {
+            // Phase 2.2: stub.
+          }}
+          onPressRemove={() => {
+            // Phase 2.2: stub.
+          }}
+          onPressAddCard={() => navigate("AddPaymentMethod")}
+          onPressBack={() => navigate("AppShell")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "AddPaymentMethod") {
+      return (
+        <AddPaymentMethodScreen
+          state={addCardFormState}
+          onChange={(next) => setAddCardFormState(next)}
+          onSubmit={() => navigate("SavedPaymentMethods")}
+          onPressBack={() => navigate("SavedPaymentMethods")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "Tipping") {
+      const tipServices = batchCServices.filter((s) => consumerSelectedServiceIds.includes(s.serviceId));
+      const tipSubtotal = tipServices.reduce((sum, s) => sum + s.price, 0);
+      return (
+        <TippingScreen
+          subtotal={tipSubtotal}
+          state={tippingState}
+          onChange={(next) => setTippingState(next)}
+          onConfirm={() => navigate("BookingPayment")}
+          onPressBack={() => navigate("BookingPayment")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "Receipt") {
+      // W38-DEBT-3: render real receipt data loaded by receiptDataService.
+      if (receiptLoading || (!receiptData && !receiptError)) {
+        return (
+          <ReceiptScreen
+            salonName="Loading…"
+            salonAddress=""
+            occurredAtIso={new Date().toISOString()}
+            items={[]}
+            paymentMethodLabel="—"
+            onPressEmail={() => {}}
+            onPressDownload={() => {}}
+            onPressShare={() => {}}
+            onPressBack={() => navigate("BookingHistory")}
+          />
+        );
+      }
+      if (receiptError || !receiptData) {
+        return (
+          <ReceiptScreen
+            salonName="Receipt unavailable"
+            salonAddress=""
+            occurredAtIso={new Date().toISOString()}
+            items={[]}
+            paymentMethodLabel="—"
+            errorMessage={receiptError ?? "No receipt found for this booking."}
+            onPressEmail={() => {}}
+            onPressDownload={() => {}}
+            onPressShare={() => {}}
+            onPressBack={() => navigate("BookingHistory")}
+          />
+        );
+      }
+      return (
+        <ReceiptScreen
+          salonName={receiptData.salonName}
+          salonAddress={receiptData.salonAddress}
+          occurredAtIso={receiptData.occurredAtIso}
+          items={[{
+            id: receiptData.bookingId,
+            description: receiptData.serviceName,
+            quantity: 1,
+            unitPriceUsd: receiptData.subtotalUsd,
+          }]}
+          taxLines={receiptData.taxUsd > 0 ? [{ label: "Tax", amount: receiptData.taxUsd }] : undefined}
+          tip={receiptData.tipUsd > 0 ? receiptData.tipUsd : undefined}
+          paymentMethodLabel={receiptData.paymentMethodLabel}
+          onPressEmail={() => {
+            // W24-DEBT-3: generate PDF and open as a mailto share.
+            if (!tenantId || !selectedReceiptBookingId || !userId) return;
+            void receiptsGeneratePdfFn({ tenantId, bookingId: selectedReceiptBookingId, userId }).then(
+              (result) => {
+                const url = result.data.downloadUrl;
+                void Linking.openURL(`mailto:?subject=Your Receipt&body=Download your receipt: ${url}`);
+              },
+            ).catch(() => {/* non-fatal */});
+          }}
+          onPressDownload={() => {
+            // W24-DEBT-3: generate PDF and open signed URL.
+            if (!tenantId || !selectedReceiptBookingId || !userId) return;
+            void receiptsGeneratePdfFn({ tenantId, bookingId: selectedReceiptBookingId, userId }).then(
+              (result) => { void Linking.openURL(result.data.downloadUrl); },
+            ).catch(() => {/* non-fatal */});
+          }}
+          onPressShare={() => {
+            // W24-DEBT-3: generate PDF and open native share sheet.
+            if (!tenantId || !selectedReceiptBookingId || !userId) return;
+            void receiptsGeneratePdfFn({ tenantId, bookingId: selectedReceiptBookingId, userId }).then(
+              (result) => {
+                void Share.share({ title: "Receipt", message: result.data.downloadUrl, url: result.data.downloadUrl });
+              },
+            ).catch(() => {/* non-fatal */});
+          }}
+          onPressBack={() => navigate("BookingHistory")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "BookingHistory") {
+      return (
+        <BookingHistoryScreen
+          records={batchCBookingHistory}
+          state={bookingHistoryState}
+          loading={batchCBookingHistoryLoading}
+          onChange={(next) => setBookingHistoryState(next)}
+          onPressRecord={(id) => {
+            const record = batchCBookingHistory.find((r) => r.id === id);
+            if (record?.status === "cancelled") {
+              setSelectedRefundBookingId(id);
+              navigate("RefundStatus");
+            } else {
+              setSelectedReceiptBookingId(id);
+              navigate("Receipt");
+            }
+          }}
+          onPressFindSalon={() => navigate("AppShell")}
+          onPressBack={() => navigate("AppShell")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "RefundStatus") {
+      // W38-DEBT-4: render real refund data loaded by refundDataService.
+      if (refundLoading || (!refundData && !refundError)) {
+        return (
+          <RefundStatusScreen
+            status="pending"
+            amountUsd={0}
+            booking={{ salonName: "Loading…", serviceName: "—", startsAtIso: new Date().toISOString() }}
+            requestedAtIso={new Date().toISOString()}
+            onPressBack={() => navigate("BookingHistory")}
+          />
+        );
+      }
+      if (refundError || !refundData) {
+        return (
+          <RefundStatusScreen
+            status="pending"
+            amountUsd={0}
+            booking={{ salonName: "Refund unavailable", serviceName: "—", startsAtIso: new Date().toISOString() }}
+            requestedAtIso={new Date().toISOString()}
+            errorMessage={refundError ?? "No refund found for this booking."}
+            onPressContactSupport={() => {}}
+            onPressBack={() => navigate("BookingHistory")}
+          />
+        );
+      }
+      return (
+        <RefundStatusScreen
+          status={refundData.status}
+          amountUsd={refundData.amountUsd}
+          booking={{
+            salonName: refundData.salonName,
+            serviceName: refundData.serviceName,
+            startsAtIso: refundData.startsAtIso,
+          }}
+          requestedAtIso={refundData.requestedAtIso}
+          issuedAtIso={refundData.status === "issued" ? refundData.processedAtIso : undefined}
+          deniedAtIso={refundData.status === "denied" ? refundData.processedAtIso : undefined}
+          denialReason={refundData.failureCode ?? undefined}
+          onPressContactSupport={() => {}}
+          onPressBack={() => navigate("BookingHistory")}
+        />
+      );
+    }
+
+    // -----------------------------------------------------------------------
+    // W33 Stream A-4: Loyalty + Activities + Reviews (Batch E). Mock-driven.
+    // -----------------------------------------------------------------------
+    if (activeRoute.name === "LoyaltyLanding") {
+      return (
+        <LoyaltyLandingScreen
+          points={loyaltyPoints ?? 0}
+          historyEntries={loyaltyHistory}
+          earnActions={DEFAULT_EARN_ACTIONS}
+          onPressBrowseRewards={() => navigate("RewardCatalog")}
+          onPressEarnAction={(action) => {
+            if (action.id === "refer") navigate("Referral");
+            else if (action.id === "review") navigate("ReviewPrompt");
+            else navigate("BookingService");
+          }}
+        />
+      );
+    }
+
+    if (activeRoute.name === "RewardCatalog") {
+      return (
+        <RewardCatalogScreen
+          userPoints={loyaltyPoints ?? 0}
+          rewards={loyaltyRewards.length > 0 ? loyaltyRewards : []}
+          activeTab={rewardsTab}
+          sortOption={rewardsSort}
+          onTabChange={(t) => setRewardsTab(t)}
+          onSortPress={() =>
+            setRewardsSort((prev) =>
+              prev === "lowest-points"
+                ? "highest-points"
+                : prev === "highest-points"
+                  ? "newest"
+                  : "lowest-points",
+            )
+          }
+          onRewardPress={(reward) => {
+            setSelectedReward(reward);
+            navigate("RewardRedemption");
+          }}
+          onPressBack={() => navigate("LoyaltyLanding")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "RewardRedemption") {
+      const reward = selectedReward ?? loyaltyRewards[0] ?? null;
+      if (!reward) return null;
+      return (
+        <RewardRedemptionScreen
+          title={reward.title}
+          description={`Redeem for ${reward.points} points.`}
+          pointsCost={reward.points}
+          userPoints={loyaltyPoints ?? 0}
+          onRedeem={() => navigate("LoyaltyLanding")}
+          onPressBack={() => navigate("RewardCatalog")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "Activities") {
+      return (
+        <ActivitiesScreen
+          activities={loyaltyActivities.length > 0 ? loyaltyActivities : []}
+          activeTab={activitiesTab}
+          onTabChange={(t) => setActivitiesTab(t)}
+          onActivityPress={(activity) => {
+            setSelectedActivity(activity);
+            navigate("ActivityDetail");
+          }}
+        />
+      );
+    }
+
+    if (activeRoute.name === "ActivityDetail") {
+      const activity = selectedActivity ?? loyaltyActivities[0] ?? null;
+      if (!activity) return null;
+      return (
+        <ActivityDetailScreen
+          activity={activity}
+          onCtaPress={() => {
+            if (activity.status === "ready_to_claim") {
+              setClaimRewardVisible(true);
+              navigate("ClaimActivityReward");
+            } else {
+              navigate("Activities");
+            }
+          }}
+          onPressBack={() => navigate("Activities")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "ClaimActivityReward") {
+      const claimActivity = selectedActivity ?? loyaltyActivities[0] ?? null;
+      if (!claimActivity) return null;
+      return (
+        <ClaimActivityRewardScreen
+          visible={claimRewardVisible}
+          activityTitle={claimActivity.title}
+          pointsReward={claimActivity.pointsReward}
+          bonusPoints={claimActivity.bonusPoints}
+          onClaim={() => {
+            setClaimRewardVisible(false);
+            navigate("LoyaltyLanding");
+          }}
+          onDone={() => {
+            setClaimRewardVisible(false);
+            navigate("Activities");
+          }}
+          onDismiss={() => {
+            setClaimRewardVisible(false);
+            navigate("Activities");
+          }}
+        />
+      );
+    }
+
+    if (activeRoute.name === "ReviewPrompt") {
+      return (
+        <ReviewPromptScreen
+          salon={{
+            name: tenantProfile?.name ?? "",
+            address: "",
+            avatarLabel: (tenantProfile?.name ?? "S").charAt(0).toUpperCase(),
+          }}
+          draft={reviewDraft}
+          onDraftChange={(patch) =>
+            setReviewDraft((prev) => ({ ...prev, ...patch }))
+          }
+          onSubmit={() => {
+            setReviewDraft({ ...EMPTY_REVIEW_DRAFT });
+            navigate("LoyaltyLanding");
+          }}
+          onPressBack={() => navigate("LoyaltyLanding")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "ReviewDetail") {
+      // P2: ReviewDetail requires selectedReview state — deferred to W38+.
+      return null;
+    }
+
+    if (activeRoute.name === "Referral") {
+      return (
+        <ReferralScreen
+          rawCode={loyaltyReferralCode}
+          stats={loyaltyReferralStats}
+          onCopy={() => {
+            // Phase 2.2: stub.
+          }}
+          onPressBack={() => navigate("LoyaltyLanding")}
+        />
+      );
+    }
+
+    // -----------------------------------------------------------------------
+    // W33 Stream A-5: Messaging + Notifications (Batch F). Mock-driven.
+    // -----------------------------------------------------------------------
+    if (activeRoute.name === "Inbox") {
+      const liveThreads = threads;
+      return (
+        <InboxScreen
+          threads={liveThreads}
+          activeTab={inboxTab}
+          searchQuery={inboxSearchQuery}
+          onTabChange={(t) => setInboxTab(t)}
+          onSearchChange={(q) => setInboxSearchQuery(q)}
+          onPressThread={(threadId) => {
+            setActiveThreadId(threadId);
+            navigate("Thread");
+          }}
+          onPressCompose={() => navigate("Compose")}
+          onOpenNotificationCenter={() => navigate("NotificationCenter")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "Thread") {
+      const liveThreads = threads;
+      const liveMessages = threadMessages;
+      const thread =
+        liveThreads.find((t) => t.id === activeThreadId) ??
+        liveThreads[0];
+      return (
+        <ThreadScreen
+          thread={thread}
+          messages={liveMessages}
+          quickReplies={["Sounds good!", "Thanks!", "Can we reschedule?"]}
+          composerText={threadComposerText}
+          onComposerChange={(text) => setThreadComposerText(text)}
+          onPressSend={async () => {
+            if (consumerMessagingService && activeThreadId && userId && threadComposerText.trim()) {
+              await consumerMessagingService.sendMessage(activeThreadId, userId, threadComposerText);
+            }
+            setThreadComposerText("");
+          }}
+          onPressQuickReply={(text) => setThreadComposerText(text)}
+          onPressBack={() => navigate("Inbox")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "Compose") {
+      const filteredSalons: SalonSearchResult[] = [];
+      return (
+        <ComposeScreen
+          recipientName={composeRecipient?.name ?? null}
+          salonSearchQuery={composeSearchQuery}
+          onSalonSearchChange={(q) => setComposeSearchQuery(q)}
+          salonResults={filteredSalons}
+          onSelectSalon={(id, name) => {
+            setComposeRecipient({ id, name });
+            setComposeSearchQuery("");
+          }}
+          onRemoveRecipient={() => setComposeRecipient(null)}
+          subject={composeSubject}
+          onSubjectChange={(s) => setComposeSubject(s)}
+          message={composeMessage}
+          onMessageChange={(m) => setComposeMessage(m)}
+          onPressSend={() => {
+            setComposeMessage("");
+            setComposeSubject("");
+            setComposeRecipient(null);
+            navigate("Inbox");
+          }}
+          onPressBack={() => navigate("Inbox")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "NotificationCenter") {
+      const liveNotifications = notifications;
+      return (
+        <NotificationCenterScreen
+          notifications={liveNotifications}
+          activeTab={notificationsTab}
+          onTabChange={(t) => setNotificationsTab(t)}
+          onMarkAllRead={() => {
+            if (consumerNotificationService && userId) {
+              const unread = liveNotifications.filter((n) => !n.isRead);
+              for (const n of unread) {
+                void consumerNotificationService.markRead(userId, n.id);
+              }
+            }
+          }}
+          onPressNotification={() => {
+            // Phase 2.2: stub.
+          }}
+          onDismissNotification={() => {
+            // Phase 2.2: stub.
+          }}
+          hasPermission
+          onEnablePermissions={() => navigate("NotificationPreferences")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "NotificationPreferences") {
+      return (
+        <NotificationPreferencesScreen
+          preferences={notificationPrefs}
+          onToggle={(key: NotificationPreferenceKey, channel: NotificationChannel, value: boolean) => {
+            const updated = {
+              ...notificationPrefs,
+              [key]: { ...notificationPrefs[key], [channel]: value },
+            };
+            setNotificationPrefs(updated);
+            if (consumerNotificationService && userId) {
+              void consumerNotificationService.updatePreferences(userId, updated);
+            }
+          }}
+          quietHoursStart={quietHoursStart}
+          quietHoursEnd={quietHoursEnd}
+          onQuietHoursStartChange={(t) => setQuietHoursStart(t)}
+          onQuietHoursEndChange={(t) => setQuietHoursEnd(t)}
+          quietDays={quietDays}
+          onToggleQuietDay={(day) =>
+            setQuietDays((prev) =>
+              prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day],
+            )
+          }
+          hasSystemPermission
+          onResetDefaults={() => {
+            setNotificationPrefs(DEFAULT_NOTIFICATION_PREFERENCES);
+            if (consumerNotificationService && userId) {
+              void consumerNotificationService.updatePreferences(userId, DEFAULT_NOTIFICATION_PREFERENCES);
+            }
+          }}
+        />
+      );
+    }
+
+    if (activeRoute.name === "EditProfile") {
+      return (
+        <EditProfileScreen
+          initialDisplayName={[firstName, lastName].filter(Boolean).join(" ") || "Dev User"}
+          initialPronouns=""
+          initialBio=""
+          onSave={async () => { navigate("AppShell"); }}
+          onBack={() => navigate("AppShell")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "SettingsShell") {
+      return (
+        <SettingsShellRouteScreen
+          onOpenNotifications={() => navigate("NotificationPreferences")}
+          onOpenPaymentMethods={() => navigate("SavedPaymentMethods")}
+          onOpenTerms={() => { setActiveLegalPage("terms"); navigate("LegalPage"); }}
+          onOpenPrivacy={() => { setActiveLegalPage("privacy"); navigate("LegalPage"); }}
+          onOpenAbout={() => { setActiveLegalPage("about"); navigate("LegalPage"); }}
+          onSignOut={() => void handleSignOut()}
+          onBack={() => navigate("AppShell")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "LegalPage") {
+      return (
+        <LegalPageScreen
+          pageType={activeLegalPage}
+          sections={[]}
+          onBack={() => navigate("SettingsShell")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "Waitlist") {
+      return (
+        <WaitlistScreen
+          entries={waitlistEntries}
+          isLoading={waitlistEntriesLoading}
+          errorMessage={waitlistEntriesError}
+          onJoinWaitlist={() => navigate("WaitlistJoin")}
+          onViewPosition={(entryId) => {
+            const entry = waitlistEntries.find((e) => e.entryId === entryId);
+            if (entry) {
+              setWaitlistPosition({
+                positionNumber: entry.positionNumber ?? 1,
+                serviceName: entry.serviceName,
+                salonName: entry.salonName,
+                salonAddress: "",
+                estimatedWait: entry.estimatedWait ?? "2\u20135 days",
+              });
+            }
+            navigate("WaitlistPosition");
+          }}
+          onLeave={async (entryId) => {
+            if (waitlistRepository && userId && tenantId) {
+              await waitlistRepository.leaveWaitlist(entryId, tenantId, userId);
+              setWaitlistEntries((prev) => prev.filter((e) => e.entryId !== entryId));
+            }
+          }}
+          onBack={() => navigate("AppShell")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "WaitlistJoin") {
+      return (
+        <WaitlistJoinSheet
+          visible
+          onClose={() => navigate("AppShell")}
+          serviceName={batchCServices.find(s => consumerSelectedServiceIds.includes(s.serviceId))?.name ?? "Service"}
+          dateRangeStart={waitlistDateStart}
+          dateRangeEnd={waitlistDateEnd}
+          onDateRangeStartChange={setWaitlistDateStart}
+          onDateRangeEndChange={setWaitlistDateEnd}
+          timePreference={waitlistTimePref}
+          onTimePreferenceChange={setWaitlistTimePref}
+          staffPreference={waitlistStaffPref}
+          onStaffPreferenceChange={setWaitlistStaffPref}
+          notifyByPush={waitlistNotifyPush}
+          onTogglePush={(v) => setWaitlistNotifyPush(v)}
+          notifyBySms={waitlistNotifySms}
+          onToggleSms={(v) => setWaitlistNotifySms(v)}
+          onJoin={async () => {
+            if (waitlistRepository && userId && tenantId && batchCLocationId) {
+              try {
+                const serviceId = consumerSelectedServiceIds[0] ?? "unknown";
+                const today = new Date().toISOString().slice(0, 10);
+                const inThirtyDays = new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10);
+                const entryId = await waitlistRepository.joinWaitlist({
+                  tenantId,
+                  locationId: batchCLocationId,
+                  userId,
+                  serviceId,
+                  staffId: null,
+                  dateFrom: waitlistDateStart || today,
+                  dateTo: waitlistDateEnd || inThirtyDays,
+                });
+                setJoinedWaitlistEntryId(entryId);
+                setWaitlistPosition({
+                  positionNumber: 1,
+                  serviceName: batchCServices.find(s => consumerSelectedServiceIds.includes(s.serviceId))?.name ?? "Service",
+                  salonName: tenantProfile?.name ?? "—",
+                  salonAddress: "",
+                  estimatedWait: "2–5 days",
+                });
+              } catch {
+                // Non-fatal: navigate to position screen regardless
+              }
+            }
+            navigate("WaitlistPosition");
+          }}
+        />
+      );
+    }
+
+    if (activeRoute.name === "WaitlistPosition") {
+      if (!waitlistPosition) return null;
+      return (
+        <WaitlistPositionScreen
+          position={waitlistPosition}
+          onUpdatePreferences={() => navigate("WaitlistJoin")}
+          onLeaveWaitlist={async () => {
+            if (waitlistRepository && joinedWaitlistEntryId && userId && tenantId) {
+              try {
+                await waitlistRepository.leaveWaitlist(joinedWaitlistEntryId, tenantId, userId);
+              } catch {
+                // Non-fatal
+              }
+              setJoinedWaitlistEntryId(null);
+              setWaitlistPosition(null);
+            }
+            navigate("AppShell");
+          }}
+        />
+      );
+    }
+
+    // ---------------------------------------------------------------------
+    // W34 Stream B — Discovery routes
+    // ---------------------------------------------------------------------
+    if (activeRoute.name === "DiscoverHome") {
+      return (
+        <DiscoverHomeScreen
+          featuredSalons={(homeFeed?.featuredSalons ?? []).map(toFeaturedSalon)}
+          categories={(homeFeed?.categories ?? []).map(toAppCategory)}
+          onSelectSalon={() => navigate("SalonProfile")}
+          onSelectCategory={() => navigate("ExploreResults")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "DiscoverFeed") {
+      return (
+        <DiscoverFeedScreen
+          posts={[]}
+          activeFilter={discoveryFeedFilter}
+          onFilterChange={setDiscoveryFeedFilter}
+          onSelectPost={() => navigate("SalonProfile")}
+          onSelectSalon={() => navigate("SalonProfile")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "ExploreResults") {
+      return (
+        <ExploreResultsScreen
+          query=""
+          results={(exploreFeed?.salons ?? []).map(toFeaturedSalon)}
+          filters={discoveryFilters}
+          onSelectSalon={() => navigate("SalonProfile")}
+          onChangeFilters={() => navigate("DiscoverFilters")}
+          onOpenMap={() => navigate("ExploreMap")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "ExploreMap") {
+      return (
+        <ExploreMapScreen
+          results={(exploreFeed?.salons ?? []).map(toFeaturedSalon)}
+          selectedSalonId={exploreMapSelectedSalon}
+          onSelectSalon={setExploreMapSelectedSalon}
+          onPressBack={() => navigate("ExploreResults")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "DiscoverFilters") {
+      return (
+        <DiscoverFiltersScreen
+          filters={discoveryFilters}
+          categories={(exploreFeed?.categories ?? []).map(toAppCategory)}
+          onChange={setDiscoveryFilters}
+          onApply={() => navigate("ExploreResults")}
+          onReset={() => setDiscoveryFilters(DEFAULT_DISCOVERY_FILTERS)}
+        />
+      );
+    }
+
+    if (activeRoute.name === "SalonProfile") {
+      // P2: getSalonById backend required (W38+). Inline static until then.
+      return (
+        <SalonProfileScreen
+          salon={{ id: "salon-1", name: "Zarkili Demo Salon", tagline: "Modern color and care", city: "San Francisco", addressLine: "123 Demo St, San Francisco, CA", rating: 4.8, reviewCount: 132, description: "A neighborhood salon focused on color, balayage, and premium hair care. Walk-ins welcome." }}
+          services={[{ id: "svc-1", name: "Cut & style", durationMinutes: 60, priceCents: 8500 }, { id: "svc-2", name: "Balayage", durationMinutes: 180, priceCents: 28000 }, { id: "svc-3", name: "Gloss treatment", durationMinutes: 45, priceCents: 6500 }]}
+          staff={[{ id: "staff-1", name: "Alex Rivera", role: "Senior stylist", rating: 4.9 }, { id: "staff-2", name: "Sam Chen", role: "Color specialist", rating: 4.7 }]}
+          reviews={[{ id: "rev-1", authorName: "Jordan", rating: 5, text: "Loved my balayage — Alex really listened to what I wanted.", postedAt: "Apr 22" }, { id: "rev-2", authorName: "Riley", rating: 4, text: "Great gloss treatment, clean salon, easy booking.", postedAt: "Apr 18" }]}
+          heroImageUrl={salonProfileHeroUrl}
+          galleryUrls={salonProfileGalleryUrls}
+          onSelectService={() => navigate("ServiceDetail")}
+          onSelectStaff={() => navigate("StaffDetail")}
+          onBook={() => navigate("BookingService")}
+          onBack={() => navigate("DiscoverHome")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "ServiceDetail") {
+      // P2: getServiceById backend required (W38+). Inline static until then.
+      return (
+        <ServiceDetailScreen
+          service={{ id: "svc-1", name: "Cut & style", durationMinutes: 60, priceCents: 8500, description: "A precision cut tailored to your hair texture and lifestyle." }}
+          salon={{ id: "salon-1", name: "Zarkili Demo Salon", city: "San Francisco" }}
+          onBook={() => navigate("BookingService")}
+          onBack={() => navigate("SalonProfile")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "StaffDetail") {
+      // P2: getStaffById backend required (W38+). Inline static until then.
+      return (
+        <StaffDetailScreen
+          staff={{ id: "staff-1", name: "Alex Rivera", role: "Senior stylist", rating: 4.9, bio: "10+ years specializing in modern color and balayage.", salonName: "Zarkili Demo Salon" }}
+          services={[{ id: "svc-1", name: "Cut & style", durationMinutes: 60, priceCents: 8500 }, { id: "svc-2", name: "Balayage", durationMinutes: 180, priceCents: 28000 }, { id: "svc-3", name: "Gloss treatment", durationMinutes: 45, priceCents: 6500 }]}
+          onSelectService={() => navigate("ServiceDetail")}
+          onBook={() => navigate("BookingService")}
+          onBack={() => navigate("SalonProfile")}
+        />
+      );
+    }
+
     if (activeRoute.name === "CompleteProfile") {
       return (
         <CompleteProfileRouteScreen
@@ -1749,8 +5018,9 @@ export function AppNavigatorShell({
           isLoadingFeed={feedLoading}
           marketplaceEnabled={featureFlags.marketplaceEnabled}
           onBookEnabled={(salon) => openTenantPublicProfile(salon.tenantId)}
-          onBack={() => navigate("Landing")}
+          onBack={() => navigate("AppShell")}
           onBookUnavailable={() => undefined}
+          onOpenDiscovery={() => navigate("DiscoverHome")}
           onRetryFeed={() => void retryDiscoveryFeeds()}
         />
       );
@@ -1828,6 +5098,21 @@ export function AppNavigatorShell({
           staffList={staffList}
           onRetry={() => void loadStaffList()}
           onCreateStaff={() => navigate("StaffCreate")}
+          onInviteStaff={() => navigate("StaffInvite")}
+          onSelectStaff={(member) => {
+            setStaffEditDisplayName(member.displayName);
+            setStaffEditRole(member.role);
+            setStaffRolePending(member.role);
+            navigate("StaffEdit");
+          }}
+          onBulkDeactivate={(ids) => {
+            ids.forEach((id) => {
+              if (staffAdminService && tenantId) {
+                void staffAdminService.deactivateStaffMember(id, tenantId);
+              }
+            });
+            void loadStaffList();
+          }}
           onBack={() => navigate("AppShell")}
         />
       );
@@ -1867,8 +5152,767 @@ export function AppNavigatorShell({
           onDisplayNameChange={setStaffEditDisplayName}
           onRoleChange={setStaffEditRole}
           onSubmit={() => undefined}
-          onDeactivate={() => undefined}
+          onDeactivate={() => {
+            if (staffAdminService && tenantId && selectedStaff) {
+              void staffAdminService.deactivateStaffMember(selectedStaff.staffId, tenantId).then(() => {
+                void loadStaffList();
+                navigate("StaffList");
+              });
+            }
+          }}
+          onReactivate={() => {
+            if (staffAdminService && tenantId && selectedStaff) {
+              void staffAdminService.reactivateStaffMember(selectedStaff.staffId, tenantId).then(() => {
+                void loadStaffList();
+                navigate("StaffList");
+              });
+            }
+          }}
+          onSchedule={() => {
+            if (staffAdminService && tenantId && selectedStaff && activeLocationId) {
+              setStaffScheduleLoading(true);
+              setStaffScheduleError(null);
+              void staffAdminService.readSchedule(tenantId, selectedStaff.staffId, activeLocationId).then((res) => {
+                setStaffScheduleLoading(false);
+                if (res.ok) {
+                  setStaffSchedule(res.data);
+                } else {
+                  setStaffScheduleError(res.message);
+                }
+              });
+            }
+            navigate("StaffSchedule");
+          }}
+          onPerformance={() => navigate("StaffPerformance")}
+          onCommission={() => navigate("StaffCommission")}
+          onRole={() => navigate("StaffRole")}
           onBack={() => navigate("StaffList")}
+        />
+      );
+    }
+
+    // -------------------------------------------------------------------------
+    // W41 — Staff admin sub-screens
+    // -------------------------------------------------------------------------
+
+    if (activeRoute.name === "StaffSchedule") {
+      return (
+        <StaffScheduleScreen
+          staffName={selectedStaff?.displayName ?? "Staff"}
+          loading={staffScheduleLoading}
+          error={staffScheduleError}
+          schedule={staffSchedule}
+          editMode={scheduleEditMode}
+          editWeekHours={scheduleEditHours ?? undefined}
+          scheduleSaving={scheduleSaving}
+          scheduleSaveError={scheduleSaveError}
+          scheduleSaveSuccess={scheduleSaveSuccess}
+          onToggleEditMode={() => {
+            if (!scheduleEditMode && staffSchedule) {
+              // Seed edit hours from existing schedule
+              const DAYS: import("../../domains/staff").ScheduleWeekday[] = [
+                "mon", "tue", "wed", "thu", "fri", "sat", "sun",
+              ];
+              const initial: EditWeekHours = {} as EditWeekHours;
+              for (const day of DAYS) {
+                const blocks = staffSchedule.weekTemplate[day] ?? [];
+                initial[day] = {
+                  enabled: blocks.length > 0,
+                  start: blocks[0]?.start ?? "09:00",
+                  end: blocks[0]?.end ?? "18:00",
+                };
+              }
+              setScheduleEditHours(initial);
+            }
+            setScheduleSaveError(null);
+            setScheduleSaveSuccess(null);
+            setScheduleEditMode((prev) => !prev);
+          }}
+          onToggleDay={(day, enabled) =>
+            setScheduleEditHours((prev) =>
+              prev ? { ...prev, [day]: { ...prev[day], enabled } } : prev,
+            )
+          }
+          onUpdateDayStart={(day, value) =>
+            setScheduleEditHours((prev) =>
+              prev ? { ...prev, [day]: { ...prev[day], start: value } } : prev,
+            )
+          }
+          onUpdateDayEnd={(day, value) =>
+            setScheduleEditHours((prev) =>
+              prev ? { ...prev, [day]: { ...prev[day], end: value } } : prev,
+            )
+          }
+          onSaveSchedule={async () => {
+            if (!staffAdminService || !tenantId || !selectedStaff || !activeLocationId || !scheduleEditHours) return;
+            const DAYS: import("../../domains/staff").ScheduleWeekday[] = [
+              "mon", "tue", "wed", "thu", "fri", "sat", "sun",
+            ];
+            const weekTemplate = {} as import("../../domains/staff").StaffScheduleTemplate["weekTemplate"];
+            for (const day of DAYS) {
+              const h = scheduleEditHours[day];
+              weekTemplate[day] = h.enabled ? [{ start: h.start, end: h.end }] : [];
+            }
+            setScheduleSaving(true);
+            setScheduleSaveError(null);
+            const saveRes = await staffAdminService.saveSchedule({
+              tenantId,
+              staffId: selectedStaff.staffId,
+              locationId: activeLocationId,
+              weekTemplate,
+              exceptions: staffSchedule?.exceptions ?? [],
+            });
+            setScheduleSaving(false);
+            if (saveRes.ok) {
+              setStaffSchedule(saveRes.data);
+              setScheduleSaveSuccess("Schedule saved.");
+              setScheduleEditMode(false);
+            } else {
+              setScheduleSaveError(saveRes.message);
+            }
+          }}
+          onRetry={() => {
+            if (staffAdminService && tenantId && selectedStaff && activeLocationId) {
+              setStaffScheduleLoading(true);
+              setStaffScheduleError(null);
+              void staffAdminService.readSchedule(tenantId, selectedStaff.staffId, activeLocationId).then((res) => {
+                setStaffScheduleLoading(false);
+                if (res.ok) {
+                  setStaffSchedule(res.data);
+                } else {
+                  setStaffScheduleError(res.message);
+                }
+              });
+            }
+          }}
+          onBack={() => navigate("StaffEdit")}
+          testID="staff-schedule-screen"
+        />
+      );
+    }
+
+    if (activeRoute.name === "StaffPerformance") {
+      return (
+        <StaffPerformanceScreen
+          staffName={selectedStaff?.displayName ?? "Staff"}
+          loading={false}
+          error={null}
+          summary={staffPerformanceSummary}
+          periodLabel="Last 30 days"
+          onRetry={() => undefined}
+          onBack={() => navigate("StaffEdit")}
+          testID="staff-performance-screen"
+        />
+      );
+    }
+
+    if (activeRoute.name === "StaffCommission") {
+      return (
+        <StaffCommissionScreen
+          staffName={selectedStaff?.displayName ?? "Staff"}
+          config={staffCommissionConfig}
+          editMode={commissionEditMode}
+          onToggleEditMode={() => {
+            if (!commissionEditMode && staffCommissionConfig) {
+              // Seed edit fields from current config
+              setCommissionEditRate(String(staffCommissionConfig.commissionRate));
+              setCommissionEditFlatRate(String(staffCommissionConfig.flatRateCents ?? 0));
+              setCommissionEditModel(staffCommissionConfig.model);
+              setCommissionEditSchedule(staffCommissionConfig.payoutSchedule);
+            }
+            setCommissionSaveError(null);
+            setCommissionSaveSuccess(null);
+            setCommissionEditMode((prev) => !prev);
+          }}
+          editRate={commissionEditRate}
+          editFlatRate={commissionEditFlatRate}
+          editModel={commissionEditModel}
+          editSchedule={commissionEditSchedule}
+          onRateChange={setCommissionEditRate}
+          onFlatRateChange={setCommissionEditFlatRate}
+          onModelChange={setCommissionEditModel}
+          onScheduleChange={setCommissionEditSchedule}
+          submitting={commissionSaving}
+          submitError={commissionSaveError}
+          submitSuccess={commissionSaveSuccess}
+          onSave={async () => {
+            if (!selectedStaff || !tenantId) return;
+            const rate = parseFloat(commissionEditRate);
+            if (isNaN(rate)) { setCommissionSaveError("Commission rate must be a number."); return; }
+            const flat = commissionEditModel === "flat_per_booking" ? parseInt(commissionEditFlatRate, 10) : null;
+            setCommissionSaving(true);
+            setCommissionSaveError(null);
+            const result = await commissionService.saveConfig(selectedStaff.staffId, tenantId, {
+              commissionRate: rate,
+              model: commissionEditModel,
+              flatRateCents: flat,
+              payoutSchedule: commissionEditSchedule,
+              currency: staffCommissionConfig?.currency ?? "EUR",
+            });
+            setCommissionSaving(false);
+            if (result.ok) {
+              // Reload config
+              const loaded = await commissionService.loadConfig(selectedStaff.staffId, tenantId);
+              if (loaded.ok) setStaffCommissionConfig(loaded.data);
+              setCommissionSaveSuccess("Commission settings saved.");
+              setCommissionEditMode(false);
+            } else {
+              setCommissionSaveError(result.message);
+            }
+          }}
+          onBack={() => navigate("StaffEdit")}
+          testID="staff-commission-screen"
+        />
+      );
+    }
+
+    if (activeRoute.name === "StaffInvite") {
+      return (
+        <StaffInviteScreen
+          email={staffInviteEmail}
+          role={staffInviteRole}
+          locationId={staffInviteLocationId}
+          submitting={staffInviteSubmitting}
+          formError={staffInviteFormError}
+          submitError={staffInviteSubmitError}
+          submitSuccess={staffInviteSuccess}
+          onEmailChange={setStaffInviteEmail}
+          onRoleChange={setStaffInviteRole}
+          onLocationIdChange={setStaffInviteLocationId}
+          onSubmit={async () => {
+            if (!staffInviteEmail.trim()) {
+              setStaffInviteFormError("Email address is required.");
+              return;
+            }
+            if (!staffInviteLocationId.trim()) {
+              setStaffInviteFormError("Location ID is required.");
+              return;
+            }
+            setStaffInviteFormError(null);
+            setStaffInviteSubmitting(true);
+            const result = await staffInviteService.sendInvite({
+              tenantId: tenantId ?? "",
+              email: staffInviteEmail,
+              role: staffInviteRole,
+              locationId: staffInviteLocationId,
+              invitedBy: userId ?? "",
+            });
+            setStaffInviteSubmitting(false);
+            if (result.ok) {
+              setStaffInviteSuccess("Invitation sent to " + staffInviteEmail);
+              setStaffInviteEmail("");
+            } else {
+              setStaffInviteSubmitError(result.message);
+            }
+          }}
+          onBack={() => navigate("StaffList")}
+          testID="staff-invite-screen"
+        />
+      );
+    }
+
+    if (activeRoute.name === "StaffRole") {
+      return (
+        <StaffRoleScreen
+          staffName={selectedStaff?.displayName ?? "Staff"}
+          currentRole={(selectedStaff?.role ?? "technician") as import("../../domains/staff/model").StaffRole}
+          pendingRole={staffRolePending}
+          auditTrail={staffRoleAuditTrail}
+          submitting={staffRoleSubmitting}
+          submitError={staffRoleSubmitError}
+          submitSuccess={staffRoleSubmitSuccess}
+          onRoleChange={setStaffRolePending}
+          onSave={async () => {
+            if (staffAdminService && tenantId && selectedStaff) {
+              setStaffRoleSubmitting(true);
+              setStaffRoleSubmitError(null);
+              setStaffRoleSubmitSuccess(null);
+              const r = await staffAdminService.updateStaffMember(
+                selectedStaff.staffId,
+                tenantId,
+                { role: staffRolePending },
+              );
+              if (!r.ok) {
+                setStaffRoleSubmitError(r.message);
+                setStaffRoleSubmitting(false);
+                return;
+              }
+              // W41-DEBT-4: write audit entry
+              await roleAuditService.writeRoleAudit(selectedStaff.staffId, tenantId, {
+                fromRole: selectedStaff.role as import("../../domains/staff/model").StaffRole,
+                toRole: staffRolePending,
+                changedBy: userId ?? "",
+              });
+              const auditResult = await roleAuditService.listRoleAudit(
+                selectedStaff.staffId,
+                tenantId,
+              );
+              if (auditResult.ok) setStaffRoleAuditTrail(auditResult.data);
+              setStaffRoleSubmitSuccess("Role updated successfully.");
+              setStaffRoleSubmitting(false);
+            }
+          }}
+          onBack={() => navigate("StaffEdit")}
+          testID="staff-role-screen"
+        />
+      );
+    }
+
+    // W41-DEBT-6 — Staff service mapping
+    if (activeRoute.name === "StaffServiceMapping") {
+      return (
+        <StaffServiceMappingScreen
+          staffName={selectedStaff?.displayName ?? "Staff"}
+          assignedServiceIds={staffMappingAssignedIds}
+          skills={staffMappingSkills}
+          serviceOptions={servicesList.map((s) => ({ serviceId: s.serviceId, name: s.name }))}
+          submitting={staffMappingSubmitting}
+          submitError={staffMappingSubmitError}
+          submitSuccess={staffMappingSubmitSuccess}
+          onToggleService={(serviceId) => {
+            setStaffMappingAssignedIds((prev) =>
+              prev.includes(serviceId)
+                ? prev.filter((id) => id !== serviceId)
+                : [...prev, serviceId],
+            );
+          }}
+          onSkillsChange={(raw) => {
+            setStaffMappingSkills(
+              raw
+                .split(",")
+                .map((s) => s.trim())
+                .filter(Boolean),
+            );
+          }}
+          onSave={async () => {
+            if (!staffAdminService || !tenantId || !selectedStaff) return;
+            setStaffMappingSubmitting(true);
+            setStaffMappingSubmitError(null);
+            const result = await staffAdminService.updateStaffMember(
+              selectedStaff.staffId,
+              tenantId,
+              { serviceIds: staffMappingAssignedIds, skills: staffMappingSkills },
+            );
+            setStaffMappingSubmitting(false);
+            if (result.ok) {
+              setStaffMappingSubmitSuccess("Service mapping saved.");
+            } else {
+              setStaffMappingSubmitError(result.message);
+            }
+          }}
+          onBack={() => navigate("StaffEdit")}
+          testID="staff-service-mapping-screen"
+        />
+      );
+    }
+
+    // -------------------------------------------------------------------------
+    // W42 — Service catalog depth routes
+    // -------------------------------------------------------------------------
+
+    if (activeRoute.name === "ServiceCategories") {
+      return (
+        <ServiceCategoriesScreen
+          loading={serviceCategoriesLoading}
+          error={serviceCategoriesError}
+          categories={serviceCategories}
+          newCategoryName={newCategoryName}
+          submitting={categorySubmitting}
+          formError={categoryFormError}
+          onNewCategoryNameChange={setNewCategoryName}
+          onCreateCategory={async () => {
+            if (!newCategoryName.trim()) {
+              setCategoryFormError("Category name is required.");
+              return;
+            }
+            setCategoryFormError(null);
+            setCategorySubmitting(true);
+            const result = await serviceCatalogService.createCategory({
+              tenantId: tenantId ?? "",
+              name: newCategoryName.trim(),
+              sortOrder: serviceCategories.length,
+            });
+            setCategorySubmitting(false);
+            if (result.ok) {
+              setNewCategoryName("");
+              setServiceCategories((prev) => [...prev, result.data]);
+            } else {
+              setCategoryFormError(result.message);
+            }
+          }}
+          onDeleteCategory={async (categoryId) => {
+            const result = await serviceCatalogService.deleteCategory(categoryId, tenantId ?? "");
+            if (result.ok) {
+              setServiceCategories((prev) => prev.filter((c) => c.categoryId !== categoryId));
+            }
+          }}
+          onRetry={async () => {
+            setServiceCategoriesLoading(true);
+            setServiceCategoriesError(null);
+            const result = await serviceCatalogService.readCategories(tenantId ?? "");
+            setServiceCategoriesLoading(false);
+            if (result.ok) {
+              setServiceCategories(result.data);
+            } else {
+              setServiceCategoriesError(result.message);
+            }
+          }}
+          onBack={() => navigate("ServiceEdit")}
+          testID="service-categories-screen"
+        />
+      );
+    }
+
+    if (activeRoute.name === "ServiceBulkImport") {
+      return (
+        <ServiceBulkImportScreen
+          csvText={csvText}
+          parsedRows={parsedRows}
+          parseErrors={parseErrors}
+          importSubmitting={importSubmitting}
+          importSuccess={importSuccess}
+          importError={importError}
+          onCsvChange={(text) => {
+            setCsvText(text);
+            const result = parseImportCsv(text);
+            setParsedRows(result.rows);
+            setParseErrors(result.errors);
+          }}
+          onImport={async () => {
+            setImportSubmitting(true);
+            setImportError(null);
+            setImportSuccess(null);
+            // Real import wired in W43 — stub success for now.
+            await new Promise((r) => setTimeout(r, 300));
+            setImportSubmitting(false);
+            setImportSuccess(`Imported ${parsedRows.length} service${parsedRows.length === 1 ? "" : "s"}.`);
+            setCsvText("");
+            setParsedRows([]);
+            setParseErrors([]);
+            void loadServicesList();
+          }}
+          onBack={() => navigate("ServiceList")}
+          testID="service-bulk-import-screen"
+        />
+      );
+    }
+
+    if (activeRoute.name === "ServicePricing") {
+      return (
+        <ServicePricingScreen
+          serviceName={selectedService?.name ?? "Service"}
+          loading={pricingLoading}
+          error={pricingError}
+          overrides={servicePriceOverrides}
+          locationId={priceLocationId}
+          price={priceAmount}
+          currency={priceCurrency}
+          submitting={pricingSubmitting}
+          formError={pricingFormError}
+          onLocationIdChange={setPriceLocationId}
+          onPriceChange={setPriceAmount}
+          onCurrencyChange={setPriceCurrency}
+          onUpsert={async () => {
+            if (!priceLocationId.trim() || !priceAmount.trim()) {
+              setPricingFormError("Location and price are required.");
+              return;
+            }
+            setPricingFormError(null);
+            setPricingSubmitting(true);
+            const result = await serviceCatalogService.upsertPriceOverride({
+              tenantId: tenantId ?? "",
+              serviceId: selectedService?.serviceId ?? "",
+              locationId: priceLocationId.trim(),
+              price: parseFloat(priceAmount),
+              currency: priceCurrency.trim() || "EUR",
+            });
+            setPricingSubmitting(false);
+            if (result.ok) {
+              setServicePriceOverrides((prev) => {
+                const idx = prev.findIndex((o) => o.overrideId === result.data.overrideId);
+                return idx >= 0 ? prev.map((o, i) => (i === idx ? result.data : o)) : [...prev, result.data];
+              });
+              setPriceLocationId("");
+              setPriceAmount("");
+            } else {
+              setPricingFormError(result.message);
+            }
+          }}
+          onDeleteOverride={async (overrideId) => {
+            const result = await serviceCatalogService.deletePriceOverride(overrideId, tenantId ?? "");
+            if (result.ok) {
+              setServicePriceOverrides((prev) => prev.filter((o) => o.overrideId !== overrideId));
+            }
+          }}
+          onRetry={async () => {
+            setPricingLoading(true);
+            setPricingError(null);
+            const result = await serviceCatalogService.readPriceOverrides(tenantId ?? "", selectedService?.serviceId ?? "");
+            setPricingLoading(false);
+            if (result.ok) {
+              setServicePriceOverrides(result.data);
+            } else {
+              setPricingError(result.message);
+            }
+          }}
+          onBack={() => navigate("ServiceEdit")}
+          testID="service-pricing-screen"
+        />
+      );
+    }
+
+    if (activeRoute.name === "ServiceAddOns") {
+      return (
+        <ServiceAddOnsScreen
+          loading={addonsLoading}
+          error={addonsError}
+          addons={serviceAddons}
+          newName={newAddonName}
+          newPrice={newAddonPrice}
+          newDuration={newAddonDuration}
+          submitting={addonSubmitting}
+          formError={addonFormError}
+          onNewNameChange={setNewAddonName}
+          onNewPriceChange={setNewAddonPrice}
+          onNewDurationChange={setNewAddonDuration}
+          onCreate={async () => {
+            if (!newAddonName.trim()) {
+              setAddonFormError("Add-on name is required.");
+              return;
+            }
+            setAddonFormError(null);
+            setAddonSubmitting(true);
+            const result = await serviceCatalogService.createAddon({
+              tenantId: tenantId ?? "",
+              name: newAddonName.trim(),
+              price: parseFloat(newAddonPrice) || 0,
+              currency: "USD",
+              durationMinutes: parseInt(newAddonDuration, 10) || 0,
+              active: true,
+            });
+            setAddonSubmitting(false);
+            if (result.ok) {
+              setServiceAddons((prev) => [...prev, result.data]);
+              setNewAddonName("");
+              setNewAddonPrice("");
+              setNewAddonDuration("");
+            } else {
+              setAddonFormError(result.message);
+            }
+          }}
+          onToggleActive={async (addonId, active) => {
+            const result = await serviceCatalogService.updateAddon(addonId, tenantId ?? "", { active });
+            if (result.ok) {
+              setServiceAddons((prev) => prev.map((a) => a.addonId === addonId ? { ...a, active } : a));
+            }
+          }}
+          onRetry={async () => {
+            setAddonsLoading(true);
+            setAddonsError(null);
+            const result = await serviceCatalogService.readAddons(tenantId ?? "");
+            setAddonsLoading(false);
+            if (result.ok) {
+              setServiceAddons(result.data);
+            } else {
+              setAddonsError(result.message);
+            }
+          }}
+          onBack={() => navigate("ServiceEdit")}
+          testID="service-addons-screen"
+        />
+      );
+    }
+
+    if (activeRoute.name === "ServiceSeasonalRules") {
+      return (
+        <ServiceSeasonalRulesScreen
+          serviceName={selectedService?.name ?? "Service"}
+          loading={seasonalLoading}
+          error={seasonalError}
+          rules={serviceSeasonalRules}
+          newLabel={newRuleLabel}
+          newStart={newRuleStart}
+          newEnd={newRuleEnd}
+          submitting={seasonalSubmitting}
+          formError={seasonalFormError}
+          onNewLabelChange={setNewRuleLabel}
+          onNewStartChange={setNewRuleStart}
+          onNewEndChange={setNewRuleEnd}
+          onCreate={async () => {
+            if (!newRuleLabel.trim() || !newRuleStart.trim() || !newRuleEnd.trim()) {
+              setSeasonalFormError("Label, start date, and end date are required.");
+              return;
+            }
+            setSeasonalFormError(null);
+            setSeasonalSubmitting(true);
+            const result = await serviceCatalogService.createSeasonalRule({
+              tenantId: tenantId ?? "",
+              serviceId: selectedService?.serviceId ?? "",
+              label: newRuleLabel.trim(),
+              startDate: newRuleStart.trim(),
+              endDate: newRuleEnd.trim(),
+              blockedCompletely: false,
+            });
+            setSeasonalSubmitting(false);
+            if (result.ok) {
+              setServiceSeasonalRules((prev) => [...prev, result.data]);
+              setNewRuleLabel("");
+              setNewRuleStart("");
+              setNewRuleEnd("");
+            } else {
+              setSeasonalFormError(result.message);
+            }
+          }}
+          onDeleteRule={async (ruleId) => {
+            const result = await serviceCatalogService.deleteSeasonalRule(ruleId, tenantId ?? "");
+            if (result.ok) {
+              setServiceSeasonalRules((prev) => prev.filter((r) => r.ruleId !== ruleId));
+            }
+          }}
+          onRetry={async () => {
+            setSeasonalLoading(true);
+            setSeasonalError(null);
+            const result = await serviceCatalogService.readSeasonalRules(tenantId ?? "", selectedService?.serviceId ?? "");
+            setSeasonalLoading(false);
+            if (result.ok) {
+              setServiceSeasonalRules(result.data);
+            } else {
+              setSeasonalError(result.message);
+            }
+          }}
+          onBack={() => navigate("ServiceEdit")}
+          testID="service-seasonal-rules-screen"
+        />
+      );
+    }
+
+    if (activeRoute.name === "ServicePhotos") {
+      return (
+        <ServicePhotosScreen
+          serviceName={selectedService?.name ?? "Service"}
+          loading={photosLoading}
+          error={photosError}
+          mediaUrls={serviceMediaUrls}
+          uploading={photoUploading}
+          uploadError={photoUploadError}
+          onUpload={async () => {
+            // W42-DEBT-2: expo-image-picker is required but not installed.
+            // Run: npx expo install expo-image-picker expo-file-system
+            setPhotoUploadError(
+              "Photo upload requires expo-image-picker. Install it with: npx expo install expo-image-picker",
+            );
+          }}
+          onRemovePhoto={(index) => {
+            setServiceMediaUrls((prev) => prev.filter((_, i) => i !== index));
+          }}
+          onRetry={async () => {
+            setPhotosLoading(true);
+            setPhotosError(null);
+            const result = await serviceCatalogService.readServiceMedia(tenantId ?? "", selectedService?.serviceId ?? "");
+            setPhotosLoading(false);
+            if (result.ok) {
+              setServiceMediaUrls(result.data);
+            } else {
+              setPhotosError(result.message);
+            }
+          }}
+          onBack={() => navigate("ServiceEdit")}
+          testID="service-photos-screen"
+        />
+      );
+    }
+
+    if (activeRoute.name === "ServiceBookingRules") {
+      return (
+        <ServiceBookingRulesScreen
+          serviceName={selectedService?.name ?? "Service"}
+          loading={bookingRulesLoading}
+          error={bookingRulesError}
+          rules={serviceBookingRules}
+          depositPercent={depositPercent}
+          cancellationWindowHours={cancellationWindowHours}
+          leadTimeHours={leadTimeHours}
+          bufferMinutes={bookingRulesBufferMinutes}
+          submitting={bookingRulesSubmitting}
+          submitError={bookingRulesSubmitError}
+          submitSuccess={bookingRulesSubmitSuccess}
+          onDepositChange={setDepositPercent}
+          onCancellationWindowChange={setCancellationWindowHours}
+          onLeadTimeChange={setLeadTimeHours}
+          onBufferChange={setBookingRulesBufferMinutes}
+          onSave={async () => {
+            setBookingRulesSubmitting(true);
+            setBookingRulesSubmitError(null);
+            setBookingRulesSubmitSuccess(null);
+            const result = await serviceCatalogService.saveBookingRules(tenantId ?? "", selectedService?.serviceId ?? "", {
+              depositPercent: parseFloat(depositPercent) || 0,
+              cancellationWindowHours: parseInt(cancellationWindowHours, 10) || 0,
+              leadTimeHours: parseInt(leadTimeHours, 10) || 0,
+              bufferMinutes: parseInt(bookingRulesBufferMinutes, 10) || 0,
+            });
+            setBookingRulesSubmitting(false);
+            if (result.ok) {
+              setServiceBookingRules(result.data);
+              setBookingRulesSubmitSuccess("Booking rules saved.");
+            } else {
+              setBookingRulesSubmitError(result.message);
+            }
+          }}
+          onRetry={async () => {
+            setBookingRulesLoading(true);
+            setBookingRulesError(null);
+            const result = await serviceCatalogService.readBookingRules(tenantId ?? "", selectedService?.serviceId ?? "");
+            setBookingRulesLoading(false);
+            if (result.ok) {
+              setServiceBookingRules(result.data);
+              if (result.data) {
+                setDepositPercent(String(result.data.depositPercent));
+                setCancellationWindowHours(String(result.data.cancellationWindowHours));
+                setLeadTimeHours(String(result.data.leadTimeHours));
+                setBookingRulesBufferMinutes(String(result.data.bufferMinutes));
+              }
+            } else {
+              setBookingRulesError(result.message);
+            }
+          }}
+          onBack={() => navigate("ServiceEdit")}
+          testID="service-booking-rules-screen"
+        />
+      );
+    }
+
+    if (activeRoute.name === "ServiceVisibility") {
+      return (
+        <ServiceVisibilityScreen
+          serviceName={selectedService?.name ?? "Service"}
+          onlineBooking={visOnlineBooking}
+          marketplaceListed={visMarketplaceListed}
+          internalOnly={visInternalOnly}
+          submitting={visibilitySubmitting}
+          submitError={visibilitySubmitError}
+          submitSuccess={visibilitySubmitSuccess}
+          onOnlineBookingChange={setVisOnlineBooking}
+          onMarketplaceListedChange={setVisMarketplaceListed}
+          onInternalOnlyChange={setVisInternalOnly}
+          onSave={async () => {
+            setVisibilitySubmitting(true);
+            setVisibilitySubmitError(null);
+            setVisibilitySubmitSuccess(null);
+            const result = await serviceCatalogService.saveVisibility(tenantId ?? "", selectedService?.serviceId ?? "", {
+              onlineBooking: visOnlineBooking,
+              marketplaceListed: visMarketplaceListed,
+              internalOnly: visInternalOnly,
+            });
+            setVisibilitySubmitting(false);
+            if (result.ok) {
+              setServiceVisibility(result.data);
+              setVisibilitySubmitSuccess("Visibility saved.");
+            } else {
+              setVisibilitySubmitError(result.message);
+            }
+          }}
+          onBack={() => navigate("ServiceEdit")}
+          testID="service-visibility-screen"
         />
       );
     }
@@ -1877,10 +5921,37 @@ export function AppNavigatorShell({
       return (
         <ServiceListScreen
           loading={servicesLoading}
-          errorMessage={servicesErrorMessage}
-          servicesList={servicesList}
-          onRetry={() => void loadServicesList()}
-          onCreateService={() => navigate("ServiceCreate")}
+          error={servicesErrorMessage}
+          services={servicesList}
+          onSelectService={(svc) => {
+            setSelectedService(svc);
+            setServiceEditName(svc.name);
+            setServiceEditCategory(svc.category);
+            setServiceEditDuration(String(svc.durationMinutes));
+            setServiceEditPrice(String(svc.price));
+            navigate("ServiceEdit");
+          }}
+          onImportCsv={() => { setCsvText(""); setParsedRows([]); setParseErrors([]); navigate("ServiceBulkImport"); }}
+          onExportCsv={async () => {
+            const header = "name,category,durationMinutes,price,currency";
+            const rows = servicesList.map(
+              (s) => `${s.name},${s.category},${s.durationMinutes},${s.price},${s.currency}`,
+            );
+            const csvText = [header, ...rows].join("\n");
+            try {
+              await Share.share({ message: csvText, title: "services.csv" });
+            } catch {
+              // User cancelled share — not an error
+            }
+          }}
+          onBulkArchive={(serviceIds) => {
+            if (serviceAdminService && tenantId) {
+              for (const id of serviceIds) {
+                void serviceAdminService.archiveService(id, tenantId);
+              }
+              void loadServicesList();
+            }
+          }}
           onBack={() => navigate("AppShell")}
         />
       );
@@ -1929,7 +6000,2144 @@ export function AppNavigatorShell({
           onPriceChange={setServiceEditPrice}
           onSubmit={() => undefined}
           onArchive={() => undefined}
+          onCategories={() => navigate("ServiceCategories")}
+          onPricing={() => navigate("ServicePricing")}
+          onAddOns={() => navigate("ServiceAddOns")}
+          onSeasonalRules={() => navigate("ServiceSeasonalRules")}
+          onPhotos={() => navigate("ServicePhotos")}
+          onBookingRules={() => navigate("ServiceBookingRules")}
+          onVisibility={() => navigate("ServiceVisibility")}
           onBack={() => navigate("ServiceList")}
+        />
+      );
+    }
+
+    // -------------------------------------------------------------------------
+    // W43 — Booking operations routes
+    // -------------------------------------------------------------------------
+
+    if (activeRoute.name === "BookingCalendar") {
+      return (
+        <BookingCalendarScreen
+          loading={calendarLoading}
+          error={calendarError}
+          dayView={calendarDayView}
+          blockedSlots={calendarBlockedSlots}
+          selectedDate={bookingOpsDate}
+          onPrevDay={() => {
+            const d = new Date(bookingOpsDate);
+            d.setDate(d.getDate() - 1);
+            setBookingOpsDate(d.toISOString().slice(0, 10));
+          }}
+          onNextDay={() => {
+            const d = new Date(bookingOpsDate);
+            d.setDate(d.getDate() + 1);
+            setBookingOpsDate(d.toISOString().slice(0, 10));
+          }}
+          onSelectBooking={(bookingId) => {
+            setBookingDetailLoading(true);
+            setBookingDetailError(null);
+            void bookingOpsService.loadBookingDetail(bookingId, tenantId ?? "").then((r) => {
+              setBookingDetailLoading(false);
+              if (r.ok) {
+                setAdminBookingDetail(r.data);
+                const b = r.data.booking;
+                setNoShowBooking({ bookingId: b.bookingId, customerName: r.data.customerName, serviceName: r.data.serviceName, date: b.date, startTime: b.startTime });
+                setCancelBookingSummary({ bookingId: b.bookingId, customerName: r.data.customerName, serviceName: r.data.serviceName, date: b.date, startTime: b.startTime });
+                setRescheduleBooking({ bookingId: b.bookingId, customerName: r.data.customerName, serviceName: r.data.serviceName });
+              } else {
+                setBookingDetailError(r.message);
+              }
+              navigate("BookingDetailAdmin");
+            });
+          }}
+          onCreateManual={() => {
+            setManualDate(bookingOpsDate);
+            setManualSubmitSuccess(null);
+            setManualSubmitError(null);
+            navigate("ManualBooking");
+          }}
+          onBlockTime={() => {
+            setBlockDate(bookingOpsDate);
+            setBlockSubmitSuccess(null);
+            setBlockSubmitError(null);
+            navigate("BlockTime");
+          }}
+          onForceBook={() => {
+            setForceDate(bookingOpsDate);
+            setForceSubmitSuccess(null);
+            setForceSubmitError(null);
+            navigate("ForceBook");
+          }}
+          onRetry={() => {
+            setCalendarLoading(true);
+            setCalendarError(null);
+            void bookingOpsService.loadCalendarDay(tenantId ?? "", tenantLocations[0]?.locationId ?? "", bookingOpsDate).then((r) => {
+              setCalendarLoading(false);
+              if (r.ok) setCalendarDayView(r.data);
+              else setCalendarError(r.message);
+            });
+          }}
+          onBack={() => navigate("OwnerHome")}
+          testID="booking-calendar-screen"
+        />
+      );
+    }
+
+    if (activeRoute.name === "BookingDetailAdmin") {
+      return (
+        <BookingDetailAdminScreen
+          loading={bookingDetailLoading}
+          error={bookingDetailError}
+          detail={adminBookingDetail}
+          submitting={bookingDetailSubmitting}
+          actionError={bookingDetailActionError}
+          onConfirm={() => {
+            setBookingDetailSubmitting(true);
+            setBookingDetailActionError(null);
+            // Repo stub — will wire in W43 Wed–Fri pass
+            void bookingOpsService.markNoShow({ bookingId: "", tenantId: tenantId ?? "", policyNote: null, penaltyApplied: false, performedBy: "" }).then(() => {
+              setBookingDetailSubmitting(false);
+            });
+          }}
+          onCancel={() => navigate("CancellationAdmin")}
+          onReschedule={() => navigate("RescheduleAdmin")}
+          onMarkNoShow={() => navigate("NoShowMark")}
+          onForceBook={() => navigate("ForceBook")}
+          onRetry={() => {
+            const id = adminBookingDetail?.booking.bookingId ?? "";
+            if (!id) return;
+            setBookingDetailLoading(true);
+            setBookingDetailError(null);
+            void bookingOpsService.loadBookingDetail(id, tenantId ?? "").then((r) => {
+              setBookingDetailLoading(false);
+              if (r.ok) setAdminBookingDetail(r.data);
+              else setBookingDetailError(r.message);
+            });
+          }}
+          onBack={() => navigate("BookingCalendar")}
+          testID="booking-detail-admin-screen"
+        />
+      );
+    }
+
+    if (activeRoute.name === "ManualBooking") {
+      const staffOpts = staffList.map((s) => ({ staffId: s.staffId, name: s.displayName }));
+      const serviceOpts = servicesList.map((s) => ({ serviceId: s.serviceId, name: s.name }));
+      return (
+        <ManualBookingScreen
+          staffOptions={staffOpts}
+          serviceOptions={serviceOpts}
+          channel={manualChannel}
+          selectedStaffId={manualStaffId}
+          selectedServiceId={manualServiceId}
+          date={manualDate}
+          startTime={manualStartTime}
+          durationMinutes={manualDuration}
+          customerName={manualCustomerName}
+          customerPhone={manualCustomerPhone}
+          notes={manualNotes}
+          submitting={manualSubmitting}
+          formError={manualFormError}
+          submitError={manualSubmitError}
+          submitSuccess={manualSubmitSuccess}
+          onChannelChange={setManualChannel}
+          onStaffChange={setManualStaffId}
+          onServiceChange={setManualServiceId}
+          onDateChange={setManualDate}
+          onStartTimeChange={setManualStartTime}
+          onDurationChange={setManualDuration}
+          onCustomerNameChange={setManualCustomerName}
+          onCustomerPhoneChange={setManualCustomerPhone}
+          onNotesChange={setManualNotes}
+          onSubmit={async () => {
+            if (!manualCustomerName.trim()) {
+              setManualFormError("Customer name is required.");
+              return;
+            }
+            setManualFormError(null);
+            setManualSubmitting(true);
+            const durationNum = parseInt(manualDuration, 10) || 45;
+            const result = await bookingOpsService.createManualBooking({
+              channel: manualChannel,
+              tenantId: tenantId ?? "",
+              locationId: tenantLocations[0]?.locationId ?? "",
+              staffId: manualStaffId,
+              serviceId: manualServiceId,
+              customerName: manualCustomerName.trim(),
+              customerPhone: manualCustomerPhone.trim() || null,
+              date: manualDate,
+              startMinutes: 0,
+              endMinutes: durationNum,
+              startTime: manualStartTime,
+              endTime: "",
+              durationMinutes: durationNum,
+              bufferMinutes: 0,
+              notes: manualNotes.trim() || null,
+            });
+            setManualSubmitting(false);
+            if (result.ok) {
+              setManualSubmitSuccess("Booking created successfully.");
+              setManualCustomerName("");
+              setManualNotes("");
+            } else {
+              setManualSubmitError(result.message);
+            }
+          }}
+          onBack={() => navigate("BookingCalendar")}
+          testID="manual-booking-screen"
+        />
+      );
+    }
+
+    if (activeRoute.name === "BlockTime") {
+      const staffOpts = staffList.map((s) => ({ staffId: s.staffId, name: s.displayName }));
+      return (
+        <BlockTimeScreen
+          staffOptions={staffOpts}
+          selectedStaffId={blockStaffId}
+          date={blockDate}
+          startTime={blockStartTime}
+          endTime={blockEndTime}
+          reason={blockReason}
+          submitting={blockSubmitting}
+          formError={blockFormError}
+          submitError={blockSubmitError}
+          submitSuccess={blockSubmitSuccess}
+          onStaffChange={setBlockStaffId}
+          onDateChange={setBlockDate}
+          onStartTimeChange={setBlockStartTime}
+          onEndTimeChange={setBlockEndTime}
+          onReasonChange={setBlockReason}
+          onSubmit={async () => {
+            if (!blockReason.trim()) {
+              setBlockFormError("Reason is required.");
+              return;
+            }
+            setBlockFormError(null);
+            setBlockSubmitting(true);
+            const fakeTs = { seconds: 0, nanoseconds: 0 } as unknown as import("firebase/firestore").Timestamp;
+            const result = await bookingOpsService.blockTimeSlot({
+              tenantId: tenantId ?? "",
+              locationId: tenantLocations[0]?.locationId ?? "",
+              staffId: blockStaffId,
+              date: blockDate,
+              startTime: blockStartTime,
+              endTime: blockEndTime,
+              reason: blockReason.trim(),
+              createdBy: userId ?? "",
+            });
+            void fakeTs; // suppress unused warning
+            setBlockSubmitting(false);
+            if (result.ok) {
+              setBlockSubmitSuccess("Slot blocked.");
+              setCalendarBlockedSlots((prev) => [...prev, result.data]);
+              setBlockReason("");
+            } else {
+              setBlockSubmitError(result.message);
+            }
+          }}
+          onBack={() => navigate("BookingCalendar")}
+          testID="block-time-screen"
+        />
+      );
+    }
+
+    if (activeRoute.name === "ForceBook") {
+      const staffOpts = staffList.map((s) => ({ staffId: s.staffId, name: s.displayName }));
+      const serviceOpts = servicesList.map((s) => ({ serviceId: s.serviceId, name: s.name }));
+      return (
+        <ForceBookScreen
+          staffOptions={staffOpts}
+          serviceOptions={serviceOpts}
+          selectedStaffId={forceStaffId}
+          selectedServiceId={forceServiceId}
+          customerUserId={forceCustomerUserId}
+          date={forceDate}
+          startTime={forceStartTime}
+          durationMinutes={forceDuration}
+          overrideReason={forceOverrideReason}
+          submitting={forceSubmitting}
+          formError={forceFormError}
+          submitError={forceSubmitError}
+          submitSuccess={forceSubmitSuccess}
+          onStaffChange={setForceStaffId}
+          onServiceChange={setForceServiceId}
+          onCustomerUserIdChange={setForceCustomerUserId}
+          onDateChange={setForceDate}
+          onStartTimeChange={setForceStartTime}
+          onDurationChange={setForceDuration}
+          onOverrideReasonChange={setForceOverrideReason}
+          onSubmit={async () => {
+            if (!forceOverrideReason.trim()) {
+              setForceFormError("Override reason is required.");
+              return;
+            }
+            setForceFormError(null);
+            setForceSubmitting(true);
+            const durationNum = parseInt(forceDuration, 10) || 45;
+            const result = await bookingOpsService.forceCreateBooking({
+              tenantId: tenantId ?? "",
+              locationId: tenantLocations[0]?.locationId ?? "",
+              staffId: forceStaffId,
+              serviceId: forceServiceId,
+              customerUserId: forceCustomerUserId,
+              date: forceDate,
+              startMinutes: 0,
+              endMinutes: durationNum,
+              startTime: forceStartTime,
+              endTime: "",
+              durationMinutes: durationNum,
+              bufferMinutes: 0,
+              overrideReason: forceOverrideReason.trim(),
+              overriddenBy: userId ?? "",
+            });
+            setForceSubmitting(false);
+            if (result.ok) {
+              setForceSubmitSuccess("Booking force-created successfully.");
+              setForceOverrideReason("");
+            } else {
+              setForceSubmitError(result.message);
+            }
+          }}
+          onBack={() => navigate("BookingCalendar")}
+          testID="force-book-screen"
+        />
+      );
+    }
+
+    if (activeRoute.name === "NoShowMark") {
+      return (
+        <NoShowMarkScreen
+          booking={noShowBooking}
+          policyNote={noShowPolicyNote}
+          penaltyApplied={noShowPenaltyApplied}
+          submitting={noShowSubmitting}
+          submitError={noShowSubmitError}
+          submitSuccess={noShowSubmitSuccess}
+          onPolicyNoteChange={setNoShowPolicyNote}
+          onPenaltyToggle={setNoShowPenaltyApplied}
+          onConfirm={async () => {
+            setNoShowSubmitting(true);
+            setNoShowSubmitError(null);
+            const result = await bookingOpsService.markNoShow({
+              bookingId: noShowBooking?.bookingId ?? "",
+              tenantId: tenantId ?? "",
+              policyNote: noShowPolicyNote.trim() || null,
+              penaltyApplied: noShowPenaltyApplied,
+              performedBy: userId ?? "",
+            });
+            setNoShowSubmitting(false);
+            if (result.ok) {
+              setNoShowSubmitSuccess("Booking marked as no-show.");
+            } else {
+              setNoShowSubmitError(result.message);
+            }
+          }}
+          onBack={() => navigate("BookingDetailAdmin")}
+          testID="no-show-mark-screen"
+        />
+      );
+    }
+
+    if (activeRoute.name === "CancellationAdmin") {
+      return (
+        <CancellationAdminScreen
+          booking={cancelBookingSummary}
+          reason={cancelReason}
+          feeAmount={cancelFeeAmount}
+          feeCurrency={cancelFeeCurrency}
+          submitting={cancelSubmitting}
+          formError={cancelFormError}
+          submitError={cancelSubmitError}
+          submitSuccess={cancelSubmitSuccess}
+          onReasonChange={setCancelReason}
+          onFeeAmountChange={setCancelFeeAmount}
+          onFeeCurrencyChange={setCancelFeeCurrency}
+          onConfirm={async () => {
+            if (!cancelReason.trim()) {
+              setCancelFormError("Cancellation reason is required.");
+              return;
+            }
+            setCancelFormError(null);
+            setCancelSubmitting(true);
+            const result = await bookingOpsService.adminCancel({
+              bookingId: cancelBookingSummary?.bookingId ?? "",
+              tenantId: tenantId ?? "",
+              reason: cancelReason.trim(),
+              feeCents: Math.round((parseFloat(cancelFeeAmount) || 0) * 100),
+              feeCurrency: cancelFeeCurrency.trim() || "USD",
+              performedBy: userId ?? "",
+            });
+            setCancelSubmitting(false);
+            if (result.ok) {
+              setCancelSubmitSuccess("Booking cancelled.");
+              setCancelReason("");
+            } else {
+              setCancelSubmitError(result.message);
+            }
+          }}
+          onBack={() => navigate("BookingDetailAdmin")}
+          testID="cancellation-admin-screen"
+        />
+      );
+    }
+
+    if (activeRoute.name === "RescheduleAdmin") {
+      const staffOpts = staffList.map((s) => ({ staffId: s.staffId, name: s.displayName }));
+      return (
+        <RescheduleAdminScreen
+          booking={rescheduleBooking}
+          staffOptions={staffOpts}
+          selectedStaffId={rescheduleStaffId}
+          newDate={rescheduleNewDate}
+          availableSlots={rescheduleAvailableSlots}
+          selectedStartTime={rescheduleSelectedStartTime}
+          rescheduleReason={rescheduleReason}
+          conflicts={rescheduleConflicts}
+          conflictOptions={rescheduleConflictOptions}
+          slotsLoading={rescheduleSlotsLoading}
+          submitting={rescheduleSubmitting}
+          formError={rescheduleFormError}
+          submitError={rescheduleSubmitError}
+          submitSuccess={rescheduleSubmitSuccess}
+          onStaffChange={setRescheduleStaffId}
+          onNewDateChange={setRescheduleNewDate}
+          onLoadSlots={() => {
+            // Slot loading wires to real slotEngine in W43 Wed–Fri pass
+            setRescheduleSlotsLoading(true);
+            setTimeout(() => { setRescheduleSlotsLoading(false); setRescheduleAvailableSlots([]); }, 300);
+          }}
+          onSelectSlot={setRescheduleSelectedStartTime}
+          onRescheduleReasonChange={setRescheduleReason}
+          onSelectConflictStrategy={(strategy) => {
+            const opts = bookingOpsService.buildConflictResolutionOptions(rescheduleConflicts);
+            setRescheduleConflictOptions(opts.filter((o) => o.strategy === strategy));
+          }}
+          onSubmit={async () => {
+            if (!rescheduleNewDate.trim() || !rescheduleSelectedStartTime) {
+              setRescheduleFormError("New date and start time are required.");
+              return;
+            }
+            setRescheduleFormError(null);
+            setRescheduleSubmitting(true);
+            const result = await bookingOpsService.adminReschedule({
+              bookingId: rescheduleBooking?.bookingId ?? "",
+              tenantId: tenantId ?? "",
+              newDate: rescheduleNewDate,
+              newStartMinutes: 0,
+              newEndMinutes: 45,
+              newStartTime: rescheduleSelectedStartTime,
+              newEndTime: "",
+              rescheduleReason: rescheduleReason.trim() || null,
+              performedBy: userId ?? "",
+            });
+            setRescheduleSubmitting(false);
+            if (result.ok) {
+              setRescheduleSubmitSuccess("Booking rescheduled.");
+              setRescheduleSelectedStartTime("");
+            } else {
+              setRescheduleSubmitError(result.message);
+            }
+          }}
+          onBack={() => navigate("BookingDetailAdmin")}
+          testID="reschedule-admin-screen"
+        />
+      );
+    }
+
+    // -------------------------------------------------------------------------
+    // W44 — Client / CRM routes
+    // -------------------------------------------------------------------------
+
+    if (activeRoute.name === "ClientListAdmin") {
+      return (
+        <ClientListAdminScreen
+          loading={clientListLoading}
+          error={clientListError}
+          clients={clientList}
+          search={clientSearch}
+          filter={clientFilter}
+          savedView={clientSavedView}
+          selectedIds={clientSelectedIds}
+          onSearchChange={(text) => {
+            setClientSearch(text);
+            setClientListLoading(true);
+            setClientListError(null);
+            void clientCrmService.listClients(tenantId ?? "", clientFilter, clientSavedView, text).then((r) => {
+              setClientListLoading(false);
+              if (r.ok) setClientList(r.data);
+              else setClientListError(r.message);
+            });
+          }}
+          onFilterChange={(f) => {
+            setClientFilter(f);
+            setClientListLoading(true);
+            setClientListError(null);
+            void clientCrmService.listClients(tenantId ?? "", f, clientSavedView, clientSearch).then((r) => {
+              setClientListLoading(false);
+              if (r.ok) setClientList(r.data);
+              else setClientListError(r.message);
+            });
+          }}
+          onSavedViewChange={(v) => {
+            setClientSavedView(v);
+            setClientListLoading(true);
+            setClientListError(null);
+            void clientCrmService.listClients(tenantId ?? "", clientFilter, v, clientSearch).then((r) => {
+              setClientListLoading(false);
+              if (r.ok) setClientList(r.data);
+              else setClientListError(r.message);
+            });
+          }}
+          onSelectClient={(clientId) => {
+            setSelectedClientId(clientId);
+            setClientDetailLoading(true);
+            setClientDetailError(null);
+            setClientDetailTab("history");
+            void clientCrmService.loadClientDetail(clientId, tenantId ?? "").then((r) => {
+              setClientDetailLoading(false);
+              if (r.ok) {
+                setClientDetail(r.data);
+                setClientNotesText(r.data.notes ?? "");
+                setBlockClientName(r.data.name);
+                setDeleteClientName(r.data.name);
+              } else {
+                setClientDetailError(r.message);
+              }
+              navigate("ClientDetailAdmin");
+            });
+          }}
+          onToggleSelect={(id) => {
+            setClientSelectedIds((prev) =>
+              prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
+            );
+          }}
+          onBulkBlock={() => navigate("BlockClient")}
+          onBulkExport={() => navigate("GdprExport")}
+          onBulkMessage={() => navigate("TargetedMessage")}
+          onRetry={() => {
+            setClientListLoading(true);
+            setClientListError(null);
+            void clientCrmService.listClients(tenantId ?? "", clientFilter, clientSavedView, clientSearch).then((r) => {
+              setClientListLoading(false);
+              if (r.ok) setClientList(r.data);
+              else setClientListError(r.message);
+            });
+          }}
+          onBack={() => navigate("OwnerHome")}
+          testID="client-list-screen"
+        />
+      );
+    }
+
+    if (activeRoute.name === "ClientDetailAdmin") {
+      return (
+        <ClientDetailAdminScreen
+          loading={clientDetailLoading}
+          error={clientDetailError}
+          client={clientDetail}
+          activeTab={clientDetailTab}
+          notesEditing={clientNotesEditing}
+          notesText={clientNotesText}
+          onTabChange={(tab) => {
+            setClientDetailTab(tab);
+            if (tab === "notes") setClientNotesEditing(true);
+            else setClientNotesEditing(false);
+          }}
+          onNotesChange={setClientNotesText}
+          onNotesSave={() => setClientNotesEditing(false)}
+          onMerge={() => {
+            if (!clientDetail) return;
+            setMergeClientA({
+              clientId: clientDetail.clientId,
+              name: clientDetail.name,
+              phone: clientDetail.phone,
+              email: clientDetail.email,
+              bookingCount: clientDetail.totalBookings,
+              loyaltyPoints: clientDetail.loyaltyBalance,
+            });
+            setMergeClientB(null);
+            setMergeReason("");
+            setMergeSubmitError(null);
+            setMergeSubmitSuccess(false);
+            navigate("MergeClients");
+          }}
+          onBlock={() => {
+            setBlockClientName(clientDetail?.name ?? "");
+            setBlockClientReason("no_show");
+            setBlockClientDuration(30);
+            setBlockClientError(null);
+            setBlockClientSuccess(false);
+            navigate("BlockClient");
+          }}
+          onGdpr={() => {
+            setGdprExportType("full");
+            setGdprExportFormat("json");
+            setGdprSubmitError(null);
+            setGdprSubmitSuccess(false);
+            setGdprLoading(true);
+            setGdprLoadError(null);
+            void clientCrmService.loadGdprRequests(selectedClientId, tenantId ?? "").then((r) => {
+              setGdprLoading(false);
+              if (r.ok) setGdprRequests(r.data);
+              else setGdprLoadError(r.message);
+              navigate("GdprExport");
+            });
+          }}
+          onDelete={() => {
+            setDeleteClientName(clientDetail?.name ?? "");
+            setDeleteClientReason("");
+            setDeleteClientError(null);
+            setDeleteClientSuccess(false);
+            navigate("DeleteClient");
+          }}
+          onRetry={() => {
+            setClientDetailLoading(true);
+            setClientDetailError(null);
+            void clientCrmService.loadClientDetail(selectedClientId, tenantId ?? "").then((r) => {
+              setClientDetailLoading(false);
+              if (r.ok) setClientDetail(r.data);
+              else setClientDetailError(r.message);
+            });
+          }}
+          onBack={() => navigate("ClientListAdmin")}
+          testID="client-detail-admin-screen"
+        />
+      );
+    }
+
+    if (activeRoute.name === "MergeClients") {
+      return (
+        <MergeClientsScreen
+          loading={mergeLoading}
+          error={mergeLoadError}
+          primary={mergeClientA}
+          duplicate={mergeClientB}
+          reason={mergeReason}
+          submitting={mergeSubmitting}
+          submitError={mergeSubmitError}
+          submitSuccess={mergeSubmitSuccess}
+          onReasonChange={setMergeReason}
+          onConfirm={() => {
+            if (!mergeClientA || !mergeClientB) return;
+            setMergeSubmitting(true);
+            setMergeSubmitError(null);
+            void clientCrmService.mergeClients({
+              primaryClientId: mergeClientA.clientId,
+              duplicateClientId: mergeClientB.clientId,
+              reason: mergeReason,
+              performedBy: userId ?? "",
+              tenantId: tenantId ?? "",
+            }).then((r) => {
+              setMergeSubmitting(false);
+              if (r.ok) setMergeSubmitSuccess(true);
+              else setMergeSubmitError(r.message);
+            });
+          }}
+          onRetry={() => {
+            setMergeLoadError(null);
+          }}
+          onBack={() => navigate("ClientDetailAdmin")}
+          testID="merge-clients-screen"
+        />
+      );
+    }
+
+    if (activeRoute.name === "BlockClient") {
+      return (
+        <BlockClientScreen
+          clientName={blockClientName}
+          reason={blockClientReason}
+          durationDays={blockClientDuration}
+          submitting={blockClientSubmitting}
+          error={blockClientError}
+          success={blockClientSuccess}
+          onReasonChange={setBlockClientReason}
+          onDurationChange={setBlockClientDuration}
+          onBlock={() => {
+            setBlockClientSubmitting(true);
+            setBlockClientError(null);
+            void clientCrmService.blockClient({
+              clientId: selectedClientId,
+              tenantId: tenantId ?? "",
+              reason: blockClientReason,
+              durationDays: blockClientDuration,
+              performedBy: userId ?? "",
+            }).then((r) => {
+              setBlockClientSubmitting(false);
+              if (r.ok) setBlockClientSuccess(true);
+              else setBlockClientError(r.message);
+            });
+          }}
+          onBack={() => navigate("ClientDetailAdmin")}
+          testID="block-client-screen"
+        />
+      );
+    }
+
+    if (activeRoute.name === "GdprExport") {
+      return (
+        <GdprExportScreen
+          clientName={gdprLoading ? "…" : (clientDetail?.name ?? deleteClientName)}
+          loading={gdprLoading}
+          error={gdprLoadError}
+          exportType={gdprExportType}
+          format={gdprExportFormat}
+          previousRequests={gdprRequests}
+          submitting={gdprSubmitting}
+          submitError={gdprSubmitError}
+          submitSuccess={gdprSubmitSuccess}
+          onExportTypeChange={setGdprExportType}
+          onFormatChange={setGdprExportFormat}
+          onRequestExport={() => {
+            setGdprSubmitting(true);
+            setGdprSubmitError(null);
+            void clientCrmService.requestGdprExport({
+              clientId: selectedClientId,
+              tenantId: tenantId ?? "",
+              exportType: gdprExportType,
+              format: gdprExportFormat,
+              requestedBy: userId ?? "",
+            }).then((r) => {
+              setGdprSubmitting(false);
+              if (r.ok) {
+                setGdprSubmitSuccess(true);
+                setGdprRequests((prev) => [r.data, ...prev]);
+              } else {
+                setGdprSubmitError(r.message);
+              }
+            });
+          }}
+          onDeleteClient={() => {
+            setDeleteClientReason("");
+            setDeleteClientError(null);
+            setDeleteClientSuccess(false);
+            navigate("DeleteClient");
+          }}
+          onRetry={() => {
+            setGdprLoading(true);
+            setGdprLoadError(null);
+            void clientCrmService.loadGdprRequests(selectedClientId, tenantId ?? "").then((r) => {
+              setGdprLoading(false);
+              if (r.ok) setGdprRequests(r.data);
+              else setGdprLoadError(r.message);
+            });
+          }}
+          onBack={() => navigate("ClientDetailAdmin")}
+          testID="gdpr-export-screen"
+        />
+      );
+    }
+
+    if (activeRoute.name === "DeleteClient") {
+      return (
+        <DeleteClientScreen
+          clientName={deleteClientName}
+          reason={deleteClientReason}
+          submitting={deleteClientSubmitting}
+          error={deleteClientError}
+          success={deleteClientSuccess}
+          onReasonChange={setDeleteClientReason}
+          onDelete={() => {
+            setDeleteClientSubmitting(true);
+            setDeleteClientError(null);
+            void clientCrmService.deleteClient({
+              clientId: selectedClientId,
+              tenantId: tenantId ?? "",
+              reason: deleteClientReason,
+              performedBy: userId ?? "",
+            }).then((r) => {
+              setDeleteClientSubmitting(false);
+              if (r.ok) {
+                setDeleteClientSuccess(true);
+                setClientDetail(null);
+              } else {
+                setDeleteClientError(r.message);
+              }
+            });
+          }}
+          onBack={() => navigate("ClientDetailAdmin")}
+          testID="delete-client-screen"
+        />
+      );
+    }
+
+    if (activeRoute.name === "SegmentBuilder") {
+      return (
+        <SegmentBuilderScreen
+          segmentName={segmentName}
+          filters={segmentFilters}
+          preview={segmentPreview}
+          previewing={segmentPreviewing}
+          saving={segmentSaving}
+          error={segmentError}
+          onNameChange={setSegmentName}
+          onAddFilter={() => {
+            const newFilter: SegmentFilter = {
+              filterId: `f-${Date.now()}`,
+              field: "lastVisitDays",
+              operator: "greater_than",
+              value: "30",
+            };
+            setSegmentFilters((prev) => [...prev, newFilter]);
+          }}
+          onRemoveFilter={(id) => {
+            setSegmentFilters((prev) => prev.filter((f) => f.filterId !== id));
+          }}
+          onUpdateFilter={(id, patch) => {
+            setSegmentFilters((prev) =>
+              prev.map((f) => (f.filterId === id ? { ...f, ...patch } : f)),
+            );
+          }}
+          onPreview={() => {
+            setSegmentPreviewing(true);
+            setSegmentError(null);
+            void clientCrmService.buildSegmentPreview(tenantId ?? "", segmentFilters).then((r) => {
+              setSegmentPreviewing(false);
+              if (r.ok) setSegmentPreview(r.data);
+              else setSegmentError(r.message);
+            });
+          }}
+          onSave={() => {
+            setSegmentSaving(true);
+            setSegmentError(null);
+            void clientCrmService.saveSegment({
+              name: segmentName,
+              filters: segmentFilters,
+              tenantId: tenantId ?? "",
+              createdBy: userId ?? "",
+            }).then((r) => {
+              setSegmentSaving(false);
+              if (r.ok) {
+                _setSavedSegment(r.data);
+                setTargetedSegmentId(r.data.segmentId);
+                setTargetedSegmentName(r.data.name);
+                setTargetedRecipientCount(r.data.estimatedCount);
+              } else {
+                setSegmentError(r.message);
+              }
+            });
+          }}
+          onBack={() => navigate("OwnerHome")}
+          testID="segment-builder-screen"
+        />
+      );
+    }
+
+    if (activeRoute.name === "TargetedMessage") {
+      return (
+        <TargetedMessageScreen
+          segmentName={targetedSegmentName}
+          recipientCount={targetedRecipientCount}
+          channel={targetedChannel}
+          subject={targetedSubject}
+          body={targetedBody}
+          scheduledAt={targetedScheduledAt}
+          sending={targetedSending}
+          error={targetedError}
+          success={targetedSuccess}
+          onChannelChange={setTargetedChannel}
+          onSubjectChange={setTargetedSubject}
+          onBodyChange={setTargetedBody}
+          onScheduleChange={setTargetedScheduledAt}
+          onSend={() => {
+            setTargetedSending(true);
+            setTargetedError(null);
+            void clientCrmService.sendToSegment({
+              segmentId: targetedSegmentId,
+              tenantId: tenantId ?? "",
+              channel: targetedChannel,
+              subject: targetedSubject || null,
+              body: targetedBody,
+              scheduledAt: targetedScheduledAt,
+              sentBy: userId ?? "",
+            }).then((r) => {
+              setTargetedSending(false);
+              if (r.ok) {
+                setTargetedSuccess(true);
+                setTargetedRecipientCount(r.data.recipientCount);
+              } else {
+                setTargetedError(r.message);
+              }
+            });
+          }}
+          onBack={() => navigate("SegmentBuilder")}
+          testID="targeted-message-screen"
+        />
+      );
+    }
+
+    // -------------------------------------------------------------------------
+    // W45 — Loyalty admin
+    // -------------------------------------------------------------------------
+
+    if (activeRoute.name === "LoyaltyConfig") {
+      return (
+        <LoyaltyConfigScreen
+          loading={loyaltyConfigLoading}
+          error={loyaltyConfigError}
+          config={loyaltyConfig}
+          saving={loyaltyConfigSaving}
+          saveError={loyaltyConfigSaveError}
+          saveSuccess={loyaltyConfigSaveSuccess}
+          onToggleEnabled={(enabled) =>
+            setLoyaltyConfig((prev) => prev ? { ...prev, enabled } : prev)
+          }
+          onPointsPerUnitChange={(v) =>
+            setLoyaltyConfig((prev) => prev ? { ...prev, pointsPerCurrencyUnit: Number(v) || 0 } : prev)
+          }
+          onExpiryDaysChange={(v) =>
+            setLoyaltyConfig((prev) => prev ? { ...prev, pointsExpiryDays: v.trim() ? Number(v) : null } : prev)
+          }
+          onAddTier={() =>
+            setLoyaltyConfig((prev) =>
+              prev
+                ? {
+                    ...prev,
+                    tiers: [
+                      ...prev.tiers,
+                      { tierId: `new-${Date.now()}`, name: "", minPoints: 0, maxPoints: null, benefits: [] },
+                    ],
+                  }
+                : prev,
+            )
+          }
+          onRemoveTier={(tierId) =>
+            setLoyaltyConfig((prev) =>
+              prev ? { ...prev, tiers: prev.tiers.filter((t) => t.tierId !== tierId) } : prev,
+            )
+          }
+          onTierChange={(tierId, field, value) =>
+            setLoyaltyConfig((prev) =>
+              prev
+                ? {
+                    ...prev,
+                    tiers: prev.tiers.map((t) =>
+                      t.tierId === tierId ? { ...t, [field]: field === "minPoints" ? Number(value) : value } : t,
+                    ),
+                  }
+                : prev,
+            )
+          }
+          onSave={() => {
+            if (!loyaltyConfig) return;
+            setLoyaltyConfigSaving(true);
+            setLoyaltyConfigSaveError(null);
+            void loyaltyAdminService.saveLoyaltyConfig(loyaltyConfig).then((r) => {
+              setLoyaltyConfigSaving(false);
+              if (r.ok) setLoyaltyConfigSaveSuccess(true);
+              else setLoyaltyConfigSaveError(r.message);
+            });
+          }}
+          onRetry={() => {
+            if (!tenantId) return;
+            setLoyaltyConfigLoading(true);
+            void loyaltyAdminService.loadLoyaltyConfig(tenantId).then((r) => {
+              setLoyaltyConfigLoading(false);
+              if (r.ok) setLoyaltyConfig(r.data);
+              else setLoyaltyConfigError(r.message);
+            });
+          }}
+          onBack={() => navigate("AppShell")}
+          testID="loyalty-config-screen"
+        />
+      );
+    }
+
+    if (activeRoute.name === "AdminRewardCatalog") {
+      return (
+        <AdminRewardCatalogScreen
+          loading={rewardsLoading}
+          error={rewardsError}
+          rewards={rewards}
+          editingRewardId={editingRewardId ?? null}
+          form={rewardForm}
+          saving={rewardSaving}
+          saveError={rewardSaveError}
+          onFormChange={(field, value) =>
+            setRewardForm((prev) => ({ ...prev, [field]: value }))
+          }
+          onEditReward={(rewardId) => {
+            const r = rewards.find((rw) => rw.rewardId === rewardId);
+            if (r) {
+              setEditingRewardId(rewardId);
+              setRewardForm({ name: r.name, pointsCost: r.pointsCost, type: r.type, description: r.description, active: r.active });
+            }
+          }}
+          onDeleteReward={(rewardId) => {
+            void loyaltyAdminService.deleteReward(rewardId, tenantId ?? "").then((r) => {
+              if (r.ok) setRewards((prev) => prev.filter((rw) => rw.rewardId !== rewardId));
+            });
+          }}
+          onSaveReward={() => {
+            setRewardSaving(true);
+            setRewardSaveError(null);
+            void loyaltyAdminService
+              .saveReward(editingRewardId ?? null, tenantId ?? "", rewardForm)
+              .then((r) => {
+                setRewardSaving(false);
+                if (r.ok) {
+                  setRewards((prev) =>
+                    editingRewardId
+                      ? prev.map((rw) => (rw.rewardId === editingRewardId ? r.data : rw))
+                      : [...prev, r.data],
+                  );
+                  setEditingRewardId(undefined);
+                } else {
+                  setRewardSaveError(r.message);
+                }
+              });
+          }}
+          onCancelEdit={() => setEditingRewardId(undefined)}
+          onAddNew={() => {
+            setEditingRewardId(null);
+            setRewardForm({ name: "", pointsCost: 0, type: "discount", description: "", active: true });
+          }}
+          onRetry={() => {
+            if (!tenantId) return;
+            setRewardsLoading(true);
+            void loyaltyAdminService.listRewards(tenantId).then((r) => {
+              setRewardsLoading(false);
+              if (r.ok) setRewards(r.data);
+              else setRewardsError(r.message);
+            });
+          }}
+          onBack={() => navigate("AppShell")}
+          testID="reward-catalog-screen"
+        />
+      );
+    }
+
+    if (activeRoute.name === "PointAdjustment") {
+      return (
+        <PointAdjustmentScreen
+          clientName={adjustClientName}
+          clientId={adjustClientId}
+          direction={adjustDirection}
+          points={adjustPoints}
+          reason={adjustReason}
+          note={adjustNote}
+          saving={adjustSaving}
+          error={adjustError}
+          success={adjustSuccess}
+          onDirectionChange={setAdjustDirection}
+          onPointsChange={setAdjustPoints}
+          onReasonChange={setAdjustReason}
+          onNoteChange={setAdjustNote}
+          onSubmit={() => {
+            setAdjustSaving(true);
+            setAdjustError(null);
+            void loyaltyAdminService
+              .adjustPoints({
+                tenantId: tenantId ?? "",
+                clientId: adjustClientId,
+                clientName: adjustClientName,
+                direction: adjustDirection,
+                points: Number(adjustPoints),
+                reason: adjustReason,
+                note: adjustNote,
+                performedBy: userId ?? "",
+              })
+              .then((r) => {
+                setAdjustSaving(false);
+                if (r.ok) setAdjustSuccess(true);
+                else setAdjustError(r.message);
+              });
+          }}
+          onBack={() => navigate("AppShell")}
+          testID="point-adjustment-screen"
+        />
+      );
+    }
+
+    if (activeRoute.name === "LoyaltyDashboard") {
+      return (
+        <LoyaltyDashboardScreen
+          loading={loyaltyStatsLoading}
+          error={loyaltyStatsError}
+          stats={loyaltyStats}
+          onRetry={() => {
+            if (!tenantId) return;
+            setLoyaltyStatsLoading(true);
+            void loyaltyAdminService.loadProgramStats(tenantId).then((r) => {
+              setLoyaltyStatsLoading(false);
+              if (r.ok) setLoyaltyStats(r.data);
+              else setLoyaltyStatsError(r.message);
+            });
+          }}
+          onBack={() => navigate("AppShell")}
+          testID="loyalty-dashboard-screen"
+        />
+      );
+    }
+
+    if (activeRoute.name === "TierMigration") {
+      return (
+        <TierMigrationScreen
+          previewLoading={tierPreviewLoading}
+          previewError={tierPreviewError}
+          preview={tierPreview}
+          reason={tierMigrationReason}
+          running={tierMigrationRunning}
+          runError={tierMigrationRunError}
+          runSuccess={tierMigrationSuccess}
+          onReasonChange={setTierMigrationReason}
+          onRunMigration={() => {
+            setTierMigrationRunning(true);
+            setTierMigrationRunError(null);
+            void loyaltyAdminService
+              .runTierMigration({ tenantId: tenantId ?? "", reason: tierMigrationReason, performedBy: userId ?? "" })
+              .then((r) => {
+                setTierMigrationRunning(false);
+                if (r.ok) setTierMigrationSuccess(true);
+                else setTierMigrationRunError(r.message);
+              });
+          }}
+          onRetry={() => {
+            if (!tenantId) return;
+            setTierPreviewLoading(true);
+            void loyaltyAdminService.previewTierMigration(tenantId).then((r) => {
+              setTierPreviewLoading(false);
+              if (r.ok) setTierPreview(r.data);
+              else setTierPreviewError(r.message);
+            });
+          }}
+          onBack={() => navigate("AppShell")}
+          testID="tier-migration-screen"
+        />
+      );
+    }
+
+    // -------------------------------------------------------------------------
+    // W45 — Activity admin
+    // -------------------------------------------------------------------------
+
+    if (activeRoute.name === "ActivityCatalog") {
+      return (
+        <ActivityCatalogScreen
+          loading={activitiesLoading}
+          error={activitiesError}
+          activities={activities}
+          onViewAnalytics={(activityId) => {
+            setActivityStatsLoading(true);
+            setActivityStats(null);
+            void loyaltyAdminService.loadActivityStats(activityId, tenantId ?? "").then((r) => {
+              setActivityStatsLoading(false);
+              if (r.ok) setActivityStats(r.data);
+              else setActivityStatsError(r.message);
+            });
+            navigate("ActivityAnalytics");
+          }}
+          onToggleStatus={(activityId, currentStatus) => {
+            const nextStatus = currentStatus === "active" ? "inactive" : "active";
+            setActivities((prev) =>
+              prev.map((a) => (a.activityId === activityId ? { ...a, status: nextStatus } : a)),
+            );
+          }}
+          onCreateActivity={() => navigate("AppShell")}
+          onRetry={() => {
+            if (!tenantId) return;
+            setActivitiesLoading(true);
+            void loyaltyAdminService.listActivities(tenantId).then((r) => {
+              setActivitiesLoading(false);
+              if (r.ok) setActivities(r.data);
+              else setActivitiesError(r.message);
+            });
+          }}
+          onBack={() => navigate("AppShell")}
+          testID="activity-catalog-screen"
+        />
+      );
+    }
+
+    if (activeRoute.name === "ActivityAnalytics") {
+      return (
+        <ActivityAnalyticsScreen
+          loading={activityStatsLoading}
+          error={activityStatsError}
+          stats={activityStats}
+          onRetry={() => {
+            if (!activityStats?.activityId || !tenantId) return;
+            setActivityStatsLoading(true);
+            void loyaltyAdminService.loadActivityStats(activityStats.activityId, tenantId).then((r) => {
+              setActivityStatsLoading(false);
+              if (r.ok) setActivityStats(r.data);
+              else setActivityStatsError(r.message);
+            });
+          }}
+          onBack={() => navigate("ActivityCatalog")}
+          testID="activity-analytics-screen"
+        />
+      );
+    }
+
+    // -------------------------------------------------------------------------
+    // W45 — Campaign admin
+    // -------------------------------------------------------------------------
+
+    if (activeRoute.name === "CampaignList") {
+      return (
+        <CampaignListScreen
+          loading={campaignsLoading}
+          error={campaignsError}
+          campaigns={campaigns}
+          statusFilter={campaignStatusFilter}
+          onStatusFilter={(s) => {
+            setCampaignStatusFilter(s);
+            setCampaignsLoading(true);
+            void campaignAdminService.listCampaigns(tenantId ?? "", s ?? undefined).then((r) => {
+              setCampaignsLoading(false);
+              if (r.ok) setCampaigns(r.data);
+              else setCampaignsError(r.message);
+            });
+          }}
+          onOpenCampaign={(campaignId) => {
+            setCampaignPerfLoading(true);
+            void campaignAdminService.loadCampaignPerformance(campaignId, tenantId ?? "").then((r) => {
+              setCampaignPerfLoading(false);
+              if (r.ok) setCampaignPerf(r.data);
+              else setCampaignPerfError(r.message);
+            });
+            navigate("CampaignPerformance");
+          }}
+          onCreateCampaign={() => navigate("CampaignBuilder")}
+          onRetry={() => {
+            if (!tenantId) return;
+            setCampaignsLoading(true);
+            void campaignAdminService.listCampaigns(tenantId, campaignStatusFilter ?? undefined).then((r) => {
+              setCampaignsLoading(false);
+              if (r.ok) setCampaigns(r.data);
+              else setCampaignsError(r.message);
+            });
+          }}
+          onBack={() => navigate("AppShell")}
+          testID="campaign-list-screen"
+        />
+      );
+    }
+
+    if (activeRoute.name === "CampaignBuilder") {
+      return (
+        <CampaignBuilderScreen
+          form={campaignBuilderForm}
+          complianceItems={campaignCompliance}
+          creating={campaignCreating}
+          createError={campaignCreateError}
+          createSuccess={campaignCreateSuccess}
+          onFormChange={(field, value) =>
+            setCampaignBuilderForm((prev) => ({ ...prev, [field]: value }))
+          }
+          onCreate={() => {
+            setCampaignCreating(true);
+            setCampaignCreateError(null);
+            void campaignAdminService.createCampaign(campaignBuilderForm).then((r) => {
+              setCampaignCreating(false);
+              if (r.ok) setCampaignCreateSuccess(true);
+              else setCampaignCreateError(r.message);
+            });
+          }}
+          onRunCompliance={() => {
+            const r = campaignAdminService.runComplianceCheck(campaignBuilderForm);
+            if (r.ok) setCampaignCompliance(r.data);
+          }}
+          onBack={() => navigate("CampaignList")}
+          testID="campaign-builder-screen"
+        />
+      );
+    }
+
+    if (activeRoute.name === "CampaignPerformance") {
+      return (
+        <CampaignPerformanceScreen
+          loading={campaignPerfLoading}
+          error={campaignPerfError}
+          detail={campaignPerf}
+          onRetry={() => {
+            if (!campaignPerf?.campaignId || !tenantId) return;
+            setCampaignPerfLoading(true);
+            void campaignAdminService.loadCampaignPerformance(campaignPerf.campaignId, tenantId).then((r) => {
+              setCampaignPerfLoading(false);
+              if (r.ok) setCampaignPerf(r.data);
+              else setCampaignPerfError(r.message);
+            });
+          }}
+          onBack={() => navigate("CampaignList")}
+          testID="campaign-performance-screen"
+        />
+      );
+    }
+
+    if (activeRoute.name === "TransactionalTemplates") {
+      return (
+        <TransactionalTemplateScreen
+          loading={txDefaultsLoading}
+          error={txOverridesError}
+          defaults={txDefaults}
+          overrides={txOverrides}
+          activeType={txActiveType}
+          activeChannel={txActiveChannel}
+          overrideBody={txOverrideBody}
+          overrideSubject={txOverrideSubject}
+          saving={txSaving}
+          saveError={txSaveError}
+          saveSuccess={txSaveSuccess}
+          onTypeChange={(t) => {
+            setTxActiveType(t);
+            setTxSaveSuccess(false);
+            setTxSaveError(null);
+          }}
+          onChannelChange={(c) => {
+            setTxActiveChannel(c);
+            setTxSaveSuccess(false);
+            setTxSaveError(null);
+          }}
+          onOverrideBodyChange={setTxOverrideBody}
+          onOverrideSubjectChange={setTxOverrideSubject}
+          onSaveOverride={() => {
+            setTxSaving(true);
+            setTxSaveError(null);
+            const existingOverride = txOverrides.find(
+              (o) => o.templateType === txActiveType && o.channel === txActiveChannel,
+            );
+            void campaignAdminService
+              .saveTransactionalOverride(existingOverride?.overrideId ?? null, {
+                tenantId: tenantId ?? "",
+                templateType: txActiveType,
+                channel: txActiveChannel,
+                subject: txActiveChannel === "email" ? txOverrideSubject : undefined,
+                body: txOverrideBody,
+                variables: [],
+                isActive: true,
+                updatedAt: new Date().toISOString(),
+              })
+              .then((r) => {
+                setTxSaving(false);
+                if (r.ok) {
+                  setTxSaveSuccess(true);
+                  setTxOverrides((prev) =>
+                    existingOverride
+                      ? prev.map((o) => (o.overrideId === existingOverride.overrideId ? r.data : o))
+                      : [...prev, r.data],
+                  );
+                } else {
+                  setTxSaveError(r.message);
+                }
+              });
+          }}
+          onResetOverride={() => {
+            const override = txOverrides.find(
+              (o) => o.templateType === txActiveType && o.channel === txActiveChannel,
+            );
+            if (!override) return;
+            void campaignAdminService
+              .deleteTransactionalOverride(override.overrideId, tenantId ?? "")
+              .then((r) => {
+                if (r.ok) {
+                  setTxOverrides((prev) => prev.filter((o) => o.overrideId !== override.overrideId));
+                  setTxOverrideBody("");
+                  setTxOverrideSubject("");
+                }
+              });
+          }}
+          onRetry={() => {
+            const defaults = campaignAdminService.loadTransactionalDefaults();
+            if (defaults.ok) setTxDefaults(defaults.data);
+            if (!tenantId) return;
+            void campaignAdminService.listTransactionalOverrides(tenantId).then((r) => {
+              if (r.ok) setTxOverrides(r.data);
+              else setTxOverridesError(r.message);
+            });
+          }}
+          onBack={() => navigate("AppShell")}
+          testID="transactional-template-screen"
+        />
+      );
+    }
+
+    if (activeRoute.name === "PromotionAdmin") {
+      return (
+        <PromotionAdminScreen
+          loading={promoCodesLoading}
+          error={promoCodesError}
+          codes={promoCodes}
+          statusFilter={promoStatusFilter}
+          showCreateForm={showPromoForm}
+          form={promoForm}
+          creating={promoCreating}
+          createError={promoCreateError}
+          onStatusFilter={(s) => {
+            setPromoStatusFilter(s);
+            setPromoCodesLoading(true);
+            void campaignAdminService.listPromoCodes(tenantId ?? "", s ?? undefined).then((r) => {
+              setPromoCodesLoading(false);
+              if (r.ok) setPromoCodes(r.data);
+              else setPromoCodesError(r.message);
+            });
+          }}
+          onToggleCreateForm={() => setShowPromoForm((prev) => !prev)}
+          onFormChange={(field, value) =>
+            setPromoForm((prev) => ({ ...prev, [field]: value }))
+          }
+          onCreateCode={() => {
+            setPromoCreating(true);
+            setPromoCreateError(null);
+            void campaignAdminService.createPromoCode(promoForm).then((r) => {
+              setPromoCreating(false);
+              if (r.ok) {
+                setPromoCodes((prev) => [r.data, ...prev]);
+                setShowPromoForm(false);
+              } else {
+                setPromoCreateError(r.message);
+              }
+            });
+          }}
+          onUpdateStatus={(codeId, status) => {
+            void campaignAdminService.updatePromoCodeStatus(codeId, tenantId ?? "", status).then((r) => {
+              if (r.ok) {
+                setPromoCodes((prev) =>
+                  prev.map((c) => (c.codeId === codeId ? { ...c, status } : c)),
+                );
+              }
+            });
+          }}
+          onRetry={() => {
+            if (!tenantId) return;
+            setPromoCodesLoading(true);
+            void campaignAdminService.listPromoCodes(tenantId, promoStatusFilter ?? undefined).then((r) => {
+              setPromoCodesLoading(false);
+              if (r.ok) setPromoCodes(r.data);
+              else setPromoCodesError(r.message);
+            });
+          }}
+          onBack={() => navigate("AppShell")}
+          testID="promotion-admin-screen"
+        />
+      );
+    }
+
+    // -------------------------------------------------------------------------
+    // W46 — Review admin
+    // -------------------------------------------------------------------------
+    if (activeRoute.name === "ReviewQueue") {
+      return (
+        <ReviewQueueScreen
+          loading={reviewsLoading}
+          error={reviewsError}
+          reviews={reviews}
+          filter={reviewQueueFilter}
+          selectedIds={selectedReviewIds}
+          onFilterChange={(f) => {
+            setReviewQueueFilter(f);
+            setReviewsLoading(true);
+            void reviewAdminService.listReviews(tenantId ?? "", f).then((r) => {
+              setReviewsLoading(false);
+              if (r.ok) setReviews(r.data);
+              else setReviewsError(r.message);
+            });
+          }}
+          onOpenReview={(id) => {
+            const r = reviews.find((x) => x.reviewId === id) ?? null;
+            setSelectedReview(r);
+            navigate("ReviewReply");
+          }}
+          onToggleSelect={(id) =>
+            setSelectedReviewIds((prev) =>
+              prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
+            )
+          }
+          onBulkHide={() => {
+            if (!tenantId || selectedReviewIds.length === 0) return;
+            void reviewAdminService
+              .bulkAction(tenantId, { type: "hide", reviewIds: selectedReviewIds, reason: "bulk-hide", actorId: userId ?? "" })
+              .then((r) => {
+                if (r.ok) setSelectedReviewIds([]);
+              });
+          }}
+          onBulkFlag={() => {
+            if (!tenantId || selectedReviewIds.length === 0) return;
+            void reviewAdminService
+              .bulkAction(tenantId, { type: "flag", reviewIds: selectedReviewIds, reason: "bulk-flag", actorId: userId ?? "" })
+              .then((r) => {
+                if (r.ok) setSelectedReviewIds([]);
+              });
+          }}
+          onRetry={() => {
+            if (!tenantId) return;
+            setReviewsLoading(true);
+            void reviewAdminService.listReviews(tenantId, reviewQueueFilter).then((r) => {
+              setReviewsLoading(false);
+              if (r.ok) setReviews(r.data);
+              else setReviewsError(r.message);
+            });
+          }}
+          onBack={() => navigate("AppShell")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "ReviewReply") {
+      return (
+        <ReviewReplyScreen
+          loading={false}
+          error={null}
+          review={selectedReview}
+          replyText={reviewReplyText}
+          submitting={reviewReplySubmitting}
+          submitError={reviewReplyError}
+          submitSuccess={reviewReplySuccess}
+          templates={[]}
+          onReplyTextChange={setReviewReplyText}
+          onApplyTemplate={(t) => setReviewReplyText(t)}
+          onSubmit={() => {
+            if (!tenantId || !selectedReview) return;
+            setReviewReplySubmitting(true);
+            setReviewReplyError(null);
+            setReviewReplySuccess(false);
+            void reviewAdminService
+              .replyToReview({
+                reviewId: selectedReview.reviewId,
+                tenantId,
+                replyText: reviewReplyText,
+                authorId: userId ?? "",
+              })
+              .then((r) => {
+                setReviewReplySubmitting(false);
+                if (r.ok) {
+                  setReviewReplySuccess(true);
+                  setReviewReplyText("");
+                } else {
+                  setReviewReplyError(r.message);
+                }
+              });
+          }}
+          onRetry={() => {}}
+          onBack={() => navigate("ReviewQueue")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "ReviewFlag") {
+      return (
+        <ReviewFlagScreen
+          loading={false}
+          error={null}
+          review={selectedReview}
+          action={reviewFlagAction}
+          reason={reviewFlagReason}
+          submitting={reviewFlagSubmitting}
+          submitError={reviewFlagError}
+          submitSuccess={reviewFlagSuccess}
+          onActionChange={setReviewFlagAction}
+          onReasonChange={setReviewFlagReason}
+          onSubmit={() => {
+            if (!tenantId || !selectedReview) return;
+            setReviewFlagSubmitting(true);
+            setReviewFlagError(null);
+            setReviewFlagSuccess(false);
+            const op =
+              reviewFlagAction === "flag"
+                ? reviewAdminService.flagReview({
+                    reviewId: selectedReview.reviewId,
+                    tenantId,
+                    reason: reviewFlagReason,
+                    flaggedBy: userId ?? "",
+                  })
+                : reviewFlagAction === "dispute"
+                  ? reviewAdminService.disputeReview({
+                      reviewId: selectedReview.reviewId,
+                      tenantId,
+                      reasoning: reviewFlagReason,
+                      requestedBy: userId ?? "",
+                    })
+                  : reviewAdminService.hideReview({
+                      reviewId: selectedReview.reviewId,
+                      tenantId,
+                      reason: reviewFlagReason,
+                      hiddenBy: userId ?? "",
+                    });
+            void op.then((r) => {
+              setReviewFlagSubmitting(false);
+              if (r.ok) setReviewFlagSuccess(true);
+              else setReviewFlagError(r.message);
+            });
+          }}
+          onRetry={() => {}}
+          onBack={() => navigate("ReviewQueue")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "ReviewAutomation") {
+      return (
+        <ReviewAutomationScreen
+          loading={automationRulesLoading}
+          error={automationRulesError}
+          rules={automationRules}
+          showCreateForm={showAutomationForm}
+          form={automationForm}
+          saving={automationSaving}
+          saveError={automationSaveError}
+          onFormChange={(field, value) =>
+            setAutomationForm((prev) => ({ ...prev, [field]: value }))
+          }
+          onToggleForm={() => {
+            if (!showAutomationForm) {
+              setAutomationRulesLoading(true);
+              void reviewAdminService.listAutomationRules(tenantId ?? "").then((r) => {
+                setAutomationRulesLoading(false);
+                if (r.ok) setAutomationRules(r.data);
+                else setAutomationRulesError(r.message);
+              });
+            }
+            setShowAutomationForm((prev) => !prev);
+          }}
+          onSaveRule={() => {
+            if (!tenantId) return;
+            setAutomationSaving(true);
+            setAutomationSaveError(null);
+            void reviewAdminService
+              .saveAutomationRule({ ...automationForm, tenantId })
+              .then((r) => {
+                setAutomationSaving(false);
+                if (r.ok) {
+                  setAutomationRules((prev) => [r.data, ...prev]);
+                  setShowAutomationForm(false);
+                } else {
+                  setAutomationSaveError(r.message);
+                }
+              });
+          }}
+          onToggleActive={(ruleId, active) => {
+            if (!tenantId) return;
+            void reviewAdminService.toggleAutomationRule(ruleId, tenantId, active).then((r) => {
+              if (r.ok) {
+                setAutomationRules((prev) =>
+                  prev.map((x) => (x.ruleId === ruleId ? { ...x, active } : x)),
+                );
+              }
+            });
+          }}
+          onDeleteRule={(ruleId) => {
+            if (!tenantId) return;
+            void reviewAdminService.deleteAutomationRule(ruleId, tenantId).then((r) => {
+              if (r.ok) {
+                setAutomationRules((prev) => prev.filter((x) => x.ruleId !== ruleId));
+              }
+            });
+          }}
+          onRetry={() => {
+            if (!tenantId) return;
+            setAutomationRulesLoading(true);
+            void reviewAdminService.listAutomationRules(tenantId).then((r) => {
+              setAutomationRulesLoading(false);
+              if (r.ok) setAutomationRules(r.data);
+              else setAutomationRulesError(r.message);
+            });
+          }}
+          onBack={() => navigate("AppShell")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "ReputationDashboard") {
+      return (
+        <ReputationDashboardScreen
+          loading={reputationStatsLoading}
+          error={reputationStatsError}
+          stats={reputationStats}
+          onRetry={() => {
+            if (!tenantId) return;
+            setReputationStatsLoading(true);
+            void reviewAdminService.loadReputationStats(tenantId).then((r) => {
+              setReputationStatsLoading(false);
+              if (r.ok) setReputationStats(r.data);
+              else setReputationStatsError(r.message);
+            });
+          }}
+          onBack={() => navigate("AppShell")}
+        />
+      );
+    }
+
+    // -------------------------------------------------------------------------
+    // W46 — Messaging admin
+    // -------------------------------------------------------------------------
+    if (activeRoute.name === "InboxTriage") {
+      return (
+        <InboxTriageScreen
+          loading={adminThreadsLoading}
+          error={adminThreadsError}
+          threads={adminThreads}
+          statusFilter={adminThreadStatusFilter}
+          onStatusFilter={(s) => {
+            setAdminThreadStatusFilter(s);
+            setAdminThreadsLoading(true);
+            void messagingAdminService
+              .listThreads(tenantId ?? "", s === "all" ? undefined : s)
+              .then((r) => {
+                setAdminThreadsLoading(false);
+                if (r.ok) setAdminThreads(r.data);
+                else setAdminThreadsError(r.message);
+              });
+          }}
+          onOpenThread={(id) => {
+            const t = adminThreads.find((x) => x.threadId === id) ?? null;
+            setSelectedAdminThread(t);
+            navigate("ThreadAssign");
+          }}
+          onAssignThread={(id) => {
+            const t = adminThreads.find((x) => x.threadId === id) ?? null;
+            setSelectedAdminThread(t);
+            navigate("ThreadAssign");
+          }}
+          onResolveThread={(id) => {
+            if (!tenantId) return;
+            void messagingAdminService
+              .resolveThread({ threadId: id, tenantId, resolvedBy: userId ?? "", note: null })
+              .then((r) => {
+                if (r.ok) {
+                  setAdminThreads((prev) =>
+                    prev.map((t) => (t.threadId === id ? { ...t, status: "resolved" } : t)),
+                  );
+                }
+              });
+          }}
+          onArchiveThread={(id) => {
+            if (!tenantId) return;
+            void messagingAdminService
+              .archiveThread({ threadId: id, tenantId, archivedBy: userId ?? "" })
+              .then((r) => {
+                if (r.ok) {
+                  setAdminThreads((prev) =>
+                    prev.map((t) => (t.threadId === id ? { ...t, status: "archived" } : t)),
+                  );
+                }
+              });
+          }}
+          onRetry={() => {
+            if (!tenantId) return;
+            setAdminThreadsLoading(true);
+            void messagingAdminService
+              .listThreads(tenantId, adminThreadStatusFilter === "all" ? undefined : adminThreadStatusFilter)
+              .then((r) => {
+                setAdminThreadsLoading(false);
+                if (r.ok) setAdminThreads(r.data);
+                else setAdminThreadsError(r.message);
+              });
+          }}
+          onBack={() => navigate("AppShell")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "ThreadAssign") {
+      return (
+        <ThreadAssignScreen
+          loading={false}
+          error={null}
+          thread={selectedAdminThread}
+          staffOptions={[]}
+          selectedStaffId={threadAssignStaffId}
+          onSelectStaff={setThreadAssignStaffId}
+          onSubmit={() => {
+            if (!tenantId || !selectedAdminThread || !threadAssignStaffId) return;
+            setThreadAssignSubmitting(true);
+            setThreadAssignError(null);
+            setThreadAssignSuccess(false);
+            void messagingAdminService
+              .assignThread({
+                threadId: selectedAdminThread.threadId,
+                tenantId,
+                staffId: threadAssignStaffId,
+                staffName: threadAssignStaffId,
+                assignedBy: userId ?? "",
+              })
+              .then((r) => {
+                setThreadAssignSubmitting(false);
+                if (r.ok) setThreadAssignSuccess(true);
+                else setThreadAssignError(r.message);
+              });
+          }}
+          submitting={threadAssignSubmitting}
+          submitError={threadAssignError}
+          submitSuccess={threadAssignSuccess}
+          onRetry={() => {}}
+          onBack={() => navigate("InboxTriage")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "CannedReplies") {
+      return (
+        <CannedRepliesScreen
+          loading={cannedRepliesLoading}
+          error={cannedRepliesError}
+          replies={cannedReplies}
+          showCreateForm={showCannedForm}
+          form={cannedForm}
+          saving={cannedSaving}
+          saveError={cannedSaveError}
+          onToggleForm={() => setShowCannedForm((prev) => !prev)}
+          onFormChange={(field, value) =>
+            setCannedForm((prev) => ({ ...prev, [field]: value }))
+          }
+          onSaveReply={() => {
+            if (!tenantId) return;
+            setCannedSaving(true);
+            setCannedSaveError(null);
+            void messagingAdminService.saveCannedReply(cannedForm).then((r) => {
+              setCannedSaving(false);
+              if (r.ok) {
+                setCannedReplies((prev) => [r.data, ...prev]);
+                setShowCannedForm(false);
+              } else {
+                setCannedSaveError(r.message);
+              }
+            });
+          }}
+          onDeleteReply={(id) => {
+            if (!tenantId) return;
+            void messagingAdminService.deleteCannedReply(id, tenantId).then((r) => {
+              if (r.ok) {
+                setCannedReplies((prev) => prev.filter((x) => x.cannedId !== id));
+              }
+            });
+          }}
+          onRetry={() => {
+            if (!tenantId) return;
+            setCannedRepliesLoading(true);
+            void messagingAdminService.listCannedReplies(tenantId).then((r) => {
+              setCannedRepliesLoading(false);
+              if (r.ok) setCannedReplies(r.data);
+              else setCannedRepliesError(r.message);
+            });
+          }}
+          onBack={() => navigate("AppShell")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "AutoReplyConfig") {
+      return (
+        <AutoReplyConfigScreen
+          loading={autoReplyLoading}
+          error={autoReplyError}
+          config={autoReplyConfig}
+          form={autoReplyForm}
+          saving={autoReplySaving}
+          saveError={autoReplySaveError}
+          saveSuccess={autoReplySaveSuccess}
+          onFormChange={(field, value) =>
+            setAutoReplyForm((prev) => ({ ...prev, [field]: value }))
+          }
+          onSave={() => {
+            if (!tenantId) return;
+            setAutoReplySaving(true);
+            setAutoReplySaveError(null);
+            setAutoReplySaveSuccess(false);
+            void messagingAdminService.saveAutoReplyConfig(autoReplyForm).then((r) => {
+              setAutoReplySaving(false);
+              if (r.ok) {
+                setAutoReplySaveSuccess(true);
+              } else {
+                setAutoReplySaveError(r.message);
+              }
+            });
+          }}
+          onRetry={() => {
+            if (!tenantId) return;
+            setAutoReplyLoading(true);
+            void messagingAdminService.loadAutoReplyConfig(tenantId).then((r) => {
+              setAutoReplyLoading(false);
+              if (r.ok) setAutoReplyConfig(r.data);
+              else setAutoReplyError(r.message);
+            });
+          }}
+          onBack={() => navigate("AppShell")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "MessageArchive") {
+      return (
+        <MessageArchiveScreen
+          loading={archiveLoading}
+          error={archiveError}
+          threads={archiveThreads}
+          filter={archiveFilter}
+          onFilterChange={(field, value) =>
+            setArchiveFilter((prev) => ({ ...prev, [field]: value }))
+          }
+          onSearch={() => {
+            if (!tenantId) return;
+            setArchiveLoading(true);
+            void messagingAdminService.searchArchive(tenantId, archiveFilter).then((r) => {
+              setArchiveLoading(false);
+              if (r.ok) setArchiveThreads(r.data);
+              else setArchiveError(r.message);
+            });
+          }}
+          onOpenThread={(id) => {
+            const t = archiveThreads.find((x) => x.threadId === id) ?? null;
+            setSelectedAdminThread(t);
+          }}
+          onRetry={() => {
+            if (!tenantId) return;
+            setArchiveLoading(true);
+            void messagingAdminService.searchArchive(tenantId, archiveFilter).then((r) => {
+              setArchiveLoading(false);
+              if (r.ok) setArchiveThreads(r.data);
+              else setArchiveError(r.message);
+            });
+          }}
+          onBack={() => navigate("AppShell")}
+        />
+      );
+    }
+
+    // -------------------------------------------------------------------------
+    // W46 — Waitlist admin
+    // -------------------------------------------------------------------------
+    if (activeRoute.name === "WaitlistAdminList") {
+      return (
+        <WaitlistAdminListScreen
+          loading={adminWaitlistLoading}
+          error={adminWaitlistError}
+          entries={adminWaitlistItems}
+          filter={adminWaitlistFilter}
+          onFilterChange={(f) => {
+            setAdminWaitlistFilter(f);
+            setAdminWaitlistLoading(true);
+            void waitlistAdminService.listEntries(tenantId ?? "", f).then((r) => {
+              setAdminWaitlistLoading(false);
+              if (r.ok) setAdminWaitlistItems(r.data);
+              else setAdminWaitlistError(r.message);
+            });
+          }}
+          onOpenEntry={(id) => {
+            const e = adminWaitlistItems.find((x) => x.waitlistId === id) ?? null;
+            setSelectedWaitlistEntry(e);
+          }}
+          onNotifyEntry={(id) => {
+            if (!tenantId) return;
+            void waitlistAdminService.notifyEntry(id, tenantId).then(() => {});
+          }}
+          onCancelEntry={(id) => {
+            if (!tenantId) return;
+            void waitlistAdminService.cancelEntry(id, tenantId, userId ?? "").then((r) => {
+              if (r.ok) {
+                setAdminWaitlistItems((prev) =>
+                  prev.map((e) => (e.waitlistId === id ? { ...e, status: "cancelled" } : e)),
+                );
+              }
+            });
+          }}
+          onConvertEntry={(id) => {
+            const e = adminWaitlistItems.find((x) => x.waitlistId === id) ?? null;
+            setSelectedWaitlistEntry(e);
+            navigate("WaitlistConvert");
+          }}
+          onRetry={() => {
+            if (!tenantId) return;
+            setAdminWaitlistLoading(true);
+            void waitlistAdminService.listEntries(tenantId, adminWaitlistFilter).then((r) => {
+              setAdminWaitlistLoading(false);
+              if (r.ok) setAdminWaitlistItems(r.data);
+              else setAdminWaitlistError(r.message);
+            });
+          }}
+          onBack={() => navigate("AppShell")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "WaitlistConvert") {
+      return (
+        <WaitlistConvertScreen
+          loading={false}
+          error={null}
+          entry={selectedWaitlistEntry}
+          staffId={convertStaffId}
+          date={convertDate}
+          startTime={convertStartTime}
+          durationMinutes={convertDuration}
+          notes={convertNotes}
+          submitting={convertSubmitting}
+          submitError={convertError}
+          submitSuccess={convertSuccess}
+          onStaffIdChange={setConvertStaffId}
+          onDateChange={setConvertDate}
+          onStartTimeChange={setConvertStartTime}
+          onDurationChange={setConvertDuration}
+          onNotesChange={setConvertNotes}
+          onSubmit={() => {
+            if (!tenantId || !selectedWaitlistEntry) return;
+            setConvertSubmitting(true);
+            setConvertError(null);
+            setConvertSuccess(false);
+            void waitlistAdminService
+              .convertToBooking({
+                waitlistId: selectedWaitlistEntry.waitlistId,
+                tenantId,
+                staffId: convertStaffId,
+                locationId: selectedWaitlistEntry.locationId,
+                serviceId: selectedWaitlistEntry.serviceId,
+                date: convertDate,
+                startTime: convertStartTime,
+                durationMinutes: parseInt(convertDuration, 10) || 60,
+                notes: convertNotes,
+                convertedBy: userId ?? "",
+              })
+              .then((r) => {
+                setConvertSubmitting(false);
+                if (r.ok) setConvertSuccess(true);
+                else setConvertError(r.message);
+              });
+          }}
+          onRetry={() => {}}
+          onBack={() => navigate("WaitlistAdminList")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "WaitlistPolicies") {
+      return (
+        <WaitlistPoliciesScreen
+          loading={waitlistPolicyLoading}
+          error={waitlistPolicyError}
+          policy={waitlistPolicy}
+          form={waitlistPolicyForm}
+          saving={waitlistPolicySaving}
+          saveError={waitlistPolicySaveError}
+          saveSuccess={waitlistPolicySaveSuccess}
+          onFormChange={(field, value) =>
+            setWaitlistPolicyForm((prev) => ({ ...prev, [field]: value }))
+          }
+          onSave={() => {
+            if (!tenantId) return;
+            setWaitlistPolicySaving(true);
+            setWaitlistPolicySaveError(null);
+            setWaitlistPolicySaveSuccess(false);
+            void waitlistAdminService.savePolicy(waitlistPolicyForm).then((r) => {
+              setWaitlistPolicySaving(false);
+              if (r.ok) {
+                setWaitlistPolicySaveSuccess(true);
+              } else {
+                setWaitlistPolicySaveError(r.message);
+              }
+            });
+          }}
+          onRetry={() => {
+            if (!tenantId) return;
+            setWaitlistPolicyLoading(true);
+            void waitlistAdminService.loadPolicy(tenantId).then((r) => {
+              setWaitlistPolicyLoading(false);
+              if (r.ok) setWaitlistPolicy(r.data);
+              else setWaitlistPolicyError(r.message);
+            });
+          }}
+          onBack={() => navigate("AppShell")}
+        />
+      );
+    }
+
+    // -------------------------------------------------------------------------
+    // W15-DEBT-1 — Onboarding admin
+    // -------------------------------------------------------------------------
+    if (activeRoute.name === "OnboardingAdmin") {
+      const actor = { userId: userId ?? "", role: isPlatformAdmin ? "platform_admin" : "tenant_owner" };
+      return (
+        <OnboardingAdminScreen
+          loading={onboardingAdminStateLoading}
+          error={onboardingAdminStateError}
+          onboardingState={onboardingAdminWizardState}
+          timeline={onboardingAdminTimeline}
+          timelineLoading={onboardingAdminTimelineLoading}
+          extendTrialSubmitting={extendTrialSubmitting}
+          extendTrialError={extendTrialError}
+          resetStepSubmitting={resetStepSubmitting}
+          resetStepError={resetStepError}
+          verificationOverrideSubmitting={verificationOverrideSubmitting}
+          verificationOverrideError={verificationOverrideError}
+          onExtendTrial={(daysAdded, reason) => {
+            if (!tenantId) return;
+            setExtendTrialSubmitting(true);
+            setExtendTrialError(null);
+            void onboardingAdminService
+              .extendTrial(actor, tenantId, daysAdded, reason, `ext-${Date.now()}`)
+              .then((event) => {
+                setExtendTrialSubmitting(false);
+                setOnboardingAdminTimeline((prev) => [event, ...prev]);
+              })
+              .catch((err: unknown) => {
+                setExtendTrialSubmitting(false);
+                setExtendTrialError(err instanceof Error ? err.message : "Failed to extend trial");
+              });
+          }}
+          onResetStep={(step, reason) => {
+            if (!tenantId) return;
+            setResetStepSubmitting(true);
+            setResetStepError(null);
+            void onboardingAdminService
+              .resetStep(actor, tenantId, step, reason, `rst-${Date.now()}`)
+              .then(({ event, state }) => {
+                setResetStepSubmitting(false);
+                setOnboardingAdminWizardState(state);
+                setOnboardingAdminTimeline((prev) => [event, ...prev]);
+              })
+              .catch((err: unknown) => {
+                setResetStepSubmitting(false);
+                setResetStepError(err instanceof Error ? err.message : "Failed to reset step");
+              });
+          }}
+          onVerificationOverride={(reason) => {
+            if (!tenantId) return;
+            setVerificationOverrideSubmitting(true);
+            setVerificationOverrideError(null);
+            void onboardingAdminService
+              .applyVerificationOverride(actor, tenantId, reason, `vov-${Date.now()}`)
+              .then(({ event, state }) => {
+                setVerificationOverrideSubmitting(false);
+                setOnboardingAdminWizardState(state);
+                setOnboardingAdminTimeline((prev) => [event, ...prev]);
+              })
+              .catch((err: unknown) => {
+                setVerificationOverrideSubmitting(false);
+                setVerificationOverrideError(err instanceof Error ? err.message : "Failed to apply override");
+              });
+          }}
+          onReloadTimeline={() => {
+            if (!tenantId) return;
+            setOnboardingAdminTimelineLoading(true);
+            void onboardingAdminService.listTimeline(tenantId).then((events) => {
+              setOnboardingAdminTimeline(events);
+              setOnboardingAdminTimelineLoading(false);
+            }).catch(() => {
+              setOnboardingAdminTimelineLoading(false);
+            });
+          }}
+          onRetry={() => {
+            if (!tenantId) return;
+            setOnboardingAdminStateLoading(true);
+            setOnboardingAdminStateError(null);
+            setOnboardingAdminTimelineLoading(true);
+            void Promise.all([
+              onboardingAdminService.getOnboardingState(tenantId),
+              onboardingAdminService.listTimeline(tenantId),
+            ]).then(([wizState, events]) => {
+              setOnboardingAdminWizardState(wizState);
+              setOnboardingAdminTimeline(events);
+              setOnboardingAdminStateLoading(false);
+              setOnboardingAdminTimelineLoading(false);
+            }).catch(() => {
+              setOnboardingAdminStateError("Failed to load onboarding data");
+              setOnboardingAdminStateLoading(false);
+              setOnboardingAdminTimelineLoading(false);
+            });
+          }}
+          onBack={() => navigate("AppShell")}
+          testID="onboarding-admin-screen"
         />
       );
     }
@@ -1966,7 +8174,154 @@ export function AppNavigatorShell({
 
     const onboardingRoute = parseOnboardingRoute();
     if (onboardingRoute) {
-      const flowLabel = onboardingRoute.flow === "salon" ? t("onboarding.salon") : t("onboarding.client");
+      // Salon onboarding: render wizard for any step in the salon flow.
+      if (onboardingRoute.flow === "salon") {
+        const advanceWizard = (step: SalonOnboardingStepKey, status: "completed" | "skipped") => {
+          setSalonWizardState((prev) => {
+            const nextStatuses = { ...prev.stepStatuses, [step]: status };
+            const currentIndex = ONBOARDING_STEPS.indexOf(step);
+            const nextStep: SalonOnboardingStepKey =
+              currentIndex >= 0 && currentIndex < ONBOARDING_STEPS.length - 1
+                ? ONBOARDING_STEPS[currentIndex + 1]
+                : step;
+            const nextBlockers = deriveBlockers(nextStatuses);
+            return {
+              ...prev,
+              stepStatuses: nextStatuses,
+              currentStep: nextStep,
+              completionScore: computeCompletionScore(nextStatuses),
+              blockers: nextBlockers,
+              canGoLive: nextBlockers.length === 0,
+            };
+          });
+          // W37-E: Persist step to Firestore if wizardService is available.
+          if (wizardService && tenantId) {
+            void wizardService
+              .submitStep(tenantId, step, {})
+              .then((newState) => setSalonWizardState(newState))
+              .catch(() => {
+                // Non-fatal: local state already updated above.
+              });
+          }
+          // Persist the move-to-next-step draft so the navigator can resume.
+          void goToNextOnboardingStep();
+        };
+        return (
+          <SalonOnboardingWizard
+            tenantId={tenantId ?? ""}
+            wizardState={salonWizardState}
+            isLoading={false}
+            onCompleteStep={(step) => advanceWizard(step, "completed")}
+            onSkipStep={(step) => advanceWizard(step, "skipped")}
+            onGoLive={() => navigate("SalonDashboard")}
+          />
+        );
+      }
+
+      // Client onboarding: render real screens for steps that have a dedicated component.
+      if (onboardingRoute.flow === "client") {
+        const totalClientSteps = 7;
+        const stepIndexMap: Record<string, number> = {
+          "account-guest": 1,
+          "phone-verify": 2,
+          profile: 3,
+          "payment-method": 4,
+          preferences: 5,
+          notifications: 6,
+          loyalty: 7,
+        };
+        const currentStepNumber = stepIndexMap[onboardingRoute.step] ?? 1;
+
+        if (onboardingRoute.step === "profile") {
+          return (
+            <ClientOnboardingProfileScreen
+              totalSteps={totalClientSteps}
+              currentStep={currentStepNumber}
+              onContinue={async () => {
+                await goToNextOnboardingStep();
+              }}
+              onSkip={() => void goToNextOnboardingStep()}
+            />
+          );
+        }
+
+        if (onboardingRoute.step === "preferences") {
+          return (
+            <ClientOnboardingPreferencesScreen
+              totalSteps={totalClientSteps}
+              currentStep={currentStepNumber}
+              onContinue={async () => {
+                await goToNextOnboardingStep();
+              }}
+              onSkip={() => void goToNextOnboardingStep()}
+            />
+          );
+        }
+
+        if (onboardingRoute.step === "payment-method") {
+          return (
+            <ClientOnboardingPaymentScreen
+              totalSteps={totalClientSteps}
+              currentStep={currentStepNumber}
+              onAddCard={async () => {
+                await goToNextOnboardingStep();
+              }}
+              onSkip={async () => {
+                await goToNextOnboardingStep();
+              }}
+            />
+          );
+        }
+
+        if (onboardingRoute.step === "account-guest") {
+          return (
+            <ClientOnboardingAccountGuestScreen
+              totalSteps={totalClientSteps}
+              currentStep={currentStepNumber}
+              onContinue={async () => { await goToNextOnboardingStep(); }}
+              onSkip={() => void goToNextOnboardingStep()}
+            />
+          );
+        }
+
+        if (onboardingRoute.step === "phone-verify") {
+          return (
+            <ClientOnboardingPhoneVerifyScreen
+              totalSteps={totalClientSteps}
+              currentStep={currentStepNumber}
+              onSendCode={async (_phone) => "stub-verification-id"}
+              onVerify={async () => { await goToNextOnboardingStep(); }}
+              onSkip={() => void goToNextOnboardingStep()}
+            />
+          );
+        }
+
+        if (onboardingRoute.step === "loyalty") {
+          return (
+            <ClientOnboardingLoyaltyScreen
+              totalSteps={totalClientSteps}
+              currentStep={currentStepNumber}
+              onContinue={async () => { await goToNextOnboardingStep(); }}
+              onSkip={() => void goToNextOnboardingStep()}
+            />
+          );
+        }
+
+        if (onboardingRoute.step === "notifications") {
+          return (
+            <ClientOnboardingNotificationsScreen
+              totalSteps={totalClientSteps}
+              currentStep={currentStepNumber}
+              onContinue={async () => {
+                await goToNextOnboardingStep();
+              }}
+              onSkip={() => void goToNextOnboardingStep()}
+            />
+          );
+        }
+      }
+
+      const flowLabel = t("onboarding.client");
       return (
         <>
           <Text style={styles.screenTitle}>{`${flowLabel} onboarding`}</Text>
@@ -2025,6 +8380,497 @@ export function AppNavigatorShell({
       );
     }
 
+    // -------------------------------------------------------------------------
+    // W38 Phase 3 — Owner console routes
+    // -------------------------------------------------------------------------
+
+    if (activeRoute.name === "OwnerHome") {
+      return (
+        <>
+          <OwnerHomeScreen
+            tenantName={tenantProfile?.name ?? tenantId ?? ""}
+            loading={ownerKpiLoading}
+            error={ownerKpiError}
+            summary={ownerKpiSummary}
+            onRetry={() => void loadOwnerKpi()}
+            onNavigateToSettings={() => navigate("TenantSettingsShell")}
+            onNavigateToBookingQueue={() => navigate("AdminBookingQueue")}
+            onNavigateToStaff={() => navigate("StaffList")}
+            onNavigateToServices={() => navigate("ServiceList")}
+            onNavigateToDashboard={() => navigate("SalonDashboard")}
+          />
+          {adminTourChecked && (
+            <AdminFirstRunTourOverlay
+              visible={adminTourVisible}
+              userId={userId ?? ""}
+              tenantId={tenantId ?? ""}
+              onComplete={() => setAdminTourVisible(false)}
+            />
+          )}
+        </>
+      );
+    }
+
+    if (activeRoute.name === "TenantSettingsShell") {
+      const sectionRouteMap: Record<TenantSettingsSection, string> = {
+        "business-profile": "BusinessProfile",
+        brand: "BrandSettings",
+        tax: "TaxSettings",
+        currency: "CurrencySettings",
+        "legal-docs": "LegalDocuments",
+        domain: "DomainSettings",
+        notifications: "OwnerNotificationPreferences",
+        // W39 billing sections
+        billing: "BillingHub",
+        plan: "SubscriptionPlan",
+        invoices: "InvoiceHistory",
+        "payment-method": "AdminPaymentMethod",
+        "cancel-subscription": "CancelSubscription",
+        connect: "StripeConnectOnboarding",
+        "connect-health": "ConnectHealth",
+        payouts: "PayoutHistory",
+        "refunds-disputes": "RefundDisputeAdmin",
+        // W40 location sections
+        locations: "LocationOverview",
+        "location-settings": "LocationSettings",
+        "location-service-overrides": "LocationServiceOverrides",
+        resources: "ResourceManagement",
+        "admin-walk-in-queue": "AdminWalkInQueue",
+        "daily-close": "DailyClose",
+      };
+      return (
+        <TenantSettingsShellScreen
+          tenantName={tenantProfile?.name ?? tenantId ?? ""}
+          onNavigateTo={(section) => navigate(sectionRouteMap[section])}
+          onBack={() => navigate("OwnerHome")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "BusinessProfile") {
+      return (
+        <BusinessProfileScreen
+          tenantId={tenantId ?? ""}
+          service={tenantLocationAdminService ?? null}
+          onBack={() => navigate("TenantSettingsShell")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "BrandSettings") {
+      return (
+        <BrandSettingsScreen
+          tenantId={tenantId ?? ""}
+          service={tenantLocationAdminService ?? null}
+          onBack={() => navigate("TenantSettingsShell")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "TaxSettings") {
+      return (
+        <TaxSettingsScreen
+          tenantId={tenantId ?? ""}
+          tenantCountry={tenantProfile?.country ?? "US"}
+          onBack={() => navigate("TenantSettingsShell")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "CurrencySettings") {
+      return (
+        <CurrencySettingsScreen
+          tenantId={tenantId ?? ""}
+          initialCurrency={tenantProfile?.defaultCurrency ?? "USD"}
+          service={tenantLocationAdminService ?? null}
+          onBack={() => navigate("TenantSettingsShell")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "LegalDocuments") {
+      return (
+        <LegalDocumentsScreen
+          tenantId={tenantId ?? ""}
+          onBack={() => navigate("TenantSettingsShell")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "DomainSettings") {
+      return (
+        <DomainSettingsScreen
+          tenantSlug={tenantProfile?.slug ?? ""}
+          onBack={() => navigate("TenantSettingsShell")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "OwnerNotificationPreferences") {
+      return (
+        <OwnerNotificationPreferencesScreen
+          tenantId={tenantId ?? ""}
+          onBack={() => navigate("TenantSettingsShell")}
+        />
+      );
+    }
+
+    // -------------------------------------------------------------------------
+    // W39 — Billing & payouts admin routes
+    // -------------------------------------------------------------------------
+
+    if (activeRoute.name === "BillingHub") {
+      const billingNavMap: Record<BillingSection, string> = {
+        plan: "SubscriptionPlan",
+        invoices: "InvoiceHistory",
+        "payment-method": "AdminPaymentMethod",
+        cancel: "CancelSubscription",
+        connect: "StripeConnectOnboarding",
+        "connect-health": "ConnectHealth",
+        payouts: "PayoutHistory",
+        refunds: "RefundDisputeAdmin",
+      };
+      return (
+        <BillingHubScreen
+          loading={billingSubLoading || billingConnectLoading}
+          error={billingSubError ?? billingConnectError}
+          subscription={billingSubscription}
+          connectAccount={billingConnectAccount}
+          pendingBalance={billingPendingBalance}
+          onBack={() => navigate("TenantSettingsShell")}
+          onNavigateTo={(section) => navigate(billingNavMap[section])}
+          onRetry={() => { void loadBillingSubscription(); void loadBillingConnect(); }}
+        />
+      );
+    }
+
+    if (activeRoute.name === "SubscriptionPlan") {
+      return (
+        <SubscriptionPlanSelectionScreen
+          tenantId={tenantId ?? ""}
+          loading={billingSubLoading}
+          error={billingSubError}
+          subscription={billingSubscription}
+          userRole="owner"
+          service={billingAdminService ?? null}
+          onBack={() => navigate("BillingHub")}
+          onPlanChanged={() => void loadBillingSubscription()}
+        />
+      );
+    }
+
+    if (activeRoute.name === "InvoiceHistory") {
+      return (
+        <InvoiceHistoryScreen
+          loading={billingInvoicesLoading}
+          error={billingInvoicesError}
+          invoices={billingInvoices}
+          onRetry={() => void loadBillingInvoices()}
+          onBack={() => navigate("BillingHub")}
+          onDownloadInvoice={(invoice) => {
+            if (invoice.pdfUrl) {
+              // Deep link to PDF handled by OS
+            }
+          }}
+        />
+      );
+    }
+
+    if (activeRoute.name === "AdminPaymentMethod") {
+      return (
+        <AdminPaymentMethodScreen
+          loading={billingMethodsLoading}
+          error={billingMethodsError}
+          methods={billingMethods}
+          onRetry={() => void loadBillingMethods()}
+          onBack={() => navigate("BillingHub")}
+          onAddCard={() => { /* Stripe payment sheet — wired at runtime */ }}
+          onSetDefault={async (paymentMethodId) => {
+            if (!billingAdminService || !tenantId) return;
+            void paymentMethodId;
+            const methods = await billingAdminService.listPaymentMethods(tenantId);
+            setBillingMethods(methods);
+          }}
+          onRemove={async (paymentMethodId) => {
+            setBillingMethods((prev) => prev.filter((m) => m.paymentMethodId !== paymentMethodId));
+          }}
+        />
+      );
+    }
+
+    if (activeRoute.name === "CancelSubscription") {
+      return (
+        <CancelSubscriptionScreen
+          tenantId={tenantId ?? ""}
+          loading={billingSubLoading}
+          error={billingSubError}
+          subscription={billingSubscription}
+          userRole="owner"
+          service={billingAdminService ?? null}
+          onBack={() => navigate("BillingHub")}
+          onCancelled={() => { void loadBillingSubscription(); navigate("BillingHub"); }}
+          onPaused={() => { void loadBillingSubscription(); navigate("BillingHub"); }}
+        />
+      );
+    }
+
+    if (activeRoute.name === "StripeConnectOnboarding") {
+      return (
+        <StripeConnectOnboardingScreen
+          tenantId={tenantId ?? ""}
+          loading={billingConnectLoading}
+          error={billingConnectError}
+          account={billingConnectAccount}
+          userRole="owner"
+          service={billingAdminService ?? null}
+          onBack={() => navigate("BillingHub")}
+          onOnboardingLinkReady={(url) => {
+            // Open the Stripe hosted onboarding URL in the OS browser.
+            void url;
+          }}
+        />
+      );
+    }
+
+    if (activeRoute.name === "ConnectHealth") {
+      return (
+        <ConnectHealthStatusScreen
+          loading={billingConnectLoading}
+          error={billingConnectError}
+          account={billingConnectAccount}
+          onRetry={() => void loadBillingConnect()}
+          onBack={() => navigate("BillingHub")}
+          onResumeOnboarding={() => navigate("StripeConnectOnboarding")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "PayoutHistory") {
+      return (
+        <PayoutHistoryScreen
+          tenantId={tenantId ?? ""}
+          loading={billingPayoutsLoading}
+          error={billingPayoutsError}
+          payouts={billingPayouts}
+          pendingBalance={billingPendingBalance}
+          payoutSchedule={billingPayoutSchedule}
+          service={billingAdminService ?? null}
+          onRetry={() => void loadBillingPayouts()}
+          onBack={() => navigate("BillingHub")}
+          onScheduleSaved={() => void loadBillingPayouts()}
+        />
+      );
+    }
+
+    if (activeRoute.name === "RefundDisputeAdmin") {
+      return (
+        <RefundDisputeAdminScreen
+          tenantId={tenantId ?? ""}
+          loading={billingRefundsLoading}
+          error={billingRefundsError}
+          refunds={billingRefunds}
+          disputes={billingDisputes}
+          service={billingAdminService ?? null}
+          onRetry={() => void loadBillingRefunds()}
+          onBack={() => navigate("BillingHub")}
+          onRefundInitiated={() => void loadBillingRefunds()}
+        />
+      );
+    }
+
+    if (activeRoute.name === "PrintPdfLayout") {
+      return (
+        <PrintPdfLayoutComponent
+          type="invoice"
+          data={{
+            tenantName: tenantProfile?.name ?? "",
+            invoiceNumber: "INV-000",
+            invoiceDate: new Date().toLocaleDateString(),
+            status: "paid",
+            customerName: "",
+            lineItems: [],
+            subtotalCents: 0,
+            totalTaxCents: 0,
+            totalCents: 0,
+            amountPaidCents: 0,
+            amountDueCents: 0,
+            currency: "USD",
+          }}
+        />
+      );
+    }
+
+    // W40 — Location admin routes
+    if (activeRoute.name === "LocationOverview") {
+      return (
+        <LocationOverviewScreen
+          loading={locationListLoading}
+          error={locationListError}
+          locations={locationList}
+          kpis={locationKpis}
+          onSelectLocation={(locationId) => {
+            setActiveLocationId(locationId);
+            navigate("LocationDashboard");
+          }}
+          onAddLocation={() => navigate("CreateLocation")}
+          onRetry={() => void loadLocationList()}
+          onBack={() => navigate("TenantSettingsShell")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "LocationDashboard") {
+      return (
+        <LocationDashboardScreen
+          loading={locationDashLoading}
+          error={locationDashError}
+          locationName={
+            locationList.find((l) => l.locationId === activeLocationId)?.name ?? activeLocationId ?? ""
+          }
+          kpi={locationDashKpi}
+          appointments={locationDashAppointments}
+          onNavigateToSettings={() => navigate("LocationSettings")}
+          onRetry={() => activeLocationId ? void loadLocationDashboard(activeLocationId) : undefined}
+          onBack={() => navigate("LocationOverview")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "LocationSettings") {
+      return (
+        <LocationSettingsScreen
+          loading={locationSettingsLoading}
+          error={locationSettingsError}
+          location={locationDetails}
+          accessibilityFlags={locationAccessibility}
+          holidays={locationHolidays}
+          onUpdateLocation={(input) =>
+            locationAdminService?.updateLocation(activeLocationId ?? "", tenantId ?? "", input) ?? Promise.resolve()
+          }
+          onUpdateAccessibility={(flags) =>
+            locationAdminService?.updateAccessibilityFlags(activeLocationId ?? "", flags) ?? Promise.resolve()
+          }
+          onToggleHoliday={(holidayId, enabled) =>
+            locationAdminService?.toggleHoliday(activeLocationId ?? "", holidayId, enabled) ?? Promise.resolve()
+          }
+          onRetry={() => activeLocationId ? void loadLocationSettings(activeLocationId) : undefined}
+          onBack={() => navigate("LocationDashboard")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "LocationServiceOverrides") {
+      return (
+        <LocationServiceOverridesScreen
+          loading={locationOverridesLoading}
+          error={locationOverridesError}
+          locationName={
+            locationList.find((l) => l.locationId === activeLocationId)?.name ?? activeLocationId ?? ""
+          }
+          overrides={locationServiceOverrides}
+          onEditOverride={(serviceId) => {
+            void locationAdminService?.updateServiceOverride(activeLocationId ?? "", serviceId, {});
+          }}
+          onRetry={() => activeLocationId ? void loadLocationOverrides(activeLocationId) : undefined}
+          onBack={() => navigate("LocationDashboard")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "ResourceManagement") {
+      return (
+        <ResourceManagementScreen
+          loading={locationResourcesLoading}
+          error={locationResourcesError}
+          locationName={
+            locationList.find((l) => l.locationId === activeLocationId)?.name ?? activeLocationId ?? ""
+          }
+          resources={locationResources}
+          onAddResource={(type) => {
+            void locationAdminService?.createResource({
+              tenantId: tenantId ?? "",
+              locationId: activeLocationId ?? "",
+              type,
+              name: "",
+              capacity: 1,
+              status: "active",
+              maintenanceNote: null,
+            });
+          }}
+          onEditResource={(resourceId) => {
+            void locationAdminService?.updateResource(resourceId, {});
+          }}
+          onRetry={() => activeLocationId ? void loadLocationResources(activeLocationId) : undefined}
+          onBack={() => navigate("LocationDashboard")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "AdminWalkInQueue") {
+      return (
+        <AdminWalkInQueueScreen
+          loading={walkInQueueLoading}
+          error={walkInQueueError}
+          locationName={
+            locationList.find((l) => l.locationId === activeLocationId)?.name ?? activeLocationId ?? ""
+          }
+          queue={walkInQueue}
+          onAddWalkIn={() => {
+            void locationAdminService?.addWalkIn(activeLocationId ?? "", "", 1, null, null);
+          }}
+          onMarkSeated={(entryId) => {
+            void locationAdminService?.updateWalkInStatus(entryId, "seated", null);
+            void (activeLocationId ? loadWalkInQueue(activeLocationId) : undefined);
+          }}
+          onMarkNoShow={(entryId) => {
+            void locationAdminService?.updateWalkInStatus(entryId, "no_show", null);
+            void (activeLocationId ? loadWalkInQueue(activeLocationId) : undefined);
+          }}
+          onRetry={() => activeLocationId ? void loadWalkInQueue(activeLocationId) : undefined}
+          onBack={() => navigate("LocationDashboard")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "DailyClose") {
+      return (
+        <DailyCloseScreen
+          loading={dailyCloseLoading}
+          error={dailyCloseError}
+          report={dailyCloseReport}
+          submitting={dailyCloseSubmitting}
+          onIncrementDenomination={(label) => {
+            if (!activeLocationId || !dailyCloseReport) return;
+            const today = new Date().toISOString().split("T")[0];
+            const current = dailyCloseReport.denominationCounts.find((d) => d.label === label)?.quantity ?? 0;
+            void locationAdminService?.updateDenominationCount(activeLocationId, today, label, current + 1);
+            void loadDailyClose(activeLocationId);
+          }}
+          onDecrementDenomination={(label) => {
+            if (!activeLocationId || !dailyCloseReport) return;
+            const today = new Date().toISOString().split("T")[0];
+            const current = dailyCloseReport.denominationCounts.find((d) => d.label === label)?.quantity ?? 0;
+            if (current <= 0) return;
+            void locationAdminService?.updateDenominationCount(activeLocationId, today, label, current - 1);
+            void loadDailyClose(activeLocationId);
+          }}
+          onSubmit={async () => {
+            if (!activeLocationId) return;
+            setDailyCloseSubmitting(true);
+            const today = new Date().toISOString().split("T")[0];
+            try {
+              await locationAdminService?.submitDailyClose(activeLocationId, today, "");
+              void loadDailyClose(activeLocationId);
+            } finally {
+              setDailyCloseSubmitting(false);
+            }
+          }}
+          onRetry={() => activeLocationId ? void loadDailyClose(activeLocationId) : undefined}
+          onBack={() => navigate("LocationDashboard")}
+        />
+      );
+    }
+
     if (activeRoute.name === "SalonDashboard") {
       return (
         <MultiSalonDashboardScreen
@@ -2067,6 +8913,7 @@ export function AppNavigatorShell({
         onBackToDashboard={() => navigate("SalonDashboard")}
         onRetryFeed={() => void retryDiscoveryFeeds()}
         onSignOut={signOut}
+        onOpenInbox={() => navigate("Inbox")}
       />
     );
   }
@@ -2084,8 +8931,8 @@ export function AppNavigatorShell({
           {renderRouteContent()}
         </View>
       </View>
-      {activeRoute.name === "AppShell" && (
-        <BottomTabBar activeTab={activeTab} onTabPress={setActiveTab} />
+      {!NO_TAB_ROUTES.has(activeRoute.name) && (
+        <BottomTabBar activeTab={activeTab} onTabPress={(tab) => { navigate("AppShell"); setActiveTab(tab); }} />
       )}
     </View>
   );

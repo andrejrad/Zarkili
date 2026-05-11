@@ -1,0 +1,168 @@
+{
+  "locale": "en-US",
+  "version": "1.0.0",
+  "batch": "L",
+  "strings": {
+    "forceUpdateGate": {
+      "heading": "Update Required",
+      "body": "A new version of Zarkili is available. Please update to continue.",
+      "primaryCta": "Update Now",
+      "releaseNotesToggle": "See what's new",
+      "releaseNotesToggleCollapse": "Hide details",
+      "versionLabel": "Version {{version}}"
+    },
+    "maintenanceMode": {
+      "heading": "We'll be right back",
+      "body": "Zarkili is undergoing scheduled maintenance. We'll be back online shortly.",
+      "statusLabel": "Status",
+      "estimatedTimeLabel": "Estimated return",
+      "estimatedTimeValue": "{{time}}",
+      "retryButton": "Try Again",
+      "statusPageLink": "Check status page"
+    },
+    "offlineState": {
+      "heading": "No internet connection",
+      "body": "It looks like you're offline. Check your connection and try again.",
+      "retryButton": "Retry",
+      "cachedDataNotice": "Showing data from {{timestamp}}"
+    },
+    "serverError": {
+      "heading": "Something went wrong",
+      "body": "We couldn't load this page. Our team has been notified.",
+      "retryButton": "Try Again",
+      "homeButton": "Go Home",
+      "errorCode": "Error code: {{code}}"
+    },
+    "featureFlag": {
+      "heading": "Coming Soon",
+      "body": "This feature is being rolled out gradually. You'll get access soon.",
+      "dismissButton": "Got it",
+      "learnMoreLink": "Learn more"
+    },
+    "deepLink": {
+      "openInAppPrompt": "Open in Zarkili",
+      "continueInBrowserLink": "Continue in browser",
+      "notInstalledHeading": "Get the Zarkili app",
+      "notInstalledBody": "Download Zarkili for the best experience.",
+      "downloadButton": "Download Free",
+      "expiredLinkHeading": "This link has expired",
+      "expiredLinkBody": "Try searching for what you were looking for.",
+      "searchButton": "Search Zarkili"
+    },
+    "permissionRecovery": {
+      "settingsButton": "Open Settings",
+      "dismissButton": "Not Now",
+      "camera": {
+        "title": "Camera access needed",
+        "description": "Allow camera access to take profile photos and share your looks."
+      },
+      "photoLibrary": {
+        "title": "Photo library access needed",
+        "description": "Allow photo access to upload your portfolio or profile picture."
+      },
+      "contacts": {
+        "title": "Contacts access needed",
+        "description": "Allow contacts access to find and invite your friends to Zarkili."
+      },
+      "calendar": {
+        "title": "Calendar access needed",
+        "description": "Allow calendar access to add your appointments to your calendar."
+      },
+      "notifications": {
+        "title": "Notifications turned off",
+        "description": "Enable notifications to get appointment reminders and loyalty rewards."
+      },
+      "location": {
+        "title": "Location access needed",
+        "description": "Allow location access to discover salons near you."
+      }
+    },
+    "firstRunTour": {
+      "skipButton": "Skip",
+      "nextButton": "Next",
+      "doneButton": "Get Started",
+      "stepIndicator": "{{current}} of {{total}}",
+      "slides": {
+        "discover": {
+          "heading": "Discover salons near you",
+          "body": "Browse hundreds of salons, stylists, and services in your area."
+        },
+        "book": {
+          "heading": "Book in seconds",
+          "body": "Choose your service, stylist, and time — all in one smooth flow."
+        },
+        "rewards": {
+          "heading": "Earn rewards every visit",
+          "body": "Collect points, unlock tiers, and get exclusive perks."
+        }
+      }
+    },
+    "whatsNew": {
+      "heading": "What's New",
+      "versionLabel": "Version {{version}}",
+      "continueButton": "Continue",
+      "dismissLink": "Maybe later"
+    },
+    "rateTheApp": {
+      "heading": "Enjoying Zarkili?",
+      "body": "Your feedback helps us improve for everyone.",
+      "rateButton": "Rate Us",
+      "feedbackButton": "Send Feedback",
+      "dismissLink": "Not now",
+      "laterLink": "Remind me later"
+    },
+    "languageLocalePicker": {
+      "screenTitle": "Language",
+      "searchPlaceholder": "Search languages",
+      "sectionCurrentLabel": "Current",
+      "sectionAllLabel": "All Languages",
+      "comingSoonBadge": "Coming soon",
+      "saveButton": "Save",
+      "restartNotice": "Restart required to apply changes"
+    },
+    "liveActivities": {
+      "appointmentInProgress": "Your appointment is in progress",
+      "waitingLabel": "Waiting",
+      "inChairLabel": "In chair",
+      "finishingLabel": "Finishing up",
+      "doneLabel": "All done!",
+      "stylistLabel": "with {{stylistName}}",
+      "tapToOpenLabel": "Tap to open Zarkili"
+    },
+    "androidWidget": {
+      "nextAppointmentLabel": "Next Appointment",
+      "noAppointmentsLabel": "No upcoming appointments",
+      "bookNowButton": "Book Now",
+      "loyaltyPointsLabel": "{{points}} pts",
+      "loyaltyTierLabel": "{{tier}} member",
+      "configureWidgetLabel": "Configure widget"
+    },
+    "appClip": {
+      "heading": "Book with {{salonName}}",
+      "serviceSummary": "{{serviceName}} · {{duration}} min",
+      "priceLabel": "{{price}}",
+      "stylistLabel": "with {{stylistName}}",
+      "confirmButton": "Confirm Booking",
+      "downloadAppLink": "Get the full Zarkili experience",
+      "poweredByLabel": "Powered by Zarkili"
+    },
+    "storeScreenshots": {
+      "screenshot1Headline": "Discover your next look",
+      "screenshot1Subheadline": "Find salons and styles near you",
+      "screenshot2Headline": "Book in under 60 seconds",
+      "screenshot2Subheadline": "Quick and easy appointments",
+      "screenshot3Headline": "Earn rewards with every visit",
+      "screenshot3Subheadline": "Points for every dollar spent",
+      "screenshot4Headline": "Style inspo from your city",
+      "screenshot4Subheadline": "See what's trending locally",
+      "screenshot5Headline": "AI-powered scheduling",
+      "screenshot5Subheadline": "Smarter booking suggestions"
+    },
+    "videoStoryboard": {
+      "tagline": "Book faster. Look better. Earn more.",
+      "ctaEndCard": "Download Zarkili free",
+      "appStoreLabel": "App Store",
+      "googlePlayLabel": "Google Play"
+    }
+  }
+}

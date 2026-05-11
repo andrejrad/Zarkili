@@ -1,0 +1,55 @@
+{
+  "component": "AuditLogRow",
+  "description": "Single row in audit log DataTable, height 56px collapsed, auto when expanded",
+  "props": {
+    "logId": { "type": "string", "required": true, "description": "Unique log entry ID" },
+    "timestamp": { "type": "string", "required": true, "description": "ISO timestamp, display as MMM D, YYYY HH:mm:ss monospace" },
+    "actor": { "type": "object", "required": true, "description": "{ id, name, role }" },
+    "action": { "type": "string", "required": true, "description": "Action identifier e.g. client.block, booking.cancel" },
+    "entityType": { "type": "string", "required": true, "description": "Entity type" },
+    "entityId": { "type": "string", "required": true, "description": "Entity ID" },
+    "entityName": { "type": "string", "required": true, "description": "Entity display name" },
+    "changesSummary": { "type": "string", "required": true, "description": "Short plain-text summary" },
+    "ipAddress": { "type": "string", "required": false, "description": "IP address" },
+    "sessionId": { "type": "string", "required": false, "description": "Session ID" },
+    "userAgent": { "type": "string", "required": false, "description": "User agent string" },
+    "severity": { "type": "string", "required": true, "description": "info, warning, or critical" },
+    "isExpanded": { "type": "boolean", "required": false, "description": "Expanded state" },
+    "onToggle": { "type": "function", "required": true, "description": "Toggle expand callback" }
+  },
+  "variants": ["default", "hovered", "expanded", "critical"],
+  "layout": {
+    "collapsedHeight": 56,
+    "columns": [
+      "Timestamp (mono, 180px)",
+      "Actor (name + role badge, 200px)",
+      "Action (pill, 200px)",
+      "Entity (type + name link, grows)",
+      "Severity badge (80px)",
+      "Expand chevron (40px)"
+    ],
+    "expandedPanel": "inset 16px padding, shows changesSummary + IP + sessionId + userAgent + Copy log ID link"
+  },
+  "severityColors": {
+    "info": "semantic.info",
+    "warning": "semantic.warning",
+    "critical": "semantic.error",
+    "pillBg": "same color at 15%",
+    "pillText": "full color"
+  },
+  "tokens": {
+    "bg": "semantic.surface",
+    "hoverBg": "admin.tableRowAlt",
+    "criticalAccent": "error (3px left border)",
+    "warningAccent": "warning",
+    "infoAccent": "info",
+    "timestampFont": "monospace",
+    "timestampColor": "semantic.muted",
+    "entityLink": "semantic.info (underline on hover)"
+  },
+  "accessibility": {
+    "role": "row",
+    "expandButton": "aria-expanded",
+    "detailPanel": "role=region"
+  }
+}

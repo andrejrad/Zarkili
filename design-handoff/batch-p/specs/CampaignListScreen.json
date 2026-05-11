@@ -1,0 +1,192 @@
+{
+  "screen": "CampaignListScreen",
+  "route": "/admin/campaigns",
+  "description": "Campaign management with status-based tabs and bulk actions",
+  "dimensions": {
+    "width": 390,
+    "height": "auto-scroll"
+  },
+  "states": [
+    "default",
+    "loading",
+    "empty",
+    "error",
+    "bulkSelection"
+  ],
+  "accessibility": {
+    "screenReaderLabel": "strings.campaignList.screenTitle",
+    "semanticRoles": [
+      {"element": "tabs", "role": "tablist"},
+      {"element": "tab", "role": "tab"},
+      {"element": "campaignList", "role": "list"},
+      {"element": "campaignRow", "role": "listitem"},
+      {"element": "bulkSelectCheckbox", "role": "checkbox"}
+    ]
+  },
+  "rtl": "deferred",
+  "darkMode": "deferred",
+  "layout": {
+    "header": {
+      "height": 64,
+      "title": "strings.campaignList.title",
+      "rightAction": {
+        "label": "strings.campaignList.newCampaign",
+        "icon": "plus"
+      }
+    },
+    "tabs": {
+      "height": 48,
+      "tabs": [
+        "strings.campaignList.tabAll",
+        "strings.campaignList.tabDraft",
+        "strings.campaignList.tabScheduled",
+        "strings.campaignList.tabSent",
+        "strings.campaignList.tabArchived"
+      ]
+    },
+    "campaignList": {
+      "rowHeight": 96,
+      "paddingHorizontal": 16,
+      "gap": 12,
+      "dividerColor": "semantic.cardBorder",
+      "dividerThickness": 0.5
+    },
+    "campaignRow": {
+      "height": 96,
+      "paddingHorizontal": 12,
+      "paddingVertical": 12,
+      "columns": [
+        {
+          "component": "checkbox",
+          "width": 44,
+          "visible": "{{bulkSelectMode}}"
+        },
+        {
+          "component": "info",
+          "flex": 1,
+          "children": [
+            "name",
+            "channelIcons",
+            "audienceSize",
+            "date",
+            "stats"
+          ]
+        },
+        {
+          "component": "statusBadge",
+          "width": "auto"
+        },
+        {
+          "component": "chevron",
+          "width": 24
+        }
+      ]
+    },
+    "bulkActionBar": {
+      "height": 56,
+      "position": "fixed-bottom",
+      "background": "semantic.admin.bulkActionBarBg",
+      "textColor": "semantic.admin.bulkActionBarText",
+      "actions": [
+        {"label": "strings.campaignList.bulkArchive", "icon": "archive"},
+        {"label": "strings.campaignList.bulkDuplicate", "icon": "copy"}
+      ]
+    }
+  },
+  "components": [
+    {
+      "id": "navigationHeader",
+      "ref": "navigation-header",
+      "props": {
+        "showBack": false,
+        "title": "strings.campaignList.title",
+        "rightAction": {
+          "icon": "plus",
+          "label": "strings.campaignList.newCampaign"
+        }
+      }
+    },
+    {
+      "id": "tabs",
+      "ref": "tabs",
+      "props": {
+        "tabs": [
+          "strings.campaignList.tabAll",
+          "strings.campaignList.tabDraft",
+          "strings.campaignList.tabScheduled",
+          "strings.campaignList.tabSent",
+          "strings.campaignList.tabArchived"
+        ]
+      }
+    },
+    {
+      "id": "campaignRow",
+      "ref": "list-row",
+      "props": {
+        "name": "{{campaignName}}",
+        "channelIcons": "{{channelIcons}}",
+        "audienceSize": "{{audienceSize}}",
+        "date": "{{date}}",
+        "statusBadge": "{{status}}",
+        "stats": "{{openRate}}, {{clickRate}}",
+        "checkbox": "{{bulkSelectMode}}"
+      }
+    },
+    {
+      "id": "statusBadge",
+      "ref": "campaign-status-badge",
+      "props": {
+        "status": "{{status}}"
+      }
+    },
+    {
+      "id": "bulkActionBar",
+      "ref": "bulk-action-bar",
+      "props": {
+        "actions": [
+          {"label": "strings.campaignList.bulkArchive", "icon": "archive"},
+          {"label": "strings.campaignList.bulkDuplicate", "icon": "copy"}
+        ]
+      }
+    }
+  ],
+  "interactions": [
+    {
+      "trigger": "campaignRow.tap",
+      "action": "navigate",
+      "target": "/admin/campaigns/:id"
+    },
+    {
+      "trigger": "tab.tap",
+      "action": "filterCampaigns"
+    },
+    {
+      "trigger": "newCampaignButton.tap",
+      "action": "navigate",
+      "target": "/admin/campaigns/new"
+    },
+    {
+      "trigger": "bulkSelectCheckbox.toggle",
+      "action": "toggleBulkSelection"
+    }
+  ],
+  "tokens": {
+    "used": [
+      "semantic.pageBackground",
+      "semantic.surface",
+      "semantic.cardBorder",
+      "semantic.foreground",
+      "semantic.secondaryText",
+      "semantic.primary",
+      "semantic.admin.bulkActionBarBg",
+      "semantic.admin.bulkActionBarText"
+    ]
+  },
+  "redlines": {
+    "tabHeight": 48,
+    "campaignRowHeight": 96,
+    "channelIconSize": 20,
+    "bulkActionBarHeight": 56,
+    "gap": 12
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "delta": "colors-batch-q",
+  "tokens": {
+    "review": {
+      "pending": { "value": "#FF9800", "token": "review.pending" },
+      "pendingBg": { "value": "#FFF3E0", "token": "review.pendingBg" },
+      "replied": { "value": "#4CAF50", "token": "review.replied" },
+      "repliedBg": { "value": "#E8F5E9", "token": "review.repliedBg" },
+      "flagged": { "value": "#F44336", "token": "review.flagged" },
+      "flaggedBg": { "value": "#FFEBEE", "token": "review.flaggedBg" },
+      "hidden": { "value": "#9CA3AF", "token": "review.hidden" },
+      "hiddenBg": { "value": "#F5F5F5", "token": "review.hiddenBg" },
+      "disputed": { "value": "#D4A5C9", "token": "review.disputed" },
+      "disputedBg": { "value": "#F5EEF8", "token": "review.disputedBg" }
+    },
+    "sentiment": {
+      "positive": { "value": "#4CAF50", "token": "sentiment.positive" },
+      "positiveBg": { "value": "#E8F5E9", "token": "sentiment.positiveBg" },
+      "neutral": { "value": "#9CA3AF", "token": "sentiment.neutral" },
+      "neutralBg": { "value": "#F5F5F5", "token": "sentiment.neutralBg" },
+      "negative": { "value": "#F44336", "token": "sentiment.negative" },
+      "negativeBg": { "value": "#FFEBEE", "token": "sentiment.negativeBg" }
+    },
+    "message": {
+      "unreadIndicator": { "value": "#E3A9A0", "token": "message.unreadIndicator" },
+      "assigned": { "value": "#4CAF50", "token": "message.assigned" },
+      "assignedBg": { "value": "#E8F5E9", "token": "message.assignedBg" },
+      "unassigned": { "value": "#FF9800", "token": "message.unassigned" },
+      "unassignedBg": { "value": "#FFF3E0", "token": "message.unassignedBg" },
+      "snoozed": { "value": "#9CA3AF", "token": "message.snoozed" },
+      "snoozedBg": { "value": "#F5F5F5", "token": "message.snoozedBg" },
+      "archived": { "value": "#9CA3AF", "token": "message.archived" },
+      "archivedBg": { "value": "#F5F5F5", "token": "message.archivedBg" }
+    },
+    "waitlist": {
+      "high": { "value": "#F44336", "token": "waitlist.high" },
+      "highBg": { "value": "#FFEBEE", "token": "waitlist.highBg" },
+      "medium": { "value": "#FF9800", "token": "waitlist.medium" },
+      "mediumBg": { "value": "#FFF3E0", "token": "waitlist.mediumBg" },
+      "low": { "value": "#4CAF50", "token": "waitlist.low" },
+      "lowBg": { "value": "#E8F5E9", "token": "waitlist.lowBg" },
+      "expired": { "value": "#9CA3AF", "token": "waitlist.expired" },
+      "expiredBg": { "value": "#F5F5F5", "token": "waitlist.expiredBg" },
+      "converted": { "value": "#A5C4D4", "token": "waitlist.converted" },
+      "convertedBg": { "value": "#EAF4F8", "token": "waitlist.convertedBg" }
+    },
+    "components": {
+      "waitlistDragHandleSize": { "value": 24, "unit": "px", "token": "components.waitlistDragHandleSize" },
+      "assignmentPickerWidth": { "value": 280, "unit": "px", "token": "components.assignmentPickerWidth" },
+      "inboxListWidth": { "value": 320, "unit": "px", "token": "components.inboxListWidth" },
+      "inboxInfoPanelWidth": { "value": 280, "unit": "px", "token": "components.inboxInfoPanelWidth" },
+      "cannedReplyRowHeight": { "value": 64, "unit": "px", "token": "components.cannedReplyRowHeight" },
+      "autoReplyDayRowHeight": { "value": 48, "unit": "px", "token": "components.autoReplyDayRowHeight" },
+      "ratingStarSize": { "value": 16, "unit": "px", "token": "components.ratingStarSize" },
+      "replyComposerMinHeight": { "value": 120, "unit": "px", "token": "components.replyComposerMinHeight" },
+      "previewBubbleMaxWidth": { "value": 280, "unit": "px", "token": "components.previewBubbleMaxWidth" }
+    }
+  }
+}

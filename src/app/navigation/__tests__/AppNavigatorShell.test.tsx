@@ -177,6 +177,26 @@ describe("AppNavigatorShell", () => {
           updatedAt: {} as never,
         },
       }),
+      updateBusinessProfile: async () => ({
+        ok: true,
+        data: {
+          tenantId: "tenantA",
+          name: "Tenant Alpha",
+          slug: "tenant-alpha",
+          status: "active",
+          plan: "starter",
+          country: "HR",
+          timezone: "Europe/Zagreb",
+          defaultLanguage: "hr",
+          defaultCurrency: "EUR",
+          brandingPrimary: "#111111",
+          brandingSecondary: "#eeeeee",
+          allowGuestBooking: true,
+          requireDeposit: false,
+        },
+      }),
+      updateBrandSettings: async () => ({ ok: true, data: undefined }),
+      updateCurrencySettings: async () => ({ ok: true, data: undefined }),
       ...overrides,
     };
   }
@@ -205,6 +225,9 @@ describe("AppNavigatorShell", () => {
       }),
       updateStaffMember: async () => ({ ok: true, data: undefined }),
       deactivateStaffMember: async () => ({ ok: true, data: undefined }),
+      reactivateStaffMember: async () => ({ ok: true, data: undefined }),
+      readSchedule: async () => ({ ok: true, data: null }),
+      saveSchedule: async () => ({ ok: false, message: "stub" }),
       ...overrides,
     };
   }
@@ -262,7 +285,7 @@ describe("AppNavigatorShell", () => {
       </AppProviders>
     );
 
-    fireEvent.press(screen.getByText("Discover businesses"));
+    fireEvent.press(screen.getByText("Explore"));
 
     expect(screen.getByText("Coming soon. Marketplace is currently disabled by feature flag.")).toBeTruthy();
   });
@@ -277,6 +300,7 @@ describe("AppNavigatorShell", () => {
       </AppProviders>
     );
 
+    fireEvent.press(screen.getByText("Profile"));
     fireEvent.press(screen.getByText("Already have an account? Sign In"));
     fireEvent.press(screen.getByText("Sign in as dev user"));
 
@@ -319,10 +343,11 @@ describe("AppNavigatorShell", () => {
       </AppProviders>
     );
 
+    fireEvent.press(screen.getByText("Profile"));
     fireEvent.press(screen.getByText("Already have an account? Sign In"));
-    fireEvent.changeText(screen.getByPlaceholderText("name@example.com"), "member@example.com");
-    fireEvent.changeText(screen.getByPlaceholderText("••••••••"), "strong-password");
-    fireEvent.press(screen.getByRole("button", { name: "Login" }));
+    fireEvent.changeText(screen.getByTestId("signin-identifier"), "member@example.com");
+    fireEvent.changeText(screen.getByTestId("signin-password"), "strong-password");
+    fireEvent.press(screen.getByTestId("signin-submit"));
 
     await waitFor(() => {
       expect(authRepository.signIn).toHaveBeenCalledWith({
@@ -342,12 +367,6 @@ describe("AppNavigatorShell", () => {
         email: input.email,
         firstName: null,
         lastName: null,
-      })),
-      updateProfile: jest.fn(async (_userId, input) => ({
-        userId: "new-user",
-        email: "new-user@example.com",
-        firstName: input.firstName,
-        lastName: input.lastName,
       })),
     });
 
@@ -372,35 +391,33 @@ describe("AppNavigatorShell", () => {
       </AppProviders>
     );
 
+    fireEvent.press(screen.getByText("Profile"));
     fireEvent.press(screen.getByText("Get Started"));
-    fireEvent.changeText(screen.getByPlaceholderText("name@example.com"), "new-user@example.com");
-    fireEvent.changeText(screen.getByPlaceholderText("••••••••"), "strong-password");
-    fireEvent.press(screen.getByRole("button", { name: "Create account" }));
-
-    await waitFor(() => {
-      expect(screen.getByText("Complete your profile")).toBeTruthy();
-    });
-
-    fireEvent.changeText(screen.getByPlaceholderText("Ana"), "Ana");
-    fireEvent.changeText(screen.getByPlaceholderText("Novak"), "Novak");
-    fireEvent.press(screen.getByRole("button", { name: "Continue" }));
+    fireEvent.changeText(screen.getByTestId("signup-first-name"), "Ana");
+    fireEvent.changeText(screen.getByTestId("signup-last-name"), "Novak");
+    fireEvent.changeText(screen.getByTestId("signup-identifier"), "new-user@example.com");
+    fireEvent.changeText(screen.getByTestId("signup-password"), "StrongPass1!");
+    fireEvent.press(screen.getByTestId("signup-terms"));
+    fireEvent.press(screen.getByTestId("signup-submit"));
 
     await waitFor(() => {
       expect(authRepository.createAccount).toHaveBeenCalledWith({
         email: "new-user@example.com",
-        password: "strong-password",
+        password: "StrongPass1!",
       });
-      expect(authRepository.updateProfile).toHaveBeenCalledWith("new-user", {
-        firstName: "Ana",
-        lastName: "Novak",
-      });
+    });
+
+    // Email verification screen — press Continue to proceed to AppShell
+    fireEvent.press(screen.getByTestId("verify-continue"));
+
+    await waitFor(() => {
       expect(screen.getByText("Tenant context: tenantA")).toBeTruthy();
     });
 
     expect(screen.getByText("Current route: AppShell")).toBeTruthy();
   });
 
-  it("saves profile changes from the profile tab", async () => {
+  it("navigates to EditProfile and saves display name changes", async () => {
     const authRepository = createAuthRepositoryStub({
       signIn: jest.fn(async (input) => ({
         userId: "member-user",
@@ -408,19 +425,6 @@ describe("AppNavigatorShell", () => {
         firstName: "Member",
         lastName: "User",
       })),
-      updateProfile: jest.fn(async (_userId, input) => ({
-        userId: "member-user",
-        email: "member@example.com",
-        firstName: input.firstName,
-        lastName: input.lastName,
-      })),
-      updateEmailAddress: jest.fn(async (_userId, input) => ({
-        userId: "member-user",
-        email: input.email,
-        firstName: "Petra",
-        lastName: "Horvat",
-      })),
-      sendPasswordReset: jest.fn(async () => undefined),
     });
 
     render(
@@ -444,49 +448,33 @@ describe("AppNavigatorShell", () => {
       </AppProviders>
     );
 
+    fireEvent.press(screen.getByText("Profile"));
     fireEvent.press(screen.getByText("Already have an account? Sign In"));
-    fireEvent.changeText(screen.getByPlaceholderText("name@example.com"), "member@example.com");
-    fireEvent.changeText(screen.getByPlaceholderText("••••••••"), "strong-password");
-    fireEvent.press(screen.getByRole("button", { name: "Login" }));
+    fireEvent.changeText(screen.getByTestId("signin-identifier"), "member@example.com");
+    fireEvent.changeText(screen.getByTestId("signin-password"), "strong-password");
+    fireEvent.press(screen.getByTestId("signin-submit"));
 
     await waitFor(() => {
       expect(screen.getByText("Tenant context: tenantA")).toBeTruthy();
     });
 
+    // Profile tab now shows overview screen with "Edit profile" CTA
     fireEvent.press(screen.getByText("Profile"));
-    fireEvent.changeText(screen.getByPlaceholderText("Ana"), "Petra");
-    fireEvent.changeText(screen.getByPlaceholderText("Novak"), "Horvat");
-    fireEvent.press(screen.getByRole("button", { name: "Save profile" }));
+    expect(screen.getByText("Member User")).toBeTruthy();
+
+    // Tap "Edit profile" to navigate to EditProfileScreen
+    fireEvent.press(screen.getByRole("button", { name: "Edit profile" }));
 
     await waitFor(() => {
-      expect(authRepository.updateProfile).toHaveBeenCalledWith("member-user", {
-        firstName: "Petra",
-        lastName: "Horvat",
-      });
-      expect(screen.getByText("Profile saved.")).toBeTruthy();
-    });
-
-    fireEvent.changeText(screen.getByPlaceholderText("name@example.com"), "petra@example.com");
-    fireEvent.press(screen.getByRole("button", { name: "Save email" }));
-
-    await waitFor(() => {
-      expect(authRepository.updateEmailAddress).toHaveBeenCalledWith("member-user", {
-        email: "petra@example.com",
-      });
-      expect(screen.getByText("Email saved.")).toBeTruthy();
-    });
-
-    fireEvent.press(screen.getByRole("button", { name: "Send password reset email" }));
-
-    await waitFor(() => {
-      expect(authRepository.sendPasswordReset).toHaveBeenCalledWith({
-        email: "petra@example.com",
-      });
-      expect(screen.getByText("Password reset email sent.")).toBeTruthy();
+      // EditProfileScreen renders the display name field pre-filled
+      expect(screen.getByDisplayValue("Member User")).toBeTruthy();
     });
   });
 
-  it("shows friendly Firebase auth errors for account email save and password reset", async () => {
+  // NOTE: Email-change and password-reset UI moved out of ProfileRouteScreen (overview) in W35.
+  // Those flows are tested directly in src/app/profile/__tests__/profileScreens.test.tsx.
+  // This shell-level test verifies the profile overview renders the correct user identity after sign-in.
+  it("shows user identity on the profile overview after sign-in", async () => {
     const authRepository = createAuthRepositoryStub({
       signIn: jest.fn(async (input) => ({
         userId: "member-user",
@@ -494,16 +482,6 @@ describe("AppNavigatorShell", () => {
         firstName: "Member",
         lastName: "User",
       })),
-      updateEmailAddress: jest.fn(async () => {
-        const error = new Error("Firebase error") as Error & { code: string };
-        error.code = "auth/requires-recent-login";
-        throw error;
-      }),
-      sendPasswordReset: jest.fn(async () => {
-        const error = new Error("Firebase error") as Error & { code: string };
-        error.code = "auth/too-many-requests";
-        throw error;
-      }),
     });
 
     render(
@@ -527,27 +505,21 @@ describe("AppNavigatorShell", () => {
       </AppProviders>
     );
 
+    fireEvent.press(screen.getByText("Profile"));
     fireEvent.press(screen.getByText("Already have an account? Sign In"));
-    fireEvent.changeText(screen.getByPlaceholderText("name@example.com"), "member@example.com");
-    fireEvent.changeText(screen.getByPlaceholderText("••••••••"), "strong-password");
-    fireEvent.press(screen.getByRole("button", { name: "Login" }));
+    fireEvent.changeText(screen.getByTestId("signin-identifier"), "member@example.com");
+    fireEvent.changeText(screen.getByTestId("signin-password"), "strong-password");
+    fireEvent.press(screen.getByTestId("signin-submit"));
 
     await waitFor(() => {
       expect(screen.getByText("Tenant context: tenantA")).toBeTruthy();
     });
 
     fireEvent.press(screen.getByText("Profile"));
-    fireEvent.changeText(screen.getByPlaceholderText("name@example.com"), "petra@example.com");
-    fireEvent.press(screen.getByRole("button", { name: "Save email" }));
 
     await waitFor(() => {
-      expect(screen.getByText("For security, please log in again before changing your email.")).toBeTruthy();
-    });
-
-    fireEvent.press(screen.getByRole("button", { name: "Send password reset email" }));
-
-    await waitFor(() => {
-      expect(screen.getByText("Too many attempts. Please wait a moment and try again.")).toBeTruthy();
+      expect(screen.getByText("Member User")).toBeTruthy();
+      expect(screen.getByText("member@example.com")).toBeTruthy();
     });
   });
 
@@ -567,10 +539,11 @@ describe("AppNavigatorShell", () => {
       </AppProviders>
     );
 
+    fireEvent.press(screen.getByText("Profile"));
     fireEvent.press(screen.getByText("Already have an account? Sign In"));
-    fireEvent.changeText(screen.getByPlaceholderText("name@example.com"), "member@example.com");
-    fireEvent.changeText(screen.getByPlaceholderText("••••••••"), "wrong-password");
-    fireEvent.press(screen.getByRole("button", { name: "Login" }));
+    fireEvent.changeText(screen.getByTestId("signin-identifier"), "member@example.com");
+    fireEvent.changeText(screen.getByTestId("signin-password"), "wrong-password");
+    fireEvent.press(screen.getByTestId("signin-submit"));
 
     await waitFor(() => {
       expect(authRepository.signIn).toHaveBeenCalledWith({
@@ -580,7 +553,7 @@ describe("AppNavigatorShell", () => {
       expect(screen.getByText("Invalid credentials")).toBeTruthy();
     });
 
-    expect(screen.getByText("Current route: Login")).toBeTruthy();
+    expect(screen.getByText("Current route: SignIn")).toBeTruthy();
   });
 
   it("clears auth errors after navigating away from and back to login", async () => {
@@ -599,10 +572,11 @@ describe("AppNavigatorShell", () => {
       </AppProviders>
     );
 
+    fireEvent.press(screen.getByText("Profile"));
     fireEvent.press(screen.getByText("Already have an account? Sign In"));
-    fireEvent.changeText(screen.getByPlaceholderText("name@example.com"), "member@example.com");
-    fireEvent.changeText(screen.getByPlaceholderText("••••••••"), "wrong-password");
-    fireEvent.press(screen.getByRole("button", { name: "Login" }));
+    fireEvent.changeText(screen.getByTestId("signin-identifier"), "member@example.com");
+    fireEvent.changeText(screen.getByTestId("signin-password"), "wrong-password");
+    fireEvent.press(screen.getByTestId("signin-submit"));
 
     await screen.findByText("Invalid credentials");
 
@@ -636,6 +610,7 @@ describe("AppNavigatorShell", () => {
       </AppProviders>
     );
 
+    fireEvent.press(screen.getByText("Profile"));
     fireEvent.press(screen.getByText("Already have an account? Sign In"));
     fireEvent.press(screen.getByText("Sign in as dev user"));
     await waitFor(() => {
@@ -643,7 +618,9 @@ describe("AppNavigatorShell", () => {
     });
     fireEvent.press(screen.getByText("Start client onboarding"));
 
-    expect(await screen.findByText("Placeholder step: Profile")).toBeTruthy();
+    // After resume, route advances to the `profile` step which renders the real
+    // ClientOnboardingProfileScreen (heading text "About you").
+    expect(await screen.findByText("About you")).toBeTruthy();
     expect(persistence.resumeDraft).toHaveBeenCalled();
   });
 
@@ -663,13 +640,17 @@ describe("AppNavigatorShell", () => {
       </AppProviders>
     );
 
+    fireEvent.press(screen.getByText("Profile"));
     fireEvent.press(screen.getByText("Already have an account? Sign In"));
     fireEvent.press(screen.getByText("Sign in as dev user"));
     await waitFor(() => {
       expect(screen.getByText("Tenant context: tenantA")).toBeTruthy();
     });
     fireEvent.press(screen.getByText("Start salon onboarding"));
-    fireEvent.press(await screen.findByText("Next step"));
+    // Salon flow now renders the SalonOnboardingWizard. Press Mark Complete on
+    // the current step (defaults to BUSINESS_PROFILE in the mock state) which
+    // triggers persistence.saveDraft via goToNextOnboardingStep.
+    fireEvent.press(await screen.findByLabelText("Complete Business Profile"));
 
     await waitFor(() => {
       expect(persistence.saveDraft).toHaveBeenCalledWith(
@@ -697,6 +678,7 @@ describe("AppNavigatorShell", () => {
       </AppProviders>
     );
 
+    fireEvent.press(screen.getByText("Profile"));
     fireEvent.press(screen.getByText("Already have an account? Sign In"));
     fireEvent.press(screen.getByText("Sign in as dev user"));
     await screen.findByText("No active memberships available.");
@@ -740,6 +722,7 @@ describe("AppNavigatorShell", () => {
       </AppProviders>
     );
 
+    fireEvent.press(screen.getByText("Profile"));
     fireEvent.press(screen.getByText("Already have an account? Sign In"));
     fireEvent.press(screen.getByText("Sign in as dev user"));
     fireEvent.press(await screen.findByText("Select tenant tenantB"));
@@ -807,6 +790,7 @@ describe("AppNavigatorShell", () => {
       </AppProviders>
     );
 
+    fireEvent.press(screen.getByText("Profile"));
     fireEvent.press(screen.getByText("Already have an account? Sign In"));
     fireEvent.press(screen.getByText("Sign in as dev user"));
     fireEvent.press(await screen.findByText("Owner AI budget settings"));
@@ -834,7 +818,7 @@ describe("AppNavigatorShell", () => {
       </AppProviders>
     );
 
-    fireEvent.press(screen.getByText("Discover businesses"));
+    fireEvent.press(screen.getByText("Explore"));
     await screen.findByText("Luna Studio");
 
     fireEvent.press(screen.getByText("Book"));
@@ -857,13 +841,13 @@ describe("AppNavigatorShell", () => {
       </AppProviders>
     );
 
-    fireEvent.press(screen.getByText("Discover businesses"));
+    fireEvent.press(screen.getByText("Explore"));
     await screen.findByText("Atelier Glow");
 
     fireEvent.press(screen.getByText("Book (coming soon)"));
 
     expect(await screen.findByText("Booking is coming soon for Atelier Glow.")).toBeTruthy();
-    expect(screen.getByText("Current route: DiscoverBusinesses")).toBeTruthy();
+    expect(screen.getByText("Current route: AppShell")).toBeTruthy();
   });
 
   it("filters discover results by search and shows empty state when nothing matches", async () => {
@@ -878,7 +862,7 @@ describe("AppNavigatorShell", () => {
       </AppProviders>
     );
 
-    fireEvent.press(screen.getByText("Discover businesses"));
+    fireEvent.press(screen.getByText("Explore"));
     await screen.findByText("Luna Studio");
 
     fireEvent.changeText(screen.getByPlaceholderText("Search services, salons..."), "luna");
@@ -908,7 +892,7 @@ describe("AppNavigatorShell", () => {
       </AppProviders>
     );
 
-    fireEvent.press(screen.getByText("Discover businesses"));
+    fireEvent.press(screen.getByText("Explore"));
 
     expect(await screen.findByText("Unable to load discovery content.")).toBeTruthy();
   });
@@ -926,6 +910,7 @@ describe("AppNavigatorShell", () => {
       </AppProviders>
     );
 
+    fireEvent.press(screen.getByText("Profile"));
     fireEvent.press(screen.getByText("Already have an account? Sign In"));
     fireEvent.press(screen.getByText("Sign in as dev user"));
     await screen.findByText("Tenant context: tenantA");
@@ -973,6 +958,7 @@ describe("AppNavigatorShell", () => {
       </AppProviders>
     );
 
+    fireEvent.press(screen.getByText("Profile"));
     fireEvent.press(screen.getByText("Already have an account? Sign In"));
     fireEvent.press(screen.getByText("Sign in as dev user"));
     await screen.findByText("Tenant context: tenantA");
@@ -1026,6 +1012,7 @@ describe("AppNavigatorShell", () => {
       </AppProviders>
     );
 
+    fireEvent.press(screen.getByText("Profile"));
     fireEvent.press(screen.getByText("Already have an account? Sign In"));
     fireEvent.press(screen.getByText("Sign in as dev user"));
     await screen.findByText("Tenant context: tenantA");
@@ -1069,6 +1056,7 @@ describe("AppNavigatorShell", () => {
       </AppProviders>
     );
 
+    fireEvent.press(screen.getByText("Profile"));
     fireEvent.press(screen.getByText("Already have an account? Sign In"));
     fireEvent.press(screen.getByText("Sign in as dev user"));
     await screen.findByText("Tenant context: tenantA");
@@ -1164,6 +1152,7 @@ describe("AppNavigatorShell", () => {
     );
 
     // Sign in — auto-navigate fires to SalonDashboard because service is wired
+    fireEvent.press(screen.getByText("Profile"));
     fireEvent.press(screen.getByText("Already have an account? Sign In"));
     fireEvent.press(screen.getByText("Sign in as dev user"));
 
@@ -1174,10 +1163,10 @@ describe("AppNavigatorShell", () => {
 
     // Select tenantB — context switches away from tenantA
     fireEvent.press(screen.getByTestId("salon-card-tenantB"));
-    await screen.findByText("Current route: AppShell");
+    await screen.findByText("Current route: OwnerHome");
 
     // Navigate to staff list — must be scoped to tenantB, not tenantA
-    fireEvent.press(screen.getByText("Staff list"));
+    fireEvent.press(screen.getByText("Staff"));
     await screen.findByText("Current route: StaffList");
 
     await waitFor(() => {

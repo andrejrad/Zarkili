@@ -1,0 +1,508 @@
+{
+  "screen": "BookingDatePicker",
+  "description": "Date selection screen in booking flow (step 3 of 5)",
+  "purpose": "Allow users to select an appointment date from available time slots within salon's bookable window",
+  "flow": "Booking flow step 3/5",
+  "device": "iPhone 14 (390x844)",
+  "source": {
+    "batch": "C",
+    "screen": "C.3 Date Picker",
+    "promotedFrom": "documentation/figma-prompts/BATCH_C_BOOKING_FLOW.md",
+    "figmaFrames": [
+      "C-3-date-picker-default",
+      "C-3-date-picker-fully-booked",
+      "C-3-date-picker-holiday",
+      "C-3-date-picker-loading",
+      "C-3-date-picker-error"
+    ],
+    "lockedAt": "2026-04-27"
+  },
+  "hierarchy": {
+    "container": {
+      "background": "#F2EDDD",
+      "safeArea": true
+    },
+    "scroll": {
+      "type": "ScrollView",
+      "bounces": true,
+      "showsVerticalScrollIndicator": false,
+      "contentPadding": {
+        "bottom": 96
+      }
+    }
+  },
+  "sections": {
+    "header": {
+      "type": "fixed",
+      "height": 56,
+      "background": "#F2EDDD",
+      "borderBottomWidth": 1,
+      "borderBottomColor": "#E5E0D1",
+      "paddingHorizontal": 16,
+      "flexDirection": "row",
+      "alignItems": "center",
+      "justifyContent": "space-between",
+      "children": ["backButton", "headerTitle", "stepIndicator"]
+    },
+    "backButton": {
+      "type": "iconButton",
+      "icon": "arrow-left",
+      "iconSize": 24,
+      "iconColor": "#1A1A1A",
+      "size": 44,
+      "position": "absolute",
+      "left": 8,
+      "accessibility": {
+        "role": "button",
+        "label": "Go back to previous step",
+        "hint": "Return to service selection"
+      }
+    },
+    "headerTitle": {
+      "type": "text",
+      "style": "heading-3",
+      "color": "#1A1A1A",
+      "textAlign": "center",
+      "content": "Pick a date"
+    },
+    "stepIndicator": {
+      "type": "text",
+      "style": "label-small",
+      "color": "#6B6B6B",
+      "position": "absolute",
+      "right": 16,
+      "content": "3/5"
+    },
+    "quickPickRow": {
+      "paddingHorizontal": 16,
+      "paddingTop": 16,
+      "flexDirection": "row",
+      "gap": 12,
+      "children": ["todayChip", "tomorrowChip", "weekendChip"]
+    },
+    "quickPickChip": {
+      "component": "chip",
+      "variant": "filled",
+      "background": "#E3A9A0",
+      "color": "#FFFFFF",
+      "paddingHorizontal": 12,
+      "paddingVertical": 8,
+      "borderRadius": 8,
+      "style": "label-small",
+      "options": ["Today", "Tomorrow", "This weekend"],
+      "accessibility": {
+        "role": "button",
+        "label": "{{chipLabel}}",
+        "hint": "Jump to {{chipLabel}} and show available times"
+      }
+    },
+    "holidayBanner": {
+      "visible": "when holiday affects availability",
+      "marginHorizontal": 16,
+      "marginTop": 16,
+      "background": "#F2EDDD",
+      "borderWidth": 1,
+      "borderColor": "#E5E0D1",
+      "borderRadius": 8,
+      "padding": 12,
+      "flexDirection": "row",
+      "alignItems": "center",
+      "gap": 8,
+      "children": ["holidayIndicator", "holidayMessage"]
+    },
+    "holidayIndicator": {
+      "width": 2,
+      "height": 2,
+      "borderRadius": 9999,
+      "background": "#BBEDDA"
+    },
+    "holidayMessage": {
+      "type": "text",
+      "style": "body-small",
+      "color": "#1A1A1A",
+      "content": "{{holidayName}} - limited hours"
+    },
+    "errorBanner": {
+      "visible": "on error state",
+      "marginHorizontal": 16,
+      "marginTop": 16,
+      "background": "rgba(244, 67, 54, 0.05)",
+      "borderWidth": 1,
+      "borderColor": "#F44336",
+      "borderRadius": 8,
+      "padding": 12,
+      "gap": 8,
+      "children": ["errorMessage", "retryButton"]
+    },
+    "errorMessage": {
+      "type": "text",
+      "style": "body",
+      "color": "#F44336",
+      "content": "Unable to load available dates"
+    },
+    "retryButton": {
+      "type": "button",
+      "variant": "primary",
+      "label": "Retry",
+      "background": "#F44336",
+      "color": "#FFFFFF",
+      "paddingHorizontal": 12,
+      "paddingVertical": 6,
+      "borderRadius": 8,
+      "alignSelf": "flex-start"
+    },
+    "monthSwitcher": {
+      "marginHorizontal": 16,
+      "marginTop": 16,
+      "height": 44,
+      "flexDirection": "row",
+      "alignItems": "center",
+      "justifyContent": "space-between",
+      "children": ["previousMonthButton", "monthLabel", "nextMonthButton"]
+    },
+    "previousMonthButton": {
+      "type": "iconButton",
+      "icon": "chevron-left",
+      "iconSize": 24,
+      "iconColor": "#1A1A1A",
+      "size": 44,
+      "accessibility": {
+        "role": "button",
+        "label": "Previous month",
+        "hint": "Go to {{previousMonthName}}"
+      }
+    },
+    "monthLabel": {
+      "type": "text",
+      "style": "heading-3",
+      "color": "#1A1A1A",
+      "textAlign": "center",
+      "content": "{{monthName}} {{year}}",
+      "format": "MMMM YYYY"
+    },
+    "nextMonthButton": {
+      "type": "iconButton",
+      "icon": "chevron-right",
+      "iconSize": 24,
+      "iconColor": "#1A1A1A",
+      "size": 44,
+      "accessibility": {
+        "role": "button",
+        "label": "Next month",
+        "hint": "Go to {{nextMonthName}}"
+      }
+    },
+    "calendarGrid": {
+      "component": "calendar-grid",
+      "marginHorizontal": 16,
+      "marginTop": 16,
+      "description": "Reuses locked calendar-grid component"
+    },
+    "selectedDateInfo": {
+      "marginHorizontal": 16,
+      "marginTop": 16,
+      "gap": 4,
+      "children": ["selectedDateLabel", "availabilityLabel"]
+    },
+    "selectedDateLabel": {
+      "type": "text",
+      "style": "body",
+      "color": "#1A1A1A",
+      "content": "{{dayName}}, {{monthName}} {{dayNumber}}",
+      "format": "dddd, MMMM D",
+      "example": "Wednesday, March 12"
+    },
+    "availabilityLabel": {
+      "type": "text",
+      "style": "body-small",
+      "color": "#6B6B6B",
+      "content": "{{staffName}} has {{slotCount}} slots available",
+      "variants": {
+        "available": "{{staffName}} has {{slotCount}} slots available",
+        "fullyBooked": "Fully booked",
+        "limited": "Limited availability"
+      }
+    },
+    "footer": {
+      "type": "fixed",
+      "position": "bottom",
+      "height": 80,
+      "background": "#F2EDDD",
+      "borderTopWidth": 1,
+      "borderTopColor": "#E5E0D1",
+      "padding": 16,
+      "paddingBottom": "16 + safe-area-inset-bottom",
+      "children": ["continueButton"]
+    },
+    "continueButton": {
+      "type": "button",
+      "variant": "primary",
+      "label": "Continue",
+      "width": "100%",
+      "height": 48,
+      "background": "#E3A9A0",
+      "color": "#FFFFFF",
+      "borderRadius": 9999,
+      "style": "label",
+      "disabled": "when no date selected",
+      "disabledStyle": {
+        "background": "#F5F5F5",
+        "color": "#B0B0B0"
+      },
+      "accessibility": {
+        "role": "button",
+        "label": "Continue to time selection",
+        "hint": "Proceed to step 4 of 5",
+        "disabled": "Select a date to continue"
+      }
+    }
+  },
+  "states": {
+    "default": {
+      "description": "Date picker with selected date (March 12)",
+      "visibility": {
+        "header": true,
+        "quickPickRow": true,
+        "holidayBanner": false,
+        "errorBanner": false,
+        "monthSwitcher": true,
+        "calendarGrid": true,
+        "selectedDateInfo": true,
+        "footer": true
+      },
+      "data": {
+        "selectedDate": "03/12/2026",
+        "availability": {
+          "staffName": "Maya",
+          "slotCount": 6
+        }
+      }
+    },
+    "fullyBooked": {
+      "description": "Selected date is fully booked (disabled)",
+      "data": {
+        "selectedDate": "03/16/2026",
+        "availability": {
+          "status": "fullyBooked",
+          "message": "Fully booked"
+        }
+      },
+      "modifications": {
+        "continueButton": "disabled",
+        "availabilityLabel": "Fully booked"
+      }
+    },
+    "holiday": {
+      "description": "Holiday banner showing limited hours",
+      "visibility": {
+        "holidayBanner": true
+      },
+      "data": {
+        "holiday": {
+          "name": "Thanksgiving",
+          "message": "limited hours"
+        }
+      }
+    },
+    "loading": {
+      "description": "Loading available dates",
+      "skeleton": {
+        "calendarGrid": true,
+        "selectedDateInfo": false
+      },
+      "animation": {
+        "type": "pulse",
+        "duration": 1500,
+        "easing": "ease-in-out"
+      }
+    },
+    "error": {
+      "description": "Error loading available dates",
+      "visibility": {
+        "errorBanner": true,
+        "calendarGrid": false,
+        "selectedDateInfo": false
+      },
+      "modifications": {
+        "continueButton": "disabled"
+      }
+    }
+  },
+  "spacing": {
+    "headerHeight": 56,
+    "sectionPaddingHorizontal": 16,
+    "sectionPaddingTop": 16,
+    "quickPickGap": 12,
+    "bannerMarginTop": 16,
+    "gridMarginTop": 16,
+    "infoMarginTop": 16,
+    "infoGap": 4,
+    "footerHeight": 80,
+    "footerPadding": 16,
+    "buttonHeight": 48
+  },
+  "responsive": {
+    "small": {
+      "screenWidth": "< 375px",
+      "adjustments": {
+        "sectionPaddingHorizontal": 12,
+        "quickPickChipPadding": "6x10px"
+      }
+    },
+    "large": {
+      "screenWidth": "> 428px",
+      "adjustments": {
+        "maxWidth": 428,
+        "centerContent": true
+      }
+    }
+  },
+  "scrollBehavior": {
+    "type": "vertical",
+    "bounces": true,
+    "contentPadding": {
+      "bottom": 96
+    }
+  },
+  "interactions": {
+    "backButtonPress": {
+      "action": "Navigate to previous step (service selection)",
+      "haptic": "light"
+    },
+    "quickPickPress": {
+      "action": "Jump to date and auto-select",
+      "haptic": "medium",
+      "targets": ["today", "tomorrow", "thisWeekend"]
+    },
+    "monthSwitcherPress": {
+      "action": "Load previous/next month",
+      "haptic": "light",
+      "animation": {
+        "type": "slide",
+        "duration": 200
+      }
+    },
+    "dateCellPress": {
+      "action": "Select date and update availability info",
+      "haptic": "light",
+      "condition": "Only if date is not disabled"
+    },
+    "retryButtonPress": {
+      "action": "Reload available dates",
+      "haptic": "medium"
+    },
+    "continueButtonPress": {
+      "action": "Navigate to time selection (step 4/5)",
+      "haptic": "medium",
+      "condition": "Only if date is selected and available"
+    }
+  },
+  "transitions": {
+    "onLoad": {
+      "animation": "fade-in",
+      "duration": 300
+    },
+    "monthChange": {
+      "animation": "slide",
+      "duration": 200,
+      "easing": "ease-out"
+    },
+    "toTimeSelection": {
+      "animation": "slide-left",
+      "duration": 300,
+      "easing": "ease-out"
+    }
+  },
+  "accessibility": {
+    "screenTitle": "Pick a date, step 3 of 5",
+    "announceOnLoad": "Date picker. Select an appointment date. Step 3 of 5.",
+    "focusOrder": [
+      "backButton",
+      "quickPickChips",
+      "previousMonthButton",
+      "nextMonthButton",
+      "calendarGrid",
+      "continueButton"
+    ],
+    "reducedMotion": {
+      "disableSlideTransitions": true,
+      "disableSkeletonPulse": true
+    },
+    "dateFormat": "US format (MM/DD/YYYY)",
+    "timezone": "Display timezone label when relevant: 'All times in {{timezone}}'",
+    "timezoneExample": "All times in EST"
+  },
+  "dependencies": {
+    "components": [
+      "calendar-grid.json (locked)",
+      "chip.json"
+    ],
+    "tokens": [
+      "colors.json",
+      "typography.json",
+      "spacing.json"
+    ],
+    "icons": [
+      "arrow-left (24px) - Back button",
+      "chevron-left (24px) - Previous month",
+      "chevron-right (24px) - Next month"
+    ],
+    "strings": [
+      "en-US.json (booking section)"
+    ]
+  },
+  "tokens": {
+    "colors": [
+      "primary (#E3A9A0)",
+      "primaryPressed (#CF8B80)",
+      "background (#F2EDDD)",
+      "surface (#FFFFFF)",
+      "foreground (#1A1A1A)",
+      "muted (#6B6B6B)",
+      "border (#E5E0D1)",
+      "accent (#BBEDDA)",
+      "error (#F44336)",
+      "disabledFg (#B0B0B0)",
+      "disabledBg (#F5F5F5)"
+    ],
+    "typography": [
+      "heading-3 (20px/28px weight 600)",
+      "body (14px/20px weight 400)",
+      "body-small (12px/16px weight 400)",
+      "label (14px/20px weight 500)",
+      "label-small (12px/16px weight 500)"
+    ],
+    "spacing": [
+      "page-horizontal (16px)",
+      "section-gap (16px)",
+      "element-gap (12px)",
+      "info-gap (4px)"
+    ],
+    "borderRadius": [
+      "small (8px)",
+      "full (9999px)"
+    ]
+  },
+  "strings": {
+    "keys": [
+      "booking.datePicker.title",
+      "booking.datePicker.stepIndicator",
+      "booking.datePicker.quickPick.today",
+      "booking.datePicker.quickPick.tomorrow",
+      "booking.datePicker.quickPick.weekend",
+      "booking.datePicker.availability.available",
+      "booking.datePicker.availability.fullyBooked",
+      "booking.datePicker.availability.limited",
+      "booking.datePicker.error.title",
+      "booking.datePicker.error.retry",
+      "booking.datePicker.continue"
+    ]
+  },
+  "dataContract": {
+    "dateFormat": "MM/DD/YYYY (US format)",
+    "timezone": "Salon's local timezone",
+    "availabilityWindow": "Configurable by salon (e.g., 90 days forward)",
+    "disabledDates": "Array of dates that are fully booked or blocked",
+    "holidays": "Array of dates with special hours or closures"
+  }
+}

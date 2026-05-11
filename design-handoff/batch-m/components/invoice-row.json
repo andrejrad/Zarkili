@@ -1,0 +1,74 @@
+{
+  "schemaVersion": "1.0.0",
+  "componentId": "MC.7",
+  "componentName": "InvoiceRow",
+  "exportedAs": "InvoiceRow",
+  "category": "admin-data-display",
+  "description": "A single data row inside DataTableV1 representing one invoice, used in the Invoice History screen (M.12).",
+  "props": {
+    "date": {
+      "type": "string",
+      "required": true,
+      "description": "Invoice date in US MM/DD/YYYY format"
+    },
+    "invoiceNumber": {
+      "type": "string",
+      "required": true,
+      "description": "Unique invoice identifier displayed in monospace"
+    },
+    "amount": {
+      "type": "number",
+      "required": true,
+      "description": "Invoice amount in the specified currency"
+    },
+    "currency": {
+      "type": "string",
+      "required": false,
+      "default": "USD",
+      "description": "ISO 4217 currency code for amount display"
+    },
+    "status": {
+      "type": "'paid' | 'open' | 'void' | 'draft'",
+      "required": true,
+      "description": "Invoice status driving the status pill variant"
+    },
+    "onDownload": {
+      "type": "() => void",
+      "required": false,
+      "description": "Callback triggered when the download icon button is pressed"
+    }
+  },
+  "tokens": {
+    "dateText": "text.primary",
+    "numberText": "text.muted",
+    "amountText": "text.primary",
+    "downloadIcon": "admin.text.muted"
+  },
+  "anatomy": [
+    "date-cell (body-small)",
+    "invoice-number-cell (monospace body-small)",
+    "amount-cell (body right-aligned)",
+    "status-pill-cell (component MC.5)",
+    "download-button (icon-button 44x44)"
+  ],
+  "sizes": [
+    {
+      "name": "default",
+      "width": "100%",
+      "height": 56
+    }
+  ],
+  "stateNames": [
+    "paid",
+    "open",
+    "void",
+    "draft",
+    "downloading",
+    "error"
+  ],
+  "accessibility": {
+    "role": "row",
+    "ariaLabel": "Invoice {{invoiceNumber}}",
+    "downloadAriaLabel": "Download invoice {{invoiceNumber}}"
+  }
+}

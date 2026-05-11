@@ -1,0 +1,136 @@
+{
+  "screenId": "L.2",
+  "name": "MaintenanceModeScreen",
+  "device": "iPhone 14",
+  "dimensions": {
+    "width": 390,
+    "height": 844
+  },
+  "description": "Full-screen blocking gate during scheduled or emergency maintenance. No dismiss path.",
+  "template": "full-screen-gate-template",
+  "layout": {
+    "type": "vertical-center-flex",
+    "background": "#F2EDDD",
+    "paddingTop": "safe-area-inset + 80",
+    "paddingBottom": "safe-area-inset + 32",
+    "paddingHorizontal": 32,
+    "gap": 24,
+    "accessibility": {
+      "modal": true,
+      "preventDismiss": true
+    }
+  },
+  "elements": [
+    {
+      "id": "hero-illustration",
+      "type": "illustration",
+      "width": 180,
+      "height": 180,
+      "motif": "wrench + clock",
+      "alignment": "center",
+      "colors": ["#E3A9A0", "#D1BFB3", "#BBEDDA"]
+    },
+    {
+      "id": "heading",
+      "type": "text",
+      "style": "heading-2",
+      "text": "{maintenanceHeading}",
+      "fontWeight": 600,
+      "color": "#1A1A1A",
+      "alignment": "center"
+    },
+    {
+      "id": "body-message",
+      "type": "text",
+      "style": "body",
+      "text": "{maintenanceMessage}",
+      "fontWeight": 400,
+      "color": "#6B6B6B",
+      "alignment": "center",
+      "maxWidth": 280
+    },
+    {
+      "id": "status-link",
+      "type": "link",
+      "text": "{statusPageLink}",
+      "href": "https://status.zarkili.com",
+      "style": "label-small",
+      "color": "#E3A9A0",
+      "textDecoration": "underline",
+      "alignment": "center",
+      "marginTop": 8
+    },
+    {
+      "id": "tertiary-cta",
+      "type": "button",
+      "variant": "tertiary",
+      "label": "{tryAgainCta}",
+      "action": "retryConnection",
+      "height": 44,
+      "labelWeight": 500,
+      "labelColor": "#6B6B6B",
+      "accessibility": {
+        "label": "Try connecting again",
+        "hint": "Checks if maintenance is complete"
+      }
+    }
+  ],
+  "states": [
+    {
+      "name": "default",
+      "description": "Generic maintenance message without specific ETA",
+      "strings": {
+        "maintenanceHeading": "We'll be right back",
+        "maintenanceMessage": "Zarkili is undergoing maintenance. We'll be back shortly.",
+        "statusPageLink": "Check status.zarkili.com",
+        "tryAgainCta": "Try again"
+      }
+    },
+    {
+      "name": "with-ETA",
+      "description": "Maintenance with specific return time",
+      "strings": {
+        "maintenanceHeading": "We'll be right back",
+        "maintenanceMessage": "Zarkili is undergoing scheduled maintenance. We'll be back on {day}, {month} {date} at {time} {timezone}.",
+        "statusPageLink": "Check status.zarkili.com",
+        "tryAgainCta": "Try again"
+      },
+      "interpolation": {
+        "day": "Thursday",
+        "month": "May",
+        "date": "15",
+        "time": "2:00 PM",
+        "timezone": "PT"
+      }
+    },
+    {
+      "name": "indefinite",
+      "description": "Emergency maintenance without known resolution time",
+      "strings": {
+        "maintenanceHeading": "We'll be right back",
+        "maintenanceMessage": "Zarkili is undergoing maintenance. We'll be back shortly.",
+        "statusPageLink": "Check status.zarkili.com",
+        "tryAgainCta": "Try again"
+      }
+    }
+  ],
+  "accessibility": {
+    "announceOnAppear": "Maintenance in progress. Zarkili will be back shortly.",
+    "preventBackGesture": true,
+    "preventSwipeToDismiss": true
+  },
+  "frames": [
+    {
+      "name": "L-2-default",
+      "state": "default"
+    },
+    {
+      "name": "L-2-with-ETA",
+      "state": "with-ETA"
+    },
+    {
+      "name": "L-2-indefinite",
+      "state": "indefinite"
+    }
+  ]
+}

@@ -1,0 +1,150 @@
+{
+  "component": "ConflictResolutionModal",
+  "props": {
+    "conflicts": {
+      "type": "array",
+      "required": true,
+      "description": "Array of conflict pairs"
+    },
+    "onApplyAll": {
+      "type": "function",
+      "required": true
+    },
+    "onDismiss": {
+      "type": "function",
+      "required": true
+    },
+    "isApplying": {
+      "type": "boolean",
+      "required": true
+    }
+  },
+  "variants": [
+    "open",
+    "applying",
+    "applied",
+    "error"
+  ],
+  "layout": {
+    "handle": {
+      "width": 36,
+      "height": 4,
+      "radius": 2,
+      "color": "cardBorder",
+      "visibleOn": "mobile only"
+    },
+    "header": {
+      "title": {
+        "variant": "heading-3"
+      },
+      "subtitle": {
+        "variant": "caption",
+        "color": "muted",
+        "interpolation": "N"
+      }
+    },
+    "conflictList": {
+      "type": "FlatList",
+      "scrollable": true
+    }
+  },
+  "conflictRow": {
+    "background": "surface",
+    "border": "1px cardBorder",
+    "radius": 12,
+    "padding": 16,
+    "marginBottom": 12,
+    "appointmentA": {
+      "label": {
+        "variant": "label-small",
+        "color": "muted"
+      },
+      "time": true,
+      "service": {
+        "weight": "bold"
+      },
+      "client": {
+        "variant": "caption"
+      },
+      "staff": {
+        "variant": "caption"
+      }
+    },
+    "conflictsWithLabel": {
+      "variant": "label-small",
+      "color": "muted"
+    },
+    "appointmentB": {
+      "structure": "same as A"
+    },
+    "fixChips": {
+      "layout": "horizontal row",
+      "count": 4,
+      "normal": {
+        "background": "surface",
+        "border": "1px cardBorder",
+        "radius": 8,
+        "padding": "8×12"
+      },
+      "selected": {
+        "background": "primary 10%",
+        "border": "2px primary",
+        "leadingCheckmark": {
+          "size": 12,
+          "color": "primary"
+        }
+      },
+      "cancelOneChip": {
+        "borderColor": "error-tint",
+        "textColor": "error"
+      },
+      "reassignStaffChip": {
+        "selected": {
+          "inlineStaffPicker": {
+            "maxHeight": 280,
+            "rows": 48,
+            "avatar": 28,
+            "singleSelect": true
+          }
+        }
+      }
+    }
+  },
+  "footer": {
+    "position": "sticky",
+    "progressCaption": {
+      "variant": "caption",
+      "color": "muted",
+      "position": "left",
+      "interpolation": "X N"
+    },
+    "applyAllButton": {
+      "variant": "primary",
+      "fullWidth": true,
+      "disabledWhen": "anyRowUnresolved"
+    },
+    "dismissLink": {
+      "variant": "link"
+    }
+  },
+  "states": {
+    "applying": {
+      "applyAll": {
+        "spinner": true
+      },
+      "list": {
+        "pointerEvents": "none"
+      }
+    },
+    "applied": {
+      "toast": true,
+      "dismiss": true
+    }
+  },
+  "tokens": [
+    "cardBorder",
+    "primary",
+    "error",
+    "surface"
+  ]
+}

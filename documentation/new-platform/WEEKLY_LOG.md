@@ -1,4 +1,4 @@
-# Weekly Development Log
+﻿# Weekly Development Log
 
 Running log for the Zarkili multi-tenant platform build.
 One entry per week. Do NOT rewrite prior entries.
@@ -573,7 +573,7 @@ W20 prompt pack lists two AI tasks (20.1 No-Show / Fraud Prediction; 20.2 Market
 - `documentation/PROGRAM_TRACKING_BOARD.md` - D-092..D-095 appended
 
 ### Next-Week Prerequisites (Week 21)
-- W21 prompt-pack scope per `PHASE2_CONSUMER_UI_PLAN_WEEKS_21_TO_28.md`.
+- W21 prompt-pack scope per `PHASE2_CONSUMER_UI_PLAN_WEEKS_21_TO_32.md`.
 - W18-DEBT-1: `stripeTaxCalculate` Cloud Function (high severity, oldest open debt).
 - W19-DEBT-4: `ClientRetentionMetrics` analytics job.
 - W19-DEBT-5: chat-assistance feature-key promotion (telemetry-driven).
@@ -628,3 +628,378 @@ User-selected `backend-only` bundle from the W20.5 triage. Six items closed: W18
 
 ### Next-Week Prerequisites (Week 21)
 W21 enters the Phase 2 consumer-UI plan with a persistent onboarding wizard backend, locked-down marketplace post path, working acquisition sink, production Stripe Tax callable, tenant-policy plumbing for risk thresholds, and a low-friction VAT pre-flight for admin onboarding UX. No backend prerequisites remain blocking W21.
+
+
+## Week 21 - Batch A: Auth & Onboarding (Consumer UI)
+
+**Window:** Week 21 (Phase 2 Consumer-UI kickoff).
+**Status:** Complete - all 9 screen groups (A.1-A.9) and all 6 new components delivered + tested - GO for Week 22.
+**Close report:** [WEEK21_CLOSE_REPORT.md](WEEK21_CLOSE_REPORT.md)
+
+### Scope
+First Phase-2 consumer-UI build. `code-only` per `FIGMA_SCREEN_REQUEST_PRIORITY_LIST.md` - the BATCH_A prompt-pack is the build spec, no Figma dependency. Foundation primitives ship first (tokens + 6 components), then 9 screen groups compose them. Auth screens wire to the existing `AuthProvider`; onboarding step screens compose the persistable `clientOnboardingOrchestrator` (W16-DEBT-1 closed in W20.5).
+
+### Features Delivered
+- **Foundation - `src/shared/ui/`.** `tokens.ts` (typed re-exports of design-handoff JSON tokens), `Button.tsx` (primary/secondary/tertiary/destructive/icon-only x large/medium/small), `InputField.tsx` (text/email/phone/password/otp-cell with full state matrix + auto-formatting), `FormRow.tsx`, `SegmentedControl.tsx`, `Stepper.tsx`, `Banner.tsx`, `formatters.ts` (US-primary phone/email/zip/password validators).
+- **Auth screens - `src/app/auth/`.** A.1 SignInScreen, A.2 SignUpScreen, A.3 SocialSignInSelectorScreen (Apple-first iOS), A.4 ForgotPassword + ResetPassword, A.5 EmailVerificationScreen (resend cooldown + change-email), A.6 OtpVerificationScreen (6-cell with auto-advance + paste), A.8 AccountMergeScreen (preserve_existing | prefer_session). All screens consume `useAuth()`; failures funnel through `Banner` with `toUserFacingAuthError` formatting.
+- **Onboarding screens - `src/app/onboarding/`.** A.7.1 ProfileScreen, A.7.2 PreferencesScreen (multi-select, min-1 validation), A.7.3 NotificationsScreen (TCPA/CAN-SPAM safe defaults; all toggles default OFF), A.7.4 LocationScreen (use-my-location + 5-digit ZIP fallback), A.7.5 PaymentScreen (optional, `Skip for now` tertiary CTA).
+- **Routes.** Eight new public `guard: ""none""` route entries: SignIn, SignUp, SocialSignIn, ForgotPassword, ResetPassword, EmailVerification, OtpVerification, AccountMerge.
+- A.9 (Error & Empty Variants) is covered through the `Banner` component states embedded across A.1-A.8 (network offline, rate-limited, server 5xx, account suspended).
+
+### Tests
+- Root jest: 1,741 -> **1,808** passing across 106 -> **117** suites (+67 tests, +11 suites).
+- Functions vitest: **187** passing across 14 suites (unchanged - Batch A is consumer-UI only).
+- `npx tsc --noEmit` (root): 0 errors. `cd functions; npx tsc --noEmit`: 0 errors.
+
+### Security
+- All forms validate at the boundary before invoking `authRepository`; firebase-error codes translated via `toUserFacingAuthError` before reaching the user.
+- Marketing / promotion toggles default OFF (TCPA / CAN-SPAM safe defaults).
+- Touch targets >= 44x44 (WCAG 2.1 AA). OTP cells expose per-cell `accessibilityLabel`; error banners on A.5/A.6 have `accessibilityRole=""alert""`.
+- US-primary defaults: `(XXX) XXX-XXXX` phone, 5-digit ZIP, no IBAN/VAT in consumer flow. Apple Sign-In is the first social provider on iOS per HIG.
+
+### Architectural Notes
+- `AuthProvider` and `clientOnboardingOrchestrator` reused unchanged. Screens are pure React components with no direct firebase imports - all auth I/O routes through the `AuthRepository` port and is mockable in tests.
+- `tokens.ts` re-exports from the JSON design-handoff spec rather than redefining values - future token bumps land in one place.
+- Primitives are props-driven and have zero auth/onboarding business knowledge - reusable as-is for Batch B onward.
+
+### Debt Register (per [DEBT_REGISTER.md](DEBT_REGISTER.md))
+- **Closed (0).**
+- **No new debts opened.** All A.7 screens use the persistable orchestrator (W16-DEBT-1 closed in W20.5), so onboarding state survives device-kill out of the box.
+
+### Index - Changed Files
+- New (production): `src/shared/ui/{tokens,Button,InputField,FormRow,SegmentedControl,Stepper,Banner,formatters,index}.ts(x)`; `src/app/auth/{SignInScreen,SignUpScreen,SocialSignInSelectorScreen,ForgotPasswordScreen,ResetPasswordScreen,EmailVerificationScreen,OtpVerificationScreen,AccountMergeScreen,index}.tsx`; `src/app/onboarding/{ClientOnboardingProfileScreen,ClientOnboardingPreferencesScreen,ClientOnboardingNotificationsScreen,ClientOnboardingLocationScreen,ClientOnboardingPaymentScreen}.tsx`.
+- New (tests): four `src/shared/ui/__tests__/` suites; six `src/app/auth/__tests__/` suites; one `src/app/onboarding/__tests__/ClientOnboardingScreens.steps.test.tsx`.
+- Modified: `src/app/navigation/routes.ts` (+8 public auth routes); `src/app/navigation/__tests__/routes.test.ts` (anonymous-route snapshot updated); `WEEKLY_LOG.md`; `PROGRAM_TRACKING_BOARD.md`.
+
+### Next-Week Prerequisites (Week 22)
+W22 (Batch B - Discovery & Browse) inherits the locked design-system primitives (Button, InputField, FormRow, SegmentedControl, Stepper, Banner, tokens). Discovery already has a backend scaffold (`DISCOVERY_SCAFFOLD.md`); W22 composes home / search / filters / category / tenant-profile screens from these primitives plus the existing service-card / chip / category-pill / filter-button / search-bar JSON specs.
+
+
+## Week 22 - Batch B: Discover, Explore, Profile (Consumer UI)
+
+**Window:** Week 22 (Phase 2 consumer-UI second sprint).
+**Status:** Complete - all 8 screens (B.1-B.8) and all 7 new shared-UI primitives delivered + tested - GO for Week 23.
+**Close report:** [WEEK22_CLOSE_REPORT.md](WEEK22_CLOSE_REPORT.md)
+
+### Scope
+Second Phase-2 consumer-UI sprint. `code-only` per FIGMA_SCREEN_REQUEST_PRIORITY_LIST.md line 86 - the BATCH_B_DISCOVER_EXPLORE_PROFILE prompt-pack is the build spec, no Figma blocker. Backend ports already exist (createDiscoveryService from W17 + Phase-2 scaffold); W22 composes 8 screens against the existing ppDiscoveryService runtime singleton plus a new pure helper module (discoveryFilters.ts) for filter + sort logic.
+
+### Features Delivered
+- **Foundation - 7 new shared-UI primitives in src/shared/ui/.** RatingStars (read-only / adjustable, half-star, sizes 16/20/32), RangeSlider (single + dual variant, Pressable +/- buttons - no gesture lib, accessibilityRole=adjustable), FilterSheet (modal bottom sheet wrapper - drag handle + scrollable body + sticky footer + reset/apply/scrim handlers), GalleryCarousel (paged FlatList with page dots + alt-text per item), SalonHeroCard (16:9 hero + scrim + name + RatingStars + meta + favorite toggle), StaffAvatarList (horizontal scroll + 2px coral ring on selected), StickyCtaBar (primary fullWidth Button + optional secondary inline Button + bottom safe-area approximation). All reuse W21 tokens unchanged.
+- **Pure helpers - src/app/discover/discoveryFilters.ts.** DiscoveryFilters type (query / category / priceRange [lo,hi] / minRating / availability / memberOnly / sort), DEFAULT_FILTERS, pplyDiscoveryFilters, sortDiscoveryResults (recommended members-first / rating-desc / price-asc / price-desc), pplyDiscoveryFiltersAndSort, hasActiveFilters, countActiveFilterDimensions. Zero React imports - fully testable without renderer. AvailabilityWindow covers any / today / tomorrow / this-week.
+- **Screens - src/app/discover/ (8).** B.1 HomeScreen (greeting + search entry + category pills + featured row + recent bookings), B.2 DiscoverFeedScreen (vertical mixed-card feed with FTC `Sponsored` badges + editorial cards), B.3 ExploreSearchResultsScreen (search header + Filters/Map toolbar + result count + list, filtering via applyDiscoveryFiltersAndSort, empty state), B.4 FilterSheetScreen (composes FilterSheet + RangeSlider + RatingStars + category/availability/sort pills + members-only Switch with live result count), B.5 SalonProfileScreen (SalonHeroCard + ADA-accessible badge + 5-tab strip Services/Staff/Reviews/Gallery/About + sticky StickyCtaBar with Book now + optional Message), B.6 ServiceDetailScreen (hero + duration + price + StaffAvatarList + add-on multi-select + sticky Choose time), B.7 StaffMemberDetailScreen (bio + rating + years exp + GalleryCarousel portfolio + sticky Book with {firstName}), B.8 ExploreMapScreen (deferred-stub with `Map view coming Week 28` notice + Switch to list CTA - native maps deferred to W28).
+- **Routes.** Eight new public guard:none routes: DiscoverHome, DiscoverFeed, ExploreResults, ExploreMap, DiscoverFilters, SalonProfile, ServiceDetail, StaffDetail.
+
+### Tests
+- Root jest: 1,808 -> **1,844** passing across 117 -> **121** suites (+36 tests, +4 suites).
+- Functions vitest: **187** passing across 14 suites (unchanged - Batch B is consumer-UI only).
+- `npx tsc --noEmit` (root): 0 errors. `cd functions; npx tsc --noEmit`: 0 errors.
+
+### Security
+- No Firestore rules changes. All screens are read-only consumers of the existing ppDiscoveryService; visibility filters live in the W17 marketplace repository layer.
+- FTC labelling: sponsored cards render an explicit `Sponsored - {sponsorName}` badge per FTC endorsement guidelines.
+- Anti-client-theft: W17 ssertNoCompetitorRecommendations is preserved for any booking-funnel context surfaced via these screens.
+- WCAG 2.1 AA preserved: every interactive >= 44x44, RatingStars uses accessibilityRole=image (read-only) or adjustable (interactive), gallery items require alt text, ADA-accessible badge surfaces on salon profile when applicable.
+- US-primary defaults retained: $ price labels, miles, MM/DD/YYYY where dates appear.
+
+### Architectural Notes
+- All screens are props-driven and accept their data as inputs. The ppDiscoveryService singleton stays wired at the navigator layer rather than inside screens, so screen tests render without provider scaffolding.
+- discoveryFilters.ts has zero React / I/O coupling so the same filter + sort logic can later be hoisted to the repository layer for server-side filtering without screen rewrites.
+- RangeSlider deliberately uses Pressable +/- buttons rather than gesture-handler - keeps W22 free of native deps and gives free a11y semantics.
+- ExploreMapScreen is intentionally a stub. Pulling react-native-maps would require Expo prebuild + native dev-client rebuild, out of scope for the consumer-UI sprint. Stub still has meaningful copy + Switch-to-list escape hatch.
+
+### Debt Register (per [DEBT_REGISTER.md](DEBT_REGISTER.md))
+- **Closed (0).**
+- **New W22 debts (3):**
+  - W22-DEBT-1 - ExploreMapScreen is a placeholder; wire react-native-maps + salon-pin layer (target W28).
+  - W22-DEBT-2 - SalonProfileScreen accepts services / staff / reviews / gallery as inputs but no getSalonProfile(salonId) port exists yet (target W23 alongside booking-funnel handoff).
+  - W22-DEBT-3 - DiscoverFeed editorial + sponsored cards have no backing repository surface yet (editorial target W23, sponsored target W34 with paid-marketplace flow).
+- **Carried forward:** W19-DEBT-4, W19-DEBT-5, W20-DEBT-2, W20-DEBT-3, W20-DEBT-4.
+
+### Index - Changed Files
+- New (production): src/shared/ui/{RatingStars,RangeSlider,FilterSheet,GalleryCarousel,SalonHeroCard,StaffAvatarList,StickyCtaBar}.tsx; src/app/discover/{HomeScreen,DiscoverFeedScreen,ExploreSearchResultsScreen,FilterSheetScreen,SalonProfileScreen,ServiceDetailScreen,StaffMemberDetailScreen,ExploreMapScreen}.tsx; src/app/discover/discoveryFilters.ts.
+- New (tests): src/shared/ui/__tests__/{discovery-primitives,FilterSheet}.test.tsx; src/app/discover/__tests__/{discoveryFilters.test.ts,discoverScreens.test.tsx}.
+- Modified: src/shared/ui/index.ts (W22 exports + types); src/app/navigation/routes.ts (+8 public B.* routes); src/app/navigation/__tests__/routes.test.ts (anonymous-route snapshot updated); WEEKLY_LOG.md; PROGRAM_TRACKING_BOARD.md.
+
+### Next-Week Prerequisites (Week 23)
+W23 (Batch C - Booking Flow) inherits W21 + W22 primitives unchanged plus the new discoveryFilters helper for any list-screen reuse. W22-DEBT-2 (getSalonProfile(salonId) port) is the lead-in dependency for the salon-detail -> booking funnel handoff. Editorial / sponsored feed adapters (W22-DEBT-3) can land alongside W23 admin-feed seeding or defer to W34 without blocking the booking funnel.
+
+
+## Week 23 - Batch C: Booking Flow (Consumer UI)
+
+**Window:** Week 23 (Phase 2 consumer-UI third sprint).
+**Status:** Complete - all 11 screens (C.1-C.11) and all 6 new shared-UI primitives delivered + tested - GO for Week 24.
+**Close report:** [WEEK23_CLOSE_REPORT.md](WEEK23_CLOSE_REPORT.md)
+
+### Scope
+Third Phase-2 consumer-UI sprint. Unblocked at sprint start by the Batch C Figma artifact handoff: calendar-grid + time-slot-chip components and screen-booking-date-picker (C.3) + screen-booking-time-picker (C.4) screen specs - each carrying a source provenance block (batch=C, figmaFrame, promotedFrom, lockedAt=2026-04-27). The other 9 screens are code-only per the Phase 2 plan.
+
+### Features Delivered
+- **Foundation - 6 new shared-UI primitives in src/shared/ui/.** CalendarGrid (7x6 month grid Sun-start, today/selected/disabled/holiday/availability states, ISO-keyed availability map; holiday dot rendered 4x4 vs spec's 2x2 for visibility), TimeSlotChip (80x44 chip with 4 states; height bumped from spec's 40 to 44 to satisfy WCAG 44pt min touch target), SummaryRow (label/value/subValue/trailing/onPress with optional chevron + bottom divider), StickyFooterCta (primary 48h CTA + optional total-amount row above; distinct from W22 StickyCtaBar which renders a secondary inline button), ModalSheet (generic bottom-sheet shell with drag handle + close X + scroll body + optional sticky footer; distinct from W22 FilterSheet which is filter-specific), PolicyAcknowledgement (checkbox row with required-state error message). All reuse W21 tokens unchanged.
+- **Pure helpers - src/app/booking/bookingHelpers.ts.** BookingStep + BOOKING_STEPS (8-step flow), BookingService/BookingAddOn/BookingStaffOption/BookingPriceBreakdown/BookingStatus types, TimeSegment + TIME_SEGMENT_LABELS + BOOKING_STATUS_LABELS, formatLongDateLabel/formatShortDateLabel/formatUsDate (US MM/DD/YYYY), formatTimeOfDay/parseTimeOfDay (12h h:mm AM/PM), categorizeTimeSlot (morning < 12 PM <= afternoon < 5 PM <= evening), groupTimeSlotsBySegment, generateTimeSlots, computeBookingTotal (cents-rounded), formatUsd (,234.50 with thousands), formatPhoneUs ((555) 123-4567 pass-through if not 10 digits), computeCancellationRefund (refund + fee both clamped at 0). Zero React imports - fully testable without a renderer.
+- **Screens - src/app/booking/ (11).** C.1 ServiceSelectionScreen (grouped service cards + inline add-on chip rows + max-reached banner + sticky footer with count + total), C.2 StaffSelectionScreen (Any-available anchor card + named staff cards with RatingStars + specialties + on-leave badge + 3-slot inline preview when selected), C.3 BookingDatePickerScreen (locked spec, quick-pick chips + month switcher + CalendarGrid + selected-date info + holiday banner + skeleton loading + error retry), C.4 BookingTimePickerScreen (locked spec, date label + SegmentedControl Morning/Afternoon/Evening + TimeSlotChip 3-col grid + timezone note + empty-state with Try-another-day CTA), C.5 BookingReviewScreen (salon mini-card + SummaryRow stack with editable chevrons + notes input + promo chip + price breakdown + sticky footer), C.6 BookingPoliciesScreen (ModalSheet with policy sections + required PolicyAcknowledgement + Agree-and-continue), C.7 BookingPaymentScreen (Apple Pay button + saved-card radio rows + dashed Add-payment tile + total breakdown + Confirm-and-pay), C.8 BookingConfirmationScreen (mint-fresh success circle + summary card + action row Calendar/Directions/Message + Manage/Done footer), C.9 ManageBookingScreen (status banner + summary + action list + cancel ModalSheet preview using computeCancellationRefund), C.10 GuestContactScreen (contact form + auto-format phone via formatPhoneUs + SMS-reminders consent OFF-by-default per TCPA), C.11 PostBookingUpgradeScreen (ModalSheet with benefits list + Create-account + Not-now).
+- **Routes.** Eleven new public guard:none routes: BookingService /book/service, BookingStaff /book/staff, BookingDate /book/date, BookingTime /book/time, BookingReview /book/review, BookingPolicies /book/policies, BookingPayment /book/payment, BookingConfirmation /book/confirmation, ManageBooking /book/manage, GuestContact /book/guest, PostBookingUpgrade /book/upgrade.
+
+### Tests
+- Root jest: 1,844 -> **1,904** passing across 121 -> **124** suites (+60 tests, +3 suites).
+- Functions vitest: **187** passing across 14 suites (unchanged - Batch C is consumer-UI only).
+- `npx tsc --noEmit` (root): 0 errors. `cd functions; npx tsc --noEmit`: 0 errors.
+
+### Security
+- No Firestore rules changes. All screens are props-driven and own no Firestore I/O; persistence is W23-DEBT-1 (next sprint).
+- TCPA: GuestContactScreen SMS-reminders toggle defaults to OFF and renders Standard-rates / STOP-to-opt-out copy inline. Consent state is a dedicated boolean.
+- No PCI scope: BookingPaymentScreen is a pure picker over caller-supplied saved cards. Stripe in-flow integration is W23-DEBT-2 - card data will only flow through Stripe Elements / PaymentSheet, never our screens.
+- WCAG 2.1 AA preserved: every interactive >= 44x44 (TimeSlotChip bumped from spec's 40 to 44), PolicyAcknowledgement uses accessibilityRole=checkbox, CalendarGrid cells expose date + selected + disabled state in their accessibility label, ModalSheet close + scrim are both labelled Close.
+- US-primary defaults retained: $ price labels via formatUsd, MM/DD/YYYY where dates appear, 12h h:mm AM/PM via formatTimeOfDay, (XXX) XXX-XXXX via formatPhoneUs.
+
+### Architectural Notes
+- All screens are props-driven and accept their data as inputs. No screen reads from a singleton or Firestore directly - caller (navigator layer) wires data + dispatch handlers in. Screen tests render without provider scaffolding.
+- bookingHelpers.ts has zero React / I/O coupling so the same pricing / formatting / categorisation logic can later be reused server-side or in admin-app review screens.
+- StickyFooterCta authored as a distinct primitive from W22's StickyCtaBar rather than enhancing the W22 primitive - StickyFooterCta is total-amount + primary CTA, StickyCtaBar is primary + secondary inline. Composing them into one would have widened the W22 contract for callers that don't need totals.
+- ModalSheet is a generic bottom-sheet shell deliberately kept separate from W22's FilterSheet (which has filter-specific reset/apply semantics). C.6 / C.9 / C.11 each use ModalSheet with a custom footer slot.
+- CalendarGrid builds its 7x6 grid via width 100/7 flex children rather than a flex-grid library - keeps W23 dependency-free and gives free a11y semantics.
+
+### Debt Register (per [DEBT_REGISTER.md](DEBT_REGISTER.md))
+- **Closed (1):** W22-DEBT-2 (getSalonProfile(salonId) port) - superseded; W23 screens accept salon / services / staff / pricing as inputs from the navigator layer. Repository surface rolls into W23-DEBT-1 below.
+- **New W23 debts (3):**
+  - W23-DEBT-1 - Booking persistence + cloud-function flow (createBookingDraft, confirmBooking, cancelBooking, rescheduleBooking, getBookingsForUser) and salon-profile / services / staff / availability read ports needed to feed C.1-C.4 and C.9 from real data. Target W24+.
+  - W23-DEBT-2 - Stripe in-flow payment (PaymentSheet / Apple Pay merchant validation / saved-card management + 3DS / SCA). Target W24 Batch D.
+  - W23-DEBT-3 - Cancel / reschedule mutation backend + audit trail and refund processor wiring. ManageBookingScreen already shows the refund preview via computeCancellationRefund; the actual side-effect is deferred. Target alongside W23-DEBT-1.
+- **Carried forward:** W19-DEBT-4, W19-DEBT-5, W20-DEBT-2, W20-DEBT-3, W20-DEBT-4, W22-DEBT-1 (react-native-maps W28), W22-DEBT-3 (editorial / sponsored feed repository).
+
+### Index - Changed Files
+- New (production): src/shared/ui/{CalendarGrid,TimeSlotChip,SummaryRow,StickyFooterCta,ModalSheet,PolicyAcknowledgement}.tsx; src/app/booking/{ServiceSelectionScreen,StaffSelectionScreen,BookingDatePickerScreen,BookingTimePickerScreen,BookingReviewScreen,BookingPoliciesScreen,BookingPaymentScreen,BookingConfirmationScreen,ManageBookingScreen,GuestContactScreen,PostBookingUpgradeScreen}.tsx; src/app/booking/bookingHelpers.ts.
+- New (tests): src/shared/ui/__tests__/booking-primitives.test.tsx; src/app/booking/__tests__/{bookingHelpers.test.ts,bookingScreens.test.tsx}.
+- New (design-handoff): design-handoff/components/{calendar-grid,time-slot-chip}.json; design-handoff/specs/{screen-booking-date-picker,screen-booking-time-picker}.json.
+- Modified: src/shared/ui/index.ts (W23 exports + types); src/app/navigation/routes.ts (+11 public /book/* routes); src/app/navigation/__tests__/routes.test.ts (anonymous-route snapshot updated); design-handoff/HANDOFF_MANIFEST.md; WEEKLY_LOG.md; PROGRAM_TRACKING_BOARD.md.
+
+### Next-Week Prerequisites (Week 24)
+W24 (Batch D - Booking Backend + Stripe) inherits W21 + W22 + W23 primitives unchanged plus the new bookingHelpers module. W23-DEBT-1 read ports gate live data on C.1-C.4. W23-DEBT-1 write ports gate end-to-end submission C.5-C.8. W23-DEBT-2 (Stripe PaymentSheet + Apple Pay) gates real payment capture in C.7. W23-DEBT-3 (cancel + reschedule mutations) gates C.9 actions. Phase 2 consumer-UI core flow (auth -> discover -> booking) is now feature-complete on the screen layer; W24+ shifts emphasis to the data + payment layer.
+
+
+## Week 23 - Batch C: Booking Flow (Consumer UI)
+
+**Window:** Week 23 (Phase 2 consumer-UI third sprint).
+**Status:** Complete - all 11 screens (C.1-C.11) and all 6 new shared-UI primitives delivered + tested - GO for Week 24.
+**Close report:** [WEEK23_CLOSE_REPORT.md](WEEK23_CLOSE_REPORT.md)
+
+### Scope
+Third Phase-2 consumer-UI sprint. Unblocked at sprint start by the Batch C Figma artifact handoff: calendar-grid + time-slot-chip components and screen-booking-date-picker (C.3) + screen-booking-time-picker (C.4) screen specs - each carrying a source provenance block (batch=C, figmaFrame, promotedFrom, lockedAt=2026-04-27). The other 9 screens are code-only per the Phase 2 plan.
+
+### Features Delivered
+- **Foundation - 6 new shared-UI primitives in `src/shared/ui/`.** CalendarGrid (7x6 month grid Sun-start, today/selected/disabled/holiday/availability states, ISO-keyed availability map; holiday dot rendered 4x4 vs spec's 2x2 for visibility), TimeSlotChip (80x44 chip with 4 states; height bumped from spec's 40 to 44 to satisfy WCAG 44pt min touch target), SummaryRow (label/value/subValue/trailing/onPress with optional chevron + bottom divider), StickyFooterCta (primary 48h CTA + optional total-amount row above; distinct from W22 StickyCtaBar which renders a secondary inline button), ModalSheet (generic bottom-sheet shell with drag handle + close X + scroll body + optional sticky footer; distinct from W22 FilterSheet which is filter-specific), PolicyAcknowledgement (checkbox row with required-state error message). All reuse W21 tokens unchanged.
+- **Pure helpers - `src/app/booking/bookingHelpers.ts`.** BookingStep + BOOKING_STEPS (8-step flow), BookingService/BookingAddOn/BookingStaffOption/BookingPriceBreakdown/BookingStatus types, TimeSegment + TIME_SEGMENT_LABELS + BOOKING_STATUS_LABELS, formatLongDateLabel/formatShortDateLabel/formatUsDate (US MM/DD/YYYY), formatTimeOfDay/parseTimeOfDay (12h h:mm AM/PM), categorizeTimeSlot (morning < 12 PM <= afternoon < 5 PM <= evening), groupTimeSlotsBySegment, generateTimeSlots, computeBookingTotal (cents-rounded), formatUsd ($1,234.50 with thousands), formatPhoneUs ((555) 123-4567 pass-through if not 10 digits), computeCancellationRefund (refund + fee both clamped at 0). Zero React imports - fully testable without a renderer.
+- **Screens - `src/app/booking/` (11).** C.1 ServiceSelectionScreen (grouped service cards + inline add-on chip rows + max-reached banner + sticky footer with count + total), C.2 StaffSelectionScreen (Any-available anchor card + named staff cards with RatingStars + specialties + on-leave badge + 3-slot inline preview when selected), C.3 BookingDatePickerScreen (locked spec, quick-pick chips + month switcher + CalendarGrid + selected-date info + holiday banner + skeleton loading + error retry), C.4 BookingTimePickerScreen (locked spec, date label + SegmentedControl Morning/Afternoon/Evening + TimeSlotChip 3-col grid + timezone note + empty-state with Try-another-day CTA), C.5 BookingReviewScreen (salon mini-card + SummaryRow stack with editable chevrons + notes input + promo chip + price breakdown + sticky footer), C.6 BookingPoliciesScreen (ModalSheet with policy sections + required PolicyAcknowledgement + Agree-and-continue), C.7 BookingPaymentScreen (Apple Pay button + saved-card radio rows + dashed Add-payment tile + total breakdown + Confirm-and-pay), C.8 BookingConfirmationScreen (mint-fresh success circle + summary card + action row Calendar/Directions/Message + Manage/Done footer), C.9 ManageBookingScreen (status banner + summary + action list + cancel ModalSheet preview using computeCancellationRefund), C.10 GuestContactScreen (contact form + auto-format phone via formatPhoneUs + SMS-reminders consent OFF-by-default per TCPA), C.11 PostBookingUpgradeScreen (ModalSheet with benefits list + Create-account + Not-now).
+- **Routes.** Eleven new public guard:none routes: BookingService /book/service, BookingStaff /book/staff, BookingDate /book/date, BookingTime /book/time, BookingReview /book/review, BookingPolicies /book/policies, BookingPayment /book/payment, BookingConfirmation /book/confirmation, ManageBooking /book/manage, GuestContact /book/guest, PostBookingUpgrade /book/upgrade.
+
+### Tests
+- Root jest: 1,844 -> **1,904** passing across 121 -> **124** suites (+60 tests, +3 suites).
+- Functions vitest: **187** passing across 14 suites (unchanged - Batch C is consumer-UI only).
+- `npx tsc --noEmit` (root): 0 errors. `cd functions; npx tsc --noEmit`: 0 errors.
+
+### Security
+- No Firestore rules changes. All screens are props-driven and own no Firestore I/O; persistence is W23-DEBT-1 (next sprint).
+- TCPA: GuestContactScreen SMS-reminders toggle defaults to OFF and renders Standard-rates / STOP-to-opt-out copy inline. Consent state is a dedicated boolean.
+- No PCI scope: BookingPaymentScreen is a pure picker over caller-supplied saved cards. Stripe in-flow integration is W23-DEBT-2 - card data will only flow through Stripe Elements / PaymentSheet, never our screens.
+- WCAG 2.1 AA preserved: every interactive >= 44x44 (TimeSlotChip bumped from spec's 40 to 44), PolicyAcknowledgement uses accessibilityRole=checkbox, CalendarGrid cells expose date + selected + disabled state in their accessibility label, ModalSheet close + scrim are both labelled Close.
+- US-primary defaults retained: $ price labels via formatUsd, MM/DD/YYYY where dates appear, 12h h:mm AM/PM via formatTimeOfDay, (XXX) XXX-XXXX via formatPhoneUs.
+
+### Architectural Notes
+- All screens are props-driven and accept their data as inputs. No screen reads from a singleton or Firestore directly - caller (navigator layer) wires data + dispatch handlers in. Screen tests render without provider scaffolding.
+- bookingHelpers.ts has zero React / I/O coupling so the same pricing / formatting / categorisation logic can later be reused server-side or in admin-app review screens.
+- StickyFooterCta authored as a distinct primitive from W22's StickyCtaBar rather than enhancing the W22 primitive - StickyFooterCta is total-amount + primary CTA, StickyCtaBar is primary + secondary inline. Composing them into one would have widened the W22 contract for callers that don't need totals.
+- ModalSheet is a generic bottom-sheet shell deliberately kept separate from W22's FilterSheet (which has filter-specific reset/apply semantics). C.6 / C.9 / C.11 each use ModalSheet with a custom footer slot.
+- CalendarGrid builds its 7x6 grid via width 100/7 flex children rather than a flex-grid library - keeps W23 dependency-free and gives free a11y semantics.
+
+### Debt Register (per [DEBT_REGISTER.md](DEBT_REGISTER.md))
+- **Closed (1):** W22-DEBT-2 (getSalonProfile(salonId) port) - superseded; W23 screens accept salon / services / staff / pricing as inputs from the navigator layer. Repository surface rolls into W23-DEBT-1 below.
+- **New W23 debts (3):**
+  - W23-DEBT-1 - Booking persistence + cloud-function flow (createBookingDraft, confirmBooking, cancelBooking, rescheduleBooking, getBookingsForUser) and salon-profile / services / staff / availability read ports needed to feed C.1-C.4 and C.9 from real data. Target W24+.
+  - W23-DEBT-2 - Stripe in-flow payment (PaymentSheet / Apple Pay merchant validation / saved-card management + 3DS / SCA). Target W24 Batch D.
+  - W23-DEBT-3 - Cancel / reschedule mutation backend + audit trail and refund processor wiring. ManageBookingScreen already shows the refund preview via computeCancellationRefund; the actual side-effect is deferred. Target alongside W23-DEBT-1.
+- **Carried forward:** W19-DEBT-4, W19-DEBT-5, W20-DEBT-2, W20-DEBT-3, W20-DEBT-4, W22-DEBT-1 (react-native-maps W28), W22-DEBT-3 (editorial / sponsored feed repository).
+
+### Index - Changed Files
+- New (production): src/shared/ui/{CalendarGrid,TimeSlotChip,SummaryRow,StickyFooterCta,ModalSheet,PolicyAcknowledgement}.tsx; src/app/booking/{ServiceSelectionScreen,StaffSelectionScreen,BookingDatePickerScreen,BookingTimePickerScreen,BookingReviewScreen,BookingPoliciesScreen,BookingPaymentScreen,BookingConfirmationScreen,ManageBookingScreen,GuestContactScreen,PostBookingUpgradeScreen}.tsx; src/app/booking/bookingHelpers.ts.
+- New (tests): src/shared/ui/__tests__/booking-primitives.test.tsx; src/app/booking/__tests__/{bookingHelpers.test.ts,bookingScreens.test.tsx}.
+- New (design-handoff): design-handoff/components/{calendar-grid,time-slot-chip}.json; design-handoff/specs/{screen-booking-date-picker,screen-booking-time-picker}.json.
+- Modified: src/shared/ui/index.ts (W23 exports + types); src/app/navigation/routes.ts (+11 public /book/* routes); src/app/navigation/__tests__/routes.test.ts (anonymous-route snapshot updated); design-handoff/HANDOFF_MANIFEST.md; WEEKLY_LOG.md; PROGRAM_TRACKING_BOARD.md.
+
+### Next-Week Prerequisites (Week 24)
+W24 (Batch D - Booking Backend + Stripe) inherits W21 + W22 + W23 primitives unchanged plus the new bookingHelpers module. W23-DEBT-1 read ports gate live data on C.1-C.4. W23-DEBT-1 write ports gate end-to-end submission C.5-C.8. W23-DEBT-2 (Stripe PaymentSheet + Apple Pay) gates real payment capture in C.7. W23-DEBT-3 (cancel + reschedule mutations) gates C.9 actions. Phase 2 consumer-UI core flow (auth -> discover -> booking) is now feature-complete on the screen layer; W24+ shifts emphasis to the data + payment layer.
+
+
+## Week 24 - Batch D: Payments, Tipping, Receipts (Consumer UI)
+
+**Window:** Week 24 (Phase 2 consumer-UI fourth sprint).
+**Status:** Complete - all 6 screens (D.1-D.6), 4 new shared-UI primitives, 2 helper modules, and Stripe SDK integration delivered + tested - GO for Week 25.
+**Close report:** [WEEK24_CLOSE_REPORT.md](WEEK24_CLOSE_REPORT.md)
+
+### Scope
+Fourth Phase-2 consumer-UI sprint, split into two focused sub-sessions at the user request: (1) Stripe SDK install (separate, prior - SDK + Expo plugin + jest mock with gates green at 1,904 unchanged), then (2) the W24 build (this entry). Batch D Figma artifacts were not locked into design-handoff for this sprint - screens were built code-first against the FIGMA_HANDOFF_TO_DEVELOPMENT_PLAYBOOK Batch D prompt brief; promotion to design-handoff/specs is recorded as W24-DEBT-1.
+
+### Features Delivered
+- **Stripe SDK integration.** @stripe/stripe-react-native installed via npx expo install (Expo SDK 54 compatible, +12 / -5 packages). Expo config plugin registered in app.config.ts with merchantIdentifier "merchant.com.zarkili" and enableGooglePay false (US-first, Apple Pay only for v1). App.tsx wraps the safe-area shell in StripeProvider sourced from Constants.expoConfig.extra.stripePublishableKey. Jest mock added in jest.setup.ts covering StripeProvider, CardField, ApplePayButton, GooglePayButton, AddToWalletButton, useStripe, useApplePay, useConfirmPayment, initStripe, isApplePaySupported.
+- **Foundation - 4 new shared-UI primitives in src/shared/ui/.** PaymentMethodRow (64h row, brand-glyph text fallback, brand+last4 + expiry/Expired error subtitle, optional mint-fresh Default pill, optional kebab; accessibilityState exposes selected + disabled), CurrencyInput (leading dollar + decimal-pad TextInput right-aligned 24/32, internal sanitize strips non-digit/dot, allows single dot, clamps to 2 decimals; emits onChangeText + onChangeValue), TipPresetChipGroup (radiogroup of radio chips, coral-blossom selected + white text, dashed error outline for destructive variant; min 44pt high), ReceiptLineItem (3-col line: description + optional modifier subtitle, optional qty hidden when qty===1, right-aligned amount). All four reuse W21 tokens unchanged.
+- **Pure helpers - src/app/payments/paymentsHelpers.ts.** CardBrand union + normalizeCardBrand (Stripe-string -> CardBrand, unknown fallback), formatBrandLabel/formatLast4/formatCardLabel ("Visa  4242"), formatCardExpiry (MM/YY), isCardExpired (handles invalid month -> expired), roundCents (NaN-safe -> 0), parseCurrencyInput (strips dollar/comma, NaN on garbage, truncates to 2 decimals), formatUsd ($1,234.50 with thousands + leading minus on negatives), DEFAULT_TIP_PRESETS (15/18/20/25/Custom/None - ids p15/p18/p20/p25/custom/none), tipAmountFromPreset (clamped >= 0), computeOrderTotal (subtotal+tax+tip rounded to cents), formatTaxLabel ("WA Sales Tax 10.25%"), formatPercent. Zero React imports.
+- **Pure helpers - src/app/payments/receiptsHelpers.ts.** ReceiptLineItem/ReceiptTaxLine/ReceiptTotals types, lineItemSubtotal (qty clamped >= 0), computeReceiptTotals (tax-line amounts clamped >= 0; cents-rounded), formatPaymentMethodLine + APPLE_PAY_PAYMENT_LINE, formatRefundAmountLabel ("$45.00 refunded", clamped >= 0), BookingHistoryRecord/Status/Tab/Filters types, BOOKING_HISTORY_TABS + LABELS, filterBookingHistory (upcoming = future+active; past = completed; cancelled = cancelled OR no-show; then salon/status/date/price filters), countActiveBookingFilters (filter-button badge), RefundStatus + REFUND_STATUS_LABELS, buildRefundTimeline (3-step success / 2-step denial / partial-completion current marker). Zero React imports.
+- **Screens - src/app/payments/ (6).** D.1 SavedPaymentMethodsScreen (Apple Pay top row + PaymentMethodRow list with kebab ModalSheet menu Set-default/Remove + remove-confirm sheet + Add-payment dashed tile + empty/loading/error), D.2 AddPaymentMethodScreen (Stripe CardField PCI-out-of-scope + cardholder name InputField + 5-digit ZIP InputField clamped + Set-as-default Switch + declined banner + 3DS-in-progress placeholder + sticky footer Add card; CTA disabled until cardComplete + name + 5-digit ZIP), D.3 TippingScreen (TipPresetChipGroup + conditional CurrencyInput on Custom + live total card + body-small "100% of tips go to your stylist" + sticky footer Confirm with totalLabel/totalValue), D.4 ReceiptScreen (salon block + US date MM/DD/YYYY + 12h time + ReceiptLineItem list + totals (per-jurisdiction tax + tip + grand) + payment-method line + Email/Download/Share row + tertiary Report a problem), D.5 BookingHistoryScreen (search TextInput + filter button with active-count badge + SegmentedControl Upcoming/Past/Cancelled + booking rows with status pills + FilterSheet placeholder + load-more + per-tab empty states with Find-a-salon CTA on Upcoming), D.6 RefundStatusScreen (status Banner info/success/error + vertical timeline from buildRefundTimeline with reached/pending/current dot states + booking summary + refund amount + denial-reason card + 5-10 business days disclaimer + Contact support tertiary).
+- **Routes.** Six new public guard:none routes: SavedPaymentMethods /payments/methods, AddPaymentMethod /payments/add, Tipping /payments/tip, Receipt /payments/receipt, BookingHistory /bookings/history, RefundStatus /payments/refund.
+
+### Tests
+- Root jest: 1,904 -> **1,953** passing across 124 -> **128** suites (+49 tests, +4 suites).
+- Functions vitest: **187** passing across 14 suites (unchanged - Batch D is consumer-UI + payments-shell only).
+- ``npx tsc --noEmit`` (root): 0 errors. ``cd functions; npx tsc --noEmit``: 0 errors.
+
+### Security
+- PCI scope avoided: AddPaymentMethodScreen uses Stripe CardField; full PAN, CVC, and expiry never reach our application layer - tokenized inside the Stripe SDK, only an opaque paymentMethod.id returns. SavedPaymentMethodsScreen and the W23 BookingPaymentScreen operate exclusively on tokenized references.
+- Apple Pay only on iOS for v1: enableGooglePay false in the Expo plugin to avoid shipping a half-configured Google Pay surface ahead of merchant onboarding. Adding Google Pay is a deliberate later step.
+- No new Firestore rules surface: W24 screens are props-driven and own no Firestore I/O; persistence (PaymentMethods document model + Stripe Customer linking) is W24-DEBT-2.
+- TCPA / consent surface unchanged from W23. No new SMS / email triggers in W24.
+- WCAG 2.1 AA preserved: every interactive >= 44x44 (tip chips min-height spacing.touchTarget, PaymentMethodRow row 64h with 44h kebab), TipPresetChipGroup exposes radiogroup/radio/selected state, PaymentMethodRow exposes selected + disabled accessibility state, CurrencyInput exposes accessibilityValue with formatted USD.
+- US-primary defaults: $1,234.50 thousands separator, MM/DD/YYYY, 12h h:mm AM/PM, 5-digit ZIP, jurisdictional tax labels.
+
+### Architectural Notes
+- Pure-helper pattern preserved. Both paymentsHelpers.ts and receiptsHelpers.ts have zero React imports - same brand-normalization / receipt-math / refund-timeline logic can be reused server-side (functions package) without rewrites.
+- Screens remain props-driven. useStripe.createPaymentMethod, Apple Pay merchant validation, Stripe Customer methods listing, and PaymentSheet presentation are all caller-wired by the navigator layer rather than embedded in screens. Mirrors the W22+W23 pattern.
+- PaymentMethodRow ships dependency-free. Brand glyphs are text-only ("VISA"/"MC"/"AMEX"/"CARD") rather than shipping a network-card-icon raster set; callers can pass a leadingIcon ReactNode if/when designers ship raster assets - no breaking change.
+- CurrencyInput owns light formatting only. Does not enforce min/max - that is caller responsibility - but accepts errorText to render the validation surface uniformly across D.3 + future P2P-tip flows.
+- computeOrderTotal vs computeReceiptTotals deliberately separate. The first composes a fresh order pre-tax-line breakdown (rate-based); the second composes a finalized receipt with already-resolved tax lines (Stripe Tax line-items). Conflating would force receipts through a rate-only path the moment Stripe Tax goes live.
+- buildRefundTimeline returns an explicit step list. Rendering iterates and chooses dot styling per step.status (reached/current/pending) rather than the screen branching on RefundStatus directly - adding a new step (e.g. "Refund disputed") becomes a helper change, not a screen rewrite.
+- SegmentedControl API: confirmed during build the W21 primitive uses value (not selectedValue) + onChange<T extends string>. BookingHistoryScreen consumes the generic for type narrowing.
+- FilterSheet requires applyLabel - W22 primitive contract; supplied as "Apply".
+
+### Debt Register (per [DEBT_REGISTER.md](DEBT_REGISTER.md))
+- **Closed (1):** W23-DEBT-2 (Stripe in-flow payment surface) - replaced by the W24 install + CardField-based AddPaymentMethodScreen + useStripe mock contract for tests. Server-side setupIntent + 3DS confirmation now part of W24-DEBT-2 below for clearer ownership.
+- **New W24 debts (3):**
+  - W24-DEBT-1 - Promote Batch D Figma artifacts to design-handoff/specs (screen-saved-payment-methods, screen-add-payment-method, screen-tipping, screen-receipt, screen-booking-history, screen-refund-status) and components (payment-method-row, currency-input, tip-preset-chip-group, receipt-line-item).
+  - W24-DEBT-2 - Stripe server-side payment infrastructure: createPaymentIntent / confirmPaymentIntent / createSetupIntent Cloud Functions; paymentMethods/{id} Firestore document model with Stripe Customer linking; webhook handler extension for payment_method.attached/.detached + payment_intent.succeeded/.payment_failed.
+  - W24-DEBT-3 - Receipt PDF rendering pipeline (Cloud Function emitting a PDF to bookings/{id}/receipt.pdf + signed-URL handoff). ReceiptScreen.onPressDownload/onPressEmail are caller wiring placeholders today.
+- **Carried forward:** W19-DEBT-4, W19-DEBT-5, W20-DEBT-2, W20-DEBT-3, W20-DEBT-4, W22-DEBT-1, W22-DEBT-3, W23-DEBT-1, W23-DEBT-3.
+
+### Index - Changed Files
+- New (production): src/shared/ui/{PaymentMethodRow,CurrencyInput,TipPresetChipGroup,ReceiptLineItem}.tsx; src/app/payments/{paymentsHelpers,receiptsHelpers}.ts; src/app/payments/{SavedPaymentMethodsScreen,AddPaymentMethodScreen,TippingScreen,ReceiptScreen,BookingHistoryScreen,RefundStatusScreen}.tsx.
+- New (tests): src/app/payments/__tests__/{paymentsHelpers,receiptsHelpers}.test.ts; src/shared/ui/__tests__/payments-primitives.test.tsx; src/app/payments/__tests__/paymentsScreens.test.tsx.
+- Modified: App.tsx (StripeProvider wiring + expo-constants import); app.config.ts (Stripe Expo plugin); jest.setup.ts (Stripe SDK mock); package.json/package-lock.json (Stripe dep); src/shared/ui/index.ts (W24 exports); src/app/navigation/routes.ts (+6 public /payments/* + /bookings/history routes); src/app/navigation/__tests__/routes.test.ts (anonymous-route snapshot extended); WEEKLY_LOG.md; PROGRAM_TRACKING_BOARD.md.
+
+### Next-Week Prerequisites (Week 25)
+W25 inherits W21+W22+W23+W24 primitives unchanged. W24-DEBT-2 server-side payment infrastructure (createPaymentIntent/setupIntent Cloud Functions + PaymentMethods Firestore model + Stripe Customer linking) gates real-money flows on D.1/D.2 and the C.7 link from W23. Without it the navigator wires mock data + a no-op onSubmit. W23-DEBT-1 read ports (getBookingsForUser plus W22 salon-profile/availability ports) gate BookingHistoryScreen against live data. W24-DEBT-3 receipt PDF pipeline is required for ReceiptScreen Email/Download/Share to wire to actual artifacts. The Stripe publishable key is read from Constants.expoConfig.extra.stripePublishableKey - wire this through Expo app.config.ts extra from the appropriate per-environment env file before W25 sandbox runs.
+
+## Week 25 - Batch E: Loyalty, Activities, Reviews (Consumer UI)
+
+**Window:** Week 25 (Phase 2 consumer-UI fifth sprint).
+**Status:** Complete - all 9 screens (E.1-E.9), 5 new shared-UI primitives, loyaltyHelpers.ts helper module, and all test gates delivered + test-fix pass completed - GO for Week 26.
+**Close report:** [WEEK25_CLOSE_REPORT.md](WEEK25_CLOSE_REPORT.md)
+
+### Scope
+Fifth Phase-2 consumer-UI sprint. Batch E ships the consumer loyalty / activities / reviews surface area. W25 was split into two sub-sessions: (1) design-handoff session (prior - Batch E artifacts locked into design-handoff/specs + design-handoff/components; primitive specs reviewed), then (2) this engineering session. All screens are props-driven with no Firestore I/O; live data wired by the navigator layer once backend loyalty service ships.
+
+### Features Delivered
+- **Foundation - 5 new shared-UI primitives in src/shared/ui/.** ProgressRing (SVG circular ring, progress 0-1, centerLabel/centerSubLabel text, state idle/loading/error, {testID}-loading and {testID}-error marker Views, accessibilityRole="progressbar" + accessibilityValue.now), TierBadge (capsule, non-interactive=accessibilityRole="text" / interactive=accessibilityRole="button"; textTransform:"uppercase" in style - text content stays original casing for RNTL queryability), RewardCard (Pressable, title + pointCost + type chip + optional image, {testID}-locked-overlay View when isLocked, {testID}-redeemed-badge View when isRedeemed, accessibilityState.disabled when locked/redeemed), RatingSelector (star Pressables testID="rs-star-{n}", no accessibilityElementsHidden so RNTL can reach all stars, outer View testID carries accessibilityRole="adjustable" + accessibilityState.disabled), PhotoUploadTile (add-photo pressable vs disabled placeholder, disabled branch has no accessibilityElementsHidden so "Max 5 photos" text is RNTL-visible). All five reuse W21 tokens unchanged.
+- **Pure helper - src/app/loyalty/loyaltyHelpers.ts.** 39 exported symbols. Tier: LoyaltyTier union + LOYALTY_TIERS + TIER_THRESHOLDS + TIER_PROGRESS_LABEL + deriveTier + nextTier + pointsToNextTier + computeTierProgress (1.0 at Platinum). Points: formatPoints ("1,234 pts") + formatPointsDelta ("+50 pts"). Earn/history: EarnAction type + DEFAULT_EARN_ACTIONS (5 entries) + HistoryEntry type + formatHistoryDate. Rewards: RewardFilterTab union (All/Free/Discount/Experience/Partner) + REWARD_FILTER_TABS + RewardSortOption + Reward type + filterRewards + sortRewards. Activities: ActivityStatus (5 values) + ActivityTab (active/completed/all) + ACTIVITY_TABS + ACTIVITY_TAB_LABELS + ActivityStep + Activity types + filterActivitiesByTab + computeActivityProgressLabel + deriveActivityCtaLabel (exhaustive). Reviews/referrals: ReviewAspect union (strings, not objects) + REVIEW_ASPECTS + AspectRating + ReviewDraft (overallRating/aspectRatings/text/photos) + EMPTY_REVIEW_DRAFT + MAX_REVIEW_PHOTOS (5) + MAX_REVIEW_TEXT_LENGTH (500) + isReviewSubmittable + ReferralStats + formatReferralCode. Zero React imports.
+- **Screens - 9 screens across src/app/loyalty/, src/app/activities/, src/app/reviews/.** E.1 LoyaltyLandingScreen (ProgressRing hero + TierBadge + points balance + EarnActionRow list + history feed + loading skeleton {testID}-loading + StickyFooterCta with primaryTestID). E.2 RewardCatalogScreen (RewardFilterTab row + sort ModalSheet + RewardCard grid + loading/error/empty-per-tab). E.3 RewardRedemptionScreen (RewardCard hero + point cost/balance comparison + lock/insufficient/expired banners + earn-more hint in scroll body when insufficient + StickyCtaBar with proper primaryLabel/onPrimaryPress/primaryTestID/primaryDisabled props). E.4 ActivitiesScreen (SegmentedControl tabs + ActivityCard rows + filterActivitiesByTab). E.5 ActivityDetailScreen (activity header + step checklist + ProgressRing step progress + StickyCtaBar proper props). E.6 ClaimActivityRewardScreen (ModalSheet without title prop - avoids duplicate heading + "Reward earned!" heading + point award summary + StickyCtaBar Done). E.7 ReviewPromptScreen (overall RatingSelector size=32 + per-aspect RatingSelector size=24 + AspectChip row rendering {aspect} string + TextInput 500-char + PhotoUploadTile row + StickyCtaBar Submit with primaryDisabled=!submittable). E.8 ReviewDetailScreen (read-only display: author/date/stars/aspect pills/text/gallery/reply + loading/error; retry Pressable keyed {testID}-retry). E.9 ReferralScreen (formatReferralCode code block + copy + share + stats card + how-it-works).
+- **Routes.** Nine new public guard:none routes: LoyaltyLanding /loyalty, RewardCatalog /loyalty/rewards, RewardRedemption /loyalty/rewards/redeem, Activities /loyalty/activities, ActivityDetail /loyalty/activities/detail, ClaimActivityReward /loyalty/activities/claim, ReviewPrompt /reviews/prompt, ReviewDetail /reviews/detail, Referral /loyalty/referral.
+
+### Tests
+- Root jest: 1,953 -> **2,045** passing across 128 -> **133** suites (+92 tests, +5 suites).
+- Functions vitest: **187** passing across 14 suites (unchanged - Batch E is consumer-UI only).
+- ``npx tsc --noEmit`` (root): 0 errors.
+
+### Security
+- No PCI surface. W25 screens handle loyalty points, reviews, and referral codes only.
+- No new Firestore rules: all screens are props-driven with no Firestore I/O.
+- Referral code is display-only (formatted from a caller-provided prop; no client-side generation).
+- Review photos accepted as URI strings only; no file I/O or network upload in the component layer.
+- WCAG 2.1 AA preserved: all interactives >=44x44; ProgressRing exposes accessibilityRole="progressbar" + accessibilityValue.now; RatingSelector exposes accessibilityRole="adjustable" + accessibilityState.disabled; RewardCard exposes accessibilityState.disabled when locked/redeemed.
+
+### Architectural Notes
+- Pure-helper pattern preserved. loyaltyHelpers.ts has zero React imports - tier thresholds / reward filtering / activity status derivation / referral formatting reusable in Cloud Functions without rewrites.
+- StickyCtaBar contract: does NOT render children - requires primaryLabel + onPrimaryPress; optional primaryTestID / primaryDisabled. Three screens incorrectly used it as a children container and were corrected.
+- StickyFooterCta vs StickyCtaBar: LoyaltyLandingScreen uses StickyFooterCta (total display + CTA with primaryTestID forwarded to inner Button). Activity/Review/Redemption screens use StickyCtaBar.
+- TierBadge uses textTransform:"uppercase" in style - text content stays capitalized for RNTL queryability.
+- RatingSelector stars have no accessibilityElementsHidden so getByTestId("rs-star-{n}") works in RNTL while the outer View carries the consolidated accessibility role.
+- computeTierProgress returns 1.0 at Platinum; filterRewards("All") is a passthrough preserving order.
+- ReviewAspect is a string union ("Service" / "Cleanliness" / "Value" / "Atmosphere") - not an object.
+
+### Debt Register (per [DEBT_REGISTER.md](DEBT_REGISTER.md))
+- **No prior debts closed in W25.**
+- **New W25 debts (3):**
+  - W25-DEBT-1 - Backend loyalty service: points ledger Firestore write + Cloud Function trigger on booking-confirmed + getPointsBalance/getPointsHistory read ports.
+  - W25-DEBT-2 - Reward redemption write path: redeemReward Cloud Function with idempotency + point deduction + reward-issuance document.
+  - W25-DEBT-3 - Activity completion + claim write path: logActivityStep + claimActivityReward Cloud Functions.
+- **Carried forward:** W19-DEBT-4, W19-DEBT-5, W20-DEBT-2, W20-DEBT-3, W20-DEBT-4, W22-DEBT-1, W22-DEBT-3, W23-DEBT-1, W23-DEBT-3, W24-DEBT-1, W24-DEBT-2, W24-DEBT-3.
+
+### Index - Changed Files
+- New (production): src/shared/ui/{ProgressRing,TierBadge,RewardCard,RatingSelector,PhotoUploadTile}.tsx; src/app/loyalty/loyaltyHelpers.ts; src/app/loyalty/{LoyaltyLandingScreen,RewardCatalogScreen,RewardRedemptionScreen,ReferralScreen}.tsx; src/app/activities/{ActivitiesScreen,ActivityDetailScreen,ClaimActivityRewardScreen}.tsx; src/app/reviews/{ReviewPromptScreen,ReviewDetailScreen}.tsx.
+- New (tests): src/shared/ui/__tests__/loyalty-primitives.test.tsx; src/app/loyalty/__tests__/{loyaltyHelpers,loyaltyScreens}.test.ts(x); src/app/activities/__tests__/activitiesScreens.test.tsx; src/app/reviews/__tests__/reviewScreens.test.tsx.
+- Modified: src/shared/ui/index.ts (W25 exports); src/app/navigation/routes.ts (+9 public /loyalty/* + /reviews/* routes); src/app/navigation/__tests__/routes.test.ts (snapshot extended); WEEKLY_LOG.md; PROGRAM_TRACKING_BOARD.md.
+
+### Next-Week Prerequisites (Week 26)
+W26 inherits W21+W22+W23+W24+W25 primitives unchanged. The Phase 2 consumer-UI surface area (auth + discover + booking + payments + loyalty/activities/reviews) is now feature-complete on the screen layer. W26 shifts to backend wiring: W25-DEBT-1/2/3 (loyalty backend, reward redemption, activity claims), W23-DEBT-1 (booking persistence Cloud Functions + read ports), W24-DEBT-2 (Stripe server-side payment infrastructure), W22-DEBT-1 (react-native-maps W28 target). Review submit path (submitReview Cloud Function) and referral claim path also required to fully activate E.7/E.9.
+
+---
+
+## Week 26 - Batch F: Messaging, Notifications, Waitlist (Consumer UI)
+
+**Closed:** 2026-05-02 | **Test count:** 2045→2138 | **TS errors:** 0
+**Window:** Week 26 (Phase 2 consumer-UI sixth sprint).
+**Status:** ✅ Complete — all 7 screens (F.1–F.7), 5 new shared-UI primitives, 1 helper module (messagingHelpers.ts), TCPA + CAN-SPAM compliance embedded, all test gates delivered — GO for Week 27.
+**Close report:** [WEEK26_CLOSE_REPORT.md](WEEK26_CLOSE_REPORT.md)
+
+### Features Completed
+
+| Task | Deliverable |
+|------|------------|
+| F primitives | `ChatBubble` — directional bubble (incoming warmOat bg / outgoing surface+coralBlossom border), status glyphs ✓/✓✓/coral ✓✓, `borderBottomLeftRadius 4` (incoming) / `borderBottomRightRadius 4` (outgoing) |
+| F primitives | `AttachmentTile` — image (64×64 thumbnail) / file (56 h row with filename+size+download) variants |
+| F primitives | `QuickReplyChip` — coral-blossom outline chip; Pressable with `label` + `onPress` + `testID` |
+| F primitives | `NotificationRow` — 32 px toned icon + title/preview + time + unread dot; category→icon+bg map (booking/promo/reminder/system/loyalty) |
+| F primitives | `PreferenceToggleRow` — RN `Switch` with `trackColor` design tokens; `accessibilityRole="switch"` |
+| F helper | `messagingHelpers.ts` — 39+ exports: thread types + `filterThreadsByTab` + `countUnreadThreads`; `formatMessageTime` (12 h local) + `formatThreadDate` (relative) + `formatUsDate` (MM/DD/YYYY); notification types + `filterNotificationsByTab` + `groupNotificationsByDate` + `categorizeNotificationDate`; `NotificationPreferences` record + `DEFAULT_NOTIFICATION_PREFERENCES` (promotions all false); TCPA `isInQuietHours()` handles midnight-spanning windows; CAN-SPAM `CAN_SPAM_UNSUBSCRIBE_COPY` + `CAN_SPAM_SENDER_COPY`; waitlist types + `formatPositionLabel` + `formatWaitlistCountdown` |
+| F.1 | `InboxScreen` — Banner + SegmentedControl tabs + search TextInput + FlatList threads; loading/empty/retry/compose testIDs |
+| F.2 | `ThreadScreen` — inverted FlatList ChatBubble + AttachmentTile; typing indicator; QuickReplyChip row; multiline composer; blocked Banner; back/blocked-banner/send/loading/retry testIDs |
+| F.3 | `ComposeScreen` — salon search → recipient chip → subject + composer; StickyCtaBar; back/recipient-search/send testIDs |
+| F.4 | `NotificationCenterScreen` — SegmentedControl tabs + FlatList with date-group headers via `groupNotificationsByDate`; permission Banner; loading/empty/permission-banner/mark-all-read testIDs |
+| F.5 | `NotificationPreferencesScreen` — 3-channel × 6-pref matrix PreferenceToggleRow; quiet-hours inputs + day chips; Reset to defaults; permission-denied-banner/pref-{key}-{channel}/reset-defaults testIDs |
+| F.6 | `WaitlistJoinSheet` — ModalSheet with date range + time/staff prefs + TCPA SMS toggle (default false); StickyCtaBar; join-cta/notify-sms-toggle/already-banner testIDs |
+| F.7 | `WaitlistPositionScreen` — hero position # + service name + salon card + estimated wait + slot-offer Banner (success) + leave/update CTAs; position/slot-offer/leave testIDs |
+| Routes | 7 new public routes: Inbox `/messages`, Thread `/messages/thread`, Compose `/messages/compose`, NotificationCenter `/notifications`, NotificationPreferences `/notifications/preferences`, WaitlistJoin `/waitlist/join`, WaitlistPosition `/waitlist/position` |
+
+### Tests and Quality Outcomes
+
+- **New tests added this week:** +93 (2045 → 2138 total)
+- Test suites: 138 | Failures: 0 | TS errors: 0
+- New suites: `messaging-primitives`, `messagingHelpers`, `messagingScreens`, `notificationsScreens`, `waitlistScreens`
+- Root-cause fixes: `MessageStatus "failed"` conditional at ChatBubble call site; `colors.surfaceAlt` → `colors.surface`; `formatMessageTime` tests rebuilt with `setHours()` for local Date correctness; `getAllByText` for multi-match preference labels; `group.group` field name; `n.category` / `!n.isRead` / `formatMessageTime(n.receivedAt)` field corrections; `NotificationPreferenceKey[]` typing; `QuietDay` capitalization; `estimatedWait: string` type
+
+### Security
+
+| Severity | Finding | Resolution |
+|----------|---------|------------|
+| **NONE** | No new Firestore rules surface — all screens are props-driven with no Firestore I/O | n/a |
+| **LEGAL** | TCPA — SMS marketing and waitlist SMS-notify must default OFF | `DEFAULT_NOTIFICATION_PREFERENCES` promotions sms = false; `WaitlistJoinSheet` notifySms default false; `isInQuietHours()` helper exported; `QUIET_HOURS_START_DEFAULT = "21:00"` / `QUIET_HOURS_END_DEFAULT = "08:00"` |
+| **LEGAL** | CAN-SPAM — Email marketing must default OFF; required sender identification on outbound email | promotions email = false in defaults; `CAN_SPAM_UNSUBSCRIBE_COPY` + `CAN_SPAM_SENDER_COPY` constants exported and surfaced in NotificationPreferencesScreen |
+
+### Open Defects and Technical Debt
+
+1. **[W26-DEBT-1]** Backend messaging service — Firestore `threads` + `messages` collections, `sendMessage` Cloud Function, `getThreadsForUser` / `getMessagesForThread` read ports. Target: W27 or Phase 3 backend pass.
+2. **[W26-DEBT-2]** Push notification delivery infrastructure — FCM token registration, `sendPushNotification` Cloud Function, `createNotification` Firestore write path. Target: W27 or Phase 3 backend pass.
+3. **[W26-DEBT-3]** Waitlist backend service — `waitlist` Firestore collection, `joinWaitlist` / `leaveWaitlist` / `notifyWaitlistSlot` Cloud Functions. Target: W27 or Phase 3 backend pass.
+4. Carried: W19-DEBT-4, W19-DEBT-5, W20-DEBT-2/3/4, W22-DEBT-1/3, W23-DEBT-1/3, W24-DEBT-1/2/3, W25-DEBT-1/2/3.
+
+### Index — Changed Files
+
+- New: `src/shared/ui/{ChatBubble,AttachmentTile,QuickReplyChip,NotificationRow,PreferenceToggleRow}.tsx`
+- New: `src/app/messaging/messagingHelpers.ts`
+- New: `src/app/messaging/{InboxScreen,ThreadScreen,ComposeScreen}.tsx`
+- New: `src/app/notifications/{NotificationCenterScreen,NotificationPreferencesScreen}.tsx`
+- New: `src/app/waitlist/{WaitlistJoinSheet,WaitlistPositionScreen}.tsx`
+- New (tests): `src/shared/ui/__tests__/messaging-primitives.test.tsx`; `src/app/messaging/__tests__/{messagingHelpers,messagingScreens}.test.ts(x)`; `src/app/notifications/__tests__/notificationsScreens.test.tsx`; `src/app/waitlist/__tests__/waitlistScreens.test.tsx`
+- Modified: `src/shared/ui/index.ts` (+5 W26 primitive exports + types); `src/app/navigation/routes.ts` (+7 routes); `src/app/navigation/__tests__/routes.test.ts` (snapshot extended)
+
+### Next-Week Prerequisites (Week 27)
+
+Phase 2 consumer-UI is now complete across all six batches (A–F). W27 options:
+- **Backend wiring sprint:** close W26-DEBT-1/2/3 + W23-DEBT-1 + W24-DEBT-2 + W25-DEBT-1/2/3 (highest priority — gates live data end-to-end).
+- **Phase 2 extension:** remaining Phase 2 W28 items (react-native-maps W22-DEBT-1, editorial-feed W22-DEBT-3).
+

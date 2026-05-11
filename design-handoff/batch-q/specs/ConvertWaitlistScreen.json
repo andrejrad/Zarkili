@@ -1,0 +1,93 @@
+{
+  "screen": "ConvertWaitlistScreen",
+  "route": "AdminConvertWaitlist",
+  "device": {
+    "type": "modal-sheet",
+    "width": 390,
+    "maxHeight": "88vh",
+    "radius": 20
+  },
+  "stateNames": [
+    "default",
+    "noSlot",
+    "submitting",
+    "success",
+    "error"
+  ],
+  "layout": {
+    "handle": {
+      "width": 36,
+      "height": 4,
+      "radius": 2,
+      "color": "cardBorder",
+      "position": "centered",
+      "marginTop": 12
+    },
+    "header": {
+      "title": { "text": "strings.convertWaitlist.title", "variant": "heading-3" }
+    },
+    "clientSummary": {
+      "type": "card",
+      "background": "surface",
+      "border": { "width": 1, "color": "cardBorder" },
+      "radius": 12,
+      "padding": 12,
+      "marginBottom": 16,
+      "content": {
+        "clientAvatar": { "size": 40 },
+        "clientName": { "variant": "body-medium" },
+        "requestedService": { "type": "category-pill" },
+        "requestedWindow": { "variant": "caption", "color": "muted" }
+      }
+    },
+    "suggestedSlots": {
+      "visibleWhen": "state.default",
+      "label": { "text": "strings.convertWaitlist.suggestedLabel", "variant": "label-small", "color": "muted" },
+      "slotChipGrid": {
+        "source": "slot engine",
+        "sortBy": "proximity to requestedWindow",
+        "unavailableChips": { "disabled": true, "greyed": true }
+      }
+    },
+    "noSlotBanner": {
+      "visibleWhen": "state.noSlot",
+      "background": "warning 15%",
+      "borderLeft": { "width": 4, "color": "warning" },
+      "fullWidth": true,
+      "text": "strings.convertWaitlist.noSlotBanner",
+      "manualBookingLink": { "navigate": "AdminNewBooking" }
+    },
+    "notifySection": {
+      "notifyToggle": { "defaultOn": true, "label": "strings.convertWaitlist.notifyLabel" },
+      "channelPicker": {
+        "type": "radio",
+        "visibleWhen": "notifyToggle ON",
+        "options": [
+          { "value": "sms", "label": "strings.convertWaitlist.channel.sms" },
+          { "value": "email", "label": "strings.convertWaitlist.channel.email" },
+          { "value": "push", "label": "strings.convertWaitlist.channel.push" }
+        ]
+      }
+    },
+    "footer": {
+      "actions": [
+        { "type": "button", "label": "strings.convertWaitlist.cancel", "variant": "secondary" },
+        { "type": "button", "label": "strings.convertWaitlist.confirm", "variant": "primary", "disabledUntil": "slot selected AND notifyChannel selected when toggle ON" }
+      ]
+    }
+  },
+  "states": {
+    "submitting": {
+      "ctaButton": { "spinner": true },
+      "form": { "locked": true }
+    },
+    "success": {
+      "toast": "strings.convertWaitlist.successToast",
+      "action": "dismiss",
+      "navigate": "AdminBookingDetail"
+    },
+    "error": {
+      "inlineBanner": { "position": "below clientSummary" }
+    }
+  }
+}

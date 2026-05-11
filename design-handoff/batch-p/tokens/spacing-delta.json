@@ -1,0 +1,19 @@
+{
+  "delta": "spacing-batch-p",
+  "note": "4pt grid system — locked from design system",
+  "grid": 4,
+  "values": [4, 8, 12, 16, 20, 24, 32, 40, 48, 64],
+  "admin": {
+    "pageHorizontal": 16,
+    "cardPadding": 16,
+    "sectionGap": 24,
+    "inputHeight": 48,
+    "touchTargetMin": 44,
+    "listRowHeight": {
+      "min": 56,
+      "max": 64
+    },
+    "bulkActionBarHeight": 56,
+    "dividerThickness": 0.5
+  }
+}

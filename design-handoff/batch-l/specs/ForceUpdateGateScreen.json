@@ -1,0 +1,165 @@
+{
+  "screenId": "L.1",
+  "name": "ForceUpdateGateScreen",
+  "device": "iPhone 14",
+  "dimensions": {
+    "width": 390,
+    "height": 844
+  },
+  "description": "Full-screen blocking gate requiring app update before proceeding. No dismiss path. No back gesture.",
+  "template": "full-screen-gate-template",
+  "layout": {
+    "type": "vertical-center-flex",
+    "background": "#F2EDDD",
+    "paddingTop": "safe-area-inset + 80",
+    "paddingBottom": "safe-area-inset + 32",
+    "paddingHorizontal": 32,
+    "gap": 24,
+    "accessibility": {
+      "modal": true,
+      "preventDismiss": true
+    }
+  },
+  "elements": [
+    {
+      "id": "hero-illustration",
+      "type": "illustration",
+      "width": 200,
+      "height": 200,
+      "motif": "lock + chevron-up",
+      "alignment": "center",
+      "colors": ["#E3A9A0", "#D1BFB3", "#BBEDDA"]
+    },
+    {
+      "id": "heading",
+      "type": "text",
+      "style": "heading-2",
+      "text": "{updateRequired}",
+      "fontWeight": 600,
+      "color": "#1A1A1A",
+      "alignment": "center"
+    },
+    {
+      "id": "body-message",
+      "type": "text",
+      "style": "body",
+      "text": "{updateMessage}",
+      "fontWeight": 400,
+      "color": "#6B6B6B",
+      "alignment": "center",
+      "maxWidth": 280
+    },
+    {
+      "id": "progress-bar",
+      "type": "progress-indicator",
+      "visibility": "state:downloading-hint",
+      "width": 240,
+      "height": 4,
+      "background": "#E5E0D1",
+      "fill": "#E3A9A0",
+      "mode": "indeterminate",
+      "animation": "pulse",
+      "marginTop": 8
+    },
+    {
+      "id": "download-subtitle",
+      "type": "text",
+      "style": "body-small",
+      "text": "{downloadingMessage}",
+      "visibility": "state:downloading-hint",
+      "fontWeight": 400,
+      "color": "#6B6B6B",
+      "alignment": "center",
+      "marginTop": 4
+    },
+    {
+      "id": "primary-cta",
+      "type": "button",
+      "variant": "primary",
+      "label": "{openStoreCta}",
+      "action": "openAppStore",
+      "width": "full-minus-64",
+      "height": 52,
+      "borderRadius": 12,
+      "background": "#E3A9A0",
+      "hoverBackground": "#D99A90",
+      "pressedBackground": "#CF8B80",
+      "labelWeight": 600,
+      "labelColor": "#FFFFFF",
+      "accessibility": {
+        "label": "Open App Store to update Zarkili",
+        "hint": "Downloads the latest version"
+      }
+    }
+  ],
+  "states": [
+    {
+      "name": "default",
+      "description": "Initial blocking state showing update required message",
+      "visibility": {
+        "hero-illustration": true,
+        "heading": true,
+        "body-message": true,
+        "primary-cta": true,
+        "progress-bar": false,
+        "download-subtitle": false
+      },
+      "strings": {
+        "updateRequired": "Update Required",
+        "updateMessage": "A new version of Zarkili is available. Please update to continue.",
+        "openStoreCta": "Open App Store"
+      }
+    },
+    {
+      "name": "downloading-hint",
+      "description": "Shown after user taps CTA, indicating download in progress",
+      "visibility": {
+        "hero-illustration": true,
+        "heading": true,
+        "body-message": true,
+        "primary-cta": false,
+        "progress-bar": true,
+        "download-subtitle": true
+      },
+      "strings": {
+        "updateRequired": "Update Required",
+        "updateMessage": "A new version of Zarkili is available. Please update to continue.",
+        "downloadingMessage": "Downloading… 12.4 MB"
+      }
+    }
+  ],
+  "variants": [
+    {
+      "name": "ios",
+      "ctaLabel": "Open App Store",
+      "action": "openAppStore"
+    },
+    {
+      "name": "android",
+      "ctaLabel": "Open Google Play",
+      "action": "openGooglePlay"
+    }
+  ],
+  "accessibility": {
+    "announceOnAppear": "Update required. A new version of Zarkili is available.",
+    "preventBackGesture": true,
+    "preventSwipeToDismiss": true
+  },
+  "frames": [
+    {
+      "name": "L-1-default",
+      "state": "default",
+      "variant": "ios"
+    },
+    {
+      "name": "L-1-downloading-hint",
+      "state": "downloading-hint",
+      "variant": "ios"
+    },
+    {
+      "name": "L-1-android-default",
+      "state": "default",
+      "variant": "android"
+    }
+  ]
+}

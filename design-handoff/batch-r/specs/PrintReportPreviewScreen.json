@@ -1,0 +1,58 @@
+{
+  "screen": "PrintReportPreviewScreen",
+  "route": "/admin/analytics/print-preview/:reportId",
+  "description": "Print-optimised full-page report preview with no sidebar; supports print and PDF download",
+  "platform": "admin-desktop",
+  "dimensions": { "width": 1280, "contentWidth": "1280 (no sidebar)" },
+  "states": ["loading", "ready", "printing"],
+  "accessibility": {
+    "screenReaderLabel": "strings.printPreview.screenTitle",
+    "semanticRoles": [
+      { "element": "reportContent", "role": "main" },
+      { "element": "headerBar", "role": "banner" }
+    ]
+  },
+  "rtl": "deferred",
+  "darkMode": "deferred",
+  "layout": {
+    "headerBar": {
+      "height": 64,
+      "bg": "semantic.surface",
+      "noAdminSideNav": true,
+      "left": { "text": "report title", "style": "bodyMedium" },
+      "right": [
+        { "component": "SecondaryButton", "label": "strings.printPreview.printButton", "action": "window.print()" },
+        { "component": "PrimaryButton", "label": "strings.printPreview.downloadPdf", "action": "headless print-to-PDF" },
+        { "component": "IconButton", "icon": "X", "action": "navigate back to report builder", "label": "strings.printPreview.close" }
+      ]
+    },
+    "body": {
+      "bg": "#F0F0F0",
+      "layout": "centered",
+      "reportContent": {
+        "component": "PrintReportLayout",
+        "width": 794,
+        "bg": "#FFFFFF",
+        "shadow": "elevation",
+        "padding": 40,
+        "content": "all widgets from saved report",
+        "pageBreaks": "visible dividers"
+      }
+    }
+  },
+  "components": [
+    {
+      "id": "reportContent",
+      "ref": "PrintReportLayout",
+      "props": {
+        "reportId": "{{reportId}}",
+        "pageBreakDividers": true,
+        "preparedBy": "strings.printPreview.preparedBy",
+        "pageOf": "strings.printPreview.pageOf",
+        "generatedAt": "strings.printPreview.generatedAt",
+        "printingMessage": "strings.printPreview.printingMessage"
+      }
+    }
+  ],
+  "strings": "See strings/en-us.json for printPreview keys"
+}

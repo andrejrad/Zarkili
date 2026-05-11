@@ -1,0 +1,190 @@
+{
+  "screen": "ClientListFiltersScreen",
+  "route": "/admin/clients/filters",
+  "description": "Full-screen modal for advanced client list filtering",
+  "dimensions": {
+    "width": 390,
+    "height": "100vh"
+  },
+  "states": [
+    "default",
+    "applying",
+    "error"
+  ],
+  "accessibility": {
+    "screenReaderLabel": "strings.clientFilters.screenTitle",
+    "semanticRoles": [
+      {"element": "modal", "role": "dialog"},
+      {"element": "filterSection", "role": "group"},
+      {"element": "multiSelect", "role": "listbox"},
+      {"element": "dateRange", "role": "group"},
+      {"element": "chipGroup", "role": "radiogroup"}
+    ]
+  },
+  "rtl": "deferred",
+  "darkMode": "deferred",
+  "layout": {
+    "modal": {
+      "type": "full-screen",
+      "background": "semantic.pageBackground"
+    },
+    "header": {
+      "height": 64,
+      "title": "strings.clientFilters.title",
+      "leftAction": "close",
+      "rightAction": "reset"
+    },
+    "filterSections": [
+      {
+        "id": "location",
+        "title": "strings.clientFilters.locationTitle",
+        "component": "multi-select",
+        "height": "auto",
+        "paddingVertical": 16
+      },
+      {
+        "id": "lastVisit",
+        "title": "strings.clientFilters.lastVisitTitle",
+        "component": "date-range-picker",
+        "height": "auto",
+        "paddingVertical": 16
+      },
+      {
+        "id": "spendRange",
+        "title": "strings.clientFilters.spendRangeTitle",
+        "component": "dual-slider",
+        "height": 80,
+        "paddingVertical": 16,
+        "min": 0,
+        "max": 10000,
+        "step": 50
+      },
+      {
+        "id": "loyaltyTier",
+        "title": "strings.clientFilters.loyaltyTierTitle",
+        "component": "chip-group",
+        "height": "auto",
+        "paddingVertical": 16,
+        "chips": ["Bronze", "Silver", "Gold", "Platinum"]
+      },
+      {
+        "id": "status",
+        "title": "strings.clientFilters.statusTitle",
+        "component": "chip-group",
+        "height": "auto",
+        "paddingVertical": 16,
+        "chips": ["Active", "Inactive", "Blocked", "VIP"]
+      }
+    ],
+    "actionBar": {
+      "height": 72,
+      "position": "fixed-bottom",
+      "background": "semantic.surface",
+      "borderTop": "1px solid semantic.cardBorder",
+      "paddingHorizontal": 16,
+      "gap": 12,
+      "buttons": [
+        {
+          "label": "strings.clientFilters.reset",
+          "style": "ghost",
+          "flex": 1
+        },
+        {
+          "label": "strings.clientFilters.apply",
+          "style": "primary",
+          "flex": 2
+        }
+      ]
+    }
+  },
+  "components": [
+    {
+      "id": "modalHeader",
+      "ref": "navigation-header",
+      "props": {
+        "title": "strings.clientFilters.title",
+        "leftAction": "close",
+        "rightAction": {
+          "label": "strings.clientFilters.reset",
+          "style": "text"
+        }
+      }
+    },
+    {
+      "id": "locationMultiSelect",
+      "ref": "multi-select",
+      "props": {
+        "label": "strings.clientFilters.locationTitle",
+        "options": "{{locations}}"
+      }
+    },
+    {
+      "id": "dateRangePicker",
+      "ref": "date-range-picker",
+      "props": {
+        "label": "strings.clientFilters.lastVisitTitle"
+      }
+    },
+    {
+      "id": "spendSlider",
+      "ref": "dual-slider",
+      "props": {
+        "label": "strings.clientFilters.spendRangeTitle",
+        "min": 0,
+        "max": 10000,
+        "step": 50,
+        "formatValue": "currency"
+      }
+    },
+    {
+      "id": "tierChipGroup",
+      "ref": "chip-group",
+      "props": {
+        "label": "strings.clientFilters.loyaltyTierTitle",
+        "chips": ["Bronze", "Silver", "Gold", "Platinum"]
+      }
+    },
+    {
+      "id": "statusChipGroup",
+      "ref": "chip-group",
+      "props": {
+        "label": "strings.clientFilters.statusTitle",
+        "chips": ["Active", "Inactive", "Blocked", "VIP"]
+      }
+    }
+  ],
+  "interactions": [
+    {
+      "trigger": "closeButton.tap",
+      "action": "dismissModal"
+    },
+    {
+      "trigger": "resetButton.tap",
+      "action": "resetFilters"
+    },
+    {
+      "trigger": "applyButton.tap",
+      "action": "applyFilters",
+      "then": "dismissModal"
+    }
+  ],
+  "tokens": {
+    "used": [
+      "semantic.pageBackground",
+      "semantic.surface",
+      "semantic.cardBorder",
+      "semantic.foreground",
+      "semantic.secondaryText",
+      "semantic.primary"
+    ]
+  },
+  "redlines": {
+    "headerHeight": 64,
+    "sectionPaddingVertical": 16,
+    "sectionPaddingHorizontal": 16,
+    "sliderHeight": 80,
+    "actionBarHeight": 72,
+    "buttonHeight": 48,
+    "buttonGap": 12
+  }
+}

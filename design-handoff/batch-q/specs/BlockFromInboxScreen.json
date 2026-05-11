@@ -1,0 +1,57 @@
+{
+  "screen": "BlockFromInboxScreen",
+  "route": "AdminBlockFromInbox",
+  "device": {
+    "iPhone": { "type": "action-sheet" },
+    "iPad": { "type": "popover", "width": 320 }
+  },
+  "stateNames": [
+    "default",
+    "blockSubmitted",
+    "reportSubmitted",
+    "error"
+  ],
+  "layout": {
+    "actionCards": {
+      "count": 2,
+      "cardStyle": {
+        "background": "surface",
+        "border": { "width": 1, "color": "cardBorder" },
+        "radius": 16,
+        "padding": 16,
+        "marginBottom": 12
+      },
+      "blockCard": {
+        "title": { "text": "strings.blockFromInbox.blockTitle", "variant": "body-medium", "weight": "bold" },
+        "description": { "text": "strings.blockFromInbox.blockDesc", "variant": "body-small", "color": "muted" },
+        "scopeRadio": {
+          "options": [
+            { "value": "thisLocation", "label": "strings.blockFromInbox.blockScope.thisLocation" },
+            { "value": "allLocations", "label": "strings.blockFromInbox.blockScope.allLocations" }
+          ]
+        },
+        "blockButton": { "variant": "secondary-destructive", "label": "strings.blockFromInbox.blockButton", "fullWidth": true }
+      },
+      "reportCard": {
+        "title": { "text": "strings.blockFromInbox.reportTitle", "variant": "body-medium", "weight": "bold" },
+        "description": { "text": "strings.blockFromInbox.reportDesc", "variant": "body-small", "color": "muted" },
+        "reasonDropdown": {
+          "required": true,
+          "options": [
+            { "value": "spam", "label": "strings.blockFromInbox.reason.spam" },
+            { "value": "harassment", "label": "strings.blockFromInbox.reason.harassment" },
+            { "value": "inappropriate", "label": "strings.blockFromInbox.reason.inappropriate" },
+            { "value": "other", "label": "strings.blockFromInbox.reason.other" }
+          ]
+        },
+        "evidenceTextArea": { "optional": true, "maxLength": 500, "label": "strings.blockFromInbox.evidenceLabel" },
+        "submitReportButton": { "variant": "primary", "label": "strings.blockFromInbox.submitReport", "fullWidth": true }
+      }
+    }
+  },
+  "states": {
+    "blockSubmitted": { "toast": "strings.blockFromInbox.blockedToast", "action": "dismiss" },
+    "reportSubmitted": { "toast": "strings.blockFromInbox.reportedToast", "action": "dismiss" },
+    "error": { "inlineBanner": { "position": "below affected card" } }
+  }
+}

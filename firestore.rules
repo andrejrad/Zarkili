@@ -546,6 +546,54 @@ service cloud.firestore {
     }
 
     // -------------------------------------------------------------------------
+    // Consumer Payments — Stripe payment methods + charges (W24-DEBT-2)
+    // -------------------------------------------------------------------------
+    // clients/{userId} — stores stripeCustomerId linking Firebase uid → Stripe
+    //   customer. Readable by the owning user and platform admin. Writes are
+    //   Cloud Function only.
+    match /clients/{userId} {
+      allow read: if isPlatformAdmin() || (isSignedIn() && request.auth.uid == userId);
+      allow write: if isPlatformAdmin();
+    }
+
+    // clients/{userId}/paymentMethods/{methodId} — non-sensitive card metadata
+    //   (brand, last4, expiry). Readable by the owning user. Writes are Cloud
+    //   Function only (paymentsAttachMethod / paymentsDetachMethod callables +
+    //   payment_method.attached / .detached webhook).
+    match /clients/{userId}/paymentMethods/{methodId} {
+      allow read: if isPlatformAdmin() || (isSignedIn() && request.auth.uid == userId);
+      allow write: if isPlatformAdmin();
+    }
+
+    // clients/{userId}/paymentsWebhookIdempotency/{eventId} — webhook dedup
+    //   store for payment_method events. Server-only.
+    match /clients/{userId}/paymentsWebhookIdempotency/{eventId} {
+      allow read, write: if isPlatformAdmin();
+    }
+
+    // tenants/{tenantId}/charges/{chargeId} — booking charge records written
+    //   by paymentsChargeBooking callable. The owning customer and tenant admins
+    //   may read (receipt display, admin revenue view). Writes are server-only.
+    match /tenants/{tenantId}/charges/{chargeId} {
+      allow read: if isPlatformAdmin()
+        || isTenantAdmin(tenantId)
+        || (isSignedIn() && resource.data.userId == request.auth.uid);
+      allow write: if isPlatformAdmin();
+    }
+
+    // tenants/{tenantId}/paymentsIdempotency/{key} — charge idempotency records.
+    //   Server-only; no client access required.
+    match /tenants/{tenantId}/paymentsIdempotency/{key} {
+      allow read, write: if isPlatformAdmin();
+    }
+
+    // tenants/{tenantId}/paymentsWebhookIdempotency/{eventId} — webhook dedup
+    //   store for payment_intent events. Server-only.
+    match /tenants/{tenantId}/paymentsWebhookIdempotency/{eventId} {
+      allow read, write: if isPlatformAdmin();
+    }
+
+    // -------------------------------------------------------------------------
     // Stripe Tax — quote calculation cache (Week 14.0)
     // -------------------------------------------------------------------------
     // Cached Stripe Tax calculation results keyed by quote hash. Tenant
@@ -584,6 +632,47 @@ service cloud.firestore {
     match /tenants/{tenantId}/gateDenials/{docId} {
       allow read: if isPlatformAdmin() || isTenantOwnerOrAdmin(tenantId);
       allow write: if isPlatformAdmin();
+    }
+
+    // -------------------------------------------------------------------------
+    // W37 — Consumer Messaging (threads/{threadId})
+    // threads/{threadId}                     — thread summary (clientId = userId)
+    // threads/{threadId}/messages/{msgId}    — individual messages
+    // -------------------------------------------------------------------------
+    match /threads/{threadId} {
+      // Clients may read/write their own threads (clientId field)
+      allow read: if isSignedIn() && (
+        isPlatformAdmin() ||
+        resource.data.clientId == request.auth.uid ||
+        resource.data.salonId == tenantId
+      );
+      allow create: if isSignedIn();
+      allow update: if isSignedIn() && (
+        isPlatformAdmin() ||
+        resource.data.clientId == request.auth.uid
+      );
+      allow delete: if isPlatformAdmin();
+    }
+
+    match /threads/{threadId}/messages/{msgId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn();
+      allow update, delete: if isPlatformAdmin();
+    }
+
+    // -------------------------------------------------------------------------
+    // W37 — Consumer Notifications (clients/{userId}/notifications/{notifId})
+    //         + Notification Preferences (clients/{userId}/notificationPrefs/prefs)
+    // -------------------------------------------------------------------------
+    match /clients/{userId}/notifications/{notifId} {
+      allow read: if isPlatformAdmin() || (isSignedIn() && request.auth.uid == userId);
+      allow update: if isSignedIn() && request.auth.uid == userId;
+      allow write: if isPlatformAdmin();
+    }
+
+    match /clients/{userId}/notificationPrefs/{docId} {
+      allow read: if isPlatformAdmin() || (isSignedIn() && request.auth.uid == userId);
+      allow write: if isPlatformAdmin() || (isSignedIn() && request.auth.uid == userId);
     }
 
     match /{document=**} {

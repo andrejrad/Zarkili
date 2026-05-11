@@ -1,0 +1,89 @@
+{
+  "screen": "PricingPlanManagementScreen",
+  "route": "SuperAdminPricingPlans",
+  "device": { "primary": "Desktop 1280+", "secondary": "iPad 1024×768" },
+  "stateNames": ["list", "editDraft", "editPublished", "error"],
+  "layout": {
+    "header": {
+      "title": { "text": "Pricing Plans", "variant": "heading-2" },
+      "cta": {
+        "label": "strings.pricingPlans.newPlanCta",
+        "type": "button",
+        "variant": "filled",
+        "icon": "add",
+        "position": "right"
+      }
+    },
+    "planTable": {
+      "columns": [
+        { "key": "name", "variant": "body-medium", "weight": "500" },
+        { "key": "billingInterval", "type": "pill" },
+        { "key": "priceUSD", "format": "USD/mo or /yr", "font": "mono", "align": "right" },
+        { "key": "maxSeats", "format": "int or ∞", "align": "right" },
+        { "key": "aiCreditsPerMonth", "format": "int k", "align": "right" },
+        { "key": "status", "type": "pill", "values": ["draft", "active", "deprecated"] },
+        { "key": "tenantCount", "format": "int", "label": "Tenants on plan" },
+        { "key": "actions", "type": "overflow-menu", "items": ["Edit", "Archive", "Duplicate"] }
+      ]
+    },
+    "editDrawer": {
+      "width": 580,
+      "position": "right",
+      "title": { "variants": { "new": "New Pricing Plan", "edit": "Edit Plan" } },
+      "form": {
+        "sections": [
+          {
+            "title": "Plan Details",
+            "fields": [
+              { "id": "planName", "type": "textInput", "label": "Plan name", "required": true },
+              { "id": "description", "type": "textArea", "label": "Description", "rows": 3 },
+              { "id": "billingInterval", "type": "segmentedControl", "options": ["monthly", "annual"] },
+              { "id": "priceUSD", "type": "currencyInput", "label": "Price (USD)", "required": true }
+            ]
+          },
+          {
+            "title": "Limits",
+            "fields": [
+              { "id": "maxSeats", "type": "numberInput", "label": "Max seats (leave blank for unlimited)" },
+              { "id": "aiCreditsPerMonth", "type": "numberInput", "label": "AI credits per month" },
+              { "id": "storageGB", "type": "numberInput", "label": "Storage (GB)" }
+            ]
+          },
+          {
+            "title": "Features",
+            "fields": [
+              { "id": "featureFlags", "type": "checkboxList", "label": "Included features", "options": "dynamic from feature flag list" }
+            ]
+          }
+        ]
+      },
+      "footer": {
+        "ctaGroup": [
+          { "label": "strings.pricingPlans.saveDraftCta", "variant": "outlined" },
+          { "label": "strings.pricingPlans.publishCta", "variant": "filled", "confirm": "Publish this plan and make it available to tenants?" }
+        ]
+      }
+    },
+    "archiveDialog": {
+      "type": "modal",
+      "title": "Archive Plan",
+      "body": "Tenants on this plan will not be affected. This plan will no longer be available for new subscriptions.",
+      "cta": { "label": "strings.pricingPlans.archiveCta", "variant": "filled", "tone": "destructive" }
+    }
+  },
+  "states": {
+    "editDraft": {
+      "editDrawer": { "open": true, "mode": "new" }
+    },
+    "editPublished": {
+      "editDrawer": { "open": true, "mode": "edit" }
+    },
+    "error": {
+      "inlineBanner": {
+        "background": "error 10%",
+        "borderLeft": { "width": 4, "color": "error" },
+        "message": "strings.pricingPlans.errorMessage"
+      }
+    }
+  }
+}

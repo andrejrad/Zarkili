@@ -1,0 +1,203 @@
+{
+  "batchId": "batch-l",
+  "version": "1.0.0",
+  "description": "Batch L: Force-Update Gates, Maintenance, Offline States, Permissions, Onboarding, Localization, Platform-Specific Features, and App Store Assets",
+  "designSystem": "Zarkili v1.0.0",
+  "deviceTargets": ["iPhone 14 390×844", "iPad 768×1024", "iPhone 14 Pro Dynamic Island", "Pixel 7", "Web 390/768/1280"],
+  "newComponents": [
+    "full-screen-gate-template",
+    "permission-recovery-card",
+    "locale-picker",
+    "coach-mark-popover",
+    "store-screenshot-frame"
+  ],
+  "screens": [
+    {
+      "id": "L.1",
+      "name": "ForceUpdateGateScreen",
+      "category": "blocking-gates",
+      "device": "iPhone 14",
+      "stateNames": ["default", "downloading-hint"]
+    },
+    {
+      "id": "L.2",
+      "name": "MaintenanceModeScreen",
+      "category": "blocking-gates",
+      "device": "iPhone 14",
+      "stateNames": ["default", "with-ETA", "indefinite"]
+    },
+    {
+      "id": "L.3",
+      "name": "OfflineStateScreen",
+      "category": "connectivity",
+      "device": "iPhone 14 + iPad",
+      "stateNames": ["offline", "reconnecting", "restored"]
+    },
+    {
+      "id": "L.4",
+      "name": "ServerErrorFallbackScreen",
+      "category": "error-recovery",
+      "device": "iPhone 14",
+      "stateNames": ["500", "503", "network"]
+    },
+    {
+      "id": "L.5",
+      "name": "FeatureFlagDisabledScreen",
+      "category": "feature-gates",
+      "device": "iPhone 14",
+      "stateNames": ["disabled", "beta-waitlist"]
+    },
+    {
+      "id": "L.6",
+      "name": "DeepLinkScreen",
+      "category": "navigation",
+      "device": "iPhone 14",
+      "stateNames": ["routing", "found", "mismatch"]
+    },
+    {
+      "id": "L.7",
+      "name": "PermissionDeniedRecoveryScreen",
+      "category": "permissions",
+      "device": "iPhone 14",
+      "stateNames": ["denied", "granted-after-redirect"],
+      "variantNames": ["camera", "photo-library", "contacts", "calendar", "notifications", "location"],
+      "formFactors": ["bottom-sheet", "inline-card"]
+    },
+    {
+      "id": "L.8",
+      "name": "FirstRunTourScreen",
+      "category": "onboarding",
+      "device": "iPhone 14",
+      "stateNames": ["step-1", "step-2", "step-3", "step-4", "step-5", "skipped"]
+    },
+    {
+      "id": "L.9",
+      "name": "WhatsNewScreen",
+      "category": "onboarding",
+      "device": "iPhone 14",
+      "stateNames": ["default", "scrolled", "acknowledged"]
+    },
+    {
+      "id": "L.10",
+      "name": "RateTheAppScreen",
+      "category": "feedback",
+      "device": "iPhone 14",
+      "stateNames": ["sentiment", "positive-rating", "negative-feedback", "submitted"]
+    },
+    {
+      "id": "L.11",
+      "name": "LanguageLocalePickerScreen",
+      "category": "localization",
+      "device": "iPhone 14 + iPad",
+      "stateNames": ["default", "changed", "error"]
+    },
+    {
+      "id": "L.12",
+      "name": "RTLLayoutExamplesScreen",
+      "category": "localization",
+      "device": "iPhone 14",
+      "stateNames": ["LTR", "RTL"],
+      "screens": ["Home", "Explore", "Booking confirmation"]
+    },
+    {
+      "id": "L.13",
+      "name": "WebResponsiveBreakpointsScreen",
+      "category": "web",
+      "device": "Web 390/768/1280",
+      "breakpoints": ["mobile-390", "tablet-768", "desktop-1280"],
+      "screens": ["Home", "Explore", "Booking flow"]
+    },
+    {
+      "id": "L.14",
+      "name": "IOSLiveActivitiesScreen",
+      "category": "platform-ios",
+      "device": "iPhone 14 Pro",
+      "stateNames": ["pre-appointment", "imminent", "in-progress", "completed"],
+      "variantNames": ["dynamic-island-compact", "dynamic-island-expanded", "lock-screen-widget"]
+    },
+    {
+      "id": "L.15",
+      "name": "AndroidWidgetScreen",
+      "category": "platform-android",
+      "device": "Pixel 7",
+      "stateNames": ["has-booking", "no-booking"]
+    },
+    {
+      "id": "L.16",
+      "name": "AppClipCardScreen",
+      "category": "platform-ios",
+      "device": "iPhone 14",
+      "stateNames": ["default", "loading", "success"]
+    },
+    {
+      "id": "L.17",
+      "name": "StoreScreenshotsScreen",
+      "category": "marketing",
+      "device": "iPhone 6.7\" + iPad 12.9\" + Pixel 7",
+      "variantNames": ["iPhone-5-shots", "iPad-3-shots", "Android-5-shots"]
+    },
+    {
+      "id": "L.18",
+      "name": "VideoStoryboardScreen",
+      "category": "marketing",
+      "device": "iPhone 14",
+      "variantNames": ["15s-6-keyframes", "30s-12-keyframes"]
+    }
+  ],
+  "components": [
+    {
+      "name": "full-screen-gate-template",
+      "category": "layout-templates",
+      "variantNames": ["with-tertiary", "without-tertiary", "with-progress"]
+    },
+    {
+      "name": "permission-recovery-card",
+      "category": "permission-ui",
+      "formFactors": ["bottom-sheet", "inline-card"],
+      "variantNames": ["camera", "photo-library", "contacts", "calendar", "notifications", "location"]
+    },
+    {
+      "name": "locale-picker",
+      "category": "settings",
+      "variantNames": ["default", "disabled-row"]
+    },
+    {
+      "name": "coach-mark-popover",
+      "category": "onboarding",
+      "variantNames": ["step-1-to-5", "final-step"]
+    },
+    {
+      "name": "store-screenshot-frame",
+      "category": "marketing",
+      "variantNames": ["iPhone-6.7", "iPhone-5.5", "iPad-12.9", "Android-Pixel"]
+    }
+  ],
+  "files": [
+    "design-handoff/batch-l/manifest.json",
+    "design-handoff/batch-l/tokens/colors-delta.json",
+    "design-handoff/batch-l/specs/ForceUpdateGateScreen.json",
+    "design-handoff/batch-l/specs/MaintenanceModeScreen.json",
+    "design-handoff/batch-l/specs/OfflineStateScreen.json",
+    "design-handoff/batch-l/specs/ServerErrorFallbackScreen.json",
+    "design-handoff/batch-l/specs/FeatureFlagDisabledScreen.json",
+    "design-handoff/batch-l/specs/DeepLinkScreen.json",
+    "design-handoff/batch-l/specs/PermissionDeniedRecoveryScreen.json",
+    "design-handoff/batch-l/specs/FirstRunTourScreen.json",
+    "design-handoff/batch-l/specs/WhatsNewScreen.json",
+    "design-handoff/batch-l/specs/RateTheAppScreen.json",
+    "design-handoff/batch-l/specs/LanguageLocalePickerScreen.json",
+    "design-handoff/batch-l/specs/RTLLayoutExamplesScreen.json",
+    "design-handoff/batch-l/specs/WebResponsiveBreakpointsScreen.json",
+    "design-handoff/batch-l/specs/IOSLiveActivitiesScreen.json",
+    "design-handoff/batch-l/specs/AndroidWidgetScreen.json",
+    "design-handoff/batch-l/specs/AppClipCardScreen.json",
+    "design-handoff/batch-l/specs/StoreScreenshotsScreen.json",
+    "design-handoff/batch-l/specs/VideoStoryboardScreen.json",
+    "design-handoff/batch-l/components/full-screen-gate-template.json",
+    "design-handoff/batch-l/components/permission-recovery-card.json",
+    "design-handoff/batch-l/components/locale-picker.json",
+    "design-handoff/batch-l/components/coach-mark-popover.json",
+    "design-handoff/batch-l/components/store-screenshot-frame.json",
+    "design-handoff/batch-l/strings/en-us.json"
+  ]
+}

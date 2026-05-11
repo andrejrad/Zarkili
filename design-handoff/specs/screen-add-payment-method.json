@@ -1,0 +1,159 @@
+{
+  "screen": "AddPaymentMethod",
+  "batchId": "D.2",
+  "description": "PCI-compliant card-capture screen using Stripe's CardField component. Consumer enters cardholder name, ZIP, and card details. Optional 'Set as default' toggle.",
+  "purpose": "Tokenise a new card via Stripe SDK. Screen is purely presentational — caller owns the createPaymentMethod / PaymentSheet flow.",
+  "sourceFile": "src/app/payments/AddPaymentMethodScreen.tsx",
+  "hierarchy": {
+    "container": {
+      "background": "#F2EDDD",
+      "safeArea": true,
+      "flex": 1
+    },
+    "scroll": {
+      "type": "ScrollView",
+      "keyboardShouldPersistTaps": "handled",
+      "contentContainerPadding": 16,
+      "contentContainerGap": 16
+    }
+  },
+  "sections": {
+    "header": {
+      "type": "fixed",
+      "height": 56,
+      "background": "#FFFFFF",
+      "paddingHorizontal": 16,
+      "paddingVertical": 12,
+      "borderBottomWidth": 1,
+      "borderBottomColor": "#E5E0D1",
+      "layout": "row",
+      "children": ["backButton", "titleLabel", "headerSpacer"]
+    },
+    "backButton": {
+      "type": "iconButton",
+      "glyph": "←",
+      "size": 44,
+      "color": "#1A1A1A",
+      "optional": true,
+      "accessibility": { "role": "button", "label": "Back" }
+    },
+    "titleLabel": {
+      "type": "text",
+      "content": "Add card",
+      "fontSize": 18,
+      "lineHeight": 24,
+      "fontWeight": "600",
+      "color": "#1A1A1A",
+      "textAlign": "center",
+      "flex": 1
+    },
+    "headerSpacer": { "type": "view", "width": 44 },
+    "declinedBanner": {
+      "type": "banner",
+      "variant": "error",
+      "background": "#D9534F",
+      "borderRadius": 8,
+      "padding": 12,
+      "optional": true,
+      "showWhen": "declinedMessage is set"
+    },
+    "threeDSecureBanner": {
+      "type": "banner",
+      "variant": "info",
+      "background": "#5BC0DE",
+      "borderRadius": 8,
+      "padding": 12,
+      "optional": true,
+      "showWhen": "threeDSecureInProgress === true",
+      "body": "Verifying with your bank…"
+    },
+    "cardDetailsSectionLabel": {
+      "type": "text",
+      "content": "Card details",
+      "fontSize": 12,
+      "lineHeight": 16,
+      "fontWeight": "600",
+      "color": "#6B6B6B",
+      "textTransform": "uppercase",
+      "letterSpacing": 0.5
+    },
+    "stripeCardField": {
+      "type": "Stripe/CardField",
+      "note": "Rendered by @stripe/stripe-react-native CardField — PCI-compliant, never exposes raw PAN to app code",
+      "postalCodeEnabled": false,
+      "background": "#FFFFFF",
+      "borderRadius": 12,
+      "borderWidth": 1,
+      "borderColor": "#E5E0D1",
+      "height": 56,
+      "paddingHorizontal": 16,
+      "placeholder": { "number": "Card number" }
+    },
+    "cardholderNameInput": {
+      "type": "InputField",
+      "label": "Cardholder name",
+      "placeholder": "Full name on card",
+      "autoCapitalize": "words",
+      "returnKeyType": "next",
+      "errorState": "shown when cardholderNameError is set"
+    },
+    "zipInput": {
+      "type": "InputField",
+      "label": "ZIP code",
+      "placeholder": "12345",
+      "keyboardType": "number-pad",
+      "maxLength": 5,
+      "errorState": "shown when zipError is set"
+    },
+    "setAsDefaultRow": {
+      "type": "row",
+      "layout": "row",
+      "justifyContent": "space-between",
+      "alignItems": "center",
+      "paddingVertical": 8,
+      "children": ["setAsDefaultLabel", "setAsDefaultToggle"]
+    },
+    "setAsDefaultLabel": {
+      "type": "text",
+      "content": "Set as default",
+      "fontSize": 16,
+      "fontWeight": "500",
+      "color": "#1A1A1A"
+    },
+    "setAsDefaultToggle": {
+      "type": "Switch",
+      "trackColor": { "true": "#E3A9A0", "false": "#E5E0D1" },
+      "thumbColor": "#FFFFFF"
+    }
+  },
+  "footer": {
+    "type": "StickyFooterCta",
+    "primaryLabel": "Add card",
+    "disabledWhen": "cardComplete is false OR cardholderName is empty OR zip.length !== 5 OR validating is true",
+    "loadingWhen": "validating === true"
+  },
+  "tokens": {
+    "background": "#F2EDDD",
+    "surface": "#FFFFFF",
+    "border": "#E5E0D1",
+    "foreground": "#1A1A1A",
+    "textMuted": "#6B6B6B",
+    "primary": "#E3A9A0",
+    "error": "#D9534F",
+    "info": "#5BC0DE",
+    "pageHorizontalPadding": 16,
+    "cornerRadius": { "sm": 8, "md": 12, "lg": 16 }
+  },
+  "interactions": {
+    "cardFieldChange": "updates state.cardComplete via onCardChange callback",
+    "cardholderNameChange": "updates state.cardholderName",
+    "zipChange": "updates state.zip",
+    "setAsDefaultToggle": "updates state.setAsDefault",
+    "tapAddCard": "calls onSubmit — caller triggers stripe.createPaymentMethod"
+  },
+  "accessibility": {
+    "screenLabel": "Add card",
+    "cardFieldNote": "Stripe CardField manages its own accessibility — cardholder name TextInput has explicit accessibilityLabel",
+    "submitDisabledHint": "Button disabled until all required fields are valid"
+  }
+}

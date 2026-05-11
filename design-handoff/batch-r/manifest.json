@@ -1,0 +1,55 @@
+{
+  "batch": "R",
+  "phase": 3,
+  "title": "Analytics & Reporting, AI Admin, Audit & Compliance, Marketplace",
+  "version": "1.0.0",
+  "generatedAt": "2026-05-09T00:00:00Z",
+  "designSystem": "Zarkili v1.0.0",
+  "scope": {
+    "screens": 18,
+    "components": 11,
+    "strings": 1,
+    "tokenDeltas": 2
+  },
+  "newComponents": [
+    "line-chart-card",
+    "bar-chart-card",
+    "funnel-chart-card",
+    "cohort-table-card",
+    "date-range-picker",
+    "report-builder-canvas",
+    "ai-suggestion-review-row",
+    "post-composer-toolbar",
+    "audit-log-filter-bar",
+    "audit-log-row",
+    "print-report-layout"
+  ],
+  "screens": {
+    "analytics": [
+      "RevenueDashboardScreen",
+      "BookingFunnelScreen",
+      "StaffProductivityScreen",
+      "ClientRetentionCohortScreen",
+      "MarketplaceAttributionScreen",
+      "CustomReportBuilderScreen",
+      "ScheduledReportScreen",
+      "ExportRbacScreen"
+    ],
+    "aiAdmin": [
+      "AiTogglesScreen",
+      "AiBudgetConfigScreen",
+      "AiSuggestionReviewQueueScreen",
+      "AiUsageAnalyticsScreen",
+      "AiAuditLogScreen"
+    ],
+    "audit": [
+      "AuditLogExplorerScreen",
+      "AntiTheftComplianceDashboardScreen"
+    ],
+    "marketplace": [
+      "MarketplacePostComposerScreen",
+      "PerPostPerformanceScreen",
+      "PrintReportPreviewScreen"
+    ]
+  }
+}

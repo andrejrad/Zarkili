@@ -587,6 +587,159 @@
         "labels": "Chip text with dismiss hint if applicable",
         "minTouchTarget": "32x32 (default), 24x24 (small - acceptable for tags)"
       }
+    },
+    "progressRing": {
+      "file": "components/progress-ring.json",
+      "batch": "E",
+      "consumedByWeek": 25,
+      "usedIn": [
+        "specs/screen-loyalty-landing.json (hero card)"
+      ],
+      "sizes": [64, 96, 128],
+      "states": [
+        "default",
+        "loading",
+        "empty",
+        "error",
+        "disabled"
+      ],
+      "dependencies": {
+        "tokens": [
+          "colors.json",
+          "spacing.json"
+        ]
+      },
+      "accessibility": {
+        "role": "progressbar",
+        "labels": "accessibilityValue min/max/now/text per state",
+        "minTouchTarget": "display-only (no interaction)"
+      },
+      "lockedAt": "2026-04-28"
+    },
+    "tierBadge": {
+      "file": "components/tier-badge.json",
+      "batch": "E",
+      "consumedByWeek": 25,
+      "usedIn": [
+        "specs/screen-loyalty-landing.json (hero card, tier-up modal)"
+      ],
+      "variants": [
+        "bronze",
+        "silver",
+        "gold",
+        "platinum",
+        "locked"
+      ],
+      "states": [
+        "default",
+        "pressed",
+        "selected"
+      ],
+      "dependencies": {
+        "tokens": [
+          "colors.json",
+          "typography.json",
+          "spacing.json"
+        ]
+      },
+      "accessibility": {
+        "role": "text (display-only) or button (if interactive)",
+        "labels": "Tier name — color always paired with label text",
+        "minTouchTarget": "24px visual → 44px hitSlop when interactive"
+      },
+      "lockedAt": "2026-04-28"
+    },
+    "rewardCard": {
+      "file": "components/reward-card.json",
+      "batch": "E",
+      "consumedByWeek": 25,
+      "usedIn": [
+        "E.2 Reward Catalog (grid)",
+        "E.3 Reward Redemption (compact)"
+      ],
+      "states": [
+        "unlocked",
+        "pressed",
+        "locked",
+        "redeemed",
+        "expired",
+        "loading",
+        "error",
+        "compact"
+      ],
+      "dependencies": {
+        "tokens": [
+          "colors.json",
+          "typography.json",
+          "spacing.json"
+        ]
+      },
+      "accessibility": {
+        "role": "button",
+        "labels": "{title}, {points} points, {state}",
+        "minTouchTarget": "full card (343px wide)"
+      },
+      "lockedAt": "2026-04-28"
+    },
+    "ratingSelector": {
+      "file": "components/rating-selector.json",
+      "batch": "E",
+      "consumedByWeek": 25,
+      "usedIn": [
+        "E.7 Review Prompt (main rating + aspect ratings)"
+      ],
+      "sizes": [32, 24],
+      "states": [
+        "default-32",
+        "default-24",
+        "hovered",
+        "selected",
+        "pressed",
+        "disabled",
+        "error",
+        "readonly"
+      ],
+      "dependencies": {
+        "tokens": [
+          "colors.json",
+          "spacing.json"
+        ]
+      },
+      "accessibility": {
+        "role": "adjustable",
+        "labels": "accessibilityActions increment/decrement; accessibilityValue min/max/now/text",
+        "minTouchTarget": "44x44 (hitSlop 6 for 32px, hitSlop 10 for 24px)"
+      },
+      "lockedAt": "2026-04-28"
+    },
+    "photoUploadTile": {
+      "file": "components/photo-upload-tile.json",
+      "batch": "E",
+      "consumedByWeek": 25,
+      "usedIn": [
+        "E.7 Review Prompt (photo grid, max 5)"
+      ],
+      "states": [
+        "empty",
+        "pressed",
+        "filled",
+        "uploading",
+        "error",
+        "disabled",
+        "max-reached"
+      ],
+      "dependencies": {
+        "tokens": [
+          "colors.json",
+          "spacing.json"
+        ]
+      },
+      "accessibility": {
+        "role": "button (empty/error/max) | image (filled) | progressbar (uploading)",
+        "labels": "State-specific labels; remove button is separate focusable element",
+        "minTouchTarget": "80x80 tile (meets 44pt minimum)"
+      },
+      "lockedAt": "2026-04-28"
     }
   },
   "screens": {
@@ -652,6 +805,43 @@
           "en-US.json (explore section)"
         ]
       }
+    },
+    "loyaltyLanding": {
+      "file": "specs/screen-loyalty-landing.json",
+      "batch": "E",
+      "consumedByWeek": 25,
+      "purpose": "Loyalty hub — tier status, earn actions, points history",
+      "components": [
+        "NavigationHeader (56px)",
+        "HeroCard (gradient, radius 24)",
+        "ProgressRing (96px, absolute top-right)",
+        "TierBadge",
+        "EarnActionList (3 items)",
+        "HistoryList (FlashList, virtualized)",
+        "StickyFooter (80px CTA)"
+      ],
+      "states": [
+        "default",
+        "zero-balance",
+        "tier-up",
+        "loading",
+        "error"
+      ],
+      "dependencies": {
+        "components": [
+          "progress-ring.json",
+          "tier-badge.json"
+        ],
+        "tokens": [
+          "colors.json",
+          "typography.json",
+          "spacing.json"
+        ],
+        "strings": [
+          "en-US.json (loyalty section)"
+        ]
+      },
+      "lockedAt": "2026-04-28"
     }
   },
   "interactions": {
@@ -726,8 +916,8 @@
       "Design tokens (3 JSON files)",
       "Icon system (24 SVG files - all 12 categories × 2 sizes, production-ready)",
       "PNG export guide (optional - for alternative workflows)",
-      "Component specs (7 JSON files with all states)",
-      "Screen specs (3 screens: Welcome, Home, Explore)",
+      "Component specs (12 JSON files with all states)",
+      "Screen specs (4 screens: Welcome, Home, Explore, Loyalty Landing)",
       "Interaction specs (1 file)",
       "Strings (1 localization file)",
       "Accessibility guide (complete)",
@@ -738,9 +928,9 @@
     ],
     "counts": {
       "svgIcons": 24,
-      "componentSpecs": 7,
+      "componentSpecs": 12,
       "tokenFiles": 3,
-      "screenSpecs": 3,
+      "screenSpecs": 4,
       "interactionSpecs": 1,
       "stringFiles": 1,
       "documentationFiles": 8,

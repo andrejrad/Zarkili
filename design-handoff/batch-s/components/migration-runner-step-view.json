@@ -1,0 +1,63 @@
+{
+  "component": "MigrationRunnerStepView",
+  "path": "src/components/platform/MigrationRunnerStepView",
+  "platform": ["Web"],
+  "variantNames": ["pending", "running", "success", "failed", "skipped"],
+  "variants": {
+    "pending": {
+      "statusIndicator": { "type": "icon", "name": "radioButtonUnchecked", "color": "on-surface-variant" },
+      "actions": [{ "label": "strings.migrationRunner.runCta", "variant": "outlined" }]
+    },
+    "running": {
+      "statusIndicator": { "type": "progressBar", "indeterminate": true, "color": "primary" },
+      "actions": [],
+      "logPane": { "visible": true, "autoScroll": true }
+    },
+    "success": {
+      "statusIndicator": { "type": "icon", "name": "checkCircle", "color": "success" },
+      "actions": [{ "label": "strings.migrationRunner.reRunCta", "variant": "outlined" }],
+      "stats": { "visible": true }
+    },
+    "failed": {
+      "statusIndicator": { "type": "icon", "name": "errorFilled", "color": "error" },
+      "border": { "width": 2, "color": "error" },
+      "actions": [{ "label": "strings.migrationRunner.retryCta", "variant": "filled", "color": "error" }],
+      "logPane": { "visible": true, "errorHighlight": true }
+    },
+    "skipped": {
+      "statusIndicator": { "type": "icon", "name": "removeCircleOutline", "color": "on-surface-variant" },
+      "actions": [{ "label": "strings.migrationRunner.reRunCta", "variant": "outlined" }],
+      "opacity": 0.7
+    }
+  },
+  "layout": {
+    "card": {
+      "padding": 16,
+      "shape": "rounded-2",
+      "border": { "width": 1, "color": "outline-variant" }
+    },
+    "header": {
+      "fields": [
+        { "key": "statusIndicator", "position": "left", "width": 24 },
+        { "key": "migrationId", "variant": "body-medium", "weight": "500", "font": "mono" },
+        { "key": "description", "variant": "caption", "color": "on-surface-variant" },
+        { "key": "target", "type": "pill" },
+        { "key": "actions", "position": "right" }
+      ]
+    },
+    "stats": {
+      "visibleWhen": "status === success || status === failed",
+      "fields": [
+        { "key": "duration", "label": "Duration", "font": "mono", "variant": "caption" },
+        { "key": "affectedRows", "label": "Rows affected", "font": "mono", "variant": "caption" }
+      ]
+    }
+  },
+  "tokens": {
+    "migration": {
+      "running": "tokens.colors.migration.running",
+      "success": "tokens.colors.migration.success",
+      "failed": "tokens.colors.migration.failed"
+    }
+  }
+}

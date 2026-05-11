@@ -1,0 +1,168 @@
+{
+  "screen": "ConflictResolverScreen",
+  "route": "AdminConflictResolver",
+  "device": {
+    "iPhone": {
+      "type": "modal-sheet",
+      "width": 390,
+      "maxHeight": "92vh"
+    },
+    "iPad": {
+      "type": "centered panel",
+      "width": 640
+    }
+  },
+  "states": [
+    "open",
+    "applying",
+    "applied",
+    "error"
+  ],
+  "layout": {
+    "handle": {
+      "width": 36,
+      "height": 4,
+      "visibleOn": "mobile only"
+    },
+    "header": {
+      "title": {
+        "text": "strings.conflictResolver.title",
+        "variant": "heading-3"
+      },
+      "subtitle": {
+        "text": "strings.conflictResolver.subtitle",
+        "interpolation": "N",
+        "variant": "caption",
+        "color": "muted"
+      }
+    },
+    "conflictList": {
+      "type": "FlatList",
+      "scrollable": true,
+      "conflictRow": {
+        "card": {
+          "background": "surface",
+          "border": {
+            "width": 1,
+            "color": "cardBorder"
+          },
+          "radius": 12,
+          "padding": 16,
+          "marginBottom": 12
+        },
+        "appointmentA": {
+          "label": {
+            "text": "Appointment A",
+            "variant": "label-small",
+            "color": "muted"
+          },
+          "time": {
+            "format": "h:mm AM"
+          },
+          "service": {
+            "weight": "bold"
+          },
+          "client": {
+            "variant": "caption"
+          },
+          "staff": {
+            "variant": "caption"
+          }
+        },
+        "conflictsWith": {
+          "label": {
+            "text": "Conflicts with:",
+            "variant": "label-small",
+            "color": "muted"
+          }
+        },
+        "appointmentB": {
+          "structure": "same as appointmentA"
+        },
+        "fixChips": {
+          "layout": "horizontal row",
+          "count": 4,
+          "chips": [
+            {
+              "label": "strings.conflictResolver.moveEarlier",
+              "variant": "default"
+            },
+            {
+              "label": "strings.conflictResolver.moveLater",
+              "variant": "default"
+            },
+            {
+              "label": "strings.conflictResolver.reassignStaff",
+              "variant": "default"
+            },
+            {
+              "label": "strings.conflictResolver.cancelOne",
+              "variant": "destructive tint"
+            }
+          ],
+          "selected": {
+            "background": "primary 10%",
+            "border": {
+              "width": 2,
+              "color": "primary"
+            },
+            "leadingCheckmark": {
+              "size": 12,
+              "color": "primary"
+            }
+          },
+          "singleSelect": true,
+          "reassignStaffSelected": {
+            "inlineStaffPicker": {
+              "position": "expands below chips",
+              "searchable": true,
+              "singleSelect": true
+            }
+          }
+        }
+      }
+    },
+    "footerSticky": {
+      "progressCaption": {
+        "text": "strings.conflictResolver.resolved",
+        "interpolation": "X, N",
+        "variant": "caption",
+        "color": "muted",
+        "position": "left"
+      },
+      "applyAllButton": {
+        "variant": "primary",
+        "label": "strings.conflictResolver.applyAll",
+        "fullWidth": true,
+        "disabledWhen": "X < N"
+      },
+      "dismissLink": {
+        "label": "strings.conflictResolver.dismiss",
+        "position": "below applyAll"
+      }
+    }
+  },
+  "states": {
+    "applying": {
+      "applyAllButton": {
+        "spinner": true
+      },
+      "conflictList": {
+        "pointerEvents": "none"
+      }
+    },
+    "applied": {
+      "toast": "strings.conflictResolver.successToast",
+      "action": "dismiss sheet",
+      "calendarRefresh": true
+    },
+    "error": {
+      "inlineBanner": {
+        "position": "above footer"
+      },
+      "list": {
+        "unlocked": "for retry"
+      }
+    }
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "screen": "MessageArchiveScreen",
+  "route": "AdminMessageArchive",
+  "device": {
+    "primary": "iPad 1024×768",
+    "secondary": "iPhone 14 390×844"
+  },
+  "stateNames": [
+    "default",
+    "searching",
+    "noResults",
+    "error"
+  ],
+  "layout": {
+    "header": { "title": "strings.messageArchive.title" },
+    "searchBar": { "fullWidth": true, "placeholder": "strings.messageArchive.searchPlaceholder" },
+    "filterRow": {
+      "chips": [
+        { "type": "filter", "key": "sender", "label": "strings.messageArchive.filter.sender" },
+        { "type": "dateRangePicker", "format": "US" },
+        { "type": "toggle", "key": "hasAttachments", "label": "strings.messageArchive.filter.hasAttachments" }
+      ]
+    },
+    "resultsList": {
+      "type": "FlatList",
+      "rowHeight": 72,
+      "row": {
+        "clientAvatar": { "size": 36 },
+        "clientName": { "variant": "label", "weight": "bold" },
+        "messagePreview": { "variant": "body-small", "color": "muted", "lines": 2, "searchTerm": { "highlight": "primary-tinted span" } },
+        "timestamp": { "variant": "label-small", "color": "muted", "position": "right" },
+        "swipeRight": { "action": "Restore to inbox", "variant": "success-tinted" }
+      },
+      "onRowTap": {
+        "iPad": "side panel thread",
+        "iPhone": "full-screen thread"
+      }
+    }
+  },
+  "states": {
+    "noResults": { "illustration": true, "message": "strings.messageArchive.noResultsMessage" },
+    "error": { "inlineBanner": true, "retryButton": true }
+  },
+  "accessibility": {
+    "row": { "accessibilityLabel": "{clientName}: {messagePreview}, {timestamp}" }
+  }
+}

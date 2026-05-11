@@ -1,0 +1,41 @@
+{
+  "component": "AiSuggestionReviewRow",
+  "description": "List row for reviewing one AI-generated suggestion",
+  "props": {
+    "suggestionId": { "type": "string", "required": true, "description": "Unique suggestion ID" },
+    "type": { "type": "string", "required": true, "description": "content, campaign, schedule, or pricing" },
+    "snippet": { "type": "string", "required": true, "description": "Preview capped 2 lines with ellipsis" },
+    "confidence": { "type": "number", "required": true, "description": "0-1, rendered as horizontal bar + % label" },
+    "status": { "type": "string", "required": true, "description": "pending, approved, or rejected" },
+    "model": { "type": "string", "required": true, "description": "Model name e.g. gpt-4o" },
+    "modelVersion": { "type": "string", "required": false, "description": "Model version string" },
+    "generatedAt": { "type": "string", "required": true, "description": "ISO timestamp" },
+    "onApprove": { "type": "function", "required": true, "description": "Approve callback" },
+    "onReject": { "type": "function", "required": true, "description": "Reject callback" },
+    "onEdit": { "type": "function", "required": true, "description": "Edit callback" },
+    "isSelected": { "type": "boolean", "required": false, "description": "Bulk selection state" }
+  },
+  "variants": ["pending", "approved", "rejected", "selected"],
+  "layout": {
+    "minHeight": 72,
+    "left": "checkbox + type Badge",
+    "center": "snippet (2-line clamp), confidence bar row, model tag + generatedAt",
+    "right": "Approve/Reject/Edit buttons or status badge"
+  },
+  "tokens": {
+    "pendingRowBg": "semantic.surface",
+    "approvedRowBg": "ai.approved at 8%",
+    "rejectedRowBg": "ai.rejected at 8%",
+    "confidenceBarFill": "ai.suggestion",
+    "confidenceBarBg": "semantic.cardBorder",
+    "snippetText": "semantic.foreground",
+    "metaText": "semantic.muted"
+  },
+  "accessibility": {
+    "role": "listitem",
+    "approveButton": "aria-label includes snippet context",
+    "rejectButton": "aria-label includes snippet context",
+    "editButton": "aria-label includes snippet context",
+    "checkbox": "aria-label: Select suggestion [id]"
+  }
+}

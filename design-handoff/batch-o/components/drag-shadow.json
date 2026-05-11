@@ -1,0 +1,102 @@
+{
+  "component": "DragShadow",
+  "description": "Drag interaction states embedded in MasterCalendarGrid — not a standalone component; documented here as a variant group for handoff",
+  "variants": [
+    "idle",
+    "longPressCharging",
+    "dragging",
+    "validDropTarget",
+    "invalidDropTarget",
+    "conflictDropTarget",
+    "confirmModal",
+    "snapBack",
+    "reduceMotion"
+  ],
+  "variant": {
+    "idle": {
+      "overlay": "none"
+    },
+    "longPressCharging": {
+      "arcRing": {
+        "radius": 16,
+        "stroke": 1,
+        "color": "primary",
+        "animation": "0→360° 200ms"
+      },
+      "haptic": "mediumImpact on complete",
+      "surroundingCells": {
+        "opacity": 0.8
+      }
+    },
+    "dragging": {
+      "cloneBlock": {
+        "opacity": 0.5,
+        "elevation": 8,
+        "shadowBlur": 16,
+        "shadowColor": "rgba(0,0,0,0.15)"
+      },
+      "snapIncrement": 32,
+      "autoScrollZone": 40,
+      "originCell": {
+        "background": "calendar.dropValid 20%",
+        "border": "1px dashed calendar.dropValidBorder"
+      }
+    },
+    "validDropTarget": {
+      "background": "calendar.dropValid",
+      "border": "1px calendar.dropValidBorder"
+    },
+    "invalidDropTarget": {
+      "background": "calendar.dropInvalid",
+      "border": "1px calendar.dropInvalidBorder",
+      "xIcon": {
+        "size": 16,
+        "color": "error",
+        "position": "center"
+      }
+    },
+    "conflictDropTarget": {
+      "background": "calendar.conflictHatch",
+      "border": "2px calendar.conflictBorder",
+      "onRelease": {
+        "navigate": "ConflictResolverScreen"
+      }
+    },
+    "confirmModal": {
+      "width": 390,
+      "radius": 20,
+      "handle": true,
+      "newTimeLabel": {
+        "variant": "bodyLarge"
+      },
+      "notifyToggle": {
+        "default": true
+      },
+      "actions": [
+        {
+          "type": "button",
+          "label": "cancel",
+          "variant": "secondary"
+        },
+        {
+          "type": "button",
+          "label": "reschedule",
+          "variant": "primary"
+        }
+      ]
+    },
+    "snapBack": {
+      "animation": "spring 200ms ease-out to origin"
+    },
+    "reduceMotion": {
+      "noOpacityTrail": true,
+      "noArcAnimation": true,
+      "noSpring": true,
+      "instantMove": true,
+      "confirmModalStillRequired": true
+    }
+  },
+  "accessibility": {
+    "altInteraction": "longPress → contextMenu → reschedule → timePicker"
+  }
+}

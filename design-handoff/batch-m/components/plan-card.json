@@ -1,0 +1,87 @@
+{
+  "schemaVersion": "1.0.0",
+  "componentId": "MC.6",
+  "componentName": "PlanCard",
+  "exportedAs": "PlanCard",
+  "category": "admin-feedback",
+  "description": "Pricing plan card with tier name, price, feature list, and choose/current CTA used in the subscription plan selection screen.",
+  "props": {
+    "tier": {
+      "type": "string",
+      "required": true,
+      "description": "Plan tier name e.g. Starter, Growth, Pro"
+    },
+    "monthlyPrice": {
+      "type": "number",
+      "required": true,
+      "description": "Monthly billing price in the given currency"
+    },
+    "annualPrice": {
+      "type": "number",
+      "required": true,
+      "description": "Annual billing price per month equivalent in the given currency"
+    },
+    "currency": {
+      "type": "string",
+      "required": false,
+      "default": "USD",
+      "description": "ISO 4217 currency code for price display"
+    },
+    "features": {
+      "type": "string[]",
+      "required": true,
+      "description": "List of feature strings shown with check icons"
+    },
+    "isCurrent": {
+      "type": "boolean",
+      "required": false,
+      "default": false,
+      "description": "When true, renders an accent border and disables the CTA"
+    },
+    "billingCycle": {
+      "type": "'monthly' | 'annual'",
+      "required": true,
+      "description": "Determines which price to display"
+    },
+    "onChoose": {
+      "type": "() => void",
+      "required": false,
+      "description": "Callback when owner selects this plan"
+    }
+  },
+  "tokens": {
+    "bg": "surface",
+    "borderDefault": "border",
+    "borderCurrent": "accent",
+    "featureIcon": "accent.fg",
+    "ctaBg": "accent",
+    "ctaDisabledBg": "disabled.bg",
+    "ctaDisabledText": "disabled.fg"
+  },
+  "anatomy": [
+    "container (radius 2xl 24, padding 24, shadow-sm, current: 2px solid accent border)",
+    "tier-name (heading-3)",
+    "price-row (heading-1 amount + body-small '/mo')",
+    "billing-cadence (body-small muted)",
+    "feature-list (check-icon 16 accent.fg + label, gap 8)",
+    "cta-button (full-width primary or disabled 'Current Plan')"
+  ],
+  "sizes": [
+    {
+      "name": "default",
+      "width": "minWidth 240px",
+      "height": 56,
+      "note": "CTA height; card height is content-driven"
+    }
+  ],
+  "stateNames": [
+    "default",
+    "current",
+    "loading",
+    "error"
+  ],
+  "accessibility": {
+    "role": "article",
+    "ariaLabel": "{{tier}} plan, {{formattedPrice}} per month"
+  }
+}

@@ -1,0 +1,207 @@
+{
+  "component": "StaffCalendarGrid",
+  "description": "Time-based appointment grid for the staff-side calendar. Fixed time column on the left, scrollable appointment area on the right. Supports day and week views.",
+  "purpose": "Allow staff to view, drag, and resize appointments across a scrollable time axis. Primary surface for G.2 Staff Calendar; used in compact form in G.1 Staff Today mini-peek pane.",
+  "source": {
+    "batch": "G",
+    "screens": ["G.2 Staff Calendar", "G.1 Staff Today (mini peek)"],
+    "promotedFrom": "design-handoff/specs/screen-staff-calendar.json",
+    "figmaFrames": "code-derived — spec locked from screen-staff-calendar.json",
+    "lockedAt": "2026-04-28"
+  },
+  "variants": {
+    "view": {
+      "options": ["day", "week"],
+      "default": "day"
+    },
+    "state": {
+      "options": ["default", "empty", "conflict", "loading", "error"],
+      "default": "default"
+    }
+  },
+  "layout": {
+    "timeRange": { "startHour": 5, "endHour": 22, "label": "5:00 AM – 10:00 PM" },
+    "slotHeight": 32,
+    "hourHeight": 64,
+    "slotsPerHour": 2,
+    "timeColumnWidth": 56,
+    "gridBackground": "#FFFFFF"
+  },
+  "anatomy": {
+    "container": {
+      "flexDirection": "row",
+      "flex": 1,
+      "overflow": "hidden"
+    },
+    "timeColumn": {
+      "width": 56,
+      "borderRight": { "width": 1, "color": "#E5E0D1" },
+      "background": "#FFFFFF",
+      "paddingTop": 8,
+      "rows": {
+        "height": 64,
+        "label": {
+          "style": "body-small",
+          "color": "#6B6B6B",
+          "textAlign": "right",
+          "paddingRight": 8,
+          "verticalAlign": "top"
+        }
+      }
+    },
+    "gridArea": {
+      "flex": 1,
+      "position": "relative",
+      "background": "#FFFFFF",
+      "gridLines": {
+        "hourLine": { "height": 1, "color": "#E5E0D1", "style": "solid" },
+        "halfHourLine": { "height": 1, "color": "#E5E0D1", "style": "dashed", "opacity": 0.5 }
+      }
+    },
+    "weekViewHeader": {
+      "visible": "view === week",
+      "height": 40,
+      "flexDirection": "row",
+      "borderBottom": { "width": 1, "color": "#E5E0D1" },
+      "dayColumn": {
+        "flex": 1,
+        "alignItems": "center",
+        "justifyContent": "center",
+        "dayLabel": { "style": "label-small", "color": "#6B6B6B", "uppercase": true },
+        "dateLabel": { "style": "body", "fontWeight": 500, "color": "#1A1A1A" },
+        "today": { "dateLabel": { "color": "#E3A9A0", "fontWeight": 600 } }
+      }
+    },
+    "nowLine": {
+      "height": 1,
+      "background": "#E3A9A0",
+      "position": "absolute",
+      "left": 0,
+      "right": 0,
+      "zIndex": 10,
+      "accessibilityElementsHidden": true,
+      "leftDot": {
+        "size": 8,
+        "borderRadius": 9999,
+        "background": "#E3A9A0",
+        "position": "absolute",
+        "left": -4,
+        "top": -4
+      }
+    },
+    "appointmentBlock": {
+      "position": "absolute",
+      "left": 4,
+      "right": 4,
+      "minHeight": 32,
+      "borderRadius": 12,
+      "overflow": "hidden",
+      "zIndex": 5,
+      "positionFormula": "top = ((startMinutes - 300) / 30) * 32",
+      "heightFormula": "height = (durationMinutes / 30) * 32",
+      "categoryTints": {
+        "hair":    { "background": "rgba(187,237,218,0.30)", "foreground": "#2D4A42" },
+        "nails":   { "background": "rgba(227,169,160,0.20)", "foreground": "#7A3C35" },
+        "skin":    { "background": "rgba(209,191,179,0.30)", "foreground": "#5A4A42" },
+        "brows":   { "background": "rgba(242,237,221,0.60)", "foreground": "#6B5C3E" },
+        "default": { "background": "rgba(227,169,160,0.12)", "foreground": "#1A1A1A" }
+      },
+      "content": {
+        "conditionFull": { "minHeight": 48, "shows": ["clientName (body-small w500)", "service (body-small muted)"] },
+        "conditionCompact": { "minHeight": 32, "maxHeight": 47, "shows": ["clientName (body-small w500, 1 line ellipsis)"] }
+      },
+      "dragHandleTop": {
+        "height": 4,
+        "width": "100%",
+        "background": "rgba(0,0,0,0.15)",
+        "borderRadiusTop": 12,
+        "position": "absolute",
+        "top": 0,
+        "accessibilityLabel": "Resize appointment, drag to change duration"
+      },
+      "dragHandleBottom": {
+        "height": 4,
+        "width": "100%",
+        "background": "rgba(0,0,0,0.15)",
+        "borderRadiusBottom": 12,
+        "position": "absolute",
+        "bottom": 0,
+        "accessibilityLabel": "Resize appointment, drag to change duration"
+      },
+      "accessibilityRole": "button",
+      "accessibilityLabel": "{{time 12h}}, {{durationHours}} hour{{s}}, {{service}} for {{clientName}}"
+    }
+  },
+  "states": {
+    "default": {
+      "description": "One or more appointments placed on the grid in their time slots."
+    },
+    "empty": {
+      "gridArea": {
+        "centerContent": {
+          "icon": { "name": "calendar-days", "size": 32, "color": "#6B6B6B" },
+          "label": { "content": "No appointments", "style": "body", "color": "#6B6B6B" }
+        }
+      }
+    },
+    "conflict": {
+      "appointmentBlock": {
+        "conflictIndicator": {
+          "borderLeft": { "width": 2, "color": "#F44336" },
+          "warningIcon": { "name": "alert-triangle", "size": 14, "color": "#F44336", "position": "top-left", "margin": 4 }
+        }
+      }
+    },
+    "loading": {
+      "timeColumn": "real (rendered)",
+      "gridArea": {
+        "shimmerBlocks": [
+          { "top": 64,  "height": 64,  "left": 4, "right": 4, "borderRadius": 12 },
+          { "top": 160, "height": 96,  "left": 4, "right": 4, "borderRadius": 12 },
+          { "top": 288, "height": 48,  "left": 4, "right": 4, "borderRadius": 12 }
+        ],
+        "shimmerStyle": { "background": "#F0EBE1", "animateTo": "#E5E0D1" }
+      }
+    },
+    "error": {
+      "gridArea": {
+        "centerContent": {
+          "icon": { "name": "wifi-off", "size": 32, "color": "#6B6B6B" },
+          "label": { "content": "Couldn't load schedule", "style": "label-small", "color": "#6B6B6B" }
+        }
+      }
+    }
+  },
+  "interactions": {
+    "tapAppointment": "Open mini-detail peek pane (bottom sheet on iPhone, right pane on iPad)",
+    "longPressHandle": "Enter resize mode — drag snaps to 30-min increments; formula: Math.round(minutes / 30) * 30",
+    "longPressBody": "Enter drag mode — reorder block across time slots with same snap formula",
+    "reduceMotion": "Resize and drag snaps are instant (no animation)"
+  },
+  "accessibility": {
+    "grid": { "accessibilityRole": "grid" },
+    "appointmentBlock": {
+      "accessibilityRole": "button",
+      "accessibilityLabel": "{{time 12h}}, {{durationHours}} hour{{s}}, {{service}} for {{clientName}}"
+    },
+    "dragHandles": { "accessibilityLabel": "Resize appointment, drag to change duration" },
+    "nowLine": { "accessibilityElementsHidden": true }
+  },
+  "engineeringNotes": [
+    "Use PanResponder (or react-native-gesture-handler) for drag/resize interactions",
+    "Snap formula on release: Math.round(newMinutes / 30) * 30",
+    "Week view: column width = (screenWidth - 56) / 7",
+    "nowLine top position must update every minute via setInterval or requestAnimationFrame",
+    "Shimmer state: expo-linear-gradient required (same install as G.1 ai-suggestion-card gradient)"
+  ],
+  "props": {
+    "view": "day | week — required",
+    "date": "Date — required (anchor date for day view; week containing this date for week view)",
+    "appointments": "Appointment[] — required",
+    "onAppointmentPress": "(id: string) => void — required",
+    "onAppointmentResize": "(id: string, newStart: Date, newEnd: Date) => void — optional",
+    "onAppointmentDrop": "(id: string, newStart: Date) => void — optional",
+    "loading": "boolean — optional",
+    "error": "boolean — optional"
+  }
+}

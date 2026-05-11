@@ -1,0 +1,85 @@
+{
+  "schemaVersion": "1.0.0",
+  "screenId": "M.8",
+  "screenName": "DomainSettingsScreen",
+  "route": "admin/settings/domain",
+  "designSystem": "Zarkili v1.0.0",
+  "device": "iPad 768x1024",
+  "engineeringStatus": "delivered",
+  "description": "Form screen for configuring a custom domain, viewing DNS verification records, and monitoring SSL certificate status.",
+  "layout": {
+    "type": "form",
+    "padding": {
+      "top": 24,
+      "right": 32,
+      "bottom": 40,
+      "left": 32
+    },
+    "maxContentWidth": 960,
+    "gap": 24
+  },
+  "sections": [
+    {
+      "id": "domain-form",
+      "type": "form-section",
+      "title": null,
+      "component": null,
+      "fields": [
+        {
+          "id": "customDomain",
+          "label": "Custom domain",
+          "type": "text-input",
+          "validation": "domain-format"
+        }
+      ]
+    },
+    {
+      "id": "dns-status-card",
+      "type": "list-section",
+      "title": "DNS records",
+      "component": null,
+      "rows": [
+        {
+          "recordType": "CNAME",
+          "name": "_zarkili",
+          "target": "verify.zarkili.com",
+          "verifiedBadge": true,
+          "errorChip": false
+        }
+      ]
+    },
+    {
+      "id": "verify-cta",
+      "type": "form-section",
+      "title": null,
+      "component": null,
+      "cta": {
+        "label": "Verify now",
+        "action": "re-trigger-dns-check",
+        "variant": "secondary"
+      }
+    },
+    {
+      "id": "ssl-badge",
+      "type": "status-banner",
+      "title": "SSL certificate",
+      "component": null,
+      "variants": [
+        "active",
+        "pending",
+        "error"
+      ]
+    }
+  ],
+  "stateNames": [
+    "not-configured",
+    "configuring",
+    "pending-verification",
+    "verified",
+    "verification-failed",
+    "error"
+  ],
+  "accessibility": {
+    "screenReaderLabel": "Domain settings"
+  }
+}

@@ -1,0 +1,203 @@
+{
+  "screen": "ManualPointAdjustmentScreen",
+  "route": "/admin/clients/:id/points/adjust",
+  "description": "Manually add or deduct loyalty points with reason and audit trail",
+  "dimensions": {
+    "width": 390,
+    "height": "auto-scroll"
+  },
+  "states": [
+    "default",
+    "loading",
+    "error",
+    "submitting"
+  ],
+  "accessibility": {
+    "screenReaderLabel": "strings.pointAdjustment.screenTitle",
+    "semanticRoles": [
+      {"element": "directionToggle", "role": "switch"},
+      {"element": "amountInput", "role": "spinbutton"},
+      {"element": "reasonDropdown", "role": "button"},
+      {"element": "submitButton", "role": "button", "hint": "strings.pointAdjustment.submitHint"}
+    ]
+  },
+  "rtl": "deferred",
+  "darkMode": "deferred",
+  "layout": {
+    "header": {
+      "component": "client-header",
+      "readOnly": true,
+      "height": "auto"
+    },
+    "directionToggle": {
+      "height": 56,
+      "marginHorizontal": 16,
+      "marginBottom": 24,
+      "options": [
+        {
+          "label": "strings.pointAdjustment.directionAdd",
+          "value": "add",
+          "color": "semantic.success"
+        },
+        {
+          "label": "strings.pointAdjustment.directionDeduct",
+          "value": "deduct",
+          "color": "semantic.error"
+        }
+      ]
+    },
+    "amountInput": {
+      "height": 48,
+      "marginHorizontal": 16,
+      "marginBottom": 16,
+      "label": "strings.pointAdjustment.amountLabel",
+      "placeholder": "0",
+      "type": "number",
+      "min": 1
+    },
+    "reasonDropdown": {
+      "height": 48,
+      "marginHorizontal": 16,
+      "marginBottom": 16,
+      "label": "strings.pointAdjustment.reasonLabel",
+      "options": [
+        "strings.pointAdjustment.reasonGoodwill",
+        "strings.pointAdjustment.reasonError",
+        "strings.pointAdjustment.reasonPromotion",
+        "strings.pointAdjustment.reasonOther"
+      ]
+    },
+    "noteInput": {
+      "height": 96,
+      "marginHorizontal": 16,
+      "marginBottom": 24,
+      "label": "strings.pointAdjustment.noteLabel",
+      "placeholder": "strings.pointAdjustment.notePlaceholder",
+      "rows": 4,
+      "optional": true
+    },
+    "balancePreview": {
+      "height": 80,
+      "marginHorizontal": 16,
+      "marginBottom": 24,
+      "background": "semantic.surface",
+      "border": "1px solid semantic.cardBorder",
+      "borderRadius": 12,
+      "padding": 16,
+      "labels": [
+        "strings.pointAdjustment.currentBalance",
+        "strings.pointAdjustment.adjustment",
+        "strings.pointAdjustment.newBalance"
+      ]
+    },
+    "auditDisclosure": {
+      "marginHorizontal": 16,
+      "marginBottom": 24,
+      "text": "strings.pointAdjustment.auditDisclosure",
+      "variant": "body-small",
+      "color": "semantic.secondaryText"
+    },
+    "submitButton": {
+      "height": 48,
+      "marginHorizontal": 16,
+      "marginBottom": 24,
+      "label": "strings.pointAdjustment.submit",
+      "style": "primary"
+    }
+  },
+  "components": [
+    {
+      "id": "navigationHeader",
+      "ref": "navigation-header",
+      "props": {
+        "showBack": true,
+        "title": "strings.pointAdjustment.title"
+      }
+    },
+    {
+      "id": "clientHeader",
+      "ref": "client-header",
+      "props": {
+        "readOnly": true,
+        "name": "{{clientName}}",
+        "currentPoints": "{{currentPoints}}"
+      }
+    },
+    {
+      "id": "directionToggle",
+      "ref": "segmented-control",
+      "props": {
+        "options": [
+          {"label": "strings.pointAdjustment.directionAdd", "value": "add"},
+          {"label": "strings.pointAdjustment.directionDeduct", "value": "deduct"}
+        ]
+      }
+    },
+    {
+      "id": "amountInput",
+      "ref": "input",
+      "props": {
+        "label": "strings.pointAdjustment.amountLabel",
+        "type": "number",
+        "min": 1
+      }
+    },
+    {
+      "id": "reasonDropdown",
+      "ref": "select",
+      "props": {
+        "label": "strings.pointAdjustment.reasonLabel",
+        "options": [
+          "strings.pointAdjustment.reasonGoodwill",
+          "strings.pointAdjustment.reasonError",
+          "strings.pointAdjustment.reasonPromotion",
+          "strings.pointAdjustment.reasonOther"
+        ]
+      }
+    },
+    {
+      "id": "balancePreview",
+      "ref": "card",
+      "props": {
+        "currentBalance": "{{currentBalance}}",
+        "adjustment": "{{adjustment}}",
+        "newBalance": "{{newBalance}}"
+      }
+    }
+  ],
+  "interactions": [
+    {
+      "trigger": "directionToggle.change",
+      "action": "updatePreview"
+    },
+    {
+      "trigger": "amountInput.change",
+      "action": "updatePreview"
+    },
+    {
+      "trigger": "submitButton.tap",
+      "action": "submitAdjustment",
+      "condition": "amountAndReasonFilled"
+    }
+  ],
+  "tokens": {
+    "used": [
+      "semantic.pageBackground",
+      "semantic.surface",
+      "semantic.cardBorder",
+      "semantic.foreground",
+      "semantic.secondaryText",
+      "semantic.primary",
+      "semantic.success",
+      "semantic.error"
+    ]
+  },
+  "redlines": {
+    "toggleHeight": 56,
+    "inputHeight": 48,
+    "textareaHeight": 96,
+    "previewHeight": 80,
+    "buttonHeight": 48,
+    "gap": 16
+  }
+}

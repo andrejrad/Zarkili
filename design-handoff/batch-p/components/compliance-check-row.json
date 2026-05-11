@@ -1,0 +1,69 @@
+{
+  "component": "ComplianceCheckRow",
+  "description": "Pre-send checklist item with pass/fail status and optional fix shortcut",
+  "props": {
+    "label": {
+      "type": "string",
+      "required": true,
+      "description": "Check item label"
+    },
+    "status": {
+      "type": "passed | failedBlocking | failedAdvisory | checking",
+      "required": true,
+      "description": "Current check status"
+    },
+    "fixShortcutLabel": {
+      "type": "string",
+      "required": false,
+      "description": "Link label for fix action"
+    },
+    "onFixClick": {
+      "type": "function",
+      "required": false,
+      "description": "Callback for fix shortcut"
+    }
+  },
+  "states": [
+    "passed",
+    "failedBlocking",
+    "failedAdvisory",
+    "checking"
+  ],
+  "variants": [],
+  "tokens": {
+    "background": "semantic.surface",
+    "iconPassed": "semantic.success",
+    "iconFailedBlocking": "semantic.error",
+    "iconFailedAdvisory": "semantic.warning",
+    "iconChecking": "semantic.muted",
+    "labelText": "semantic.foreground",
+    "fixLinkText": "semantic.primary"
+  },
+  "accessibility": {
+    "role": "listitem",
+    "label": "{label}: {status}",
+    "hint": "Tap to fix if failed"
+  },
+  "dimensions": {
+    "height": 56,
+    "paddingHorizontal": 16,
+    "paddingVertical": 12,
+    "iconSize": 20,
+    "gap": 12,
+    "touchTarget": 44
+  },
+  "examples": [
+    {
+      "label": "Unsubscribe link present",
+      "status": "passed",
+      "fixShortcutLabel": null,
+      "onFixClick": null
+    },
+    {
+      "label": "Sender name configured",
+      "status": "failedBlocking",
+      "fixShortcutLabel": "Add sender",
+      "onFixClick": "() => {}"
+    }
+  ]
+}

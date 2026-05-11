@@ -1,0 +1,159 @@
+{
+  "screen": "BlockClientScreen",
+  "route": "/admin/clients/:id/block",
+  "description": "Bottom sheet modal for blocking a client with reason and duration selection",
+  "dimensions": {
+    "width": 390,
+    "height": "auto"
+  },
+  "states": [
+    "default",
+    "submitting",
+    "error"
+  ],
+  "accessibility": {
+    "screenReaderLabel": "strings.blockClient.screenTitle",
+    "semanticRoles": [
+      {"element": "modal", "role": "dialog"},
+      {"element": "reasonDropdown", "role": "button"},
+      {"element": "durationSelector", "role": "radiogroup"},
+      {"element": "blockButton", "role": "button", "hint": "strings.blockClient.blockHint"}
+    ]
+  },
+  "rtl": "deferred",
+  "darkMode": "deferred",
+  "layout": {
+    "modal": {
+      "type": "bottom-sheet",
+      "maxHeight": "80vh",
+      "borderRadius": 24,
+      "padding": 24
+    },
+    "header": {
+      "avatar": {
+        "size": 64,
+        "marginBottom": 16
+      },
+      "name": {
+        "variant": "h3",
+        "marginBottom": 24
+      }
+    },
+    "reasonDropdown": {
+      "height": 48,
+      "marginBottom": 16,
+      "options": [
+        "strings.blockClient.reasonNoShow",
+        "strings.blockClient.reasonHarassment",
+        "strings.blockClient.reasonPayment",
+        "strings.blockClient.reasonOther"
+      ]
+    },
+    "noteInput": {
+      "height": 96,
+      "rows": 4,
+      "marginBottom": 16,
+      "placeholder": "strings.blockClient.notePlaceholder"
+    },
+    "durationSelector": {
+      "marginBottom": 24,
+      "options": [
+        {"label": "strings.blockClient.durationPermanent", "value": "permanent"},
+        {"label": "strings.blockClient.duration30Days", "value": "30"},
+        {"label": "strings.blockClient.duration90Days", "value": "90"}
+      ]
+    },
+    "actions": {
+      "gap": 12,
+      "buttons": [
+        {
+          "label": "strings.blockClient.cancel",
+          "style": "ghost"
+        },
+        {
+          "label": "strings.blockClient.blockClient",
+          "style": "destructive"
+        }
+      ]
+    }
+  },
+  "components": [
+    {
+      "id": "modalOverlay",
+      "ref": "bottom-sheet",
+      "props": {
+        "isOpen": true,
+        "onClose": "{{onClose}}"
+      }
+    },
+    {
+      "id": "avatar",
+      "ref": "avatar",
+      "props": {
+        "size": 64,
+        "initials": "{{initials}}",
+        "photoUrl": "{{photoUrl}}"
+      }
+    },
+    {
+      "id": "reasonDropdown",
+      "ref": "select",
+      "props": {
+        "placeholder": "strings.blockClient.reasonPlaceholder",
+        "options": [
+          "strings.blockClient.reasonNoShow",
+          "strings.blockClient.reasonHarassment",
+          "strings.blockClient.reasonPayment",
+          "strings.blockClient.reasonOther"
+        ]
+      }
+    },
+    {
+      "id": "noteTextArea",
+      "ref": "textarea",
+      "props": {
+        "placeholder": "strings.blockClient.notePlaceholder",
+        "rows": 4
+      }
+    },
+    {
+      "id": "durationRadio",
+      "ref": "radio-group",
+      "props": {
+        "options": [
+          {"label": "strings.blockClient.durationPermanent", "value": "permanent"},
+          {"label": "strings.blockClient.duration30Days", "value": "30"},
+          {"label": "strings.blockClient.duration90Days", "value": "90"}
+        ]
+      }
+    }
+  ],
+  "interactions": [
+    {
+      "trigger": "cancelButton.tap",
+      "action": "dismissModal"
+    },
+    {
+      "trigger": "blockButton.tap",
+      "action": "blockClient",
+      "condition": "reasonSelected"
+    }
+  ],
+  "tokens": {
+    "used": [
+      "semantic.surface",
+      "semantic.cardBorder",
+      "semantic.foreground",
+      "semantic.secondaryText",
+      "semantic.error"
+    ]
+  },
+  "redlines": {
+    "modalPadding": 24,
+    "avatarSize": 64,
+    "inputHeight": 48,
+    "textareaHeight": 96,
+    "buttonHeight": 48,
+    "gap": 12
+  }
+}

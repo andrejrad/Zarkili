@@ -1,0 +1,75 @@
+{
+  "screen": "FeatureFlagConsoleScreen",
+  "route": "SuperAdminFeatureFlags",
+  "device": { "primary": "Desktop 1280+", "secondary": "iPad 1024×768" },
+  "stateNames": ["default", "overridesDrawer", "error"],
+  "layout": {
+    "header": {
+      "title": { "text": "Feature Flags", "variant": "heading-2" },
+      "search": {
+        "type": "searchInput",
+        "placeholder": "strings.featureFlags.searchPlaceholder",
+        "width": 320
+      },
+      "filters": {
+        "type": "filterChipRow",
+        "position": "below-title",
+        "filters": [
+          { "key": "status", "options": ["all", "enabled", "disabled"] },
+          { "key": "scope", "options": ["global", "per-tenant"] },
+          { "key": "stage", "options": ["alpha", "beta", "stable", "deprecated"] }
+        ]
+      },
+      "bulkActions": {
+        "position": "right",
+        "visibleWhen": "rowsSelected > 0",
+        "actions": [
+          { "label": "strings.featureFlags.enableSelectedCta", "variant": "outlined" },
+          { "label": "strings.featureFlags.disableSelectedCta", "variant": "outlined", "tone": "destructive" }
+        ]
+      }
+    },
+    "flagTable": {
+      "columns": [
+        { "key": "select", "type": "checkbox", "width": 48 },
+        { "key": "flagKey", "variant": "body-medium", "weight": "500", "font": "mono" },
+        { "key": "description", "variant": "caption", "color": "on-surface-variant", "maxLines": 2 },
+        { "key": "stage", "type": "pill" },
+        { "key": "globalEnabled", "type": "switch" },
+        { "key": "tenantOverrideCount", "label": "Overrides", "type": "link", "variant": "caption" },
+        { "key": "lastModified", "type": "relative", "variant": "caption" },
+        { "key": "actions", "type": "overflow-menu", "items": ["View Overrides", "Edit Metadata", "Deprecate"] }
+      ]
+    },
+    "overridesDrawer": {
+      "width": 540,
+      "position": "right",
+      "title": "strings.featureFlags.overridesDrawerTitle",
+      "body": {
+        "search": { "type": "searchInput", "placeholder": "Search tenants..." },
+        "list": {
+          "item": {
+            "fields": [
+              { "key": "tenantName", "variant": "body-medium" },
+              { "key": "plan", "type": "pill", "variant": "caption" },
+              { "key": "overrideToggle", "type": "switch" },
+              { "key": "overrideSource", "variant": "caption", "color": "on-surface-variant", "values": ["manual", "plan", "beta-group"] }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "states": {
+    "overridesDrawer": {
+      "overridesDrawer": { "open": true }
+    },
+    "error": {
+      "inlineBanner": {
+        "background": "error 10%",
+        "borderLeft": { "width": 4, "color": "error" },
+        "message": "strings.featureFlags.errorMessage"
+      }
+    }
+  }
+}

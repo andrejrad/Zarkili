@@ -23,6 +23,16 @@ export { getRiskPolicyAdmin, updateRiskPolicyAdmin } from "./riskPolicyAdmin";
 
 export { stripeTaxCalculate } from "./stripeTaxCalculate";
 
+export {
+  paymentsAttachMethod,
+  paymentsDetachMethod,
+  paymentsChargeBooking,
+  paymentsApplyLoyaltyDiscount,
+  paymentsRefundBooking,
+} from "./payments";
+
+export { receiptsGeneratePdf } from "./receipts";
+
 setGlobalOptions({ maxInstances: 10 });
 
 export const health = onRequest((req, res) => {

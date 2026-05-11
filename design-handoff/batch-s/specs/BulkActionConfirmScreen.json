@@ -1,0 +1,63 @@
+{
+  "screen": "BulkActionConfirmScreen",
+  "route": "BulkActionConfirm",
+  "device": { "primary": "Mobile 375×812", "secondary": "Desktop 1280+" },
+  "stateNames": ["confirm", "applying", "applied", "error"],
+  "layout": {
+    "type": "bottomSheet",
+    "mobileHeight": "50vh",
+    "desktopVariant": "modal",
+    "header": {
+      "icon": { "name": "warningAmber", "size": 40, "color": "warning" },
+      "title": { "text": "{actionName}", "variant": "heading-4", "align": "center" },
+      "subtitle": { "text": "{N} items selected", "variant": "body-medium", "align": "center", "color": "on-surface-variant" }
+    },
+    "body": {
+      "itemPreviewList": {
+        "maxItems": 5,
+        "overflow": { "label": "and {N} more…", "variant": "caption", "color": "on-surface-variant" },
+        "item": {
+          "fields": [
+            { "key": "icon", "type": "avatar", "size": 24 },
+            { "key": "name", "variant": "body-medium" }
+          ]
+        }
+      },
+      "undoPolicyCaption": {
+        "text": "strings.bulkActionConfirm.undoPolicyCaption",
+        "variant": "caption",
+        "color": "on-surface-variant",
+        "align": "center"
+      }
+    },
+    "footer": {
+      "ctaGroup": [
+        { "label": "strings.bulkActionConfirm.cancelCta", "variant": "outlined", "fullWidth": false },
+        { "label": "strings.bulkActionConfirm.applyCta", "variant": "filled", "fullWidth": false }
+      ]
+    },
+    "undoToast": {
+      "label": "strings.bulkActionConfirm.undoToastLabel",
+      "action": { "label": "strings.bulkActionConfirm.undoCta", "variant": "text" },
+      "duration": 5000
+    }
+  },
+  "states": {
+    "applying": {
+      "footer": { "applyCta": { "loading": true, "disabled": true } }
+    },
+    "applied": {
+      "dismiss": true,
+      "toast": { "label": "strings.bulkActionConfirm.undoToastLabel", "tone": "success", "action": "undoCta" }
+    },
+    "error": {
+      "errorMessage": {
+        "type": "text",
+        "color": "error",
+        "variant": "body-medium",
+        "align": "center",
+        "text": "strings.bulkActionConfirm.errorMessage"
+      }
+    }
+  }
+}

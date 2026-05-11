@@ -1,0 +1,91 @@
+{
+  "screen": "PerPostPerformanceScreen",
+  "route": "/admin/marketplace/post/:postId/performance",
+  "description": "Per-listing performance metrics: impressions, clicks, CTR, bookings, revenue, ratings",
+  "platform": "admin-desktop",
+  "dimensions": { "width": 1280, "contentWidth": "calc(1280 - 240px sidebar)" },
+  "states": ["default", "loading", "empty", "error"],
+  "accessibility": {
+    "screenReaderLabel": "strings.perPostPerformance.screenTitle",
+    "semanticRoles": [
+      { "element": "summaryCard", "role": "region" },
+      { "element": "bookingsTable", "role": "table" }
+    ]
+  },
+  "rtl": "deferred",
+  "darkMode": "deferred",
+  "layout": {
+    "header": {
+      "component": "AdminHeader",
+      "title": "strings.perPostPerformance.screenTitle",
+      "rightActions": [{ "component": "SecondaryButton", "label": "strings.perPostPerformance.exportButton" }]
+    },
+    "body": {
+      "padding": 24,
+      "postSummaryCard": {
+        "width": "full",
+        "height": 96,
+        "layout": "horizontal",
+        "left": {
+          "thumbnail": "80×80 br-8",
+          "title": "bodyLarge",
+          "category": "caption muted",
+          "statusBadge": "marketplace.* token"
+        },
+        "center": {
+          "price": "bodyMedium",
+          "duration": "caption"
+        },
+        "right": {
+          "lastUpdated": "caption muted",
+          "editLink": "strings.perPostPerformance.editListing"
+        }
+      },
+      "kpiRow": {
+        "tiles": 5,
+        "metrics": [
+          "strings.perPostPerformance.kpiImpressions",
+          "strings.perPostPerformance.kpiClicks",
+          "strings.perPostPerformance.kpiCtr",
+          "strings.perPostPerformance.kpiBookings",
+          "strings.perPostPerformance.kpiRevenue ($)"
+        ]
+      },
+      "row2": {
+        "layout": "2 columns equal",
+        "left": { "component": "LineChartCard", "title": "strings.perPostPerformance.chartImpressionsClicks", "series": ["Impressions", "Clicks"] },
+        "right": { "component": "LineChartCard", "title": "strings.perPostPerformance.chartBookings", "series": ["Bookings"] }
+      },
+      "row3": {
+        "layout": "2 columns equal",
+        "left": { "component": "BarChartCard", "title": "strings.perPostPerformance.chartByDay", "orientation": "vertical", "bars": 7 },
+        "right": {
+          "component": "KPI cluster card",
+          "fields": [
+            { "label": "strings.perPostPerformance.avgRating", "display": "star rating" },
+            { "label": "strings.perPostPerformance.totalReviews" },
+            { "label": "strings.perPostPerformance.fiveStarPct" },
+            { "label": "strings.perPostPerformance.lowRatingPct", "alertTint": "when > 10%" }
+          ]
+        }
+      },
+      "bookingsTable": {
+        "width": "full",
+        "component": "DataTable",
+        "title": "strings.perPostPerformance.bookingsTableTitle",
+        "columns": [
+          "strings.perPostPerformance.columnDate",
+          "strings.perPostPerformance.columnClient",
+          "strings.perPostPerformance.columnService",
+          "strings.perPostPerformance.columnAmount",
+          "strings.perPostPerformance.columnRating (star display)",
+          "strings.perPostPerformance.columnReview (2-line clamp)"
+        ]
+      }
+    }
+  },
+  "components": [
+    { "id": "bookingsTable", "ref": "DataTable", "props": { "title": "strings.perPostPerformance.bookingsTableTitle", "data": "{{bookings}}" } }
+  ],
+  "strings": "See strings/en-us.json for perPostPerformance keys"
+}

@@ -1,0 +1,267 @@
+{
+  "screenId": "L.7",
+  "name": "PermissionDeniedRecoveryScreen",
+  "device": "iPhone 14",
+  "dimensions": {
+    "width": 390,
+    "height": 844
+  },
+  "description": "Permission recovery cards for 6 permission types in 2 form factors (12 total frames)",
+  "component": "permission-recovery-card",
+  "formFactors": ["bottom-sheet", "inline-card"],
+  "bottomSheetLayout": {
+    "type": "vertical-flex",
+    "background": "#FFFFFF",
+    "borderRadiusTop": 24,
+    "padding": 24,
+    "gap": 16,
+    "shadow": "large"
+  },
+  "inlineCardLayout": {
+    "type": "vertical-flex",
+    "background": "#FFFFFF",
+    "borderRadius": 24,
+    "padding": 24,
+    "gap": 16,
+    "shadow": "large"
+  },
+  "cardElements": [
+    {
+      "id": "icon-container",
+      "type": "circle",
+      "size": 80,
+      "background": "#BBEDDA33",
+      "alignment": "center",
+      "children": [
+        {
+          "id": "permission-icon",
+          "type": "icon",
+          "name": "{iconName}",
+          "size": 48,
+          "color": "#BBEDDA"
+        }
+      ]
+    },
+    {
+      "id": "heading",
+      "type": "text",
+      "style": "heading-4",
+      "text": "{permissionHeading}",
+      "fontWeight": 600,
+      "color": "#1A1A1A",
+      "alignment": "left",
+      "marginTop": 16
+    },
+    {
+      "id": "body-message",
+      "type": "text",
+      "style": "body",
+      "text": "{permissionMessage}",
+      "fontWeight": 400,
+      "color": "#6B6B6B",
+      "alignment": "left",
+      "maxWidth": 280,
+      "marginTop": 8
+    },
+    {
+      "id": "primary-cta",
+      "type": "button",
+      "variant": "primary",
+      "label": "{enableCta}",
+      "action": "openSettings",
+      "width": "full",
+      "height": 52,
+      "borderRadius": 12,
+      "background": "#E3A9A0",
+      "labelWeight": 600,
+      "labelColor": "#FFFFFF",
+      "marginTop": 20
+    },
+    {
+      "id": "tertiary-cta",
+      "type": "button",
+      "variant": "tertiary",
+      "label": "{notNowCta}",
+      "action": "dismiss",
+      "height": 44,
+      "labelWeight": 500,
+      "labelColor": "#6B6B6B",
+      "alignment": "center",
+      "marginTop": 8
+    }
+  ],
+  "permissionVariants": [
+    {
+      "id": "L.7.1",
+      "name": "camera",
+      "iconName": "camera-alt",
+      "strings": {
+        "permissionHeading": "Camera Access Needed",
+        "permissionMessage": "Enable camera access to take photos for your profile or reviews.",
+        "enableCta": "Enable in Settings",
+        "notNowCta": "Not now"
+      }
+    },
+    {
+      "id": "L.7.2",
+      "name": "photo-library",
+      "iconName": "photo-library",
+      "strings": {
+        "permissionHeading": "Photo Library Access Needed",
+        "permissionMessage": "Enable photo library access to upload images from your gallery.",
+        "enableCta": "Enable in Settings",
+        "notNowCta": "Not now"
+      }
+    },
+    {
+      "id": "L.7.3",
+      "name": "contacts",
+      "iconName": "contacts",
+      "strings": {
+        "permissionHeading": "Contacts Access Needed",
+        "permissionMessage": "Enable contacts access to invite friends to Zarkili.",
+        "enableCta": "Enable in Settings",
+        "notNowCta": "Not now"
+      }
+    },
+    {
+      "id": "L.7.4",
+      "name": "calendar",
+      "iconName": "event",
+      "strings": {
+        "permissionHeading": "Calendar Access Needed",
+        "permissionMessage": "Enable calendar access to sync your bookings automatically.",
+        "enableCta": "Enable in Settings",
+        "notNowCta": "Not now"
+      }
+    },
+    {
+      "id": "L.7.5",
+      "name": "notifications",
+      "iconName": "notifications",
+      "strings": {
+        "permissionHeading": "Notifications Access Needed",
+        "permissionMessage": "Enable notifications to receive booking reminders and updates.",
+        "enableCta": "Enable in Settings",
+        "notNowCta": "Not now"
+      }
+    },
+    {
+      "id": "L.7.6",
+      "name": "location",
+      "iconName": "location-on",
+      "strings": {
+        "permissionHeading": "Location Access Needed",
+        "permissionMessage": "Enable location access to find salons and services near you.",
+        "enableCta": "Enable in Settings",
+        "notNowCta": "Not now"
+      }
+    }
+  ],
+  "states": [
+    {
+      "name": "denied",
+      "description": "Permission denied, showing recovery card"
+    },
+    {
+      "name": "granted-after-redirect",
+      "description": "User returned from Settings with permission granted",
+      "toast": {
+        "text": "{permissionType} enabled",
+        "icon": "checkmark",
+        "background": "#4CAF50",
+        "color": "#FFFFFF",
+        "duration": 3000
+      }
+    }
+  ],
+  "accessibility": {
+    "enableCta": {
+      "label": "Open Settings to enable {permissionType}",
+      "hint": "Opens iOS Settings app"
+    },
+    "notNowCta": {
+      "label": "Dismiss permission request",
+      "hint": "You can enable this later in Settings"
+    }
+  },
+  "frames": [
+    {
+      "name": "L-7-camera-bottom-sheet-denied",
+      "variant": "camera",
+      "formFactor": "bottom-sheet",
+      "state": "denied"
+    },
+    {
+      "name": "L-7-camera-inline-card-denied",
+      "variant": "camera",
+      "formFactor": "inline-card",
+      "state": "denied"
+    },
+    {
+      "name": "L-7-photo-library-bottom-sheet-denied",
+      "variant": "photo-library",
+      "formFactor": "bottom-sheet",
+      "state": "denied"
+    },
+    {
+      "name": "L-7-photo-library-inline-card-denied",
+      "variant": "photo-library",
+      "formFactor": "inline-card",
+      "state": "denied"
+    },
+    {
+      "name": "L-7-contacts-bottom-sheet-denied",
+      "variant": "contacts",
+      "formFactor": "bottom-sheet",
+      "state": "denied"
+    },
+    {
+      "name": "L-7-contacts-inline-card-denied",
+      "variant": "contacts",
+      "formFactor": "inline-card",
+      "state": "denied"
+    },
+    {
+      "name": "L-7-calendar-bottom-sheet-denied",
+      "variant": "calendar",
+      "formFactor": "bottom-sheet",
+      "state": "denied"
+    },
+    {
+      "name": "L-7-calendar-inline-card-denied",
+      "variant": "calendar",
+      "formFactor": "inline-card",
+      "state": "denied"
+    },
+    {
+      "name": "L-7-notifications-bottom-sheet-denied",
+      "variant": "notifications",
+      "formFactor": "bottom-sheet",
+      "state": "denied"
+    },
+    {
+      "name": "L-7-notifications-inline-card-denied",
+      "variant": "notifications",
+      "formFactor": "inline-card",
+      "state": "denied"
+    },
+    {
+      "name": "L-7-location-bottom-sheet-denied",
+      "variant": "location",
+      "formFactor": "bottom-sheet",
+      "state": "denied"
+    },
+    {
+      "name": "L-7-location-inline-card-denied",
+      "variant": "location",
+      "formFactor": "inline-card",
+      "state": "denied"
+    },
+    {
+      "name": "L-7-camera-granted-toast",
+      "variant": "camera",
+      "state": "granted-after-redirect"
+    }
+  ]
+}

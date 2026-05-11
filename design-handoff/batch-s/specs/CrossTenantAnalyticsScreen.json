@@ -1,0 +1,61 @@
+{
+  "screen": "CrossTenantAnalyticsScreen",
+  "route": "SuperAdminAnalytics",
+  "device": { "primary": "Desktop 1280+", "secondary": "iPad 1024×768" },
+  "stateNames": ["default", "error"],
+  "layout": {
+    "toolbar": {
+      "dateRangePicker": { "position": "right", "options": ["30d", "90d", "12mo", "custom"] },
+      "comparisonToggle": { "label": "vs prior period" }
+    },
+    "kpiRow": {
+      "type": "chips",
+      "count": 4,
+      "items": [
+        { "key": "totalMRR", "label": "strings.crossTenantAnalytics.kpiMRR", "format": "USD", "value": { "variant": "heading-3" }, "delta": { "type": "pill", "format": "▲/▼ % vs prior period", "colors": { "positive": "green", "negative": "red" } } },
+        { "key": "arr", "label": "strings.crossTenantAnalytics.kpiARR", "format": "USD", "value": { "variant": "heading-3" }, "delta": { "type": "pill" } },
+        { "key": "activeTenants", "label": "strings.crossTenantAnalytics.kpiTenants", "format": "count", "value": { "variant": "heading-3" }, "delta": { "type": "pill" } },
+        { "key": "churn", "label": "strings.crossTenantAnalytics.kpiChurn", "format": "% trailing 30d", "value": { "variant": "heading-3" }, "delta": { "type": "pill" } }
+      ]
+    },
+    "charts": {
+      "layout": { "desktop": "2-up grid", "iPad": "single column" },
+      "cards": [
+        { "type": "chart-card", "chartType": "line", "title": "MRR + ARR over time", "dualAxis": true, "legend": true },
+        { "type": "chart-card", "chartType": "bar", "title": "New tenants by month" },
+        { "type": "chart-card", "chartType": "area", "title": "Churn % trailing" }
+      ]
+    },
+    "topTenantsTable": {
+      "title": "strings.crossTenantAnalytics.topTenantsTitle",
+      "columns": [
+        { "key": "rank", "font": "mono", "variant": "caption" },
+        { "key": "tenantName", "variant": "body-medium" },
+        { "key": "plan", "type": "pill" },
+        { "key": "mrrUSD", "format": "USD", "align": "right", "weight": "bold" },
+        { "key": "growthDelta", "type": "pill", "format": "▲/▼ %", "colors": { "positive": "green", "negative": "red" } },
+        { "key": "seats", "format": "int" }
+      ]
+    },
+    "cohortGrid": {
+      "title": "strings.crossTenantAnalytics.cohortTitle",
+      "rows": "cohort month MM/YYYY",
+      "columns": "M+0 through M+11",
+      "cell": {
+        "type": "heatmap",
+        "colorScale": { "0%": "surface", "100%": "primary" },
+        "label": { "position": "center", "variant": "caption", "font": "mono" }
+      }
+    }
+  },
+  "states": {
+    "error": {
+      "inlineBanner": {
+        "background": "error 10%",
+        "borderLeft": { "width": 4, "color": "error" },
+        "position": "above charts",
+        "message": "strings.crossTenantAnalytics.errorMessage"
+      }
+    }
+  }
+}

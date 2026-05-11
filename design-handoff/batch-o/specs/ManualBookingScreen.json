@@ -1,0 +1,214 @@
+{
+  "screen": "ManualBookingScreen",
+  "route": "AdminNewBooking",
+  "device": {
+    "primary": "iPad 1024×768",
+    "secondary": "iPhone 14 390×844"
+  },
+  "states": [
+    "default",
+    "clientNotFound",
+    "validationError",
+    "conflict",
+    "submitting",
+    "success",
+    "error"
+  ],
+  "layout": {
+    "iPad": {
+      "type": "2-column",
+      "stepForm": {
+        "width": 340,
+        "position": "left"
+      },
+      "summaryCard": {
+        "position": "right",
+        "sticky": true
+      }
+    },
+    "iPhone": {
+      "type": "1-column",
+      "summaryCard": {
+        "collapsed": "compact bar",
+        "position": "above footer"
+      }
+    },
+    "header": {
+      "left": {
+        "type": "button",
+        "icon": "x",
+        "action": "close"
+      },
+      "center": {
+        "type": "label",
+        "text": "strings.manualBooking.title"
+      }
+    },
+    "stepIndicator": {
+      "type": "horizontal",
+      "steps": 6,
+      "states": {
+        "active": "primaryFilledCircle",
+        "completed": "checkmarkCircle",
+        "future": "mutedOutline"
+      },
+      "labels": [
+        "strings.manualBooking.stepClient",
+        "strings.manualBooking.stepService",
+        "strings.manualBooking.stepStaff",
+        "strings.manualBooking.stepDateTime",
+        "strings.manualBooking.stepPayment",
+        "strings.manualBooking.stepNotes"
+      ]
+    }
+  },
+  "steps": {
+    "client": {
+      "searchInput": {
+        "debounce": 300,
+        "placeholder": "strings.manualBooking.clientSearchPlaceholder"
+      },
+      "resultRow": {
+        "avatar": {
+          "size": 36
+        },
+        "name": true,
+        "phone": {
+          "format": "US"
+        },
+        "lastVisit": {
+          "variant": "caption"
+        }
+      },
+      "clientNotFound": {
+        "type": "inline form",
+        "fields": [
+          {
+            "key": "phone",
+            "format": "(XXX) XXX-XXXX",
+            "required": true
+          },
+          {
+            "key": "firstName",
+            "required": true
+          },
+          {
+            "key": "lastName",
+            "required": true
+          },
+          {
+            "key": "email",
+            "required": false
+          }
+        ]
+      }
+    },
+    "service": {
+      "type": "serviceCard list",
+      "select": "single",
+      "row": {
+        "name": {
+          "weight": "bold"
+        },
+        "categoryPill": true,
+        "duration": true,
+        "price": {
+          "format": "USD",
+          "position": "right"
+        }
+      },
+      "selectedBorder": {
+        "width": 2,
+        "color": "primary"
+      }
+    },
+    "staff": {
+      "type": "staffCard list",
+      "select": "single",
+      "row": {
+        "avatar": {
+          "size": 40
+        },
+        "name": true,
+        "role": true,
+        "availabilityDot": {
+          "available": "green",
+          "limited": "amber",
+          "unavailable": "grey"
+        }
+      }
+    },
+    "dateTime": {
+      "inlineMonthCalendar": true,
+      "timeSlotChipGrid": {
+        "for": "selected staff × date × duration",
+        "unavailableChip": {
+          "disabled": true,
+          "greyed": true
+        }
+      }
+    },
+    "payment": {
+      "type": "radioOptionCards",
+      "height": 72,
+      "options": [
+        {
+          "value": "paySkip",
+          "label": "strings.manualBooking.paySkip",
+          "description": "strings.manualBooking.paySkipDesc"
+        },
+        {
+          "value": "payNow",
+          "label": "strings.manualBooking.payNow",
+          "description": "strings.manualBooking.payNowDesc",
+          "disabledWhen": "noCardOnFile",
+          "badge": "No card on file"
+        },
+        {
+          "value": "payLater",
+          "label": "strings.manualBooking.payLater",
+          "description": "strings.manualBooking.payLaterDesc"
+        }
+      ]
+    },
+    "notes": {
+      "type": "textarea",
+      "maxLength": 500,
+      "counter": "NN/500"
+    }
+  },
+  "summaryCard": {
+    "device": "iPad",
+    "type": "progressive",
+    "unfilledRequired": {
+      "background": "amber-tinted",
+      "badge": "Required"
+    }
+  },
+  "conflictBanner": {
+    "background": "warning 15%",
+    "borderLeft": {
+      "width": 4,
+      "color": "warning"
+    },
+    "label": "strings.manualBooking.conflictBanner"
+  },
+  "footer": {
+    "createBookingButton": {
+      "variant": "primary",
+      "label": "strings.manualBooking.createBooking",
+      "fullWidth": {
+        "iPhone": true,
+        "iPad": false
+      },
+      "alignment": {
+        "iPad": "right"
+      },
+      "disabledUntil": "steps 1-4 complete"
+    }
+  },
+  "onSuccess": {
+    "toast": "strings.manualBooking.successMessage",
+    "navigate": "BookingDetailAdminScreen"
+  }
+}

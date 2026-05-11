@@ -1,0 +1,113 @@
+{
+  "screen": "ModerationActionScreen",
+  "route": "AdminModerationAction",
+  "device": {
+    "type": "modal-sheet",
+    "width": 390,
+    "maxHeight": "80vh",
+    "radius": 20
+  },
+  "stateNames": [
+    "default",
+    "submitted",
+    "accepted",
+    "rejected",
+    "error"
+  ],
+  "layout": {
+    "handle": {
+      "width": 36,
+      "height": 4,
+      "radius": 2,
+      "color": "cardBorder",
+      "position": "centered",
+      "marginTop": 12
+    },
+    "header": {
+      "title": { "text": "strings.moderationAction.title", "variant": "heading-3" }
+    },
+    "reviewSummary": {
+      "type": "compact row",
+      "clientName": { "variant": "body", "weight": "bold" },
+      "service": { "variant": "caption" },
+      "ratingStars": true,
+      "date": { "format": "MM/DD/YYYY" }
+    },
+    "actionPicker": {
+      "type": "option cards",
+      "count": 3,
+      "cardStyle": {
+        "background": "surface",
+        "border": { "width": 1, "color": "cardBorder" },
+        "radius": 16,
+        "padding": 16,
+        "marginBottom": 8
+      },
+      "options": [
+        {
+          "value": "flagForPlatform",
+          "label": { "text": "strings.moderationAction.flagForPlatform", "variant": "body-medium", "weight": "bold" },
+          "description": { "text": "strings.moderationAction.flagDesc", "variant": "body-small", "color": "muted" }
+        },
+        {
+          "value": "dispute",
+          "label": { "text": "strings.moderationAction.dispute", "variant": "body-medium", "weight": "bold" },
+          "description": { "text": "strings.moderationAction.disputeDesc", "variant": "body-small", "color": "muted" }
+        },
+        {
+          "value": "hideLocally",
+          "label": { "text": "strings.moderationAction.hideLocally", "variant": "body-medium", "weight": "bold" },
+          "description": { "text": "strings.moderationAction.hideDesc", "variant": "body-small", "color": "muted" }
+        }
+      ],
+      "selected": { "border": { "width": 2, "color": "primary" } }
+    },
+    "reasonDropdown": {
+      "required": true,
+      "label": "strings.moderationAction.reasonLabel",
+      "options": [
+        { "value": "spam", "label": "strings.moderationAction.reasonSpam" },
+        { "value": "policyViolation", "label": "strings.moderationAction.reasonPolicyViolation" },
+        { "value": "defamatory", "label": "strings.moderationAction.reasonDefamatory" },
+        { "value": "other", "label": "strings.moderationAction.reasonOther" }
+      ]
+    },
+    "evidenceTextArea": {
+      "type": "textarea",
+      "optional": true,
+      "label": "strings.moderationAction.evidenceLabel",
+      "attachmentUpload": { "maxFiles": 3, "maxSizePerFile": "10MB" }
+    },
+    "auditPreview": {
+      "component": "audit-timeline-row",
+      "style": "greyed preview",
+      "label": {
+        "text": "strings.moderationAction.auditPreviewLabel",
+        "variant": "caption",
+        "color": "muted",
+        "position": "above"
+      }
+    },
+    "footer": {
+      "actions": [
+        { "type": "button", "label": "strings.moderationAction.cancel", "variant": "secondary" },
+        { "type": "button", "label": "strings.moderationAction.submitAction", "variant": "primary", "disabledUntil": "actionPicker selected AND reasonDropdown selected" }
+      ]
+    }
+  },
+  "states": {
+    "submitted": {
+      "toast": "strings.moderationAction.submittedToast",
+      "action": "dismiss"
+    },
+    "accepted": {
+      "reviewSummary": { "statusBadge": "accepted" },
+      "form": { "locked": "read-only" }
+    },
+    "rejected": {
+      "reviewSummary": { "statusBadge": "rejected" },
+      "form": { "locked": "read-only" }
+    },
+    "error": { "inlineBanner": true }
+  }
+}

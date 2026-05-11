@@ -1,0 +1,133 @@
+{
+  "screen": "PreSendComplianceScreen",
+  "route": "/admin/campaigns/:id/compliance",
+  "description": "Pre-send compliance checklist with pass/fail validation",
+  "dimensions": {
+    "width": 390,
+    "height": "auto-scroll"
+  },
+  "states": [
+    "default",
+    "loading",
+    "error",
+    "checking",
+    "passed",
+    "failed"
+  ],
+  "accessibility": {
+    "screenReaderLabel": "strings.preSendCompliance.screenTitle",
+    "semanticRoles": [
+      {"element": "checklistContainer", "role": "list"},
+      {"element": "checkRow", "role": "listitem"},
+      {"element": "proceedButton", "role": "button", "hint": "strings.preSendCompliance.proceedHint"}
+    ]
+  },
+  "rtl": "deferred",
+  "darkMode": "deferred",
+  "layout": {
+    "header": {
+      "height": 64,
+      "title": "strings.preSendCompliance.title"
+    },
+    "checklist": {
+      "paddingHorizontal": 16,
+      "paddingVertical": 24,
+      "gap": 12,
+      "items": [
+        {
+          "id": "unsubscribeLink",
+          "label": "strings.preSendCompliance.checkUnsubscribe",
+          "fixShortcut": "strings.preSendCompliance.fixAddLink"
+        },
+        {
+          "id": "senderName",
+          "label": "strings.preSendCompliance.checkSender",
+          "fixShortcut": "strings.preSendCompliance.fixConfigureSender"
+        },
+        {
+          "id": "spamTriggers",
+          "label": "strings.preSendCompliance.checkSpam",
+          "fixShortcut": "strings.preSendCompliance.fixReviewContent"
+        },
+        {
+          "id": "audienceOptIn",
+          "label": "strings.preSendCompliance.checkOptIn",
+          "fixShortcut": "strings.preSendCompliance.fixVerifyAudience"
+        },
+        {
+          "id": "legalFooter",
+          "label": "strings.preSendCompliance.checkFooter",
+          "fixShortcut": "strings.preSendCompliance.fixAddFooter"
+        }
+      ]
+    },
+    "proceedButton": {
+      "height": 48,
+      "marginHorizontal": 16,
+      "marginTop": 24,
+      "marginBottom": 24,
+      "label": "strings.preSendCompliance.proceed",
+      "style": "primary",
+      "disabled": "{{!allChecksPassed}}"
+    }
+  },
+  "components": [
+    {
+      "id": "navigationHeader",
+      "ref": "navigation-header",
+      "props": {
+        "showBack": true,
+        "title": "strings.preSendCompliance.title"
+      }
+    },
+    {
+      "id": "complianceCheckRow",
+      "ref": "compliance-check-row",
+      "props": {
+        "label": "{{label}}",
+        "status": "{{status}}",
+        "fixShortcutLabel": "{{fixShortcutLabel}}",
+        "onFixClick": "{{onFixClick}}"
+      }
+    },
+    {
+      "id": "proceedButton",
+      "ref": "button",
+      "props": {
+        "label": "strings.preSendCompliance.proceed",
+        "style": "primary",
+        "disabled": "{{!allChecksPassed}}"
+      }
+    }
+  ],
+  "interactions": [
+    {
+      "trigger": "fixShortcut.tap",
+      "action": "navigateToFix"
+    },
+    {
+      "trigger": "proceedButton.tap",
+      "action": "proceedToCampaign",
+      "condition": "allChecksPassed"
+    }
+  ],
+  "tokens": {
+    "used": [
+      "semantic.pageBackground",
+      "semantic.surface",
+      "semantic.cardBorder",
+      "semantic.foreground",
+      "semantic.secondaryText",
+      "semantic.primary",
+      "semantic.compliance.passed",
+      "semantic.compliance.failedBlocking",
+      "semantic.compliance.failedAdvisory"
+    ]
+  },
+  "redlines": {
+    "checkRowHeight": 56,
+    "checklistGap": 12,
+    "buttonHeight": 48,
+    "iconSize": 20
+  }
+}

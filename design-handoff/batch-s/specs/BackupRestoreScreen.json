@@ -1,0 +1,62 @@
+{
+  "screen": "BackupRestoreScreen",
+  "route": "SuperAdminBackupRestore",
+  "device": { "primary": "Desktop 1280+", "secondary": "iPad 1024×768" },
+  "stateNames": ["default", "restoring", "error"],
+  "layout": {
+    "lateBanner": {
+      "component": "InlineBanner",
+      "showWhen": "lastBackupAgeHours > scheduleIntervalHours",
+      "background": "warning 10%",
+      "borderLeft": { "width": 4, "color": "warning" },
+      "icon": "warning",
+      "message": "strings.backupRestore.lateBanner"
+    },
+    "backupHistorySection": {
+      "title": { "text": "Backup History", "variant": "title-medium" },
+      "table": {
+        "columns": [
+          { "key": "completedAt", "format": "datetime local", "font": "mono", "variant": "caption" },
+          { "key": "type", "type": "pill", "values": ["full", "incremental"] },
+          { "key": "sizeGB", "format": "N.N GB", "font": "mono", "align": "right" },
+          { "key": "status", "type": "pill", "values": ["success", "failed", "in-progress"] },
+          { "key": "tenantName", "variant": "body-medium" },
+          { "key": "actions", "type": "button-group", "items": [
+            { "label": "strings.backupRestore.downloadCta", "variant": "outlined", "icon": "download" },
+            { "label": "strings.backupRestore.restoreCta", "variant": "outlined", "tone": "destructive", "confirm": "This will overwrite current data. Continue?" }
+          ]}
+        ]
+      }
+    },
+    "scheduleSection": {
+      "title": { "text": "Backup Schedule", "variant": "title-medium" },
+      "form": {
+        "fields": [
+          { "id": "frequency", "type": "segmentedControl", "options": ["Daily", "Weekly", "Custom cron"] },
+          { "id": "time", "type": "timePicker", "label": "Backup time (UTC)" },
+          { "id": "retention", "type": "select", "label": "Retention period", "options": ["7 days", "30 days", "90 days", "1 year"] },
+          { "id": "types", "type": "checkboxList", "label": "Include", "options": ["Firestore", "Storage files", "Function configs"] }
+        ]
+      },
+      "footer": {
+        "cta": { "label": "strings.backupRestore.saveCta", "variant": "filled" }
+      }
+    }
+  },
+  "states": {
+    "restoring": {
+      "overlay": {
+        "type": "fullscreenProgress",
+        "label": "strings.backupRestore.restoringLabel",
+        "indeterminate": true
+      }
+    },
+    "error": {
+      "inlineBanner": {
+        "background": "error 10%",
+        "borderLeft": { "width": 4, "color": "error" },
+        "message": "strings.backupRestore.errorMessage"
+      }
+    }
+  }
+}

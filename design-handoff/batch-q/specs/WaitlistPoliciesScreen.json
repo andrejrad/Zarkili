@@ -1,0 +1,76 @@
+{
+  "screen": "WaitlistPoliciesScreen",
+  "route": "AdminWaitlistPolicies",
+  "device": {
+    "primary": "iPad 1024×768",
+    "secondary": "iPhone 14 390×844"
+  },
+  "stateNames": [
+    "draft",
+    "published",
+    "saving",
+    "error"
+  ],
+  "layout": {
+    "header": {
+      "title": "strings.waitlistPolicies.title",
+      "publishedPill": {
+        "background": "success",
+        "label": "strings.waitlistPolicies.publishedBadge",
+        "visibleWhen": "state.published"
+      }
+    },
+    "form": {
+      "scrollable": true,
+      "fields": {
+        "maxTimeOnList": {
+          "type": "numberInput + unitDropdown",
+          "label": "strings.waitlistPolicies.maxTimeLabel",
+          "units": ["days", "weeks"]
+        },
+        "autoExpire": {
+          "type": "toggle",
+          "label": "strings.waitlistPolicies.autoExpireLabel",
+          "defaultOn": true,
+          "expirationDays": { "type": "numberInput", "visibleWhen": "toggle ON" },
+          "helpCaption": { "text": "strings.waitlistPolicies.autoExpireHelp" }
+        },
+        "notificationCadence": {
+          "type": "section",
+          "fields": {
+            "initialInviteDelay": { "type": "numberInput", "label": "strings.waitlistPolicies.initialInviteLabel", "suffix": "hours of slot opening" },
+            "reminderFrequency": { "type": "numberInput + unitDropdown", "label": "strings.waitlistPolicies.reminderFrequencyLabel", "units": ["hours", "days"] },
+            "maxReminders": { "type": "numberInput", "label": "strings.waitlistPolicies.maxRemindersLabel" }
+          }
+        },
+        "responseWindow": {
+          "type": "numberInput + unitDropdown",
+          "label": "strings.waitlistPolicies.responseWindowLabel",
+          "units": ["hours", "days"],
+          "helpCaption": { "text": "strings.waitlistPolicies.responseWindowHelp" }
+        },
+        "expiredAction": {
+          "type": "radio",
+          "options": [
+            { "value": "keepAsExpired", "label": "strings.waitlistPolicies.expiredAction.keep" },
+            { "value": "removeFromList", "label": "strings.waitlistPolicies.expiredAction.remove" }
+          ]
+        }
+      }
+    },
+    "footer": {
+      "actions": [
+        { "type": "button", "label": "strings.waitlistPolicies.saveAsDraft", "variant": "secondary" },
+        { "type": "button", "label": "strings.waitlistPolicies.publish", "variant": "primary" }
+      ]
+    }
+  },
+  "states": {
+    "saving": { "footer": { "spinner": true } },
+    "published": {
+      "form": { "readOnly": true },
+      "header": { "editButton": true }
+    },
+    "error": { "inlineBanner": true }
+  }
+}

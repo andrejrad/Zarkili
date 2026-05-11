@@ -1,0 +1,46 @@
+{
+  "component": "AuditLogFilterBar",
+  "description": "Composite filter bar for audit log explorer",
+  "props": {
+    "search": { "type": "string", "required": false, "description": "Search query" },
+    "onSearchChange": { "type": "function", "required": true, "description": "Search change callback" },
+    "dateRange": { "type": "object", "required": false, "description": "{ startDate, endDate } or null" },
+    "onDateRangeChange": { "type": "function", "required": true, "description": "Date range change callback" },
+    "actorFilter": { "type": "string", "required": false, "description": "Actor filter value" },
+    "onActorFilterChange": { "type": "function", "required": true, "description": "Actor filter callback" },
+    "entityFilter": { "type": "string", "required": false, "description": "Entity type filter" },
+    "onEntityFilterChange": { "type": "function", "required": true, "description": "Entity filter callback" },
+    "entityOptions": { "type": "array", "required": true, "description": "Entity type options: booking, client, staff, payment, ai, settings" },
+    "actionFilter": { "type": "string", "required": false, "description": "Action filter value" },
+    "onActionFilterChange": { "type": "function", "required": true, "description": "Action filter callback" },
+    "actionOptions": { "type": "array", "required": true, "description": "Action options: create, update, delete, approve, reject, export" },
+    "severityFilter": { "type": "string", "required": false, "description": "info, warning, critical, or null" },
+    "onSeverityFilterChange": { "type": "function", "required": true, "description": "Severity filter callback" },
+    "onReset": { "type": "function", "required": true, "description": "Reset all filters" },
+    "activeFilterCount": { "type": "number", "required": true, "description": "Count of active filters" }
+  },
+  "variants": ["default", "filtered"],
+  "layout": {
+    "height": 64,
+    "gap": 8,
+    "searchInput": "240px grows",
+    "dateRangePicker": "200px fixed",
+    "actorDropdown": "160px",
+    "entityDropdown": "160px",
+    "actionDropdown": "140px",
+    "severityDropdown": "130px",
+    "resetButton": "shown when activeFilterCount > 0 with badge"
+  },
+  "tokens": {
+    "bg": "admin.tableHeaderBg",
+    "border": "semantic.cardBorder",
+    "text": "semantic.foreground",
+    "badgeFill": "primary",
+    "badgeText": "white"
+  },
+  "accessibility": {
+    "role": "search",
+    "ariaLabel": "Audit log filters",
+    "childInputs": "each has aria-label"
+  }
+}

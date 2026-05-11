@@ -1,0 +1,213 @@
+{
+  "screen": "LoyaltyPerformanceDashboardScreen",
+  "route": "/admin/loyalty/performance",
+  "description": "Analytics dashboard for loyalty program KPIs and trends",
+  "dimensions": {
+    "width": 390,
+    "height": "auto-scroll"
+  },
+  "states": [
+    "default",
+    "loading",
+    "empty",
+    "error"
+  ],
+  "accessibility": {
+    "screenReaderLabel": "strings.loyaltyPerformance.screenTitle",
+    "semanticRoles": [
+      {"element": "kpiGrid", "role": "grid"},
+      {"element": "kpiTile", "role": "gridcell"},
+      {"element": "chart", "role": "img", "hint": "strings.loyaltyPerformance.chartHint"},
+      {"element": "leaderboardTable", "role": "table"}
+    ]
+  },
+  "rtl": "deferred",
+  "darkMode": "deferred",
+  "layout": {
+    "header": {
+      "height": 64,
+      "title": "strings.loyaltyPerformance.title",
+      "rightAction": {
+        "component": "date-range-selector",
+        "defaultRange": "30d"
+      }
+    },
+    "kpiGrid": {
+      "columns": 2,
+      "gap": 12,
+      "paddingHorizontal": 16,
+      "paddingVertical": 16,
+      "tiles": [
+        {
+          "id": "activeMembers",
+          "label": "strings.loyaltyPerformance.kpiActiveMembers",
+          "value": "{{activeMembers}}",
+          "trend": "{{activeMembersTrend}}"
+        },
+        {
+          "id": "pointsIssued",
+          "label": "strings.loyaltyPerformance.kpiPointsIssued",
+          "value": "{{pointsIssued}}",
+          "trend": "{{pointsIssuedTrend}}"
+        },
+        {
+          "id": "pointsRedeemed",
+          "label": "strings.loyaltyPerformance.kpiPointsRedeemed",
+          "value": "{{pointsRedeemed}}",
+          "trend": "{{pointsRedeemedTrend}}"
+        },
+        {
+          "id": "redemptionRate",
+          "label": "strings.loyaltyPerformance.kpiRedemptionRate",
+          "value": "{{redemptionRate}}%",
+          "trend": "{{redemptionRateTrend}}"
+        },
+        {
+          "id": "avgTier",
+          "label": "strings.loyaltyPerformance.kpiAvgTier",
+          "value": "{{avgTier}}",
+          "trend": null
+        },
+        {
+          "id": "churnRisk",
+          "label": "strings.loyaltyPerformance.kpiChurnRisk",
+          "value": "{{churnRisk}}",
+          "trend": "{{churnRiskTrend}}",
+          "alert": true
+        }
+      ]
+    },
+    "memberGrowthChart": {
+      "height": 240,
+      "marginHorizontal": 16,
+      "marginTop": 24,
+      "title": "strings.loyaltyPerformance.memberGrowthTitle",
+      "chartType": "line",
+      "xAxis": "week",
+      "yAxis": "members",
+      "dataPoints": 12
+    },
+    "tierDistributionChart": {
+      "height": 240,
+      "marginHorizontal": 16,
+      "marginTop": 24,
+      "title": "strings.loyaltyPerformance.tierDistributionTitle",
+      "chartType": "bar",
+      "xAxis": "tier",
+      "yAxis": "count"
+    },
+    "topRewardsLeaderboard": {
+      "marginHorizontal": 16,
+      "marginTop": 24,
+      "title": "strings.loyaltyPerformance.topRewardsTitle",
+      "rowHeight": 56,
+      "maxRows": 5,
+      "columns": [
+        "rank",
+        "rewardName",
+        "redemptions"
+      ]
+    },
+    "tierMigrationTable": {
+      "marginHorizontal": 16,
+      "marginTop": 24,
+      "marginBottom": 24,
+      "title": "strings.loyaltyPerformance.tierMigrationTitle",
+      "rowHeight": 56,
+      "columns": [
+        "tier",
+        "upgrades",
+        "downgrades",
+        "net"
+      ]
+    }
+  },
+  "components": [
+    {
+      "id": "navigationHeader",
+      "ref": "navigation-header",
+      "props": {
+        "showBack": true,
+        "title": "strings.loyaltyPerformance.title"
+      }
+    },
+    {
+      "id": "kpiTile",
+      "ref": "kpi-tile",
+      "props": {
+        "label": "{{label}}",
+        "value": "{{value}}",
+        "trend": "{{trend}}",
+        "alert": "{{alert}}"
+      }
+    },
+    {
+      "id": "memberGrowthChart",
+      "ref": "line-chart",
+      "props": {
+        "title": "strings.loyaltyPerformance.memberGrowthTitle",
+        "data": "{{memberGrowthData}}"
+      }
+    },
+    {
+      "id": "tierDistributionChart",
+      "ref": "bar-chart",
+      "props": {
+        "title": "strings.loyaltyPerformance.tierDistributionTitle",
+        "data": "{{tierDistributionData}}"
+      }
+    },
+    {
+      "id": "topRewardsTable",
+      "ref": "data-table",
+      "props": {
+        "title": "strings.loyaltyPerformance.topRewardsTitle",
+        "columns": ["rank", "rewardName", "redemptions"]
+      }
+    },
+    {
+      "id": "tierMigrationTable",
+      "ref": "data-table",
+      "props": {
+        "title": "strings.loyaltyPerformance.tierMigrationTitle",
+        "columns": ["tier", "upgrades", "downgrades", "net"]
+      }
+    }
+  ],
+  "interactions": [
+    {
+      "trigger": "dateRangeSelector.change",
+      "action": "fetchDashboardData"
+    },
+    {
+      "trigger": "kpiTile.tap",
+      "action": "drillDown"
+    },
+    {
+      "trigger": "chart.tap",
+      "action": "showDetails"
+    }
+  ],
+  "tokens": {
+    "used": [
+      "semantic.pageBackground",
+      "semantic.surface",
+      "semantic.cardBorder",
+      "semantic.foreground",
+      "semantic.secondaryText",
+      "semantic.primary",
+      "semantic.success",
+      "semantic.warning",
+      "semantic.error",
+      "semantic.admin.tableHeaderBg"
+    ]
+  },
+  "redlines": {
+    "kpiGridColumns": 2,
+    "kpiGridGap": 12,
+    "kpiTileHeight": 96,
+    "chartHeight": 240,
+    "tableRowHeight": 56,
+    "sectionGap": 24
+  }
+}

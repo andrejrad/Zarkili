@@ -1,0 +1,94 @@
+{
+  "schemaVersion": "1.0.0",
+  "screenId": "M.2",
+  "screenName": "OperatorNotificationCenterScreen",
+  "route": "admin/notifications",
+  "designSystem": "Zarkili v1.0.0",
+  "device": "iPad 768x1024",
+  "engineeringStatus": "delivered",
+  "description": "Tabbed notification center for operators to review and manage all system alerts sorted by category and severity.",
+  "layout": {
+    "type": "tab-view",
+    "padding": {
+      "top": 24,
+      "right": 32,
+      "bottom": 40,
+      "left": 32
+    },
+    "maxContentWidth": 960,
+    "gap": 24
+  },
+  "sections": [
+    {
+      "id": "tab-bar",
+      "type": "tab-bar",
+      "title": null,
+      "component": null,
+      "tabs": [
+        {
+          "key": "all",
+          "label": "All",
+          "unreadCountKey": "unreadAll"
+        },
+        {
+          "key": "bookings",
+          "label": "Bookings",
+          "unreadCountKey": "unreadBookings"
+        },
+        {
+          "key": "payments",
+          "label": "Payments",
+          "unreadCountKey": "unreadPayments"
+        },
+        {
+          "key": "payouts",
+          "label": "Payouts",
+          "unreadCountKey": "unreadPayouts"
+        },
+        {
+          "key": "ai",
+          "label": "AI",
+          "unreadCountKey": "unreadAi"
+        },
+        {
+          "key": "system",
+          "label": "System",
+          "unreadCountKey": "unreadSystem"
+        }
+      ]
+    },
+    {
+      "id": "filter-bar",
+      "type": "filter-bar",
+      "title": null,
+      "component": null,
+      "severityChips": [
+        "info",
+        "warning",
+        "error"
+      ],
+      "dateRangePicker": {
+        "format": "MM/DD/YYYY"
+      }
+    },
+    {
+      "id": "notifications-list",
+      "type": "list-section",
+      "title": null,
+      "component": "MC.8",
+      "sortOrder": "newest-first",
+      "emptyStatePerTab": true
+    }
+  ],
+  "stateNames": [
+    "default",
+    "empty-per-tab",
+    "all-read",
+    "error",
+    "loading"
+  ],
+  "accessibility": {
+    "screenReaderLabel": "Operator notifications",
+    "tabRole": "tablist"
+  }
+}

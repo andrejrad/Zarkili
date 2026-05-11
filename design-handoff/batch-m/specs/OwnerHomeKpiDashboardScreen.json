@@ -1,0 +1,144 @@
+{
+  "schemaVersion": "1.0.0",
+  "screenId": "M.1",
+  "screenName": "OwnerHomeKpiDashboardScreen",
+  "route": "admin/owner-home",
+  "designSystem": "Zarkili v1.0.0",
+  "device": "iPad 768x1024",
+  "engineeringStatus": "delivered",
+  "description": "Primary owner dashboard displaying real-time KPIs, top staff performance, and actionable alerts for business owners.",
+  "layout": {
+    "type": "scrollable-column",
+    "padding": {
+      "top": 24,
+      "right": 32,
+      "bottom": 40,
+      "left": 32
+    },
+    "maxContentWidth": 960,
+    "gap": 24
+  },
+  "sections": [
+    {
+      "id": "page-header",
+      "type": "page-header",
+      "title": "Good morning, {{ownerFirstName}}",
+      "component": null,
+      "subtitle": "{{tenantName}} · {{todayDate}}",
+      "quickNavRow": [
+        "Settings",
+        "Staff",
+        "Services",
+        "Bookings"
+      ]
+    },
+    {
+      "id": "kpi-primary-grid",
+      "type": "kpi-tile-grid",
+      "title": null,
+      "component": "MC.2",
+      "gridCols": {
+        "iPad": 4,
+        "iPhone": 2
+      },
+      "gap": 16,
+      "tiles": [
+        {
+          "label": "Revenue today",
+          "valueKey": "revenueToday",
+          "format": "currency",
+          "currencyCode": "USD",
+          "trend": true,
+          "nullLabel": "Pending setup"
+        },
+        {
+          "label": "Bookings today",
+          "valueKey": "bookingsToday",
+          "format": "integer",
+          "trend": true,
+          "nullLabel": null
+        },
+        {
+          "label": "New clients this week",
+          "valueKey": "newClientsWeek",
+          "format": "integer",
+          "trend": true,
+          "nullLabel": null
+        },
+        {
+          "label": "AI Savings",
+          "valueKey": "aiSavings",
+          "format": "currency",
+          "currencyCode": "USD",
+          "trend": true,
+          "nullLabel": "Pending setup"
+        }
+      ]
+    },
+    {
+      "id": "kpi-secondary-grid",
+      "type": "kpi-tile-grid",
+      "title": null,
+      "component": "MC.2",
+      "gridCols": {
+        "iPad": 3,
+        "iPhone": 1
+      },
+      "gap": 16,
+      "tiles": [
+        {
+          "label": "Occupancy today",
+          "valueKey": "occupancyToday",
+          "format": "percent",
+          "trend": false,
+          "nullLabel": "Coming W40"
+        },
+        {
+          "label": "Open slots today",
+          "valueKey": "openSlotsToday",
+          "format": "integer",
+          "trend": false,
+          "nullLabel": "Coming W40"
+        },
+        {
+          "label": "New clients",
+          "valueKey": "newClientsToday",
+          "format": "integer",
+          "trend": true,
+          "nullLabel": "Coming W40"
+        }
+      ]
+    },
+    {
+      "id": "top-staff-section",
+      "type": "list-section",
+      "title": "Top staff today",
+      "component": null,
+      "columns": [
+        "staffName",
+        "bookingsToday",
+        "revenueToday"
+      ],
+      "revenueNullLabel": "—",
+      "emptyState": "No bookings yet today."
+    },
+    {
+      "id": "alerts-section",
+      "type": "list-section",
+      "title": "Alerts requiring action",
+      "component": "MC.8",
+      "emptyState": "No alerts. Everything looks good."
+    }
+  ],
+  "stateNames": [
+    "loading",
+    "loaded",
+    "error",
+    "revenueNullPending"
+  ],
+  "accessibility": {
+    "screenReaderLabel": "Owner dashboard",
+    "kpiTilesRole": "region",
+    "alertsRole": "list"
+  }
+}

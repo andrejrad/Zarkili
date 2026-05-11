@@ -1,0 +1,35 @@
+{
+  "component": "CohortTableCard",
+  "description": "Card widget rendering a retention cohort heatmap table",
+  "props": {
+    "title": { "type": "string", "required": true, "description": "Table title" },
+    "subtitle": { "type": "string", "required": false, "description": "Optional subtitle" },
+    "cohorts": { "type": "array", "required": true, "description": "Array of { weekLabel, startCount, retentions }" },
+    "periodLabels": { "type": "array", "required": true, "description": "Column headers e.g. Wk 1, Wk 2 ... Wk 12" },
+    "isLoading": { "type": "boolean", "required": false, "description": "Loading state" },
+    "isEmpty": { "type": "boolean", "required": false, "description": "Empty state" }
+  },
+  "variants": ["default", "loading", "empty"],
+  "layout": {
+    "headerRow": "fixed Cohort column (120px) + period columns (equal width, min 48px, scrollable)",
+    "cellDisplay": "percentage text + background fill color",
+    "cohortColumn": "shows startCount"
+  },
+  "cellColoring": {
+    "high": ">=50% -> chart.cohort.high",
+    "mid": "20-49% -> chart.cohort.mid",
+    "low": "1-19% -> chart.cohort.low",
+    "zero": "0% -> chart.cohort.zero",
+    "textContrast": "auto (dark on light, white on dark)"
+  },
+  "tokens": {
+    "headerBg": "admin.tableHeaderBg",
+    "border": "semantic.cardBorder",
+    "cellColors": "chart.cohort.*",
+    "font": "monospace for percentages"
+  },
+  "accessibility": {
+    "role": "table",
+    "headers": "scope attributes on column and row headers"
+  }
+}

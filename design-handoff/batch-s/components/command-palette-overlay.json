@@ -1,0 +1,79 @@
+{
+  "component": "CommandPaletteOverlay",
+  "path": "src/components/platform/CommandPaletteOverlay",
+  "platform": ["Web"],
+  "note": "Activated via ⌘K / Ctrl+K. Manages its own open/close state via keyboard event listener.",
+  "variantNames": ["idle", "searching", "noResults"],
+  "variants": {
+    "idle": {
+      "resultsList": {
+        "sections": [
+          { "key": "recent", "title": "Recent", "maxItems": 5 },
+          { "key": "quickNav", "title": "Quick Navigation", "maxItems": 10 }
+        ]
+      }
+    },
+    "searching": {
+      "resultsList": {
+        "sections": [
+          { "key": "screens", "title": "Screens", "maxItems": 5 },
+          { "key": "actions", "title": "Actions", "maxItems": 5 },
+          { "key": "tenants", "title": "Tenants", "maxItems": 5 }
+        ]
+      }
+    },
+    "noResults": {
+      "resultsList": { "visible": false },
+      "emptyState": { "visible": true }
+    }
+  },
+  "layout": {
+    "overlay": {
+      "position": "fixed",
+      "top": 80,
+      "left": "50%",
+      "transform": "translateX(-50%)",
+      "width": 600,
+      "maxHeight": 480,
+      "zIndex": 1000,
+      "shape": "rounded-3",
+      "elevation": 8,
+      "backdrop": { "color": "black 40%", "blur": 4 }
+    },
+    "searchInput": {
+      "icon": { "leading": "search", "size": 20 },
+      "clearButton": true,
+      "border": "none",
+      "padding": { "horizontal": 16, "vertical": 14 }
+    },
+    "resultItem": {
+      "height": 44,
+      "fields": [
+        { "key": "icon", "type": "icon", "size": 18 },
+        { "key": "label", "variant": "body-medium", "flex": 1 },
+        { "key": "description", "variant": "caption", "color": "on-surface-variant" },
+        { "key": "shortcut", "type": "kbdBadge", "font": "mono", "variant": "caption" }
+      ],
+      "selectedStyle": { "background": "primary-container" }
+    },
+    "footer": {
+      "keyboardHints": {
+        "text": "strings.commandPalette.keyboardHints",
+        "variant": "caption",
+        "font": "mono",
+        "color": "on-surface-variant"
+      }
+    }
+  },
+  "keyboard": {
+    "open": ["Meta+k", "Control+k"],
+    "close": ["Escape"],
+    "navigate": ["ArrowUp", "ArrowDown"],
+    "select": ["Enter"]
+  },
+  "accessibility": {
+    "role": "dialog",
+    "ariaLabel": "Command palette",
+    "searchInput": { "ariaLabel": "Search commands, screens, and tenants" }
+  }
+}

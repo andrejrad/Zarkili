@@ -1,0 +1,33 @@
+{
+  "screen": "AutoReplyScheduleScreen",
+  "route": "AdminAutoReplySchedule",
+  "device": {
+    "primary": "iPad 1024×768",
+    "secondary": "iPhone 14 390×844"
+  },
+  "stateNames": [
+    "enabled",
+    "disabled",
+    "saving",
+    "error"
+  ],
+  "layout": {
+    "header": {
+      "title": "strings.autoReply.title",
+      "right": { "type": "toggle", "label": "strings.autoReply.globalEnableLabel", "defaultOn": true }
+    },
+    "scheduleEditor": { "component": "auto-reply-schedule-editor" },
+    "footer": { "type": "button", "label": "strings.autoReply.save", "variant": "primary", "fullWidth": true }
+  },
+  "states": {
+    "disabled": {
+      "scheduleEditor": { "opacity": 0.4, "nonInteractive": true }
+    },
+    "saving": {
+      "footer": { "spinner": true }
+    },
+    "error": {
+      "inlineBanner": { "position": "below header" }
+    }
+  }
+}

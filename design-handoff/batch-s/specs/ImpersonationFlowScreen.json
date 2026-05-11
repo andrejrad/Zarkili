@@ -1,0 +1,73 @@
+{
+  "screen": "ImpersonationFlowScreen",
+  "route": "SuperAdminImpersonate",
+  "device": {
+    "preConfirmModal": { "width": 480, "radius": 20 },
+    "banner": { "fullWidth": true, "position": "fixed top" }
+  },
+  "stateNames": ["idle", "requesting", "active", "ending", "ended"],
+  "layout": {
+    "preConfirmModal": {
+      "handle": { "width": 36, "height": 4 },
+      "header": {
+        "icon": { "name": "eye", "size": 24, "color": "primary" },
+        "title": { "text": "strings.impersonation.screenTitle", "variant": "heading-3" }
+      },
+      "fields": {
+        "tenantSelector": { "type": "searchable dropdown", "required": true, "placeholder": "strings.impersonation.tenantSelectorPlaceholder" },
+        "durationRadio": {
+          "label": "Session limit",
+          "options": [
+            { "value": "15min", "label": "strings.impersonation.duration15" },
+            { "value": "30min", "label": "strings.impersonation.duration30" },
+            { "value": "60min", "label": "strings.impersonation.duration60" }
+          ],
+          "default": "30min"
+        },
+        "reasonTextarea": {
+          "label": "strings.impersonation.reasonLabel",
+          "required": true,
+          "minChars": 20,
+          "maxChars": 500,
+          "counter": "NN/500"
+        },
+        "acknowledgeCheckbox": { "size": 24, "label": "strings.impersonation.acknowledgeLabel", "required": true }
+      },
+      "footer": {
+        "actions": [
+          { "type": "button", "label": "strings.impersonation.cancelLabel", "variant": "secondary" },
+          { "type": "button", "label": "strings.impersonation.beginCta", "variant": "primary", "disabledUntil": "tenantSelected AND reason.length>=20 AND acknowledged" }
+        ]
+      }
+    },
+    "impersonationBanner": {
+      "position": "fixed top",
+      "height": 48,
+      "width": "100%",
+      "zIndex": 9999,
+      "background": "impersonation.bannerBg",
+      "borderBottom": { "width": 2, "color": "impersonation.bannerBorder" },
+      "leftZone": {
+        "icon": { "name": "eye", "size": 16 },
+        "label": { "text": "strings.impersonation.bannerLabel", "font": "body-medium", "weight": "bold", "color": "impersonation.bannerText" }
+      },
+      "centerZone": {
+        "countdown": { "format": "{MM}:{SS} remaining", "font": "mono body-small", "color": "impersonation.timerText" }
+      },
+      "rightZone": {
+        "button": { "label": "strings.impersonation.endSessionCta", "variant": "secondary-sm", "size": "44×32" }
+      }
+    }
+  },
+  "states": {
+    "requesting": { "modal": { "cta": { "spinner": true } } },
+    "active": { "banner": { "visible": true, "zIndex": "above all other UI" } },
+    "ending": { "banner": { "endSessionButton": { "spinner": true }, "countdown": { "frozen": true } } },
+    "ended": { "banner": { "hidden": true }, "toast": "strings.impersonation.endedToast" },
+    "error": { "message": "strings.impersonation.errorMessage" }
+  },
+  "accessibility": {
+    "banner": { "role": "alert", "ariaLive": "polite" },
+    "countdown": { "announced": "every 60 seconds" }
+  }
+}

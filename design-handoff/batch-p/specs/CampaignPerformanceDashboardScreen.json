@@ -1,0 +1,156 @@
+{
+  "screen": "CampaignPerformanceDashboardScreen",
+  "route": "/admin/campaigns/:id/performance",
+  "description": "Campaign performance analytics with KPIs, charts, and device breakdown",
+  "dimensions": {
+    "width": 390,
+    "height": "auto-scroll"
+  },
+  "states": [
+    "default",
+    "loading",
+    "error"
+  ],
+  "accessibility": {
+    "screenReaderLabel": "strings.campaignPerformance.screenTitle",
+    "semanticRoles": [
+      {"element": "campaignSelector", "role": "button"},
+      {"element": "kpiRow", "role": "list"},
+      {"element": "kpiItem", "role": "listitem"},
+      {"element": "chart", "role": "img", "hint": "strings.campaignPerformance.chartHint"}
+    ]
+  },
+  "rtl": "deferred",
+  "darkMode": "deferred",
+  "layout": {
+    "header": {
+      "height": 64,
+      "title": "strings.campaignPerformance.title"
+    },
+    "campaignSelector": {
+      "height": 48,
+      "marginHorizontal": 16,
+      "marginBottom": 24,
+      "placeholder": "strings.campaignPerformance.selectCampaign"
+    },
+    "kpiRow": {
+      "height": 80,
+      "paddingHorizontal": 16,
+      "marginBottom": 24,
+      "scrollHorizontal": true,
+      "gap": 12,
+      "kpis": [
+        {"id": "sent", "label": "strings.campaignPerformance.kpiSent", "value": "{{sent}}"},
+        {"id": "delivered", "label": "strings.campaignPerformance.kpiDelivered", "value": "{{delivered}}"},
+        {"id": "opens", "label": "strings.campaignPerformance.kpiOpens", "value": "{{opens}}", "rate": "{{openRate}}"},
+        {"id": "clicks", "label": "strings.campaignPerformance.kpiClicks", "value": "{{clicks}}", "rate": "{{clickRate}}"},
+        {"id": "conversions", "label": "strings.campaignPerformance.kpiConversions", "value": "{{conversions}}"},
+        {"id": "revenue", "label": "strings.campaignPerformance.kpiRevenue", "value": "{{revenue}}"}
+      ]
+    },
+    "openClickChart": {
+      "height": 240,
+      "marginHorizontal": 16,
+      "marginBottom": 24,
+      "title": "strings.campaignPerformance.openClickChartTitle",
+      "chartType": "line",
+      "series": ["opens", "clicks"]
+    },
+    "deviceDonut": {
+      "height": 200,
+      "marginHorizontal": 16,
+      "marginBottom": 24,
+      "title": "strings.campaignPerformance.deviceBreakdownTitle",
+      "chartType": "donut"
+    },
+    "topVariantCard": {
+      "height": 120,
+      "marginHorizontal": 16,
+      "marginBottom": 24,
+      "title": "strings.campaignPerformance.topVariantTitle",
+      "background": "semantic.surface",
+      "padding": 16
+    },
+    "unsubscribeWarning": {
+      "height": 64,
+      "marginHorizontal": 16,
+      "marginBottom": 24,
+      "visible": "{{unsubscribeRate > 0.005}}",
+      "background": "#FEF3C7",
+      "icon": "alert-triangle",
+      "message": "strings.campaignPerformance.unsubscribeWarning"
+    }
+  },
+  "components": [
+    {
+      "id": "navigationHeader",
+      "ref": "navigation-header",
+      "props": {
+        "showBack": true,
+        "title": "strings.campaignPerformance.title"
+      }
+    },
+    {
+      "id": "campaignSelector",
+      "ref": "select",
+      "props": {
+        "placeholder": "strings.campaignPerformance.selectCampaign",
+        "options": "{{campaigns}}"
+      }
+    },
+    {
+      "id": "kpiTile",
+      "ref": "kpi-tile",
+      "props": {
+        "label": "{{label}}",
+        "value": "{{value}}",
+        "rate": "{{rate}}"
+      }
+    },
+    {
+      "id": "openClickChart",
+      "ref": "line-chart",
+      "props": {
+        "title": "strings.campaignPerformance.openClickChartTitle",
+        "data": "{{openClickData}}"
+      }
+    },
+    {
+      "id": "deviceDonut",
+      "ref": "donut-chart",
+      "props": {
+        "title": "strings.campaignPerformance.deviceBreakdownTitle",
+        "data": "{{deviceData}}"
+      }
+    }
+  ],
+  "interactions": [
+    {
+      "trigger": "campaignSelector.change",
+      "action": "fetchCampaignData"
+    },
+    {
+      "trigger": "kpiTile.tap",
+      "action": "drillDown"
+    }
+  ],
+  "tokens": {
+    "used": [
+      "semantic.pageBackground",
+      "semantic.surface",
+      "semantic.cardBorder",
+      "semantic.foreground",
+      "semantic.secondaryText",
+      "semantic.primary",
+      "semantic.warning"
+    ]
+  },
+  "redlines": {
+    "kpiRowHeight": 80,
+    "kpiTileWidth": 140,
+    "kpiTileGap": 12,
+    "chartHeight": 240,
+    "donutHeight": 200,
+    "warningHeight": 64
+  }
+}

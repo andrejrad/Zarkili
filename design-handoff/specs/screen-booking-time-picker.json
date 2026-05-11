@@ -1,0 +1,527 @@
+{
+  "screen": "BookingTimePicker",
+  "description": "Time slot selection screen in booking flow (step 4 of 5)",
+  "purpose": "Allow users to select a specific appointment start time from available slots",
+  "flow": "Booking flow step 4/5",
+  "device": "iPhone 14 (390x844)",
+  "source": {
+    "batch": "C",
+    "screen": "C.4 Time-Slot Picker",
+    "promotedFrom": "documentation/figma-prompts/BATCH_C_BOOKING_FLOW.md",
+    "figmaFrames": [
+      "C-4-time-picker-default",
+      "C-4-time-picker-no-slots",
+      "C-4-time-picker-partial",
+      "C-4-time-picker-loading",
+      "C-4-time-picker-error"
+    ],
+    "lockedAt": "2026-04-27"
+  },
+  "hierarchy": {
+    "container": {
+      "background": "#F2EDDD",
+      "safeArea": true
+    },
+    "scroll": {
+      "type": "ScrollView",
+      "bounces": true,
+      "showsVerticalScrollIndicator": false,
+      "contentPadding": {
+        "bottom": 96
+      }
+    }
+  },
+  "sections": {
+    "header": {
+      "type": "fixed",
+      "height": 56,
+      "background": "#F2EDDD",
+      "borderBottomWidth": 1,
+      "borderBottomColor": "#E5E0D1",
+      "paddingHorizontal": 16,
+      "flexDirection": "row",
+      "alignItems": "center",
+      "justifyContent": "space-between",
+      "children": ["backButton", "headerTitle", "stepIndicator"]
+    },
+    "backButton": {
+      "type": "iconButton",
+      "icon": "arrow-left",
+      "iconSize": 24,
+      "iconColor": "#1A1A1A",
+      "size": 44,
+      "position": "absolute",
+      "left": 8,
+      "accessibility": {
+        "role": "button",
+        "label": "Go back to date selection",
+        "hint": "Return to step 3"
+      }
+    },
+    "headerTitle": {
+      "type": "text",
+      "style": "heading-3",
+      "color": "#1A1A1A",
+      "textAlign": "center",
+      "content": "Pick a time"
+    },
+    "stepIndicator": {
+      "type": "text",
+      "style": "label-small",
+      "color": "#6B6B6B",
+      "position": "absolute",
+      "right": 16,
+      "content": "4/5"
+    },
+    "dateLabel": {
+      "paddingHorizontal": 16,
+      "paddingTop": 16,
+      "type": "text",
+      "style": "heading-3",
+      "color": "#1A1A1A",
+      "content": "{{dayShort}}, {{monthShort}} {{dayNumber}}",
+      "format": "ddd, MMM D",
+      "example": "Wed, Mar 12"
+    },
+    "segmentedControl": {
+      "marginTop": 16,
+      "marginHorizontal": 16,
+      "height": 40,
+      "background": "#FFFFFF",
+      "borderWidth": 1,
+      "borderColor": "#E5E0D1",
+      "borderRadius": 8,
+      "flexDirection": "row",
+      "segments": [
+        {
+          "id": "morning",
+          "label": "Morning",
+          "timeRange": "6:00 AM - 11:59 AM"
+        },
+        {
+          "id": "afternoon",
+          "label": "Afternoon",
+          "timeRange": "12:00 PM - 4:59 PM"
+        },
+        {
+          "id": "evening",
+          "label": "Evening",
+          "timeRange": "5:00 PM - 9:00 PM"
+        }
+      ],
+      "segmentStyle": {
+        "default": {
+          "background": "transparent",
+          "color": "#1A1A1A",
+          "style": "label"
+        },
+        "selected": {
+          "background": "#E3A9A0",
+          "color": "#FFFFFF",
+          "style": "label"
+        }
+      },
+      "accessibility": {
+        "role": "tablist",
+        "label": "Time of day filter",
+        "hint": "Select time range to filter available slots"
+      }
+    },
+    "timeSlotGrid": {
+      "marginTop": 16,
+      "paddingHorizontal": 16,
+      "layout": "grid",
+      "columns": 3,
+      "gap": 12,
+      "children": "time-slot-chip components"
+    },
+    "timeSlotChip": {
+      "component": "time-slot-chip",
+      "height": 40,
+      "minWidth": 80,
+      "borderRadius": 8,
+      "paddingHorizontal": 12,
+      "timeFormat": "h:mm A",
+      "states": ["default", "selected", "disabled", "pressed"],
+      "examples": [
+        "9:00 AM",
+        "9:30 AM",
+        "10:00 AM",
+        "10:30 AM",
+        "11:00 AM",
+        "11:30 AM",
+        "12:00 PM",
+        "12:30 PM",
+        "1:00 PM"
+      ]
+    },
+    "timezoneNote": {
+      "marginTop": 16,
+      "paddingHorizontal": 16,
+      "type": "text",
+      "style": "body-small",
+      "color": "#6B6B6B",
+      "content": "Times shown in {{timezone}}",
+      "format": "Times shown in {{timezoneAbbreviation}}",
+      "examples": ["Times shown in PT", "Times shown in EST", "Times shown in CST"]
+    },
+    "emptyState": {
+      "visible": "when no slots available",
+      "marginTop": 40,
+      "paddingHorizontal": 16,
+      "alignItems": "center",
+      "gap": 16,
+      "children": ["emptyIllustration", "emptyTitle", "tryAnotherDayButton"]
+    },
+    "emptyIllustration": {
+      "width": 120,
+      "height": 120,
+      "background": "#BBEDDA",
+      "borderRadius": 9999,
+      "description": "Placeholder circle with centered icon or empty state graphic"
+    },
+    "emptyTitle": {
+      "type": "text",
+      "style": "body",
+      "color": "#1A1A1A",
+      "textAlign": "center",
+      "content": "No times available"
+    },
+    "tryAnotherDayButton": {
+      "type": "button",
+      "variant": "tertiary",
+      "label": "Try another day",
+      "background": "transparent",
+      "color": "#E3A9A0",
+      "borderWidth": 1,
+      "borderColor": "#E3A9A0",
+      "height": 40,
+      "paddingHorizontal": 16,
+      "borderRadius": 9999,
+      "accessibility": {
+        "role": "button",
+        "label": "Go back to date selection",
+        "hint": "Choose a different date"
+      }
+    },
+    "errorBanner": {
+      "visible": "on error state",
+      "marginHorizontal": 16,
+      "marginTop": 16,
+      "background": "rgba(244, 67, 54, 0.05)",
+      "borderWidth": 1,
+      "borderColor": "#F44336",
+      "borderRadius": 8,
+      "padding": 12,
+      "gap": 8,
+      "children": ["errorMessage", "retryButton"]
+    },
+    "errorMessage": {
+      "type": "text",
+      "style": "body",
+      "color": "#F44336",
+      "content": "Unable to load available times"
+    },
+    "retryButton": {
+      "type": "button",
+      "variant": "primary",
+      "label": "Retry",
+      "background": "#F44336",
+      "color": "#FFFFFF",
+      "paddingHorizontal": 12,
+      "paddingVertical": 6,
+      "borderRadius": 8,
+      "alignSelf": "flex-start"
+    },
+    "loadingSkeleton": {
+      "visible": "on loading state",
+      "marginTop": 16,
+      "paddingHorizontal": 16,
+      "layout": "grid",
+      "columns": 3,
+      "rows": 4,
+      "gap": 12,
+      "children": "skeleton chips"
+    },
+    "skeletonChip": {
+      "width": 80,
+      "height": 40,
+      "background": "#E5E0D1",
+      "borderRadius": 8,
+      "animation": {
+        "type": "pulse",
+        "duration": 1500,
+        "easing": "ease-in-out"
+      }
+    },
+    "footer": {
+      "type": "fixed",
+      "position": "bottom",
+      "height": 80,
+      "background": "#F2EDDD",
+      "borderTopWidth": 1,
+      "borderTopColor": "#E5E0D1",
+      "padding": 16,
+      "paddingBottom": "16 + safe-area-inset-bottom",
+      "children": ["continueButton"]
+    },
+    "continueButton": {
+      "type": "button",
+      "variant": "primary",
+      "label": "Continue",
+      "width": "100%",
+      "height": 48,
+      "background": "#E3A9A0",
+      "color": "#FFFFFF",
+      "borderRadius": 9999,
+      "style": "label",
+      "disabled": "when no time slot selected",
+      "disabledStyle": {
+        "background": "#F5F5F5",
+        "color": "#B0B0B0"
+      },
+      "accessibility": {
+        "role": "button",
+        "label": "Continue to confirmation",
+        "hint": "Proceed to step 5 of 5",
+        "disabled": "Select a time to continue"
+      }
+    }
+  },
+  "states": {
+    "default": {
+      "description": "Time picker with selected time (11:30 AM), mix of available and disabled slots",
+      "data": {
+        "selectedDate": "03/12/2026",
+        "selectedTime": "11:30 AM",
+        "selectedSegment": "morning",
+        "availableSlots": ["9:00 AM", "9:30 AM", "10:00 AM", "10:30 AM", "11:00 AM", "11:30 AM"],
+        "disabledSlots": ["12:00 PM", "12:30 PM", "1:00 PM"]
+      },
+      "modifications": {
+        "continueButton": "enabled"
+      }
+    },
+    "noSlots": {
+      "description": "No available time slots for selected date/period",
+      "visibility": {
+        "timeSlotGrid": false,
+        "timezoneNote": false,
+        "emptyState": true
+      },
+      "modifications": {
+        "continueButton": "disabled"
+      }
+    },
+    "partiallyAvailable": {
+      "description": "Most slots disabled, only 2-3 available",
+      "data": {
+        "availableSlots": ["9:00 AM", "2:30 PM"],
+        "disabledSlots": ["9:30 AM", "10:00 AM", "10:30 AM", "11:00 AM", "11:30 AM", "12:00 PM", "12:30 PM", "1:00 PM", "1:30 PM", "2:00 PM", "3:00 PM", "3:30 PM"]
+      },
+      "modifications": {
+        "continueButton": "disabled"
+      }
+    },
+    "loading": {
+      "description": "Loading available time slots",
+      "visibility": {
+        "timeSlotGrid": false,
+        "timezoneNote": false,
+        "loadingSkeleton": true
+      },
+      "modifications": {
+        "continueButton": "disabled",
+        "segmentedControl": "disabled"
+      }
+    },
+    "error": {
+      "description": "Error loading time slots",
+      "visibility": {
+        "timeSlotGrid": false,
+        "timezoneNote": false,
+        "errorBanner": true
+      },
+      "modifications": {
+        "continueButton": "disabled"
+      }
+    }
+  },
+  "spacing": {
+    "headerHeight": 56,
+    "sectionPaddingHorizontal": 16,
+    "dateLabelPaddingTop": 16,
+    "segmentedControlMarginTop": 16,
+    "segmentedControlHeight": 40,
+    "gridMarginTop": 16,
+    "gridGap": 12,
+    "timezoneNoteMarginTop": 16,
+    "emptyStateMarginTop": 40,
+    "emptyStateGap": 16,
+    "footerHeight": 80,
+    "footerPadding": 16,
+    "buttonHeight": 48
+  },
+  "responsive": {
+    "small": {
+      "screenWidth": "< 375px",
+      "adjustments": {
+        "sectionPaddingHorizontal": 12,
+        "gridGap": 8,
+        "timeSlotChipMinWidth": 70
+      }
+    },
+    "large": {
+      "screenWidth": "> 428px",
+      "adjustments": {
+        "maxWidth": 428,
+        "centerContent": true
+      }
+    }
+  },
+  "scrollBehavior": {
+    "type": "vertical",
+    "bounces": true,
+    "contentPadding": {
+      "bottom": 96
+    }
+  },
+  "interactions": {
+    "backButtonPress": {
+      "action": "Navigate to date picker (step 3)",
+      "haptic": "light"
+    },
+    "segmentPress": {
+      "action": "Filter time slots by time of day",
+      "haptic": "light",
+      "targets": ["morning", "afternoon", "evening"]
+    },
+    "timeSlotPress": {
+      "action": "Select time slot and enable Continue button",
+      "haptic": "light",
+      "condition": "Only if slot is available (not disabled)"
+    },
+    "tryAnotherDayPress": {
+      "action": "Navigate back to date picker",
+      "haptic": "medium"
+    },
+    "retryButtonPress": {
+      "action": "Reload available time slots",
+      "haptic": "medium"
+    },
+    "continueButtonPress": {
+      "action": "Navigate to confirmation (step 5/5)",
+      "haptic": "medium",
+      "condition": "Only if time slot is selected"
+    }
+  },
+  "transitions": {
+    "onLoad": {
+      "animation": "fade-in",
+      "duration": 300
+    },
+    "segmentChange": {
+      "animation": "fade",
+      "duration": 150,
+      "easing": "ease-out"
+    },
+    "toConfirmation": {
+      "animation": "slide-left",
+      "duration": 300,
+      "easing": "ease-out"
+    }
+  },
+  "accessibility": {
+    "screenTitle": "Pick a time, step 4 of 5",
+    "announceOnLoad": "Time picker. Select an appointment time for {{selectedDate}}. Step 4 of 5.",
+    "focusOrder": [
+      "backButton",
+      "segmentedControl",
+      "timeSlotGrid",
+      "continueButton"
+    ],
+    "reducedMotion": {
+      "disableSlideTransitions": true,
+      "disableSkeletonPulse": true
+    },
+    "timeFormat": "US 12-hour format (h:mm A)",
+    "timezoneLabel": "Always display timezone abbreviation at bottom of grid",
+    "timezoneExamples": ["PT", "EST", "CST", "MST"]
+  },
+  "dependencies": {
+    "components": [
+      "time-slot-chip.json (locked)",
+      "chip.json"
+    ],
+    "tokens": [
+      "colors.json",
+      "typography.json",
+      "spacing.json"
+    ],
+    "icons": [
+      "arrow-left (24px) - Back button"
+    ],
+    "strings": [
+      "en-US.json (booking section)"
+    ]
+  },
+  "tokens": {
+    "colors": [
+      "primary (#E3A9A0)",
+      "primaryPressed (#CF8B80)",
+      "background (#F2EDDD)",
+      "surface (#FFFFFF)",
+      "foreground (#1A1A1A)",
+      "muted (#6B6B6B)",
+      "border (#E5E0D1)",
+      "accent (#BBEDDA)",
+      "error (#F44336)",
+      "disabledFg (#B0B0B0)",
+      "disabledBg (#F5F5F5)"
+    ],
+    "typography": [
+      "heading-3 (20px/28px weight 600)",
+      "body (14px/20px weight 400)",
+      "body-small (12px/16px weight 400)",
+      "label (14px/20px weight 500)",
+      "label-small (12px/16px weight 500)"
+    ],
+    "spacing": [
+      "page-horizontal (16px)",
+      "section-gap (16px)",
+      "grid-gap (12px)"
+    ],
+    "borderRadius": [
+      "small (8px)",
+      "full (9999px)"
+    ]
+  },
+  "strings": {
+    "keys": [
+      "booking.timePicker.title",
+      "booking.timePicker.stepIndicator",
+      "booking.timePicker.segments.morning",
+      "booking.timePicker.segments.afternoon",
+      "booking.timePicker.segments.evening",
+      "booking.timePicker.timezone",
+      "booking.timePicker.emptyState.title",
+      "booking.timePicker.emptyState.action",
+      "booking.timePicker.error.title",
+      "booking.timePicker.error.retry",
+      "booking.timePicker.continue"
+    ]
+  },
+  "dataContract": {
+    "timeFormat": "US 12-hour format (h:mm A)",
+    "timezone": "Salon's local timezone with abbreviation display",
+    "slotDuration": "Configurable (typically 30 minutes)",
+    "availableSlots": "Array of available time strings",
+    "disabledSlots": "Array of fully booked time strings",
+    "timeRanges": {
+      "morning": "6:00 AM - 11:59 AM",
+      "afternoon": "12:00 PM - 4:59 PM",
+      "evening": "5:00 PM - 9:00 PM"
+    }
+  },
+  "timezoneRule": "Always display timezone abbreviation (e.g., 'PT', 'EST') below time grid using body-small muted text style. Show full timezone name on hover/long-press for accessibility."
+}

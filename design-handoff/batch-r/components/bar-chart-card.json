@@ -1,0 +1,37 @@
+{
+  "component": "BarChartCard",
+  "description": "Reusable card widget that renders a grouped or stacked bar chart",
+  "props": {
+    "title": { "type": "string", "required": true, "description": "Chart title" },
+    "subtitle": { "type": "string", "required": false, "description": "Optional subtitle" },
+    "data": { "type": "array", "required": true, "description": "Array of { label: string, values: number[] }" },
+    "seriesLabels": { "type": "array", "required": true, "description": "Series legend labels" },
+    "stacked": { "type": "boolean", "required": false, "description": "Stacked bars (default false)" },
+    "orientation": { "type": "string", "required": false, "description": "vertical or horizontal (default vertical)" },
+    "height": { "type": "number", "required": false, "description": "Chart height (default 220)" },
+    "showLegend": { "type": "boolean", "required": false, "description": "Show legend (default true)" },
+    "showTooltip": { "type": "boolean", "required": false, "description": "Show tooltip (default true)" },
+    "showValueLabels": { "type": "boolean", "required": false, "description": "Show value on each bar (default false)" },
+    "isLoading": { "type": "boolean", "required": false, "description": "Loading state" },
+    "isEmpty": { "type": "boolean", "required": false, "description": "Empty state" },
+    "onExport": { "type": "function", "required": false, "description": "Export callback" }
+  },
+  "variants": ["default", "loading", "empty", "error", "horizontal"],
+  "tokens": {
+    "bg": "report.widget.bg",
+    "border": "semantic.cardBorder",
+    "titleColor": "semantic.foreground",
+    "subtitleColor": "semantic.muted",
+    "barColors": "chart.palette",
+    "barRadius": 4,
+    "gridColor": "chart.grid",
+    "axisColor": "chart.axis",
+    "tooltipBg": "chart.tooltip.bg",
+    "tooltipText": "chart.tooltip.text",
+    "horizontalLabelColumn": 160
+  },
+  "accessibility": {
+    "role": "img",
+    "ariaLabel": "[title] bar chart"
+  }
+}

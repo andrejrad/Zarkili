@@ -1,0 +1,38 @@
+{
+  "component": "ImpersonationBanner",
+  "path": "src/components/platform/ImpersonationBanner",
+  "platform": ["iOS", "Android", "Web"],
+  "variantNames": ["active", "ending"],
+  "variants": {
+    "active": {
+      "layout": {
+        "position": "fixed-top",
+        "height": 48,
+        "background": "tokens.colors.impersonation.bannerBackground",
+        "fields": [
+          { "key": "icon", "type": "icon", "name": "personSearch", "size": 20, "color": "tokens.colors.impersonation.bannerIcon" },
+          { "key": "label", "text": "strings.impersonation.bannerLabel", "variant": "body-medium", "weight": "500", "color": "tokens.colors.impersonation.bannerForeground", "flex": 1 },
+          { "key": "tenantName", "variant": "body-medium", "weight": "600", "color": "tokens.colors.impersonation.bannerForeground" },
+          { "key": "timer", "type": "monoClock", "font": "mono", "variant": "caption", "color": "tokens.colors.impersonation.bannerForeground", "opacity": 0.8 },
+          { "key": "endCta", "type": "button", "label": "strings.impersonation.endSessionCta", "variant": "outlined", "size": "compact", "borderColor": "tokens.colors.impersonation.bannerForeground", "color": "tokens.colors.impersonation.bannerForeground" }
+        ]
+      }
+    },
+    "ending": {
+      "layout": {
+        "endCta": { "loading": true, "disabled": true },
+        "label": { "opacity": 0.7 }
+      }
+    }
+  },
+  "tokens": {
+    "height": 48,
+    "background": "tokens.colors.impersonation.bannerBackground",
+    "foreground": "tokens.colors.impersonation.bannerForeground"
+  },
+  "accessibility": {
+    "role": "banner",
+    "liveRegion": "assertive",
+    "endCta": { "accessibilityLabel": "End impersonation session for {tenantName}" }
+  }
+}

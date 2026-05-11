@@ -32,6 +32,9 @@ export type DiscoverySalonCard = {
   member: boolean;
   bookingEnabled: boolean;
   messageEnabled: boolean;
+  /** Geographic coordinates for map pin placement. Optional until Firestore population (W22-DEBT-1). */
+  locationLat?: number;
+  locationLng?: number;
 };
 
 export type DiscoveryRecentBooking = {

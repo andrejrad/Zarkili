@@ -1,0 +1,30 @@
+{
+  "delta": "spacing-batch-r",
+  "values": {
+    "chartCard": {
+      "minHeight": 220,
+      "headerHeight": 48,
+      "padding": 16
+    },
+    "reportCanvas": {
+      "gridUnit": 40,
+      "widgetMinW": 2,
+      "widgetMinH": 2
+    },
+    "auditLog": {
+      "rowHeight": 56
+    },
+    "printReport": {
+      "pageWidth": 794,
+      "pageHeight": 1123
+    },
+    "dateRangePicker": {
+      "dropdownWidth": 320,
+      "calendarCellSize": 36
+    },
+    "postComposer": {
+      "toolbarHeight": 56,
+      "previewPanelWidth": 320
+    }
+  }
+}

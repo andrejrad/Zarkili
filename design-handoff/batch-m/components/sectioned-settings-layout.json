@@ -1,0 +1,78 @@
+{
+  "schemaVersion": "1.0.0",
+  "componentId": "MC.3",
+  "componentName": "SectionedSettingsLayout",
+  "exportedAs": "SectionedSettingsLayout",
+  "category": "admin-navigation",
+  "description": "Master-detail settings shell with a 280px persistent sidebar on iPad and a collapsible list-then-detail pattern on iPhone.",
+  "props": {
+    "sections": {
+      "type": "NavSection[]",
+      "required": true,
+      "description": "Array of navigation items with shape { key, icon, label, badge }"
+    },
+    "activeSectionKey": {
+      "type": "string | null",
+      "required": false,
+      "default": null,
+      "description": "Key of the currently active settings section"
+    },
+    "onSectionPress": {
+      "type": "(key: string) => void",
+      "required": false,
+      "description": "Callback when a sidebar nav item is tapped"
+    },
+    "searchQuery": {
+      "type": "string",
+      "required": false,
+      "default": "",
+      "description": "Current value of the sidebar search input"
+    },
+    "onSearchChange": {
+      "type": "(query: string) => void",
+      "required": false,
+      "description": "Callback when the sidebar search input changes"
+    },
+    "children": {
+      "type": "ReactNode",
+      "required": false,
+      "description": "Content rendered in the right detail pane"
+    }
+  },
+  "tokens": {
+    "sidebarBg": "admin.surface",
+    "sidebarBorder": "admin.border",
+    "activeItemBorder": "accent",
+    "activeItemBg": "accent",
+    "itemText": "text.primary",
+    "mutedText": "admin.text.muted"
+  },
+  "anatomy": [
+    "sidebar (width 280 fixed iPad, full-width collapsed iPhone)",
+    "search-input (sidebar header, radius medium)",
+    "nav-item-row (height 44, label body w500, active-indicator 3px left border coral-blossom)",
+    "role-denied-badge (lock icon inline on restricted items)",
+    "right-content-pane (flex 1)"
+  ],
+  "sizes": [
+    {
+      "name": "default",
+      "width": "280px sidebar + flex detail",
+      "height": 44,
+      "note": "sidebar item height"
+    }
+  ],
+  "stateNames": [
+    "default",
+    "search-active",
+    "section-selected",
+    "role-denied-section",
+    "error"
+  ],
+  "accessibility": {
+    "role": "navigation",
+    "ariaLabel": "Settings navigation",
+    "itemRole": "menuitem",
+    "activeAriaSelected": true
+  }
+}

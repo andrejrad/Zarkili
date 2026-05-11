@@ -1,0 +1,164 @@
+{
+  "screen": "ClientListScreen",
+  "route": "/admin/clients",
+  "description": "Searchable client list with filters, bulk selection, and saved views",
+  "dimensions": {
+    "width": 390,
+    "height": "auto-scroll"
+  },
+  "states": [
+    "default",
+    "loading",
+    "empty",
+    "error",
+    "bulkSelection"
+  ],
+  "accessibility": {
+    "screenReaderLabel": "strings.clientList.screenTitle",
+    "semanticRoles": [
+      {"element": "clientList", "role": "list"},
+      {"element": "clientRow", "role": "listitem"},
+      {"element": "filterRow", "role": "tablist"},
+      {"element": "bulkSelectCheckbox", "role": "checkbox"}
+    ]
+  },
+  "rtl": "deferred",
+  "darkMode": "deferred",
+  "layout": {
+    "header": {
+      "height": 64,
+      "title": "strings.clientList.title",
+      "rightAction": {
+        "component": "search-bar",
+        "placeholder": "strings.clientList.searchPlaceholder"
+      }
+    },
+    "filterRow": {
+      "height": 48,
+      "paddingHorizontal": 16,
+      "gap": 8,
+      "filters": [
+        {"label": "strings.clientList.filterAll", "key": "all"},
+        {"label": "strings.clientList.filterActive", "key": "active"},
+        {"label": "strings.clientList.filterBlocked", "key": "blocked"},
+        {"label": "strings.clientList.filterVip", "key": "vip"}
+      ]
+    },
+    "savedViewsDropdown": {
+      "height": 44,
+      "marginHorizontal": 16,
+      "marginBottom": 12,
+      "options": [
+        "strings.clientList.viewMyClients",
+        "strings.clientList.viewNoShowRisk",
+        "strings.clientList.viewChurned"
+      ]
+    },
+    "list": {
+      "rowHeight": 64,
+      "paddingHorizontal": 16,
+      "dividerColor": "semantic.cardBorder",
+      "dividerThickness": 0.5
+    },
+    "bulkActionBar": {
+      "height": 56,
+      "position": "fixed-bottom",
+      "background": "semantic.admin.bulkActionBarBg",
+      "textColor": "semantic.admin.bulkActionBarText"
+    }
+  },
+  "components": [
+    {
+      "id": "header",
+      "ref": "navigation-header",
+      "props": {
+        "title": "strings.clientList.title",
+        "showBack": false
+      }
+    },
+    {
+      "id": "searchBar",
+      "ref": "search-bar",
+      "props": {
+        "placeholder": "strings.clientList.searchPlaceholder"
+      }
+    },
+    {
+      "id": "filterChips",
+      "ref": "chip-group",
+      "props": {
+        "chips": [
+          {"label": "strings.clientList.filterAll", "selected": true},
+          {"label": "strings.clientList.filterActive", "selected": false},
+          {"label": "strings.clientList.filterBlocked", "selected": false},
+          {"label": "strings.clientList.filterVip", "selected": false}
+        ]
+      }
+    },
+    {
+      "id": "clientRow",
+      "ref": "list-row",
+      "props": {
+        "leftIcon": "avatar-initials",
+        "title": "{{clientName}}",
+        "subtitle": "strings.clientList.lastVisit",
+        "badges": [
+          {"ref": "tier-badge", "tier": "{{clientTier}}"},
+          {"ref": "badge", "label": "{{lifetimeSpend}}"}
+        ],
+        "rightIcon": "chevron-right",
+        "checkbox": "{{bulkSelectMode}}"
+      }
+    },
+    {
+      "id": "bulkActionBar",
+      "ref": "bulk-action-bar",
+      "props": {
+        "actions": [
+          {"label": "strings.clientList.bulkExport", "icon": "download"},
+          {"label": "strings.clientList.bulkTag", "icon": "tag"},
+          {"label": "strings.clientList.bulkBlock", "icon": "block", "destructive": true}
+        ]
+      }
+    }
+  ],
+  "interactions": [
+    {
+      "trigger": "clientRow.tap",
+      "action": "navigate",
+      "target": "/admin/clients/:id"
+    },
+    {
+      "trigger": "bulkSelectCheckbox.toggle",
+      "action": "toggleBulkSelection"
+    },
+    {
+      "trigger": "filterChip.tap",
+      "action": "filterClients"
+    },
+    {
+      "trigger": "searchBar.input",
+      "action": "searchClients",
+      "debounce": 300
+    }
+  ],
+  "tokens": {
+    "used": [
+      "semantic.pageBackground",
+      "semantic.surface",
+      "semantic.cardBorder",
+      "semantic.foreground",
+      "semantic.secondaryText",
+      "semantic.admin.bulkActionBarBg",
+      "semantic.admin.bulkActionBarText"
+    ]
+  },
+  "redlines": {
+    "filterRowGap": 8,
+    "listRowHeight": 64,
+    "avatarSize": 40,
+    "checkboxSize": 20,
+    "touchTarget": 44,
+    "dividerInset": 56
+  }
+}

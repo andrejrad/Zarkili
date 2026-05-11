@@ -7,6 +7,7 @@ import { db } from "../../shared/config/firebase";
 import { createTenantLocationAdminService } from "./tenantLocationAdminService";
 import { createStaffAdminService } from "./staffAdminService";
 import { createServiceAdminService } from "./serviceAdminService";
+import { createOwnerKpiService } from "./ownerKpiService";
 
 const tenantRepository = createTenantRepository(db);
 const locationRepository = createLocationRepository(db);
@@ -20,3 +21,4 @@ export const tenantLocationAdminService = createTenantLocationAdminService({
 
 export const staffAdminService = createStaffAdminService({ staffRepository });
 export const serviceAdminService = createServiceAdminService({ serviceRepository });
+export const ownerKpiService = createOwnerKpiService(db);

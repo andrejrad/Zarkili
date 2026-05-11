@@ -1,0 +1,54 @@
+{
+  "screen": "ViewAsClientScreen",
+  "route": "ViewAsClient",
+  "device": { "primary": "Mobile 375×812", "secondary": "Desktop 1280+" },
+  "stateNames": ["previewing", "exiting"],
+  "layout": {
+    "previewBanner": {
+      "position": "fixed-top",
+      "height": 48,
+      "background": "secondary",
+      "layout": "row space-between",
+      "fields": [
+        { "key": "icon", "type": "icon", "name": "visibility", "size": 20, "color": "on-secondary" },
+        { "key": "label", "text": "strings.viewAsClient.bannerLabel", "variant": "body-medium", "color": "on-secondary", "weight": "500" },
+        {
+          "key": "exitCta",
+          "type": "button",
+          "label": "strings.viewAsClient.exitPreviewCta",
+          "variant": "outlined",
+          "size": "compact",
+          "borderColor": "on-secondary",
+          "color": "on-secondary",
+          "onPress": "confirmExitPreview"
+        }
+      ]
+    },
+    "clientContent": {
+      "marginTop": 48,
+      "note": "The full client app UI renders below the banner. The banner overlays and reduces the effective viewport.",
+      "overlay": {
+        "type": "frameBorder",
+        "borderColor": "secondary",
+        "borderWidth": 2,
+        "pulse": { "enabled": true, "interval": 3000 }
+      }
+    },
+    "exitToast": {
+      "showWhen": "state === exiting",
+      "label": "strings.viewAsClient.exitedToast",
+      "tone": "success",
+      "duration": 3000
+    }
+  },
+  "states": {
+    "previewing": {
+      "previewBanner": { "visible": true },
+      "clientContent": { "overlay": { "visible": true } }
+    },
+    "exiting": {
+      "previewBanner": { "animate": "slideUp", "duration": 200 },
+      "exitToast": { "visible": true }
+    }
+  }
+}

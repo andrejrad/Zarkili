@@ -1,0 +1,91 @@
+{
+  "component": "CampaignStatusBadge",
+  "description": "Pill badge showing campaign status with semantic colors and optional pulsing animation",
+  "props": {
+    "status": {
+      "type": "draft | scheduled | sending | sent | archived | failed",
+      "required": true,
+      "description": "Current campaign status"
+    },
+    "size": {
+      "type": "small | medium",
+      "required": false,
+      "description": "Badge size variant (default: medium)"
+    }
+  },
+  "states": [
+    "draft",
+    "scheduled",
+    "sending",
+    "sent",
+    "archived",
+    "failed"
+  ],
+  "variants": [
+    "small",
+    "medium"
+  ],
+  "tokens": {
+    "draft": {
+      "background": "#F3F4F6",
+      "text": "#6B7280",
+      "border": "#E5E7EB"
+    },
+    "scheduled": {
+      "background": "#DBEAFE",
+      "text": "#1E40AF",
+      "border": "#93C5FD"
+    },
+    "sending": {
+      "background": "#FEF3C7",
+      "text": "#92400E",
+      "border": "#FCD34D",
+      "pulsingDot": "#FF9800"
+    },
+    "sent": {
+      "background": "#D1FAE5",
+      "text": "#065F46",
+      "border": "#6EE7B7"
+    },
+    "archived": {
+      "background": "#F3F4F6",
+      "text": "#9CA3AF",
+      "border": "#E5E7EB"
+    },
+    "failed": {
+      "background": "#FEE2E2",
+      "text": "#991B1B",
+      "border": "#FCA5A5"
+    }
+  },
+  "accessibility": {
+    "role": "status",
+    "label": "Campaign status: {status}",
+    "hint": null
+  },
+  "dimensions": {
+    "small": {
+      "height": 20,
+      "paddingHorizontal": 8,
+      "fontSize": 11,
+      "borderRadius": 6
+    },
+    "medium": {
+      "height": 24,
+      "paddingHorizontal": 12,
+      "fontSize": 12,
+      "borderRadius": 6
+    },
+    "pulsingDotSize": 6
+  },
+  "examples": [
+    {
+      "status": "sending",
+      "size": "medium"
+    },
+    {
+      "status": "sent",
+      "size": "small"
+    }
+  ]
+}

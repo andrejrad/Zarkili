@@ -1,0 +1,171 @@
+{
+  "screen": "RewardCatalogEditorScreen",
+  "route": "/admin/loyalty/rewards",
+  "description": "Manage loyalty reward catalog with drag-to-reorder and inline editing",
+  "dimensions": {
+    "width": 390,
+    "height": "auto-scroll"
+  },
+  "states": [
+    "default",
+    "loading",
+    "empty",
+    "error",
+    "reordering"
+  ],
+  "accessibility": {
+    "screenReaderLabel": "strings.rewardCatalog.screenTitle",
+    "semanticRoles": [
+      {"element": "rewardsList", "role": "list"},
+      {"element": "rewardRow", "role": "listitem"},
+      {"element": "dragHandle", "role": "button", "hint": "strings.rewardCatalog.dragHint"},
+      {"element": "addFab", "role": "button"}
+    ]
+  },
+  "rtl": "deferred",
+  "darkMode": "deferred",
+  "layout": {
+    "header": {
+      "height": 64,
+      "title": "strings.rewardCatalog.title"
+    },
+    "rewardsList": {
+      "paddingHorizontal": 16,
+      "gap": 12,
+      "rowHeight": 80,
+      "expandedHeight": "auto"
+    },
+    "rewardRow": {
+      "collapsed": {
+        "height": 80,
+        "paddingHorizontal": 12,
+        "paddingVertical": 12,
+        "columns": [
+          {
+            "component": "drag-handle",
+            "width": 32
+          },
+          {
+            "component": "thumbnail",
+            "width": 56,
+            "height": 56
+          },
+          {
+            "component": "info",
+            "flex": 1,
+            "children": ["name", "pointsCost"]
+          },
+          {
+            "component": "status-badge",
+            "width": "auto"
+          }
+        ]
+      },
+      "expanded": {
+        "paddingHorizontal": 16,
+        "paddingVertical": 16,
+        "gap": 16,
+        "fields": [
+          "name",
+          "description",
+          "pointsCost",
+          "redemptionLimit",
+          "photoUpload",
+          "visibility",
+          "expiryDate"
+        ]
+      }
+    },
+    "addFab": {
+      "position": "fixed",
+      "bottom": 24,
+      "right": 24,
+      "size": 56,
+      "icon": "plus",
+      "label": "strings.rewardCatalog.addReward"
+    }
+  },
+  "components": [
+    {
+      "id": "navigationHeader",
+      "ref": "navigation-header",
+      "props": {
+        "showBack": true,
+        "title": "strings.rewardCatalog.title"
+      }
+    },
+    {
+      "id": "rewardRow",
+      "ref": "list-row",
+      "props": {
+        "draggable": true,
+        "expandable": true,
+        "thumbnail": "{{thumbnailUrl}}",
+        "name": "{{name}}",
+        "pointsCost": "{{pointsCost}} pts",
+        "statusBadge": "{{status}}"
+      }
+    },
+    {
+      "id": "photoUploadTile",
+      "ref": "photo-upload-tile",
+      "props": {
+        "imageUrl": "{{imageUrl}}",
+        "onUpload": "{{onUpload}}"
+      }
+    },
+    {
+      "id": "visibilityToggle",
+      "ref": "switch",
+      "props": {
+        "label": "strings.rewardCatalog.visibilityLabel"
+      }
+    },
+    {
+      "id": "addFab",
+      "ref": "fab",
+      "props": {
+        "icon": "plus",
+        "label": "strings.rewardCatalog.addReward"
+      }
+    }
+  ],
+  "interactions": [
+    {
+      "trigger": "rewardRow.tap",
+      "action": "toggleExpanded"
+    },
+    {
+      "trigger": "dragHandle.drag",
+      "action": "reorderReward"
+    },
+    {
+      "trigger": "addFab.tap",
+      "action": "createNewReward"
+    },
+    {
+      "trigger": "field.change",
+      "action": "updateReward",
+      "debounce": 500
+    }
+  ],
+  "tokens": {
+    "used": [
+      "semantic.pageBackground",
+      "semantic.surface",
+      "semantic.cardBorder",
+      "semantic.foreground",
+      "semantic.secondaryText",
+      "semantic.primary"
+    ]
+  },
+  "redlines": {
+    "rowHeight": 80,
+    "thumbnailSize": 56,
+    "dragHandleWidth": 32,
+    "fabSize": 56,
+    "fabBottom": 24,
+    "fabRight": 24,
+    "gap": 12
+  }
+}

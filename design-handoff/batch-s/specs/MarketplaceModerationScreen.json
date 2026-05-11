@@ -1,0 +1,78 @@
+{
+  "screen": "MarketplaceModerationScreen",
+  "route": "SuperAdminMarketplaceModeration",
+  "device": { "primary": "Desktop 1280+", "secondary": "iPad 1024×768" },
+  "stateNames": ["queue", "detailDrawer", "banAuthorDialog", "error"],
+  "layout": {
+    "header": {
+      "title": { "text": "Marketplace Moderation", "variant": "heading-2" },
+      "tabs": {
+        "type": "tabBar",
+        "tabs": [
+          { "key": "pending", "label": "Pending Review", "badge": { "type": "count", "color": "primary" } },
+          { "key": "approved", "label": "Approved" },
+          { "key": "removed", "label": "Removed" }
+        ]
+      }
+    },
+    "submissionTable": {
+      "columns": [
+        { "key": "thumbnail", "type": "image", "width": 64, "aspectRatio": "1:1", "shape": "rounded" },
+        { "key": "pluginName", "variant": "body-medium", "weight": "500" },
+        { "key": "author", "type": "userPill", "showAvatar": true },
+        { "key": "submittedAt", "type": "relative", "variant": "caption" },
+        { "key": "category", "type": "pill" },
+        { "key": "status", "type": "pill", "values": ["pending", "approved", "removed", "flagged"] },
+        { "key": "reportCount", "label": "Reports", "format": "int", "color": "error" },
+        { "key": "actions", "type": "overflow-menu", "items": [
+          { "label": "strings.marketplaceModeration.approveCta", "icon": "checkCircle" },
+          { "label": "strings.marketplaceModeration.removeCta", "icon": "delete", "tone": "destructive" },
+          { "label": "strings.marketplaceModeration.banAuthorCta", "icon": "block", "tone": "destructive" },
+          { "label": "strings.marketplaceModeration.escalateCta", "icon": "arrowUpward" }
+        ]}
+      ],
+      "rowAction": { "type": "open-detail-drawer" }
+    },
+    "detailDrawer": {
+      "width": 600,
+      "position": "right",
+      "sections": [
+        { "title": "Plugin Details", "fields": ["name", "description", "version", "category", "permissions"] },
+        { "title": "Author", "fields": ["authorName", "tenantName", "registeredDate", "previousSubmissionCount"] },
+        { "title": "User Reports", "type": "list", "fields": ["reportReason", "reportedBy", "timestamp"] },
+        { "title": "Review Notes", "type": "textArea" }
+      ],
+      "footer": {
+        "ctaGroup": [
+          { "label": "strings.marketplaceModeration.approveCta", "variant": "filled", "color": "success" },
+          { "label": "strings.marketplaceModeration.removeCta", "variant": "filled", "color": "error" }
+        ]
+      }
+    },
+    "banAuthorDialog": {
+      "type": "modal",
+      "title": "Ban Marketplace Author",
+      "form": [
+        { "id": "reason", "type": "select", "label": "Ban reason", "required": true },
+        { "id": "duration", "type": "segmentedControl", "options": ["7 days", "30 days", "Permanent"] },
+        { "id": "notes", "type": "textArea", "label": "Internal notes", "rows": 3 }
+      ],
+      "cta": { "label": "strings.marketplaceModeration.banAuthorCta", "variant": "filled", "tone": "destructive" }
+    }
+  },
+  "states": {
+    "detailDrawer": {
+      "detailDrawer": { "open": true }
+    },
+    "banAuthorDialog": {
+      "banAuthorDialog": { "open": true }
+    },
+    "error": {
+      "inlineBanner": {
+        "background": "error 10%",
+        "borderLeft": { "width": 4, "color": "error" },
+        "message": "strings.marketplaceModeration.errorMessage"
+      }
+    }
+  }
+}

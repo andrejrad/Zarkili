@@ -1,0 +1,80 @@
+{
+  "screen": "PlatformHealthDashboardScreen",
+  "route": "SuperAdminPlatformHealth",
+  "device": { "primary": "Desktop 1280+", "secondary": "iPad 1024×768" },
+  "stateNames": ["default", "degraded", "outage", "error"],
+  "layout": {
+    "header": {
+      "title": { "text": "Platform Health", "variant": "heading-2" },
+      "overallStatus": {
+        "type": "pill",
+        "variants": {
+          "operational": { "background": "success", "label": "All Systems Operational", "icon": "checkCircle" },
+          "degraded": { "background": "warning", "label": "Degraded Performance", "icon": "warning" },
+          "outage": { "background": "error", "label": "Partial Outage", "icon": "errorFilled" }
+        }
+      },
+      "lastChecked": { "prefix": "Last checked", "font": "mono", "variant": "caption", "color": "on-surface-variant" }
+    },
+    "serviceGrid": {
+      "layout": { "desktop": "4-column grid", "iPad": "2-column grid" },
+      "card": {
+        "width": 280,
+        "padding": 16,
+        "shape": "rounded-2",
+        "fields": [
+          { "key": "serviceIcon", "type": "icon", "position": "top-left" },
+          { "key": "serviceName", "variant": "body-large", "weight": "600" },
+          { "key": "statusPill", "type": "pill" },
+          { "key": "uptime", "label": "30d uptime", "variant": "heading-3", "font": "mono" },
+          { "key": "p99Latency", "label": "p99 latency", "variant": "caption", "font": "mono", "color": "on-surface-variant" },
+          { "key": "errorRate", "label": "error rate", "variant": "caption", "font": "mono" }
+        ]
+      },
+      "services": ["Auth", "Firestore", "Cloud Functions", "Push", "AI", "Storage", "Billing API", "CDN"]
+    },
+    "incidentFeed": {
+      "title": { "text": "Recent Incidents", "variant": "title-medium" },
+      "list": {
+        "maxItems": 10,
+        "item": {
+          "fields": [
+            { "key": "severity", "type": "pill", "values": ["P1", "P2", "P3"] },
+            { "key": "title", "variant": "body-medium", "weight": "500" },
+            { "key": "affectedService", "variant": "caption", "color": "on-surface-variant" },
+            { "key": "duration", "type": "monoClock", "variant": "caption", "font": "mono" },
+            { "key": "stamp", "type": "relative", "variant": "caption" }
+          ]
+        }
+      }
+    },
+    "charts": {
+      "title": { "text": "System Metrics", "variant": "title-medium" },
+      "layout": { "desktop": "2-up grid", "iPad": "single column" },
+      "cards": [
+        { "type": "chart-card", "chartType": "line", "title": "API error rate (%)", "span": "24h" },
+        { "type": "chart-card", "chartType": "line", "title": "Auth latency p99 (ms)", "span": "24h" },
+        { "type": "chart-card", "chartType": "bar", "title": "Queue depth", "span": "24h" }
+      ]
+    }
+  },
+  "states": {
+    "degraded": {
+      "overallStatus": "degraded",
+      "affectedCards": { "border": { "width": 2, "color": "warning" } },
+      "inlineBanner": { "severity": "warning", "position": "top", "showAlert": true }
+    },
+    "outage": {
+      "overallStatus": "outage",
+      "affectedCards": { "border": { "width": 2, "color": "error" } },
+      "inlineBanner": { "severity": "error", "position": "top", "showAlert": true }
+    },
+    "error": {
+      "inlineBanner": {
+        "background": "error 10%",
+        "borderLeft": { "width": 4, "color": "error" },
+        "message": "strings.platformHealth.errorMessage"
+      }
+    }
+  }
+}

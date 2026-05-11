@@ -1,0 +1,73 @@
+{
+  "screen": "CommandPaletteScreen",
+  "route": "CommandPalette",
+  "device": { "primary": "Desktop 1280+" },
+  "note": "Overlay component activated via keyboard shortcut (⌘K / Ctrl+K). Not a full-page screen — renders as a floating overlay.",
+  "stateNames": ["idle", "searching", "noResults"],
+  "layout": {
+    "overlay": {
+      "type": "dialog",
+      "position": "top-center",
+      "marginTop": 80,
+      "width": 600,
+      "maxHeight": 480,
+      "backdrop": { "color": "black 40%", "blur": 4 },
+      "shape": "rounded-3",
+      "elevation": 8
+    },
+    "searchInput": {
+      "type": "textInput",
+      "placeholder": "strings.commandPalette.placeholder",
+      "icon": { "leading": "search", "size": 20 },
+      "autoFocus": true,
+      "clearButton": true,
+      "border": "none",
+      "padding": { "horizontal": 16, "vertical": 14 }
+    },
+    "divider": { "height": 1, "color": "outline-variant" },
+    "resultsList": {
+      "virtualScroll": true,
+      "section": {
+        "header": { "variant": "label-small", "color": "on-surface-variant", "padding": { "horizontal": 16, "vertical": 6 }, "text": "section label" },
+        "item": {
+          "height": 44,
+          "padding": { "horizontal": 16 },
+          "layout": "row",
+          "fields": [
+            { "key": "icon", "type": "icon", "size": 18, "color": "on-surface-variant" },
+            { "key": "label", "variant": "body-medium" },
+            { "key": "description", "variant": "caption", "color": "on-surface-variant" },
+            { "key": "shortcut", "type": "kbdBadge", "font": "mono", "variant": "caption", "position": "right" }
+          ],
+          "selectedStyle": { "background": "primary-container" }
+        }
+      }
+    },
+    "emptyState": {
+      "showWhen": "state === noResults",
+      "icon": { "name": "searchOff", "size": 40, "color": "on-surface-variant" },
+      "text": { "value": "No results for \"{query}\"", "variant": "body-medium", "color": "on-surface-variant" }
+    },
+    "footer": {
+      "keyboardHints": {
+        "text": "strings.commandPalette.keyboardHints",
+        "variant": "caption",
+        "color": "on-surface-variant",
+        "font": "mono",
+        "padding": { "horizontal": 16, "vertical": 8 }
+      }
+    }
+  },
+  "states": {
+    "idle": {
+      "resultsList": { "sections": ["recent", "quickNav"] }
+    },
+    "searching": {
+      "resultsList": { "sections": ["searchResults"] }
+    },
+    "noResults": {
+      "resultsList": { "visible": false },
+      "emptyState": { "visible": true }
+    }
+  }
+}

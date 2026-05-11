@@ -326,6 +326,97 @@ export function createBookingsRepository(db: Firestore) {
   }
 
   /**
+   * Atomically reschedules a confirmed (or previously rescheduled) booking to a
+   * new date/time slot.
+   *
+   * Strategy (single Firestore transaction):
+   *   1. Read the current booking — must be "confirmed" or "rescheduled".
+   *   2. Verify the new slot token is free (or already owned by this booking).
+   *   3. Write the new slot token, delete the old one.
+   *   4. Update the booking: status → "rescheduled", new date/time fields,
+   *      version++, append lifecycle event.
+   *
+   * Bypasses the status-transition actor check intentionally: the consumer
+   * self-service reschedule is treated as an immediate approval (no
+   * reschedule_pending gate) for Phase 2 single-tenant simplicity.
+   */
+  async function rescheduleBookingAtomically(
+    bookingId: string,
+    tenantId: string,
+    newDate: string,         // YYYY-MM-DD
+    newStartMinutes: number,
+    newEndMinutes: number,
+    actor: BookingActorRole,
+    reason?: string,
+  ): Promise<void> {
+    assertNonEmpty(bookingId, "bookingId");
+    assertNonEmpty(tenantId, "tenantId");
+    assertNonEmpty(newDate, "newDate");
+
+    const bookingRef = doc(db, COLLECTION, bookingId);
+
+    await runTransaction(db, async (tx) => {
+      const snap = await tx.get(bookingRef);
+      if (!snap.exists()) {
+        throw new BookingError("BOOKING_NOT_FOUND", `Booking ${bookingId} not found`);
+      }
+      const booking = snap.data() as Booking;
+      if (booking.tenantId !== tenantId) {
+        throw new BookingError("BOOKING_NOT_FOUND", `Booking ${bookingId} not found`);
+      }
+      if (booking.status !== "confirmed" && booking.status !== "rescheduled") {
+        throw new BookingError(
+          "INVALID_STATUS_TRANSITION",
+          `Cannot reschedule booking with status "${booking.status}"`,
+        );
+      }
+
+      // Acquire new slot token
+      const newSlotTokenId = buildSlotTokenId(tenantId, booking.staffId, newDate, newStartMinutes);
+      const newSlotTokenRef = doc(db, SLOT_TOKENS_COLLECTION, newSlotTokenId);
+      const newSlotSnap = await tx.get(newSlotTokenRef);
+      if (newSlotSnap.exists() && (newSlotSnap.data() as { bookingId?: string }).bookingId !== bookingId) {
+        throw new BookingError("SLOT_UNAVAILABLE", `Slot ${newSlotTokenId} is already reserved`);
+      }
+
+      // Release old slot token
+      const oldSlotTokenId = buildSlotTokenId(tenantId, booking.staffId, booking.date, booking.startMinutes);
+      const oldSlotTokenRef = doc(db, SLOT_TOKENS_COLLECTION, oldSlotTokenId);
+
+      const pad = (n: number) => String(n).padStart(2, "0");
+      const startTime = `${pad(Math.floor(newStartMinutes / 60))}:${pad(newStartMinutes % 60)}`;
+      const endTime = `${pad(Math.floor(newEndMinutes / 60))}:${pad(newEndMinutes % 60)}`;
+
+      const lifecycleEvent = {
+        status: "rescheduled",
+        actor,
+        reason: reason ?? null,
+        occurredAt: serverTimestamp(),
+      };
+
+      tx.set(newSlotTokenRef, {
+        bookingId,
+        tenantId,
+        staffId: booking.staffId,
+        date: newDate,
+        startMinutes: newStartMinutes,
+      });
+      tx.delete(oldSlotTokenRef);
+      tx.update(bookingRef, {
+        status: "rescheduled",
+        date: newDate,
+        startMinutes: newStartMinutes,
+        endMinutes: newEndMinutes,
+        startTime,
+        endTime,
+        version: booking.version + 1,
+        lifecycleEvents: arrayUnion(lifecycleEvent),
+        updatedAt: serverTimestamp(),
+      });
+    });
+  }
+
+  /**
    * Lists bookings for a tenant filtered by one or more statuses, with optional
    * location and date filters for the admin booking queue.
    *
@@ -376,6 +467,7 @@ export function createBookingsRepository(db: Firestore) {
     cancelBooking,
     markCompleted,
     markNoShow,
+    rescheduleBookingAtomically,
   };
 }
 

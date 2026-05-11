@@ -1,0 +1,69 @@
+{
+  "delta": "colors-batch-r",
+  "semantic": {
+    "chart": {
+      "palette": [
+        "#E3A9A0",
+        "#D4A5C9",
+        "#A5C4D4",
+        "#A5D4B8",
+        "#D4CCA5",
+        "#C4A5D4",
+        "#A5B8D4",
+        "#D4B8A5"
+      ],
+      "grid": "#E5E0D1",
+      "axis": "#6B6B6B",
+      "tooltip": {
+        "bg": "#1A1A1A",
+        "text": "#FFFFFF"
+      },
+      "funnel": {
+        "step1": "#E3A9A0",
+        "step2": "#DC9E97",
+        "step3": "#D5948F",
+        "step4": "#CE8A87",
+        "step5": "#CF8B80"
+      },
+      "cohort": {
+        "high": "#4CAF50",
+        "mid": "#FF9800",
+        "low": "#F44336",
+        "zero": "#F5F5F5"
+      }
+    },
+    "ai": {
+      "suggestion": "#D4A5C9",
+      "approved": "#4CAF50",
+      "rejected": "#F44336",
+      "pending": "#FF9800",
+      "budgetSafe": "#4CAF50",
+      "budgetWarning": "#FF9800",
+      "budgetCritical": "#F44336",
+      "safetyOk": "#4CAF50",
+      "safetyFlagged": "#FF9800",
+      "safetyBlocked": "#F44336"
+    },
+    "marketplace": {
+      "live": "#4CAF50",
+      "pending": "#FF9800",
+      "rejected": "#F44336",
+      "draft": "#9CA3AF",
+      "paused": "#6B6B6B"
+    },
+    "antiTheft": {
+      "clean": "#4CAF50",
+      "suspicious": "#FF9800",
+      "confirmed": "#F44336"
+    },
+    "report": {
+      "canvas": {
+        "bg": "#F7F4EC",
+        "border": "#E5E0D1"
+      },
+      "widget": {
+        "bg": "#FFFFFF"
+      }
+    }
+  }
+}

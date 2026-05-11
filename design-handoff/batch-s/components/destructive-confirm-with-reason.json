@@ -1,0 +1,82 @@
+{
+  "component": "DestructiveConfirmWithReason",
+  "path": "src/components/platform/DestructiveConfirmWithReason",
+  "platform": ["iOS", "Android", "Web"],
+  "variantNames": ["idle", "submitting", "error"],
+  "variants": {
+    "idle": {
+      "form": { "disabled": false },
+      "confirmCta": { "loading": false, "disabled": "typedValue !== confirmWord || explanation.length < 20" }
+    },
+    "submitting": {
+      "form": { "disabled": true },
+      "confirmCta": { "loading": true, "disabled": true }
+    },
+    "error": {
+      "errorMessage": { "visible": true }
+    }
+  },
+  "layout": {
+    "modal": {
+      "maxWidth": 440,
+      "shape": "rounded-3",
+      "padding": 24
+    },
+    "header": {
+      "icon": { "name": "errorFilled", "size": 48, "color": "error", "align": "center" },
+      "title": { "variant": "heading-4", "align": "center" },
+      "body": { "variant": "body-medium", "align": "center", "color": "on-surface-variant" }
+    },
+    "form": {
+      "fields": [
+        {
+          "id": "typedValue",
+          "type": "textInput",
+          "label": "strings.destructiveConfirm.typedValueLabel",
+          "validation": { "mustEqual": "{confirmWord}" },
+          "errorStyle": { "borderColor": "error" }
+        },
+        {
+          "id": "reason",
+          "type": "select",
+          "label": "strings.destructiveConfirm.reasonLabel",
+          "required": true
+        },
+        {
+          "id": "explanation",
+          "type": "textArea",
+          "label": "strings.destructiveConfirm.explanationLabel",
+          "helperText": "strings.destructiveConfirm.explanationHelper",
+          "rows": 4,
+          "minChars": 20,
+          "showWhen": "reason !== null"
+        }
+      ]
+    },
+    "footer": {
+      "layout": "row end",
+      "gap": 12,
+      "items": [
+        { "label": "strings.destructiveConfirm.cancelCta", "variant": "outlined" },
+        { "label": "{actionCta}", "variant": "filled", "tone": "destructive" }
+      ]
+    },
+    "errorMessage": {
+      "type": "text",
+      "color": "error",
+      "variant": "body-medium",
+      "align": "center"
+    }
+  },
+  "tokens": {
+    "confirmWord": "string — passed as prop",
+    "actionCta": "string — passed as prop",
+    "actionTitle": "string — passed as prop",
+    "actionDescription": "string — passed as prop"
+  },
+  "accessibility": {
+    "role": "dialog",
+    "ariaLabelledby": "title",
+    "typedValue": { "ariaDescribedby": "typeToConfirmHint" }
+  }
+}

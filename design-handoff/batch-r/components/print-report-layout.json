@@ -1,0 +1,55 @@
+{
+  "component": "PrintReportLayout",
+  "description": "Print-optimised A4 page wrapper for generated PDF/print reports",
+  "props": {
+    "reportTitle": { "type": "string", "required": true, "description": "Report title" },
+    "salonName": { "type": "string", "required": true, "description": "Salon name" },
+    "generatedAt": { "type": "string", "required": true, "description": "ISO timestamp" },
+    "dateRange": { "type": "object", "required": true, "description": "{ startDate, endDate }" },
+    "preparedBy": { "type": "string", "required": true, "description": "User who prepared report" },
+    "widgets": { "type": "array", "required": true, "description": "Array of ReactNode widget renders" },
+    "pageBreaks": { "type": "array", "required": false, "description": "Widget indices after which page break inserted" },
+    "showPageNumbers": { "type": "boolean", "required": false, "description": "Show page numbers (default true)" },
+    "totalPages": { "type": "number", "required": true, "description": "Total page count" },
+    "showLogo": { "type": "boolean", "required": false, "description": "Show logo (default true)" }
+  },
+  "variants": ["screen-preview", "print"],
+  "layout": {
+    "width": 794,
+    "background": "#FFFFFF",
+    "outerContainer": "#F0F0F0",
+    "pageHeader": {
+      "height": 80,
+      "firstPageOnly": true,
+      "left": "logo (40x40 grey box) + reportTitle + salonName",
+      "right": "dateRange + generatedAt",
+      "borderBottom": "1px semantic.border"
+    },
+    "body": {
+      "padding": 40,
+      "widgetGap": 24,
+      "pageBreak": "CSS page-break-after: always"
+    },
+    "pageFooter": {
+      "height": 48,
+      "allPages": true,
+      "left": "Prepared by [preparedBy]",
+      "center": "Zarkili",
+      "right": "Page [n] of [total]",
+      "borderTop": "1px semantic.border"
+    }
+  },
+  "tokens": {
+    "pageBg": "#FFFFFF",
+    "outerBg": "#F0F0F0",
+    "headerBorder": "semantic.border",
+    "footerBorder": "semantic.border",
+    "bodyPadding": 40,
+    "fontColor": "semantic.foreground",
+    "mutedFont": "semantic.muted"
+  },
+  "accessibility": {
+    "role": "document",
+    "page": "role=region, aria-label=Page [n]"
+  }
+}

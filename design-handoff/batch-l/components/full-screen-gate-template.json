@@ -1,0 +1,117 @@
+{
+  "componentId": "full-screen-gate-template",
+  "name": "FullScreenGateTemplate",
+  "description": "Reusable full-screen gate layout used for force-update, maintenance, offline, and feature-flag screens",
+  "category": "layout-templates",
+  "version": "1.0.0",
+  "slots": [
+    {
+      "id": "illustration",
+      "label": "Illustration",
+      "type": "image",
+      "required": true,
+      "constraints": {
+        "width": 220,
+        "height": 220,
+        "format": ["svg", "png@2x"],
+        "verticalPosition": "top-center",
+        "marginTop": 80
+      }
+    },
+    {
+      "id": "heading",
+      "label": "Heading",
+      "type": "text",
+      "required": true,
+      "constraints": {
+        "maxChars": 48,
+        "style": "headingLarge",
+        "alignment": "center",
+        "marginTop": 32
+      }
+    },
+    {
+      "id": "body",
+      "label": "Body",
+      "type": "text",
+      "required": true,
+      "constraints": {
+        "maxChars": 160,
+        "style": "bodyMedium",
+        "alignment": "center",
+        "marginTop": 12,
+        "marginHorizontal": 24
+      }
+    },
+    {
+      "id": "progress-bar",
+      "label": "Progress Bar",
+      "type": "component",
+      "required": false,
+      "constraints": {
+        "height": 4,
+        "borderRadius": 2,
+        "marginTop": 24,
+        "marginHorizontal": 40,
+        "color": "#E3A9A0"
+      }
+    },
+    {
+      "id": "primary-cta",
+      "label": "Primary CTA",
+      "type": "button",
+      "required": false,
+      "constraints": {
+        "style": "primary",
+        "maxChars": 24,
+        "verticalPosition": "bottom-fixed",
+        "marginBottom": 32,
+        "marginHorizontal": 24
+      }
+    },
+    {
+      "id": "tertiary-cta",
+      "label": "Tertiary CTA",
+      "type": "button",
+      "required": false,
+      "constraints": {
+        "style": "tertiary",
+        "maxChars": 32,
+        "verticalPosition": "below-primary",
+        "marginBottom": 16
+      }
+    }
+  ],
+  "variants": [
+    {
+      "id": "with-tertiary",
+      "name": "With Tertiary Action",
+      "description": "Shows both primary CTA and tertiary dismiss/retry link",
+      "slotsVisible": ["illustration", "heading", "body", "primary-cta", "tertiary-cta"]
+    },
+    {
+      "id": "without-tertiary",
+      "name": "No Tertiary Action",
+      "description": "Shows only primary CTA, no dismiss link — used when action is mandatory",
+      "slotsVisible": ["illustration", "heading", "body", "primary-cta"]
+    },
+    {
+      "id": "with-progress",
+      "name": "With Progress Bar",
+      "description": "Shows an indeterminate or determinate progress bar — used for maintenance or loading states",
+      "slotsVisible": ["illustration", "heading", "body", "progress-bar"]
+    }
+  ],
+  "spacing": {
+    "backgroundColor": "#F2EDDD",
+    "containerMaxWidth": 480,
+    "horizontalPadding": 24,
+    "verticalScrollEnabled": false
+  },
+  "accessibility": {
+    "semanticRole": "alert",
+    "focusOnMount": "heading",
+    "trapFocus": true,
+    "announceLive": "assertive"
+  }
+}

@@ -1,0 +1,139 @@
+{
+  "screen": "MergeClientsScreen",
+  "route": "/admin/clients/merge/:primaryId/:duplicateId",
+  "description": "Two-column comparison interface for resolving client duplicate merges",
+  "dimensions": {
+    "width": 390,
+    "height": "auto-scroll"
+  },
+  "states": [
+    "default",
+    "loading",
+    "error",
+    "submitting"
+  ],
+  "accessibility": {
+    "screenReaderLabel": "strings.mergeClients.screenTitle",
+    "semanticRoles": [
+      {"element": "comparisonTable", "role": "table"},
+      {"element": "conflictRow", "role": "row"},
+      {"element": "radioButton", "role": "radio"},
+      {"element": "confirmButton", "role": "button", "hint": "strings.mergeClients.confirmHint"}
+    ]
+  },
+  "rtl": "deferred",
+  "darkMode": "deferred",
+  "layout": {
+    "header": {
+      "height": 64,
+      "title": "strings.mergeClients.title",
+      "subtitle": "strings.mergeClients.subtitle"
+    },
+    "comparison": {
+      "columns": [
+        {
+          "label": "strings.mergeClients.columnPrimary",
+          "align": "left"
+        },
+        {
+          "label": "strings.mergeClients.columnDuplicate",
+          "align": "right"
+        }
+      ],
+      "fields": [
+        "name",
+        "phone",
+        "email",
+        "bookingCount",
+        "loyaltyPoints"
+      ]
+    },
+    "reasonInput": {
+      "height": 120,
+      "marginTop": 24,
+      "placeholder": "strings.mergeClients.reasonPlaceholder",
+      "required": true
+    },
+    "actionBar": {
+      "height": 72,
+      "paddingHorizontal": 16,
+      "gap": 12,
+      "buttons": [
+        {
+          "label": "strings.mergeClients.cancel",
+          "style": "ghost"
+        },
+        {
+          "label": "strings.mergeClients.confirmMerge",
+          "style": "destructive",
+          "requiresReason": true
+        }
+      ]
+    }
+  },
+  "components": [
+    {
+      "id": "navigationHeader",
+      "ref": "navigation-header",
+      "props": {
+        "showBack": true,
+        "title": "strings.mergeClients.title"
+      }
+    },
+    {
+      "id": "conflictResolver",
+      "ref": "merge-conflict-resolver",
+      "props": {
+        "fieldName": "{{fieldName}}",
+        "primaryValue": "{{primaryValue}}",
+        "duplicateValue": "{{duplicateValue}}",
+        "selectedSide": "left",
+        "isDifferent": true
+      }
+    },
+    {
+      "id": "reasonTextArea",
+      "ref": "textarea",
+      "props": {
+        "placeholder": "strings.mergeClients.reasonPlaceholder",
+        "rows": 4,
+        "required": true
+      }
+    }
+  ],
+  "interactions": [
+    {
+      "trigger": "radioButton.select",
+      "action": "selectFieldValue"
+    },
+    {
+      "trigger": "confirmButton.tap",
+      "action": "showConfirmationModal",
+      "condition": "reasonTextFilled"
+    },
+    {
+      "trigger": "confirmationModal.confirm",
+      "action": "mergeDuplicates"
+    }
+  ],
+  "tokens": {
+    "used": [
+      "semantic.pageBackground",
+      "semantic.surface",
+      "semantic.cardBorder",
+      "semantic.foreground",
+      "semantic.secondaryText",
+      "semantic.error",
+      "semantic.warning"
+    ]
+  },
+  "redlines": {
+    "columnGap": 12,
+    "rowHeight": 64,
+    "radioSize": 20,
+    "conflictHighlight": "#FEF3C7",
+    "textareaHeight": 120,
+    "buttonHeight": 48,
+    "buttonGap": 12
+  }
+}

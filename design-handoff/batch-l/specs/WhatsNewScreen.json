@@ -1,0 +1,246 @@
+{
+  "screenId": "L.9",
+  "name": "WhatsNewScreen",
+  "device": "iPhone 14",
+  "dimensions": {
+    "width": 390,
+    "height": 844
+  },
+  "description": "Bottom sheet showing new features after app update",
+  "formFactor": "bottom-sheet",
+  "layout": {
+    "type": "vertical-flex",
+    "background": "#FFFFFF",
+    "borderRadiusTop": 24,
+    "maxHeight": "70vh",
+    "paddingBottom": "safe-area-inset + 24"
+  },
+  "elements": [
+    {
+      "id": "grabber-handle",
+      "type": "grabber",
+      "width": 36,
+      "height": 4,
+      "background": "#E5E0D1",
+      "borderRadius": 9999,
+      "alignment": "center-top",
+      "marginTop": 12
+    },
+    {
+      "id": "header",
+      "type": "horizontal-flex",
+      "paddingHorizontal": 24,
+      "paddingTop": 24,
+      "paddingBottom": 16,
+      "gap": 12,
+      "alignment": "center",
+      "sticky": true,
+      "children": [
+        {
+          "id": "heading",
+          "type": "text",
+          "style": "heading-3",
+          "text": "{whatsNewHeading}",
+          "fontWeight": 600,
+          "color": "#1A1A1A",
+          "flex": 1,
+          "interpolation": {
+            "version": "2.1.0"
+          }
+        },
+        {
+          "id": "version-pill",
+          "type": "pill",
+          "text": "{versionPill}",
+          "background": "#BBEDDA",
+          "color": "#2D4A42",
+          "paddingHorizontal": 12,
+          "paddingVertical": 6,
+          "borderRadius": 8,
+          "style": "label-small",
+          "fontWeight": 500
+        }
+      ]
+    },
+    {
+      "id": "feature-list",
+      "type": "scrollable-list",
+      "paddingHorizontal": 24,
+      "gap": 20,
+      "items": [
+        {
+          "id": "feature-1",
+          "type": "horizontal-flex",
+          "gap": 16,
+          "alignment": "flex-start",
+          "children": [
+            {
+              "type": "icon",
+              "name": "sparkles",
+              "size": 24,
+              "color": "#E3A9A0"
+            },
+            {
+              "type": "vertical-flex",
+              "gap": 4,
+              "flex": 1,
+              "children": [
+                {
+                  "type": "text",
+                  "style": "heading-4",
+                  "text": "{feature1Name}",
+                  "fontWeight": 600,
+                  "color": "#1A1A1A"
+                },
+                {
+                  "type": "text",
+                  "style": "body",
+                  "text": "{feature1Description}",
+                  "fontWeight": 400,
+                  "color": "#6B6B6B"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "feature-2",
+          "type": "horizontal-flex",
+          "gap": 16,
+          "alignment": "flex-start",
+          "children": [
+            {
+              "type": "icon",
+              "name": "calendar-today",
+              "size": 24,
+              "color": "#E3A9A0"
+            },
+            {
+              "type": "vertical-flex",
+              "gap": 4,
+              "flex": 1,
+              "children": [
+                {
+                  "type": "text",
+                  "style": "heading-4",
+                  "text": "{feature2Name}",
+                  "fontWeight": 600,
+                  "color": "#1A1A1A"
+                },
+                {
+                  "type": "text",
+                  "style": "body",
+                  "text": "{feature2Description}",
+                  "fontWeight": 400,
+                  "color": "#6B6B6B"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "feature-3",
+          "type": "horizontal-flex",
+          "gap": 16,
+          "alignment": "flex-start",
+          "children": [
+            {
+              "type": "icon",
+              "name": "speed",
+              "size": 24,
+              "color": "#E3A9A0"
+            },
+            {
+              "type": "vertical-flex",
+              "gap": 4,
+              "flex": 1,
+              "children": [
+                {
+                  "type": "text",
+                  "style": "heading-4",
+                  "text": "{feature3Name}",
+                  "fontWeight": 600,
+                  "color": "#1A1A1A"
+                },
+                {
+                  "type": "text",
+                  "style": "body",
+                  "text": "{feature3Description}",
+                  "fontWeight": 400,
+                  "color": "#6B6B6B"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "primary-cta",
+      "type": "button",
+      "variant": "primary",
+      "label": "{gotItCta}",
+      "action": "dismiss",
+      "position": "fixed-bottom",
+      "width": "full-minus-48",
+      "height": 52,
+      "borderRadius": 12,
+      "background": "#E3A9A0",
+      "labelWeight": 600,
+      "labelColor": "#FFFFFF",
+      "marginHorizontal": 24,
+      "marginBottom": 24
+    }
+  ],
+  "states": [
+    {
+      "name": "default",
+      "description": "Initial state with feature list",
+      "headerSticky": false
+    },
+    {
+      "name": "scrolled",
+      "description": "User scrolled down, header becomes sticky",
+      "headerSticky": true
+    },
+    {
+      "name": "acknowledged",
+      "description": "User tapped Got it, sheet dismisses"
+    }
+  ],
+  "strings": {
+    "whatsNewHeading": "What's New in {version}",
+    "versionPill": "v{version}",
+    "feature1Name": "AI-Powered Suggestions",
+    "feature1Description": "Get personalized service recommendations based on your style.",
+    "feature2Name": "Calendar Sync",
+    "feature2Description": "Automatically add bookings to your device calendar.",
+    "feature3Name": "Faster Checkout",
+    "feature3Description": "Book and pay in half the time with our improved flow.",
+    "gotItCta": "Got it"
+  },
+  "accessibility": {
+    "grabberHandle": {
+      "label": "Drag to dismiss",
+      "hint": "Swipe down to close"
+    },
+    "gotItCta": {
+      "label": "Acknowledge and dismiss",
+      "hint": "Closes What's New sheet"
+    }
+  },
+  "frames": [
+    {
+      "name": "L-9-default",
+      "state": "default"
+    },
+    {
+      "name": "L-9-scrolled",
+      "state": "scrolled"
+    },
+    {
+      "name": "L-9-acknowledged",
+      "state": "acknowledged"
+    }
+  ]
+}

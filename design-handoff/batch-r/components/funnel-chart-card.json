@@ -1,0 +1,29 @@
+{
+  "component": "FunnelChartCard",
+  "description": "Card widget rendering a conversion funnel with up to 6 steps",
+  "props": {
+    "title": { "type": "string", "required": true, "description": "Chart title" },
+    "subtitle": { "type": "string", "required": false, "description": "Optional subtitle" },
+    "steps": { "type": "array", "required": true, "description": "Array of { label, count, rate, dropOff } max 6" },
+    "height": { "type": "number", "required": false, "description": "Chart height (default 300)" },
+    "showDropOff": { "type": "boolean", "required": false, "description": "Show drop-off annotations (default true)" },
+    "isLoading": { "type": "boolean", "required": false, "description": "Loading state" },
+    "isEmpty": { "type": "boolean", "required": false, "description": "Empty state" }
+  },
+  "variants": ["default", "loading", "empty"],
+  "layout": {
+    "steps": "full-width trapezoidal steps stacked vertically",
+    "stepContent": "label (left), count (center bold), rate from prior (right caption)",
+    "dropOffAnnotation": "arrow between steps when showDropOff true"
+  },
+  "tokens": {
+    "stepColors": "chart.funnel.step1 through step5",
+    "text": "semantic.foreground",
+    "caption": "semantic.muted",
+    "dropOffArrowColor": "semantic.muted"
+  },
+  "accessibility": {
+    "role": "img",
+    "ariaLabel": "[title] conversion funnel"
+  }
+}

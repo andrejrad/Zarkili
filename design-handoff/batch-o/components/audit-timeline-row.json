@@ -1,0 +1,133 @@
+{
+  "component": "AuditTimelineRow",
+  "props": {
+    "action": {
+      "type": "string",
+      "required": true,
+      "description": "Event label e.g. 'Booking confirmed'"
+    },
+    "actorRole": {
+      "type": "string",
+      "required": true
+    },
+    "actorName": {
+      "type": "string",
+      "required": true
+    },
+    "timestamp": {
+      "type": "string",
+      "required": true,
+      "description": "ISO timestamp"
+    },
+    "status": {
+      "type": "string",
+      "required": true,
+      "description": "booking status for dot color"
+    },
+    "isFirst": {
+      "type": "boolean",
+      "required": true
+    },
+    "isLast": {
+      "type": "boolean",
+      "required": true
+    },
+    "isSystem": {
+      "type": "boolean",
+      "required": false,
+      "default": false
+    },
+    "isError": {
+      "type": "boolean",
+      "required": false,
+      "default": false
+    },
+    "note": {
+      "type": "string",
+      "required": false
+    }
+  },
+  "variants": [
+    "default",
+    "systemEvent",
+    "errorEvent"
+  ],
+  "layout": {
+    "leftColumn": {
+      "width": 24,
+      "dot": {
+        "size": 10,
+        "filled": true,
+        "color": "booking.[status]",
+        "ring": {
+          "size": 2,
+          "color": "surface"
+        }
+      },
+      "connectorTop": {
+        "width": 2,
+        "color": "audit.connector",
+        "hiddenWhen": "isFirst"
+      },
+      "connectorBottom": {
+        "width": 2,
+        "color": "audit.connector",
+        "hiddenWhen": "isLast"
+      }
+    },
+    "rightColumn": {
+      "paddingLeft": 12,
+      "actionLabel": {
+        "variant": "body-medium",
+        "color": "foreground"
+      },
+      "actorLine": {
+        "variant": "label-small",
+        "color": "audit.actorText",
+        "format": "{role} · {name}",
+        "roleTransform": "capitalized"
+      },
+      "timestamp": {
+        "font": "mono",
+        "variant": "label-small",
+        "color": "audit.timestamp",
+        "format": "h:mm AM MM/DD/YYYY"
+      },
+      "note": {
+        "variant": "caption",
+        "color": "muted",
+        "style": "italic",
+        "marginTop": 2,
+        "visibleWhen": "present"
+      }
+    }
+  },
+  "variantStyles": {
+    "systemEvent": {
+      "dot": {
+        "color": "#9CA3AF"
+      },
+      "actorLine": {
+        "text": "System",
+        "style": "italic"
+      }
+    },
+    "errorEvent": {
+      "dot": {
+        "color": "error"
+      },
+      "actionLabel": {
+        "color": "error"
+      }
+    }
+  },
+  "minHeight": 56,
+  "autoHeight": "on long notes",
+  "tokens": [
+    "booking.*",
+    "audit.*",
+    "surface",
+    "foreground",
+    "muted"
+  ]
+}

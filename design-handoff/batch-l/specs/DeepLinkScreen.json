@@ -1,0 +1,172 @@
+{
+  "screenId": "L.6",
+  "name": "DeepLinkScreen",
+  "device": "iPhone 14",
+  "dimensions": {
+    "width": 390,
+    "height": 844
+  },
+  "description": "Deep-link cold-start splash and universal-link mismatch recovery",
+  "subframes": [
+    {
+      "id": "L.6.1",
+      "name": "cold-start-splash",
+      "type": "full-screen",
+      "background": "#F2EDDD",
+      "layout": {
+        "type": "vertical-center-flex",
+        "gap": 24,
+        "alignment": "center"
+      },
+      "elements": [
+        {
+          "id": "wordmark",
+          "type": "image",
+          "src": "zarkili-wordmark",
+          "height": 48,
+          "alignment": "center"
+        },
+        {
+          "id": "routing-message",
+          "type": "text",
+          "style": "body",
+          "text": "{routingMessage}",
+          "color": "#6B6B6B",
+          "alignment": "center",
+          "interpolation": {
+            "destination": "your booking"
+          }
+        },
+        {
+          "id": "progress-bar",
+          "type": "progress-indicator",
+          "width": 200,
+          "height": 4,
+          "background": "#E5E0D1",
+          "fill": "#E3A9A0",
+          "mode": "indeterminate",
+          "animation": "pulse"
+        }
+      ]
+    },
+    {
+      "id": "L.6.2",
+      "name": "universal-link-mismatch",
+      "type": "full-screen-gate-template",
+      "background": "#F2EDDD",
+      "layout": {
+        "type": "vertical-center-flex",
+        "paddingHorizontal": 32,
+        "gap": 24
+      },
+      "elements": [
+        {
+          "id": "hero-illustration",
+          "type": "illustration",
+          "width": 160,
+          "height": 160,
+          "motif": "compass-lost",
+          "alignment": "center",
+          "colors": ["#E3A9A0", "#D1BFB3", "#6B6B6B"]
+        },
+        {
+          "id": "heading",
+          "type": "text",
+          "style": "heading-3",
+          "text": "{mismatchHeading}",
+          "fontWeight": 600,
+          "color": "#1A1A1A",
+          "alignment": "center"
+        },
+        {
+          "id": "body-message",
+          "type": "text",
+          "style": "body",
+          "text": "{mismatchMessage}",
+          "fontWeight": 400,
+          "color": "#6B6B6B",
+          "alignment": "center",
+          "maxWidth": 280
+        },
+        {
+          "id": "primary-cta",
+          "type": "button",
+          "variant": "primary",
+          "label": "{homeCta}",
+          "action": "navigateHome",
+          "width": "full-minus-64",
+          "height": 52,
+          "borderRadius": 12,
+          "background": "#E3A9A0",
+          "labelWeight": 600,
+          "labelColor": "#FFFFFF"
+        },
+        {
+          "id": "tertiary-cta",
+          "type": "button",
+          "variant": "tertiary",
+          "label": "{backCta}",
+          "action": "goBack",
+          "height": 44,
+          "labelWeight": 500,
+          "labelColor": "#6B6B6B"
+        }
+      ]
+    }
+  ],
+  "states": [
+    {
+      "name": "routing",
+      "description": "App is processing deep link and routing to destination",
+      "subframe": "L.6.1",
+      "strings": {
+        "routingMessage": "Taking you to {destination}…"
+      }
+    },
+    {
+      "name": "found",
+      "description": "Deep link successfully resolved, screen auto-dismisses",
+      "subframe": "L.6.1",
+      "autoDismiss": true,
+      "strings": {
+        "routingMessage": "Taking you to {destination}…"
+      }
+    },
+    {
+      "name": "mismatch",
+      "description": "Universal link expired or content removed",
+      "subframe": "L.6.2",
+      "strings": {
+        "mismatchHeading": "We couldn't find that page",
+        "mismatchMessage": "The link may be expired or the content was removed.",
+        "homeCta": "Go to Home",
+        "backCta": "Go Back"
+      }
+    }
+  ],
+  "accessibility": {
+    "routingSplash": {
+      "announceOnAppear": "Loading {destination}",
+      "role": "progressbar",
+      "valueText": "Loading"
+    },
+    "mismatchScreen": {
+      "announceOnAppear": "Page not found",
+      "role": "alert"
+    }
+  },
+  "frames": [
+    {
+      "name": "L-6-routing",
+      "state": "routing"
+    },
+    {
+      "name": "L-6-found",
+      "state": "found"
+    },
+    {
+      "name": "L-6-mismatch",
+      "state": "mismatch"
+    }
+  ]
+}

@@ -1,0 +1,78 @@
+{
+  "screen": "SuspendTenantScreen",
+  "route": "SuperAdminSuspendTenant",
+  "device": { "type": "modal-sheet", "width": 480, "radius": 20 },
+  "stateNames": ["default", "submitting", "suspended", "reactivating", "reactivated", "error"],
+  "layout": {
+    "handle": { "width": 36, "height": 4, "radius": 2, "color": "border", "position": "centered", "marginTop": 12 },
+    "header": {
+      "icon": { "name": "warning", "size": 24, "color": "error" },
+      "title": { "text": "strings.suspendTenant.titleSuspend", "variant": "heading-3" }
+    },
+    "tenantSummaryCard": {
+      "background": "surface",
+      "border": { "width": 1, "color": "warning" },
+      "radius": "large",
+      "padding": 16,
+      "fields": [
+        { "key": "tenantName", "variant": "body-large", "weight": "bold" },
+        { "key": "plan", "type": "pill" },
+        { "key": "mrr", "format": "USD", "variant": "caption" }
+      ]
+    },
+    "additionalFields": {
+      "reasonDropdown": {
+        "required": true,
+        "label": "strings.suspendTenant.reasonLabel",
+        "options": [
+          { "value": "policyViolation", "label": "strings.suspendTenant.reasonViolation" },
+          { "value": "nonPayment", "label": "strings.suspendTenant.reasonNonPayment" },
+          { "value": "fraudSuspicion", "label": "strings.suspendTenant.reasonFraud" },
+          { "value": "userRequest", "label": "strings.suspendTenant.reasonUserRequest" },
+          { "value": "other", "label": "strings.suspendTenant.reasonOther" }
+        ]
+      },
+      "durationRadio": {
+        "options": [
+          { "value": "indefinite", "label": "strings.suspendTenant.durationIndefinite" },
+          { "value": "7days", "label": "strings.suspendTenant.duration7Days" },
+          { "value": "30days", "label": "strings.suspendTenant.duration30Days" }
+        ],
+        "defaultValue": "indefinite"
+      },
+      "notifyOwnerToggle": { "label": "strings.suspendTenant.notifyOwnerLabel", "defaultOn": true }
+    },
+    "destructiveConfirm": {
+      "component": "destructive-confirm-with-reason",
+      "confirmWord": "SUSPEND",
+      "actionLabel": "strings.suspendTenant.suspendCta"
+    },
+    "footer": {
+      "actions": [
+        { "type": "button", "label": "strings.suspendTenant.cancelLabel", "variant": "secondary" },
+        { "type": "button", "label": "strings.suspendTenant.suspendCta", "variant": "destructive-primary", "disabledUntil": "all valid" }
+      ]
+    },
+    "reactivateVariant": {
+      "title": "strings.suspendTenant.titleReactivate",
+      "noDurationField": true,
+      "noConfirmWord": true,
+      "reasonOptions": [
+        { "value": "reinstated", "label": "Reinstated" },
+        { "value": "paymentReceived", "label": "Payment received" },
+        { "value": "reviewComplete", "label": "Review complete" },
+        { "value": "other", "label": "Other" }
+      ],
+      "cta": { "label": "strings.suspendTenant.reactivateCta", "variant": "primary" }
+    }
+  },
+  "states": {
+    "submitting": {
+      "cta": { "spinner": true },
+      "form": { "locked": true, "pointerEvents": "none" }
+    },
+    "suspended": { "toast": "strings.suspendTenant.successToastSuspend", "action": "dismiss sheet and refresh tenant row" },
+    "reactivated": { "toast": "strings.suspendTenant.successToastReactivate", "action": "dismiss sheet and refresh tenant row" },
+    "error": { "message": "strings.suspendTenant.errorMessage" }
+  }
+}

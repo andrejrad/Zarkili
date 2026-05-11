@@ -1,0 +1,72 @@
+{
+  "screen": "AiBudgetConfigScreen",
+  "route": "/admin/ai/budget",
+  "description": "Per-feature AI token and spend budget configuration with usage tracking",
+  "platform": "admin-desktop",
+  "dimensions": { "width": 1280, "contentWidth": "calc(1280 - 240px sidebar)" },
+  "states": ["default", "editing-cell", "saving", "saved", "critical-state"],
+  "accessibility": {
+    "screenReaderLabel": "strings.aiBudget.screenTitle",
+    "semanticRoles": [
+      { "element": "summaryCard", "role": "region" },
+      { "element": "budgetTable", "role": "table" }
+    ]
+  },
+  "rtl": "deferred",
+  "darkMode": "deferred",
+  "layout": {
+    "header": {
+      "component": "AdminHeader",
+      "title": "strings.aiBudget.title",
+      "rightActions": [{ "component": "PrimaryButton", "label": "strings.aiBudget.saveChanges" }]
+    },
+    "body": {
+      "padding": 24,
+      "summaryCard": {
+        "width": "full",
+        "height": 120,
+        "border": true,
+        "layout": "horizontal",
+        "left": {
+          "component": "Donut chart",
+          "size": 160,
+          "center": "[spend] / [budget]",
+          "arcColorByThreshold": "ai.budget.* tokens"
+        },
+        "right": {
+          "label": "strings.aiBudget.summaryTitle",
+          "metrics": ["strings.aiBudget.summaryCurrentSpend", "strings.aiBudget.summaryRemaining", "strings.aiBudget.summaryDaysLeft"]
+        }
+      },
+      "budgetTable": {
+        "component": "DataTable",
+        "editableCells": ["Monthly Budget $", "Token Limit", "Alert Threshold %"],
+        "columns": [
+          "Feature",
+          "Monthly Budget $ (editable)",
+          "Token Limit (editable)",
+          "Alert Threshold % (editable)",
+          "Current Spend $",
+          "Usage % (inline progress bar, color per ai.budget.* thresholds)",
+          "Status badge (ai.budget.* tokens)"
+        ]
+      },
+      "settingsCard": {
+        "border": true,
+        "padding": 16,
+        "fields": [
+          { "label": "strings.aiBudget.globalLimitLabel", "component": "number input", "prefix": "$" },
+          { "label": "strings.aiBudget.autoPauseToggle", "component": "Toggle" },
+          { "section": "strings.aiBudget.alertsTitle" },
+          { "label": "strings.aiBudget.alertEmailsLabel", "component": "email tag input" },
+          { "label": "strings.aiBudget.alertIndividualToggle", "component": "Toggle" },
+          { "label": "strings.aiBudget.alertGlobalToggle", "component": "Toggle" }
+        ]
+      }
+    }
+  },
+  "components": [
+    { "id": "budgetTable", "ref": "DataTable", "props": { "editableCells": true, "data": "{{budgetData}}" } }
+  ],
+  "strings": "See strings/en-us.json for aiBudget keys"
+}

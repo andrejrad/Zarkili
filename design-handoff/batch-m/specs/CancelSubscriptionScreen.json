@@ -1,0 +1,94 @@
+{
+  "schemaVersion": "1.0.0",
+  "screenId": "M.14",
+  "screenName": "CancelSubscriptionScreen",
+  "route": "admin/billing/cancel",
+  "designSystem": "Zarkili v1.0.0",
+  "device": "iPad 768x1024",
+  "engineeringStatus": "designed",
+  "description": "Screen allowing owners to pause their subscription for a set duration or permanently cancel it with a typed confirmation guard.",
+  "layout": {
+    "type": "scrollable-column",
+    "padding": {
+      "top": 24,
+      "right": 32,
+      "bottom": 40,
+      "left": 32
+    },
+    "maxContentWidth": 960,
+    "gap": 24
+  },
+  "sections": [
+    {
+      "id": "pause-card",
+      "type": "form-section",
+      "title": "Pause subscription",
+      "component": null,
+      "body": "Put your account on hold without losing data.",
+      "controls": [
+        {
+          "id": "pauseDuration",
+          "type": "segmented-control",
+          "options": [
+            "1 month",
+            "3 months",
+            "6 months"
+          ]
+        }
+      ],
+      "cta": {
+        "label": "Pause Plan",
+        "variant": "secondary"
+      }
+    },
+    {
+      "id": "cancel-card",
+      "type": "form-section",
+      "title": "Cancel subscription",
+      "component": null,
+      "body": "Your account will be downgraded at period end.",
+      "controls": [
+        {
+          "id": "cancellationReason",
+          "type": "picker",
+          "label": "Reason",
+          "required": true,
+          "options": [
+            "Too expensive",
+            "Missing features",
+            "Closing business",
+            "Switching tools",
+            "Other"
+          ]
+        },
+        {
+          "id": "winback-banner",
+          "type": "status-banner",
+          "text": "Get 3 months at 50% off — stay?",
+          "dismissible": true
+        },
+        {
+          "id": "typedConfirm",
+          "type": "text-input",
+          "placeholder": "Type CANCEL to confirm",
+          "requiredValue": "CANCEL"
+        }
+      ],
+      "cta": {
+        "label": "Cancel Plan",
+        "variant": "destructive"
+      }
+    }
+  ],
+  "stateNames": [
+    "default",
+    "paused",
+    "cancelling",
+    "cancelled",
+    "error"
+  ],
+  "accessibility": {
+    "screenReaderLabel": "Cancel or pause subscription",
+    "cancelCtaAriaLabel": "Cancel subscription — requires typed confirmation"
+  }
+}

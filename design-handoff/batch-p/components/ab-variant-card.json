@@ -1,0 +1,77 @@
+{
+  "component": "ABVariantCard",
+  "description": "A/B test variant card with split percentage slider and winner indication",
+  "props": {
+    "variantLabel": {
+      "type": "A | B",
+      "required": true,
+      "description": "Variant identifier"
+    },
+    "subject": {
+      "type": "string",
+      "required": false,
+      "description": "Email subject or push title"
+    },
+    "bodySnippet": {
+      "type": "string",
+      "required": true,
+      "description": "Preview of message body (max 2 lines)"
+    },
+    "splitPercentage": {
+      "type": "number",
+      "required": true,
+      "description": "Percentage of audience (0-100)"
+    },
+    "onSplitChange": {
+      "type": "function",
+      "required": true,
+      "description": "Callback when slider changes"
+    },
+    "winnerStatus": {
+      "type": "winner | loser | pending",
+      "required": false,
+      "description": "Post-evaluation status"
+    }
+  },
+  "states": [
+    "default",
+    "winner",
+    "loser",
+    "pending"
+  ],
+  "variants": [
+    "variantA",
+    "variantB"
+  ],
+  "tokens": {
+    "background": "semantic.surface",
+    "border": "semantic.cardBorder",
+    "labelBackground": "semantic.primary",
+    "labelText": "semantic.surface",
+    "snippetText": "semantic.foreground",
+    "winnerCrownColor": "#FFD700",
+    "loserDashColor": "semantic.muted"
+  },
+  "accessibility": {
+    "role": "group",
+    "label": "Variant {variantLabel}",
+    "hint": "Adjust split percentage with slider"
+  },
+  "dimensions": {
+    "width": "100%",
+    "minHeight": 140,
+    "padding": 16,
+    "borderRadius": 12,
+    "labelBadgeHeight": 24,
+    "sliderHeight": 44
+  },
+  "examples": [
+    {
+      "variantLabel": "A",
+      "subject": "Special Offer Inside",
+      "bodySnippet": "Get 20% off your next visit this week only",
+      "splitPercentage": 50,
+      "winnerStatus": "pending"
+    }
+  ]
+}

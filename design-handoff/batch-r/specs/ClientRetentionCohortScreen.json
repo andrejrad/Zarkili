@@ -1,0 +1,51 @@
+{
+  "screen": "ClientRetentionCohortScreen",
+  "route": "/admin/analytics/retention",
+  "description": "Client retention analysis via weekly cohort table and churn risk summary",
+  "platform": "admin-desktop",
+  "dimensions": { "width": 1280, "contentWidth": "calc(1280 - 240px sidebar)" },
+  "states": ["default", "loading", "empty", "error"],
+  "accessibility": {
+    "screenReaderLabel": "strings.clientRetention.screenTitle",
+    "semanticRoles": [
+      { "element": "cohortTable", "role": "table" },
+      { "element": "atRiskTable", "role": "table" }
+    ]
+  },
+  "rtl": "deferred",
+  "darkMode": "deferred",
+  "layout": {
+    "header": {
+      "component": "AdminHeader",
+      "title": "strings.clientRetention.title",
+      "rightActions": ["DateRangePicker", "Export SecondaryButton"]
+    },
+    "body": {
+      "padding": 24,
+      "cohortTable": {
+        "width": "full",
+        "component": "CohortTableCard",
+        "title": "strings.clientRetention.cohortTableTitle",
+        "periods": "Wk 1-12",
+        "cohorts": "12-week cohorts",
+        "caption": "Green = 50%+ retained | Orange = 20–49% | Red = <20% | Grey = 0%"
+      },
+      "row2": {
+        "layout": "2 columns equal",
+        "left": { "component": "LineChartCard", "title": "Avg Retention Rate Over Time", "series": ["week 1", "week 4", "week 8", "week 12"] },
+        "right": { "component": "BarChartCard", "title": "Churn Risk by Tier", "stacked": true, "stackBy": "loyalty tier" }
+      },
+      "atRiskTable": {
+        "width": "full",
+        "component": "DataTable",
+        "title": "Clients at Churn Risk",
+        "columns": ["Client Name", "Last Visit", "Lifetime Spend", "Tier", "Risk Score (0-100, colour bar)", "Action (Send Re-engagement SecondaryButton)"]
+      }
+    }
+  },
+  "components": [
+    { "id": "cohortTable", "ref": "CohortTableCard", "props": { "title": "strings.clientRetention.cohortTableTitle", "cohorts": "{{cohortData}}", "periodLabels": "{{periodLabels}}" } },
+    { "id": "atRiskTable", "ref": "DataTable", "props": { "title": "strings.clientRetention.atRiskTableTitle", "columns": "{{atRiskColumns}}", "data": "{{atRiskData}}" } }
+  ],
+  "strings": "See strings/en-us.json for clientRetention keys"
+}

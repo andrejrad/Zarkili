@@ -1,0 +1,187 @@
+{
+  "screen": "LoyaltyConfigScreen",
+  "route": "/admin/loyalty/config",
+  "description": "Configure loyalty program earn rules, tiers, and expiration policies",
+  "dimensions": {
+    "width": 390,
+    "height": "auto-scroll"
+  },
+  "states": [
+    "default",
+    "loading",
+    "error",
+    "saving"
+  ],
+  "accessibility": {
+    "screenReaderLabel": "strings.loyaltyConfig.screenTitle",
+    "semanticRoles": [
+      {"element": "earnRulesList", "role": "list"},
+      {"element": "tiersList", "role": "list"},
+      {"element": "expirationRadio", "role": "radiogroup"},
+      {"element": "saveButton", "role": "button"}
+    ]
+  },
+  "rtl": "deferred",
+  "darkMode": "deferred",
+  "layout": {
+    "header": {
+      "height": 64,
+      "title": "strings.loyaltyConfig.title",
+      "rightAction": {
+        "label": "strings.loyaltyConfig.save",
+        "style": "primary",
+        "sticky": true
+      }
+    },
+    "earnRulesSection": {
+      "paddingHorizontal": 16,
+      "paddingVertical": 24,
+      "title": "strings.loyaltyConfig.earnRulesTitle",
+      "subtitle": "strings.loyaltyConfig.earnRulesSubtitle",
+      "rows": {
+        "height": 64,
+        "columns": [
+          "serviceCategory",
+          "pointsPerUsd",
+          "multiplier"
+        ]
+      }
+    },
+    "tiersSection": {
+      "paddingHorizontal": 16,
+      "paddingVertical": 24,
+      "title": "strings.loyaltyConfig.tiersTitle",
+      "subtitle": "strings.loyaltyConfig.tiersSubtitle",
+      "rows": {
+        "height": 72,
+        "columns": [
+          "name",
+          "minPoints",
+          "colorSwatch",
+          "perks"
+        ]
+      }
+    },
+    "expirationSection": {
+      "paddingHorizontal": 16,
+      "paddingVertical": 24,
+      "title": "strings.loyaltyConfig.expirationTitle",
+      "options": [
+        "strings.loyaltyConfig.expirationNone",
+        "strings.loyaltyConfig.expirationRolling12",
+        "strings.loyaltyConfig.expirationFixed"
+      ]
+    },
+    "birthdayMultiplier": {
+      "paddingHorizontal": 16,
+      "paddingVertical": 16,
+      "toggle": {
+        "label": "strings.loyaltyConfig.birthdayMultiplierLabel",
+        "height": 48
+      },
+      "valueInput": {
+        "height": 48,
+        "placeholder": "2x"
+      }
+    },
+    "actionBar": {
+      "height": 72,
+      "position": "sticky-bottom",
+      "background": "semantic.surface",
+      "borderTop": "1px solid semantic.cardBorder",
+      "paddingHorizontal": 16,
+      "button": {
+        "label": "strings.loyaltyConfig.save",
+        "style": "primary",
+        "height": 48
+      }
+    }
+  },
+  "components": [
+    {
+      "id": "navigationHeader",
+      "ref": "navigation-header",
+      "props": {
+        "showBack": true,
+        "title": "strings.loyaltyConfig.title"
+      }
+    },
+    {
+      "id": "earnRulesTable",
+      "ref": "data-table",
+      "props": {
+        "columns": [
+          "strings.loyaltyConfig.columnCategory",
+          "strings.loyaltyConfig.columnPointsPerUsd",
+          "strings.loyaltyConfig.columnMultiplier"
+        ],
+        "editable": true
+      }
+    },
+    {
+      "id": "tiersTable",
+      "ref": "data-table",
+      "props": {
+        "columns": [
+          "strings.loyaltyConfig.columnName",
+          "strings.loyaltyConfig.columnMinPoints",
+          "strings.loyaltyConfig.columnColor",
+          "strings.loyaltyConfig.columnPerks"
+        ],
+        "editable": true
+      }
+    },
+    {
+      "id": "expirationRadio",
+      "ref": "radio-group",
+      "props": {
+        "label": "strings.loyaltyConfig.expirationTitle",
+        "options": [
+          "strings.loyaltyConfig.expirationNone",
+          "strings.loyaltyConfig.expirationRolling12",
+          "strings.loyaltyConfig.expirationFixed"
+        ]
+      }
+    },
+    {
+      "id": "birthdayToggle",
+      "ref": "switch",
+      "props": {
+        "label": "strings.loyaltyConfig.birthdayMultiplierLabel"
+      }
+    }
+  ],
+  "interactions": [
+    {
+      "trigger": "earnRule.edit",
+      "action": "updateEarnRule"
+    },
+    {
+      "trigger": "tier.edit",
+      "action": "updateTier"
+    },
+    {
+      "trigger": "saveButton.tap",
+      "action": "saveLoyaltyConfig"
+    }
+  ],
+  "tokens": {
+    "used": [
+      "semantic.pageBackground",
+      "semantic.surface",
+      "semantic.cardBorder",
+      "semantic.foreground",
+      "semantic.secondaryText",
+      "semantic.primary",
+      "semantic.admin.tableHeaderBg"
+    ]
+  },
+  "redlines": {
+    "sectionGap": 24,
+    "rowHeight": 64,
+    "tierRowHeight": 72,
+    "inputHeight": 48,
+    "colorSwatchSize": 24,
+    "actionBarHeight": 72
+  }
+}

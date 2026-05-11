@@ -1,0 +1,195 @@
+{
+  "component": "AIChatComposer",
+  "description": "Input composer for the staff AI chat panel. Includes an 'AI' identity badge, auto-growing textarea, real-time token counter, and send/stop button. Budget-exhausted and generating states handled inline.",
+  "purpose": "Let staff compose messages to the AI assistant with immediate cost feedback and clear affordances for the generating, budget-limited, and error states.",
+  "source": {
+    "batch": "G",
+    "screens": ["G.6 AI Chat Panel"],
+    "promotedFrom": "documentation/figma-prompts/BATCH_G_STAFF_APP_AI.md",
+    "figmaFrames": "code-derived — spec locked from BATCH_G_STAFF_APP_AI.md component section",
+    "lockedAt": "2026-04-28"
+  },
+  "variants": {
+    "state": {
+      "options": ["default", "composing", "sending", "generating", "budget-exhausted", "error"],
+      "default": "default"
+    }
+  },
+  "anatomy": {
+    "container": {
+      "background": "#FFFFFF",
+      "borderTop": { "width": 1, "color": "#E5E0D1" },
+      "paddingHorizontal": 12,
+      "paddingVertical": 8
+    },
+    "mainRow": {
+      "flexDirection": "row",
+      "alignItems": "center",
+      "gap": 8,
+      "children": ["aiBadge", "inputField", "tokenCounter", "actionButton"]
+    },
+    "aiBadge": {
+      "height": 24,
+      "paddingHorizontal": 8,
+      "borderRadius": 9999,
+      "background": "#BBEDDA",
+      "label": { "style": "label-small", "fontWeight": 600, "color": "#2D4A42", "content": "AI" },
+      "flexShrink": 0
+    },
+    "inputField": {
+      "flex": 1,
+      "minHeight": 36,
+      "maxHeight": 120,
+      "borderRadius": 12,
+      "background": "#F5F5F5",
+      "border": { "default": "1px solid #E5E0D1", "focus": "1px solid #E3A9A0" },
+      "paddingHorizontal": 12,
+      "paddingVertical": 8,
+      "style": "body",
+      "fontSize": 14,
+      "lineHeight": 20,
+      "color": "#1A1A1A",
+      "placeholder": { "content": "Ask AI…", "color": "#6B6B6B" },
+      "multiline": true,
+      "accessibilityLabel": "Message AI assistant"
+    },
+    "tokenCounter": {
+      "visible": "state === composing",
+      "style": "label-small",
+      "color": "#6B6B6B",
+      "flexShrink": 0,
+      "format": "~{{n}} tokens, ${{x}}",
+      "accessibilityLabel": "Estimated {{n}} tokens, cost ${{x}}"
+    },
+    "sendButton": {
+      "visible": "state !== generating",
+      "size": 36,
+      "borderRadius": 9999,
+      "flexShrink": 0,
+      "states": {
+        "default": {
+          "background": "#F5F5F5",
+          "icon": { "name": "send", "size": 16, "color": "#B0B0B0" },
+          "disabled": true
+        },
+        "composing": {
+          "background": "#E3A9A0",
+          "icon": { "name": "send", "size": 16, "color": "#FFFFFF" },
+          "disabled": false
+        },
+        "sending": {
+          "background": "#E3A9A0",
+          "icon": "Loader2 spinner 16px #FFFFFF (animated)",
+          "disabled": true
+        },
+        "budget-exhausted": {
+          "background": "#F5F5F5",
+          "icon": { "name": "send", "size": 16, "color": "#B0B0B0" },
+          "disabled": true
+        },
+        "error": {
+          "background": "#E3A9A0",
+          "icon": { "name": "send", "size": 16, "color": "#FFFFFF" },
+          "disabled": false
+        }
+      },
+      "accessibilityLabel": "Send message"
+    },
+    "stopButton": {
+      "visible": "state === generating",
+      "size": 36,
+      "borderRadius": 9999,
+      "background": "rgba(244,67,54,0.10)",
+      "icon": { "name": "square", "size": 16, "color": "#F44336" },
+      "flexShrink": 0,
+      "accessibilityLabel": "Stop generating"
+    }
+  },
+  "states": {
+    "default": {
+      "description": "Input empty, send button disabled, no token counter.",
+      "inputField": { "editable": true, "background": "#F5F5F5" }
+    },
+    "composing": {
+      "description": "Input has text, send enabled, token counter visible.",
+      "inputField": { "editable": true, "background": "#F5F5F5" }
+    },
+    "sending": {
+      "description": "Message submitted, awaiting AI response.",
+      "inputField": { "editable": false, "background": "#FAFAFA", "opacity": 0.7 }
+    },
+    "generating": {
+      "description": "AI is streaming a response. Send button replaced by Stop. Typing indicator shows in message area (parent responsibility).",
+      "inputField": { "editable": false },
+      "typingDots": {
+        "note": "3-dot bounce animation rendered by parent AIChatScreen, not by this component",
+        "reduceMotion": "Static '…' text"
+      },
+      "accessibilityText": "AI is generating a response"
+    },
+    "budget-exhausted": {
+      "description": "Daily budget reached. Send permanently disabled until reset.",
+      "sendButton": { "disabled": true },
+      "inputField": { "editable": true },
+      "helperRow": {
+        "position": "below mainRow",
+        "paddingTop": 4,
+        "flexDirection": "row",
+        "alignItems": "center",
+        "gap": 4,
+        "icon": { "name": "alert-triangle", "size": 12, "color": "#FF9800" },
+        "label": {
+          "content": "Budget exhausted — basic mode only",
+          "style": "body-small",
+          "color": "#FF9800"
+        },
+        "accessibilityRole": "alert"
+      }
+    },
+    "error": {
+      "description": "Last send failed.",
+      "helperRow": {
+        "position": "below mainRow",
+        "paddingTop": 4,
+        "label": {
+          "content": "Couldn't send · Retry",
+          "style": "body-small",
+          "color": "#F44336"
+        },
+        "tapTarget": "Retry action re-submits last message"
+      }
+    }
+  },
+  "interactions": {
+    "inputChange": "Show/hide token counter; enable/disable send button based on text presence",
+    "sendTap": "Transition to sending state; clear input after server confirms receipt",
+    "stopTap": "Cancel in-flight generation; transition back to composing state",
+    "retryTap": "Re-submit last failed message from error state",
+    "reduceMotion": "Sending spinner is immediate opacity change; no animation"
+  },
+  "accessibility": {
+    "inputField": { "label": "Message AI assistant" },
+    "tokenCounter": { "label": "Estimated {{n}} tokens, cost ${{x}}" },
+    "sendButton": { "label": "Send message" },
+    "stopButton": { "label": "Stop generating" },
+    "budgetHelper": { "role": "alert" },
+    "generatingState": { "label": "AI is generating a response" }
+  },
+  "engineeringNotes": [
+    "Token counter should update debounced (300ms) on input change — avoid per-keystroke API calls",
+    "Token/cost estimate is client-side approximation (~4 chars per token), not server-computed",
+    "Input auto-grows from minHeight 36 to maxHeight 120; use ScrollView or TextInput multiline",
+    "Budget-exhausted helper uses accessibilityRole='alert' so screen readers announce immediately",
+    "Stop button cancels the SSE/streaming fetch — ensure AbortController is wired"
+  ],
+  "props": {
+    "state": "default | composing | sending | generating | budget-exhausted | error — required",
+    "value": "string — required (controlled input)",
+    "onChangeText": "(text: string) => void — required",
+    "onSend": "() => void — required",
+    "onStop": "() => void — required when state=generating",
+    "onRetry": "() => void — optional (required when state=error)",
+    "estimatedTokens": "number | null — optional (shown in token counter when composing)",
+    "estimatedCost": "string | null — optional (e.g. '$0.02')"
+  }
+}

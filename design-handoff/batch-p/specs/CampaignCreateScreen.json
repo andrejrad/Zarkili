@@ -1,0 +1,218 @@
+{
+  "screen": "CampaignCreateScreen",
+  "route": "/admin/campaigns/new",
+  "description": "4-step wizard for creating campaigns: Audience → Content → Schedule → Review",
+  "dimensions": {
+    "width": 390,
+    "height": "auto-scroll"
+  },
+  "states": [
+    "default",
+    "loading",
+    "error",
+    "submitting"
+  ],
+  "accessibility": {
+    "screenReaderLabel": "strings.campaignCreate.screenTitle",
+    "semanticRoles": [
+      {"element": "stepIndicator", "role": "progressbar"},
+      {"element": "stepContent", "role": "group"},
+      {"element": "navigationButtons", "role": "toolbar"}
+    ]
+  },
+  "rtl": "deferred",
+  "darkMode": "deferred",
+  "layout": {
+    "header": {
+      "height": 64,
+      "title": "strings.campaignCreate.title",
+      "leftAction": "close"
+    },
+    "stepIndicator": {
+      "height": 64,
+      "paddingHorizontal": 16,
+      "steps": [
+        {"label": "strings.campaignCreate.stepAudience", "number": 1},
+        {"label": "strings.campaignCreate.stepContent", "number": 2},
+        {"label": "strings.campaignCreate.stepSchedule", "number": 3},
+        {"label": "strings.campaignCreate.stepReview", "number": 4}
+      ]
+    },
+    "step1Audience": {
+      "paddingHorizontal": 16,
+      "paddingVertical": 24,
+      "segmentPicker": {
+        "height": 48,
+        "placeholder": "strings.campaignCreate.selectSegment"
+      },
+      "audienceCountBadge": {
+        "marginTop": 12,
+        "label": "{{count}} recipients"
+      }
+    },
+    "step2Content": {
+      "paddingHorizontal": 16,
+      "paddingVertical": 24,
+      "channelMultiSelect": {
+        "height": "auto",
+        "label": "strings.campaignCreate.channelLabel",
+        "options": ["Push", "Email", "SMS", "In-app"]
+      },
+      "templatePicker": {
+        "height": 48,
+        "marginTop": 16,
+        "placeholder": "strings.campaignCreate.selectTemplate"
+      }
+    },
+    "step3Schedule": {
+      "paddingHorizontal": 16,
+      "paddingVertical": 24,
+      "sendOptions": [
+        {
+          "label": "strings.campaignCreate.sendNow",
+          "value": "now"
+        },
+        {
+          "label": "strings.campaignCreate.sendScheduled",
+          "value": "scheduled",
+          "children": ["dateTimePicker"]
+        },
+        {
+          "label": "strings.campaignCreate.sendRecurring",
+          "value": "recurring",
+          "children": ["recurringConfig"]
+        }
+      ]
+    },
+    "step4Review": {
+      "paddingHorizontal": 16,
+      "paddingVertical": 24,
+      "summaryCard": {
+        "height": "auto",
+        "padding": 16,
+        "fields": [
+          "audience",
+          "channels",
+          "template",
+          "schedule"
+        ]
+      },
+      "complianceChecklist": {
+        "marginTop": 24,
+        "items": [
+          "strings.campaignCreate.checkUnsubscribe",
+          "strings.campaignCreate.checkSender",
+          "strings.campaignCreate.checkSpam",
+          "strings.campaignCreate.checkOptIn",
+          "strings.campaignCreate.checkFooter"
+        ]
+      }
+    },
+    "navigationBar": {
+      "height": 72,
+      "position": "fixed-bottom",
+      "background": "semantic.surface",
+      "borderTop": "1px solid semantic.cardBorder",
+      "paddingHorizontal": 16,
+      "gap": 12,
+      "buttons": [
+        {
+          "label": "strings.campaignCreate.back",
+          "style": "ghost",
+          "visible": "{{currentStep > 1}}"
+        },
+        {
+          "label": "strings.campaignCreate.next",
+          "style": "primary",
+          "visible": "{{currentStep < 4}}"
+        },
+        {
+          "label": "strings.campaignCreate.launch",
+          "style": "primary",
+          "visible": "{{currentStep === 4}}"
+        }
+      ]
+    }
+  },
+  "components": [
+    {
+      "id": "navigationHeader",
+      "ref": "navigation-header",
+      "props": {
+        "showBack": false,
+        "title": "strings.campaignCreate.title",
+        "leftAction": "close"
+      }
+    },
+    {
+      "id": "stepIndicator",
+      "ref": "step-indicator",
+      "props": {
+        "currentStep": "{{currentStep}}",
+        "totalSteps": 4,
+        "steps": [
+          "strings.campaignCreate.stepAudience",
+          "strings.campaignCreate.stepContent",
+          "strings.campaignCreate.stepSchedule",
+          "strings.campaignCreate.stepReview"
+        ]
+      }
+    },
+    {
+      "id": "segmentPicker",
+      "ref": "select",
+      "props": {
+        "placeholder": "strings.campaignCreate.selectSegment",
+        "options": "{{segments}}"
+      }
+    },
+    {
+      "id": "channelMultiSelect",
+      "ref": "checkbox-group",
+      "props": {
+        "label": "strings.campaignCreate.channelLabel",
+        "options": ["Push", "Email", "SMS", "In-app"]
+      }
+    },
+    {
+      "id": "complianceChecklist",
+      "ref": "compliance-check-list",
+      "props": {
+        "items": "{{complianceItems}}"
+      }
+    }
+  ],
+  "interactions": [
+    {
+      "trigger": "nextButton.tap",
+      "action": "nextStep",
+      "condition": "currentStepValid"
+    },
+    {
+      "trigger": "backButton.tap",
+      "action": "previousStep"
+    },
+    {
+      "trigger": "launchButton.tap",
+      "action": "createCampaign",
+      "condition": "allStepsValid"
+    }
+  ],
+  "tokens": {
+    "used": [
+      "semantic.pageBackground",
+      "semantic.surface",
+      "semantic.cardBorder",
+      "semantic.foreground",
+      "semantic.secondaryText",
+      "semantic.primary"
+    ]
+  },
+  "redlines": {
+    "stepIndicatorHeight": 64,
+    "inputHeight": 48,
+    "navigationBarHeight": 72,
+    "buttonHeight": 48,
+    "gap": 12
+  }
+}

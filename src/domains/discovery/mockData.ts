@@ -36,6 +36,8 @@ export const featuredDiscoverySalons: DiscoverySalonCard[] = [
     member: true,
     bookingEnabled: true,
     messageEnabled: true,
+    locationLat: 45.815,
+    locationLng: 15.9819,
   },
   {
     id: "atelier-glow",
@@ -52,6 +54,8 @@ export const featuredDiscoverySalons: DiscoverySalonCard[] = [
     member: false,
     bookingEnabled: true,
     messageEnabled: true,
+    locationLat: 43.5081,
+    locationLng: 16.4402,
   },
   {
     id: "the-polish-room",
@@ -68,6 +72,8 @@ export const featuredDiscoverySalons: DiscoverySalonCard[] = [
     member: true,
     bookingEnabled: false,
     messageEnabled: false,
+    locationLat: 45.3271,
+    locationLng: 14.4422,
   },
 ];
 

@@ -1,0 +1,72 @@
+{
+  "component": "MergeConflictResolver",
+  "description": "Two-column comparison tile for resolving client merge conflicts",
+  "props": {
+    "fieldName": {
+      "type": "string",
+      "required": true,
+      "description": "Field label (Name, Phone, Email, etc.)"
+    },
+    "primaryValue": {
+      "type": "string",
+      "required": true,
+      "description": "Value from primary client record"
+    },
+    "duplicateValue": {
+      "type": "string",
+      "required": true,
+      "description": "Value from duplicate client record"
+    },
+    "selectedSide": {
+      "type": "left | right",
+      "required": true,
+      "description": "Which value is currently selected"
+    },
+    "onSelect": {
+      "type": "function",
+      "required": true,
+      "description": "Callback when a side is selected"
+    },
+    "isDifferent": {
+      "type": "boolean",
+      "required": true,
+      "description": "Whether the values differ (triggers amber highlight)"
+    }
+  },
+  "states": [
+    "default",
+    "conflict",
+    "resolved"
+  ],
+  "variants": [],
+  "tokens": {
+    "background": "semantic.surface",
+    "backgroundConflict": "#FEF3C7",
+    "border": "semantic.cardBorder",
+    "labelText": "semantic.secondaryText",
+    "valueText": "semantic.foreground",
+    "radioSelected": "semantic.primary",
+    "radioUnselected": "semantic.cardBorder"
+  },
+  "accessibility": {
+    "role": "radiogroup",
+    "label": "Choose value for {fieldName}",
+    "hint": "Select which value to keep after merge"
+  },
+  "dimensions": {
+    "height": "auto",
+    "minHeight": 64,
+    "padding": 16,
+    "columnGap": 12,
+    "radioSize": 20
+  },
+  "examples": [
+    {
+      "fieldName": "Phone",
+      "primaryValue": "+1 (555) 123-4567",
+      "duplicateValue": "+1 (555) 987-6543",
+      "selectedSide": "left",
+      "isDifferent": true
+    }
+  ]
+}

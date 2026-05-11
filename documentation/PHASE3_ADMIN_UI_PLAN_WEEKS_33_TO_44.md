@@ -1,4 +1,6 @@
-# Phase 3 — Admin and Operator UI Build (Weeks 33–44)
+# Phase 3 — Admin and Operator UI Build (Weeks 35–46)
+
+> **Filename note:** the document filename retains `WEEKS_33_TO_44` for stable links across the program. Phase 2.2 (Weeks 33–34, navigation wiring) was inserted between Phase 2.1 and Phase 3; all Phase 3 weeks shifted by +2. Actual week range: **W35–W46**.
 
 ## Why This Plan Exists
 Phase 1 (Weeks 1–12) delivered the multi-tenant backend and pilot hardening. Phase 2 (Weeks 21–32) delivers the consumer and staff-shell client UI. Neither phase covers the full set of admin and operator screens that real salons and the platform owner need to run the business day-to-day.
@@ -17,9 +19,9 @@ This document closes that gap. It defines a 12-week Phase 3 that turns existing 
 - Admin UI uses the same theme tokens as the client app. Admin-specific patterns (data tables, bulk actions, command palette) are introduced as new components and added to the design system.
 - All admin work assumes RBAC (owner, location_manager, salon_staff, platform_owner) is enforced at the service layer; UI surfaces only what the role allows and degrades gracefully for denied actions.
 
-## Entry Conditions (must be true before Week 33 starts)
-1. Phase 2 close report signed off; release candidate from Week 32 in the field.
-2. Figma packages for Weeks 33–34 priority screens accepted via the handoff playbook.
+## Entry Conditions (must be true before Week 35 starts)
+1. Phase 2.2 close report signed off; all 49 routes wired in AppNavigatorShell; Phase 2.1 release candidate from Week 32 in the field.
+2. Figma packages for Weeks 35–36 priority screens accepted via the handoff playbook.
 3. Admin design system additions (data table, bulk action bar, command palette, destructive confirm) accepted.
 4. No P0/P1 defects open against the booking/payments path.
 5. Platform super-admin role and impersonation token model defined and reviewed by security.
@@ -56,7 +58,7 @@ This document closes that gap. It defines a 12-week Phase 3 that turns existing 
 
 ## Week-by-Week Plan
 
-### Week 33 — Owner Home, Tenant Settings, Brand and Legal Config
+### Week 35 — Owner Home, Tenant Settings, Brand and Legal Config
 - Owner home / KPI dashboard (revenue today/week, bookings, occupancy, top staff, alerts).
 - **Operator notification center** (booking failures, payment failures, payout issues, AI safety events). Surfaces alerts the system already emits.
 - Tenant settings shell with sectioned navigation.
@@ -70,7 +72,7 @@ This document closes that gap. It defines a 12-week Phase 3 that turns existing 
 - **Admin pattern landings (apply across all subsequent weeks)**: empty state, loading state, error state, role-denied state, embedded help anchor / runbook deep link.
 - **First-run admin console tour** (light-touch coach marks for owners landing in the console for the first time).
 
-### Week 34 — Subscription, Billing, Connect, Payouts
+### Week 36 — Subscription, Billing, Connect, Payouts
 - Plan selection and change-plan flow (uses Week 13–14 backend).
 - Invoice history with download.
 - Payment method on file (admin-side card management).
@@ -82,7 +84,7 @@ This document closes that gap. It defines a 12-week Phase 3 that turns existing 
 - Refund / dispute admin view (read + initiate where allowed).
 - **Print / PDF rendering** for invoices, payout statements, refund receipts (server-side render service).
 
-### Week 35 — Location Dashboard, Settings, Resources
+### Week 37 — Location Dashboard, Settings, Resources
 - Per-location dashboard (today's bookings, revenue, occupancy, walk-ins).
 - Multi-location switcher and overview.
 - Location settings (hours, holidays, contact, address, photos). **US-primary (per [US_PRIMARY_MARKET_ADDENDUM.md](US_PRIMARY_MARKET_ADDENDUM.md)):** US federal holidays seed available for booking blackout, with state-optional holiday toggles per location. EU locations seed by country.
@@ -91,7 +93,7 @@ This document closes that gap. It defines a 12-week Phase 3 that turns existing 
 - Walk-in / queue management at location level (admin variant of staff app).
 - Daily close / cash report.
 
-### Week 36 — Staff Administration
+### Week 38 — Staff Administration
 - Staff invite flow with email/SMS and pending state.
 - Role assignment with audit trail.
 - Schedule editor (templates, exceptions, time-off approvals workflow).
@@ -101,7 +103,7 @@ This document closes that gap. It defines a 12-week Phase 3 that turns existing 
 - Deactivate / reactivate with reason and audit.
 - **Bulk-action pattern v1 lands here** (multi-select, bulk-action bar, confirmation modal). Pattern is reused by every subsequent admin list (services, bookings, clients, reviews, messages).
 
-### Week 37 — Service Catalog Depth
+### Week 39 — Service Catalog Depth
 - Category and tag management.
 - Bulk import / export (CSV).
 - Price list management.
@@ -111,7 +113,7 @@ This document closes that gap. It defines a 12-week Phase 3 that turns existing 
 - Booking rules per service (deposit, cancellation window, buffer time, lead time).
 - Visibility toggles (online, marketplace, internal-only).
 
-### Week 38 — Booking Operations
+### Week 40 — Booking Operations
 The operator's daily-driver screen.
 - Master calendar (all staff, all rooms, day/week/month).
 - Drag-to-reschedule with slot-engine validation.
@@ -125,7 +127,7 @@ The operator's daily-driver screen.
 - Recurring booking management (if Phase 2 decision-gate approved).
 - Slot-engine conflict resolution UI.
 
-### Week 39 — Client / CRM
+### Week 41 — Client / CRM
 - Client list with filters, search, saved views.
 - Client detail (history, preferences, loyalty, notes, allergies, photo gallery, consents).
 - Merge duplicate clients with conflict resolution.
@@ -135,7 +137,7 @@ The operator's daily-driver screen.
 - GDPR data export per client.
 - Delete client per request (with audit).
 
-### Week 40 — Loyalty, Activities, Campaigns Admin
+### Week 42 — Loyalty, Activities, Campaigns Admin
 - Loyalty program configuration (earn rules, tiers, expirations, multipliers).
 - Reward catalog editor with media.
 - Manual point adjustment with audit.
@@ -153,7 +155,7 @@ The operator's daily-driver screen.
 - **Transactional message template editor** (booking confirmation, booking reminder, no-show, cancellation, receipt, password reset). Per-tenant overrides on top of platform defaults.
 - **Promotions / discount codes admin** (create code, apply rules: services, dates, max uses, per-client cap; track redemption).
 
-### Week 41 — Reviews, Messaging, Waitlist Admin
+### Week 43 — Reviews, Messaging, Waitlist Admin
 - Review queue with filters and bulk actions.
 - Owner reply composer with templates.
 - Flag, dispute, hide review with audit.
@@ -169,7 +171,7 @@ The operator's daily-driver screen.
 - Convert waitlist to booking.
 - Waitlist policies and configuration.
 
-### Week 42 — Analytics, Reporting, Exports
+### Week 44 — Analytics, Reporting, Exports
 Backend exists; this week brings the surfaces.
 - Revenue dashboard.
 - Booking funnel.
@@ -184,7 +186,7 @@ Backend exists; this week brings the surfaces.
 - **Operator-scoped audit log explorer** (tenant-scoped: who did what, when, on what record). Distinct from platform-wide audit log in Week 44.
 - **Print / PDF rendering** for daily close reports, scheduled reports, GDPR export packages.
 
-### Week 43 — AI Admin and Marketplace Tenant Tools
+### Week 45 — AI Admin and Marketplace Tenant Tools
 - AI feature toggles per tenant.
 - Role-aware AI budget config (extends current owner-only screens).
 - AI suggestion review queue (scheduling, retention, content).
@@ -197,7 +199,7 @@ Backend exists; this week brings the surfaces.
 - Visibility settings (marketplace vs profile-only).
 - Anti-client-theft compliance dashboard.
 
-### Week 44 — Platform Super-Admin, Compliance, Polish, RC
+### Week 46 — Platform Super-Admin, Compliance, Polish, RC
 - Tenant directory (all tenants) with status, plan, health, support notes.
 - Tenant detail and intervention surface.
 - Suspend / reactivate tenant.
@@ -219,31 +221,31 @@ Backend exists; this week brings the surfaces.
 ## Decision Gates
 | Gate | Decide by | Default if undecided |
 |------|-----------|----------------------|
-| Custom domains per tenant in scope? | End of Week 33 | No (post-launch) |
-| Web-primary admin vs full mobile parity? | End of Week 33 | Web-primary; native parity only for floor-operator flows (calendar, queue, manual booking) |
-| Recurring booking admin in scope? | End of Week 37 | Mirrors Phase 2 decision |
-| Custom report builder vs pre-built reports only? | End of Week 41 | Pre-built reports + CSV export only; custom builder post-launch |
-| Support ticketing built-in vs vendor (Zendesk/Intercom) embed? | End of Week 43 | Vendor embed |
-| Impersonation duration cap | End of Week 43 | 30 minutes, owner consent prompt required |
-| Cross-tenant marketplace moderation in scope this phase? | End of Week 43 | Yes (read + flag); takedown post-launch |
+| Custom domains per tenant in scope? | End of Week 35 | No (post-launch) |
+| Web-primary admin vs full mobile parity? | End of Week 35 | Web-primary; native parity only for floor-operator flows (calendar, queue, manual booking) |
+| Recurring booking admin in scope? | End of Week 39 | Mirrors Phase 2 decision |
+| Custom report builder vs pre-built reports only? | End of Week 43 | Pre-built reports + CSV export only; custom builder post-launch |
+| Support ticketing built-in vs vendor (Zendesk/Intercom) embed? | End of Week 45 | Vendor embed |
+| Impersonation duration cap | End of Week 45 | 30 minutes, owner consent prompt required |
+| Cross-tenant marketplace moderation in scope this phase? | End of Week 45 | Yes (read + flag); takedown post-launch |
 
 ## Decision Gates Addendum (Group B — Scope Expansions)
 The following items are real product surfaces that some salon-management competitors include. None are in the current Phase 3 scope. Each must receive an explicit yes/no answer by its decide-by date. A "yes" expands Phase 3 by approximately the number of weeks shown; a "no" defers the item to a Phase 4 backlog.
 
 | Gate | Decide by | If "yes" — added scope | Default if undecided |
 |------|-----------|------------------------|----------------------|
-| Inventory / retail products and stock | End of Week 35 | +1 week (insert as W37.5 or extend W42 by 5 days): product catalog, stock levels, low-stock alerts, retail receipts, retail at booking checkout (Phase 2 client-side change too) | No |
-| Accounting / bookkeeping export (QuickBooks, Xero) | End of Week 41 | +0.5 week absorbed into W42: connector setup, export schedule, mapping table | No |
-| Gift cards as an admin product (issuance, balance, sale) | End of Week 38 | +0.5 week absorbed into W40: gift card create/issue, balance lookup, redemption admin, refund/void; client-side already covered in Phase 2.1 redemption | No |
-| Service intake / consult / consent forms (per service) | End of Week 36 | +1 week (insert as W37.5): form builder, per-service attachment, signature capture, retention rules, audit | No |
-| Multi-currency operations | End of Week 33 | RESOLVED YES (per [US_PRIMARY_MARKET_ADDENDUM.md](US_PRIMARY_MARKET_ADDENDUM.md)): per-location currency, FX disclosure, multi-currency reporting absorbed across W33/W34/W42 | Yes |
-| NPS / post-booking survey configuration | End of Week 40 | +0.5 week absorbed into W41: survey config, channel + cadence, response dashboard | No |
-| Vendor / supplier management | End of Week 35 | +1 week: vendor directory, purchase orders, invoice intake | No (out of typical SMB scope) |
-| Configurable messaging SLAs (response-time targets, alerts) | End of Week 40 | +0.5 week absorbed into W41: SLA config, breach alerts | No |
+| Inventory / retail products and stock | End of Week 37 | +1 week (insert as W39.5 or extend W44 by 5 days): product catalog, stock levels, low-stock alerts, retail receipts, retail at booking checkout (Phase 2 client-side change too) | No |
+| Accounting / bookkeeping export (QuickBooks, Xero) | End of Week 43 | +0.5 week absorbed into W44: connector setup, export schedule, mapping table | No |
+| Gift cards as an admin product (issuance, balance, sale) | End of Week 40 | +0.5 week absorbed into W42: gift card create/issue, balance lookup, redemption admin, refund/void; client-side already covered in Phase 2.1 redemption | No |
+| Service intake / consult / consent forms (per service) | End of Week 38 | +1 week (insert as W39.5): form builder, per-service attachment, signature capture, retention rules, audit | No |
+| Multi-currency operations | End of Week 35 | RESOLVED YES (per [US_PRIMARY_MARKET_ADDENDUM.md](US_PRIMARY_MARKET_ADDENDUM.md)): per-location currency, FX disclosure, multi-currency reporting absorbed across W35/W36/W44 | Yes |
+| NPS / post-booking survey configuration | End of Week 42 | +0.5 week absorbed into W43: survey config, channel + cadence, response dashboard | No |
+| Vendor / supplier management | End of Week 37 | +1 week: vendor directory, purchase orders, invoice intake | No (out of typical SMB scope) |
+| Configurable messaging SLAs (response-time targets, alerts) | End of Week 42 | +0.5 week absorbed into W43: SLA config, breach alerts | No |
 
 If two or more Group B gates resolve to "yes", re-baseline Phase 3 end date accordingly; do not silently absorb scope into the existing 12 weeks.
 
-## Parallel Streams (run alongside Weeks 33–44)
+## Parallel Streams (run alongside Weeks 35–46)
 - **Design supply**: admin batches M–S delivered two sprints ahead.
 - **Continuous QA**: visual regression and RBAC regression suite grown weekly.
 - **Docs**: per-screen operator runbooks appended to `documentation/new-platform/runbooks/`.
@@ -266,14 +268,14 @@ If two or more Group B gates resolve to "yes", re-baseline Phase 3 end date acco
 | Audit-log gaps on admin writes | High | Medium | Audit-write checked in PR review; automated test asserting audit emission |
 | Impersonation abuse risk | Critical | Low | Hard duration cap; owner consent (or platform-policy-approved override); banner; full audit; quarterly review |
 | Data-table performance degrades on large tenants | Medium | High | Virtualization required; server-side pagination and filtering; perf budget per screen |
-| Operator confusion from too many surfaces | Medium | High | Information architecture review at Week 33 entry; consistent navigation; command palette by Week 44 |
+| Operator confusion from too many surfaces | Medium | High | Information architecture review at Week 35 entry; consistent navigation; command palette by Week 46 |
 | Reporting accuracy regressions | High | Medium | Snapshot tests against Week 11 analytics fixtures; reconciliation report weekly |
 
 ## Trello Code Convention
 Phase 3 cards extend the prefix scheme:
-- `[W33-ADM-001]` Owner KPI dashboard
-- `[W38-ADM-014]` Master calendar drag-to-reschedule
-- `[W44-PLT-007]` Platform impersonation flow
+- `[W35-ADM-001]` Owner KPI dashboard
+- `[W40-ADM-014]` Master calendar drag-to-reschedule
+- `[W46-PLT-007]` Platform impersonation flow
 
 New category codes:
 - `ADM`: Admin / operator UI

@@ -1,0 +1,171 @@
+{
+  "screenId": "L.13",
+  "name": "WebResponsiveBreakpointsScreen",
+  "description": "Responsive web layout breakpoints for Home, Explore, and Booking flow screens",
+  "breakpoints": [
+    {
+      "name": "mobile",
+      "width": 390,
+      "columns": 1,
+      "pagePadding": 16,
+      "gutter": 0,
+      "navigation": "bottom-tabs"
+    },
+    {
+      "name": "tablet",
+      "width": 768,
+      "columns": 2,
+      "pagePadding": 24,
+      "gutter": 24,
+      "navigation": "side-rail-64px"
+    },
+    {
+      "name": "desktop",
+      "width": 1280,
+      "maxContentWidth": 1200,
+      "columns": 3,
+      "pagePadding": 32,
+      "gutter": 32,
+      "navigation": "top-nav + side-rail"
+    }
+  ],
+  "screens": ["Home", "Explore", "Booking flow"],
+  "frames": [
+    {
+      "id": "L.13.1",
+      "name": "Home-Mobile-390",
+      "screen": "Home",
+      "breakpoint": "mobile",
+      "width": 390,
+      "annotations": {
+        "layout": "1-column vertical stack",
+        "pagePadding": "16px horizontal",
+        "navigation": "Bottom tabs with 5 items",
+        "cardsPerRow": 1,
+        "searchBar": "Full-width minus 32px margin"
+      }
+    },
+    {
+      "id": "L.13.2",
+      "name": "Home-Tablet-768",
+      "screen": "Home",
+      "breakpoint": "tablet",
+      "width": 768,
+      "annotations": {
+        "layout": "2-column grid",
+        "pagePadding": "24px horizontal",
+        "gutter": "24px between columns",
+        "navigation": "64px side rail (left), no bottom tabs",
+        "cardsPerRow": 2,
+        "reflow": "Search bar and filters in sticky header"
+      }
+    },
+    {
+      "id": "L.13.3",
+      "name": "Home-Desktop-1280",
+      "screen": "Home",
+      "breakpoint": "desktop",
+      "width": 1280,
+      "maxContentWidth": 1200,
+      "annotations": {
+        "layout": "3-column grid, max 1200px content width, centered",
+        "pagePadding": "32px horizontal (outside max-width container)",
+        "gutter": "32px between columns",
+        "navigation": "Top nav 64px height + side rail 64px width",
+        "cardsPerRow": 3,
+        "reflow": "Search bar in top nav, filters inline above grid"
+      }
+    },
+    {
+      "id": "L.13.4",
+      "name": "Explore-Mobile-390",
+      "screen": "Explore",
+      "breakpoint": "mobile",
+      "width": 390,
+      "annotations": {
+        "layout": "1-column vertical stack",
+        "pagePadding": "16px horizontal",
+        "navigation": "Bottom tabs",
+        "categoryPills": "Horizontal scroll, full-width",
+        "serviceCards": "1 per row"
+      }
+    },
+    {
+      "id": "L.13.5",
+      "name": "Explore-Tablet-768",
+      "screen": "Explore",
+      "breakpoint": "tablet",
+      "width": 768,
+      "annotations": {
+        "layout": "2-column grid",
+        "pagePadding": "24px horizontal",
+        "gutter": "24px",
+        "navigation": "Side rail",
+        "categoryPills": "Wrap to multiple rows, no scroll",
+        "serviceCards": "2 per row"
+      }
+    },
+    {
+      "id": "L.13.6",
+      "name": "Explore-Desktop-1280",
+      "screen": "Explore",
+      "breakpoint": "desktop",
+      "width": 1280,
+      "maxContentWidth": 1200,
+      "annotations": {
+        "layout": "3-column grid, max 1200px content width",
+        "pagePadding": "32px horizontal",
+        "gutter": "32px",
+        "navigation": "Top nav + side rail",
+        "categoryPills": "Inline in top filter bar",
+        "serviceCards": "3 per row"
+      }
+    },
+    {
+      "id": "L.13.7",
+      "name": "BookingFlow-Mobile-390",
+      "screen": "Booking flow",
+      "breakpoint": "mobile",
+      "width": 390,
+      "annotations": {
+        "layout": "Single-column wizard",
+        "pagePadding": "16px horizontal",
+        "navigation": "Back button top-left, progress dots top-center",
+        "timeSlots": "2-column grid",
+        "cta": "Fixed bottom, full-width minus 32px margin"
+      }
+    },
+    {
+      "id": "L.13.8",
+      "name": "BookingFlow-Tablet-768",
+      "screen": "Booking flow",
+      "breakpoint": "tablet",
+      "width": 768,
+      "annotations": {
+        "layout": "Centered card max-width 600px",
+        "pagePadding": "24px horizontal (within centered card)",
+        "navigation": "Back button + progress bar in card header",
+        "timeSlots": "3-column grid",
+        "cta": "Fixed bottom within card"
+      }
+    },
+    {
+      "id": "L.13.9",
+      "name": "BookingFlow-Desktop-1280",
+      "screen": "Booking flow",
+      "breakpoint": "desktop",
+      "width": 1280,
+      "maxContentWidth": 800,
+      "annotations": {
+        "layout": "Centered card max-width 800px",
+        "pagePadding": "32px horizontal within card",
+        "navigation": "Top nav visible, back + progress in card",
+        "timeSlots": "4-column grid",
+        "cta": "Fixed bottom within card, constrained width"
+      }
+    }
+  ],
+  "accessibility": {
+    "breakpointAnnouncement": "Layout changed to {breakpointName} view"
+  }
+}

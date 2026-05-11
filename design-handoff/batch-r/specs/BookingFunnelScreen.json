@@ -1,0 +1,50 @@
+{
+  "screen": "BookingFunnelScreen",
+  "route": "/admin/analytics/funnel",
+  "description": "Visualizes booking conversion from discovery through completed appointment",
+  "platform": "admin-desktop",
+  "dimensions": { "width": 1280, "contentWidth": "calc(1280 - 240px sidebar)" },
+  "states": ["default", "loading", "empty", "error"],
+  "accessibility": {
+    "screenReaderLabel": "strings.bookingFunnel.screenTitle",
+    "semanticRoles": [
+      { "element": "funnelChart", "role": "img" },
+      { "element": "channelTable", "role": "table" }
+    ]
+  },
+  "rtl": "deferred",
+  "darkMode": "deferred",
+  "layout": {
+    "header": {
+      "component": "AdminHeader",
+      "title": "strings.bookingFunnel.title",
+      "rightActions": ["DateRangePicker", "Export SecondaryButton"]
+    },
+    "body": {
+      "padding": 24,
+      "funnelCard": {
+        "width": "full",
+        "component": "FunnelChartCard",
+        "steps": ["Discovery", "Profile View", "Time Slot Selected", "Booking Initiated", "Booking Confirmed", "Appointment Completed"]
+      },
+      "row2": {
+        "layout": "2 columns equal",
+        "left": { "component": "BarChartCard", "title": "Drop-off Reasons by Step", "orientation": "horizontal", "note": "top 5 reasons per step, tab/dropdown to switch step" },
+        "right": { "component": "LineChartCard", "title": "Funnel Conversion Rate Over Time", "series": "overall %" }
+      },
+      "channelTable": {
+        "width": "full",
+        "component": "DataTable",
+        "title": "Funnel by Channel",
+        "columns": ["Source Channel", "Discovery", "Profile View", "Time Slot", "Initiated", "Confirmed", "Completed"],
+        "sortable": true,
+        "channels": ["Organic", "Google Search", "Marketplace", "Referral Link", "Social"]
+      }
+    }
+  },
+  "components": [
+    { "id": "funnelChart", "ref": "FunnelChartCard", "props": { "title": "strings.bookingFunnel.title", "steps": "{{funnelSteps}}", "showDropOff": true } },
+    { "id": "channelTable", "ref": "DataTable", "props": { "title": "strings.bookingFunnel.channelTableTitle", "columns": "{{channelColumns}}", "data": "{{channelData}}" } }
+  ],
+  "strings": "See strings/en-us.json for bookingFunnel keys"
+}

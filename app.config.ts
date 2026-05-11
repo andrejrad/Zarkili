@@ -9,7 +9,30 @@ const config: ExpoConfig = {
   version: "0.1.0",
   orientation: "portrait",
   userInterfaceStyle: "automatic",
-  plugins: ["expo-font"],
+  plugins: [
+    "expo-font",
+    [
+      "react-native-maps",
+      {
+        googleMapsApiKey: process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY ?? ""
+      }
+    ],
+    [
+      "@stripe/stripe-react-native",
+      {
+        merchantIdentifier: "merchant.com.zarkili",
+        enableGooglePay: false
+      }
+    ],
+    [
+      "expo-notifications",
+      {
+        icon: "./assets/notification-icon.png",
+        color: "#E3A9A0",
+        defaultChannel: "default"
+      }
+    ]
+  ],
   extra: {
     appVariant: APP_VARIANT,
     firebaseProjectId: process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID ?? ""

@@ -1,0 +1,227 @@
+{
+  "schemaVersion": "1.0.0",
+  "screenId": "M.9",
+  "screenName": "OwnerNotificationPreferencesScreen",
+  "route": "admin/settings/notifications",
+  "designSystem": "Zarkili v1.0.0",
+  "device": "iPad 768x1024",
+  "engineeringStatus": "delivered",
+  "description": "Settings screen for owners to configure Do Not Disturb hours and per-channel notification preferences by event category.",
+  "layout": {
+    "type": "scrollable-column",
+    "padding": {
+      "top": 24,
+      "right": 32,
+      "bottom": 40,
+      "left": 32
+    },
+    "maxContentWidth": 960,
+    "gap": 24
+  },
+  "sections": [
+    {
+      "id": "dnd-banner",
+      "type": "status-banner",
+      "title": null,
+      "component": null,
+      "condition": "dndActive",
+      "text": "Do Not Disturb active until {{dndEndTime}}.",
+      "dismissible": false
+    },
+    {
+      "id": "dnd-form",
+      "type": "form-section",
+      "title": "Do Not Disturb",
+      "component": null,
+      "fields": [
+        {
+          "id": "dndStart",
+          "type": "time-picker",
+          "label": "Start time",
+          "format": "12h"
+        },
+        {
+          "id": "dndEnd",
+          "type": "time-picker",
+          "label": "End time",
+          "format": "12h"
+        },
+        {
+          "id": "dndTimezone",
+          "type": "timezone-picker",
+          "label": "Timezone"
+        }
+      ]
+    },
+    {
+      "id": "bookings-prefs",
+      "type": "list-section",
+      "title": "Bookings",
+      "component": null,
+      "rows": [
+        {
+          "label": "New booking",
+          "channels": [
+            "push",
+            "email",
+            "sms"
+          ]
+        },
+        {
+          "label": "Cancellation",
+          "channels": [
+            "push",
+            "email",
+            "sms"
+          ]
+        },
+        {
+          "label": "Reschedule",
+          "channels": [
+            "push",
+            "email",
+            "sms"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "payments-prefs",
+      "type": "list-section",
+      "title": "Payments",
+      "component": null,
+      "rows": [
+        {
+          "label": "Payment received",
+          "channels": [
+            "push",
+            "email",
+            "sms"
+          ]
+        },
+        {
+          "label": "Refund issued",
+          "channels": [
+            "push",
+            "email",
+            "sms"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "payouts-prefs",
+      "type": "list-section",
+      "title": "Payouts",
+      "component": null,
+      "rows": [
+        {
+          "label": "Payout settled",
+          "channels": [
+            "push",
+            "email",
+            "sms"
+          ]
+        },
+        {
+          "label": "Payout failed",
+          "channels": [
+            "push",
+            "email",
+            "sms"
+          ]
+        },
+        {
+          "label": "On-hold",
+          "channels": [
+            "push",
+            "email",
+            "sms"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "connect-prefs",
+      "type": "list-section",
+      "title": "Connect Issues",
+      "component": null,
+      "rows": [
+        {
+          "label": "Connect action required",
+          "channels": [
+            "push",
+            "email",
+            "sms"
+          ]
+        },
+        {
+          "label": "Connect restricted",
+          "channels": [
+            "push",
+            "email",
+            "sms"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ai-prefs",
+      "type": "list-section",
+      "title": "AI Alerts",
+      "component": null,
+      "rows": [
+        {
+          "label": "AI suggestion available",
+          "channels": [
+            "push",
+            "email",
+            "sms"
+          ]
+        },
+        {
+          "label": "AI anomaly detected",
+          "channels": [
+            "push",
+            "email",
+            "sms"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "reviews-prefs",
+      "type": "list-section",
+      "title": "Reviews",
+      "component": null,
+      "rows": [
+        {
+          "label": "New review",
+          "channels": [
+            "push",
+            "email",
+            "sms"
+          ]
+        },
+        {
+          "label": "Negative review flagged",
+          "channels": [
+            "push",
+            "email",
+            "sms"
+          ]
+        }
+      ]
+    }
+  ],
+  "stateNames": [
+    "default",
+    "editing",
+    "saved",
+    "DND-active",
+    "error"
+  ],
+  "accessibility": {
+    "screenReaderLabel": "Notification preferences"
+  }
+}

@@ -1,0 +1,172 @@
+{
+  "screen": "Tipping",
+  "batchId": "D.3",
+  "description": "Allows the consumer to select a tip amount before confirming a booking payment. Offers percentage presets (15%, 20%, 25%), a 'Custom' fixed-amount entry, and a 'No tip' option.",
+  "purpose": "Collect voluntary gratuity. Tip is passed back via state to the booking payment confirmation flow.",
+  "sourceFile": "src/app/payments/TippingScreen.tsx",
+  "hierarchy": {
+    "container": {
+      "background": "#F2EDDD",
+      "safeArea": true,
+      "flex": 1
+    },
+    "scroll": {
+      "type": "ScrollView",
+      "keyboardShouldPersistTaps": "handled",
+      "contentContainerPadding": 16,
+      "contentContainerGap": 16
+    }
+  },
+  "sections": {
+    "header": {
+      "type": "fixed",
+      "height": 56,
+      "background": "#FFFFFF",
+      "paddingHorizontal": 16,
+      "paddingVertical": 12,
+      "borderBottomWidth": 1,
+      "borderBottomColor": "#E5E0D1",
+      "layout": "row",
+      "children": ["backButton", "titleLabel", "headerSpacer"]
+    },
+    "backButton": {
+      "type": "iconButton",
+      "glyph": "←",
+      "size": 44,
+      "color": "#1A1A1A",
+      "optional": true,
+      "accessibility": { "role": "button", "label": "Back" }
+    },
+    "titleLabel": {
+      "type": "text",
+      "content": "Add a tip",
+      "fontSize": 18,
+      "lineHeight": 24,
+      "fontWeight": "600",
+      "color": "#1A1A1A",
+      "textAlign": "center",
+      "flex": 1
+    },
+    "headerSpacer": { "type": "view", "width": 44 },
+    "promptHeading": {
+      "type": "text",
+      "content": "How much would you like to tip?",
+      "fontSize": 20,
+      "lineHeight": 28,
+      "fontWeight": "600",
+      "color": "#1A1A1A"
+    },
+    "tipPresetChipGroup": {
+      "type": "TipPresetChipGroup",
+      "description": "Horizontal wrapping chip row with preset options",
+      "defaultOptions": [
+        { "id": "none", "label": "No tip", "kind": "none", "destructive": true },
+        { "id": "15", "label": "15%", "kind": "percent", "value": 0.15 },
+        { "id": "20", "label": "20%", "kind": "percent", "value": 0.20 },
+        { "id": "25", "label": "25%", "kind": "percent", "value": 0.25 },
+        { "id": "custom", "label": "Custom", "kind": "fixed" }
+      ],
+      "selectedHighlight": { "background": "#E3A9A0", "borderColor": "#E3A9A0", "textColor": "#FFFFFF" },
+      "noTipStyle": { "borderColor": "#D9534F", "borderStyle": "dashed", "background": "#FFFFFF" }
+    },
+    "customAmountSection": {
+      "type": "view",
+      "showWhen": "selectedPreset.kind === 'fixed'",
+      "gap": 8,
+      "children": ["customLabel", "currencyInput"]
+    },
+    "customLabel": {
+      "type": "text",
+      "content": "Custom amount",
+      "fontSize": 12,
+      "lineHeight": 16,
+      "fontWeight": "600",
+      "color": "#6B6B6B",
+      "textTransform": "uppercase",
+      "letterSpacing": 0.5
+    },
+    "currencyInput": {
+      "type": "CurrencyInput",
+      "autoFocus": true,
+      "description": "Leading '$' prefix, decimal-pad keyboard, error text on invalid input"
+    },
+    "totalsCard": {
+      "type": "view",
+      "background": "#FFFFFF",
+      "borderRadius": 16,
+      "borderWidth": 1,
+      "borderColor": "#E5E0D1",
+      "padding": 16,
+      "gap": 8,
+      "children": ["subtotalRow", "tipRow", "grandTotalRow"]
+    },
+    "subtotalRow": {
+      "type": "row",
+      "layout": "row",
+      "justifyContent": "space-between",
+      "children": [
+        { "type": "text", "content": "Subtotal", "fontSize": 14, "color": "#6B6B6B" },
+        { "type": "text", "content": "{subtotal}", "fontSize": 14, "fontWeight": "500", "color": "#1A1A1A" }
+      ]
+    },
+    "tipRow": {
+      "type": "row",
+      "layout": "row",
+      "justifyContent": "space-between",
+      "children": [
+        { "type": "text", "content": "Tip", "fontSize": 14, "color": "#6B6B6B" },
+        { "type": "text", "content": "{tipAmount}", "fontSize": 14, "fontWeight": "500", "color": "#1A1A1A" }
+      ]
+    },
+    "grandTotalRow": {
+      "type": "row",
+      "layout": "row",
+      "justifyContent": "space-between",
+      "borderTopWidth": 1,
+      "borderTopColor": "#E5E0D1",
+      "paddingTop": 12,
+      "marginTop": 8,
+      "children": [
+        { "type": "text", "content": "Total", "fontSize": 16, "fontWeight": "600", "color": "#1A1A1A" },
+        { "type": "text", "content": "{total}", "fontSize": 16, "fontWeight": "600", "color": "#1A1A1A" }
+      ]
+    },
+    "stylistNote": {
+      "type": "text",
+      "content": "100% of tips go to your stylist.",
+      "fontSize": 12,
+      "lineHeight": 16,
+      "color": "#6B6B6B",
+      "textAlign": "center"
+    }
+  },
+  "footer": {
+    "type": "StickyFooterCta",
+    "primaryLabel": "Confirm",
+    "totalLabel": "Total",
+    "totalValue": "{total}",
+    "disabledWhen": "customError is set OR loading === true",
+    "loadingWhen": "loading === true"
+  },
+  "tokens": {
+    "background": "#F2EDDD",
+    "surface": "#FFFFFF",
+    "border": "#E5E0D1",
+    "foreground": "#1A1A1A",
+    "textMuted": "#6B6B6B",
+    "primary": "#E3A9A0",
+    "error": "#D9534F",
+    "pageHorizontalPadding": 16,
+    "cornerRadius": { "full": 9999, "lg": 16 }
+  },
+  "interactions": {
+    "tapPresetChip": "updates state.selectedPresetId; clears customAmountInput if not 'custom'",
+    "typeCustomAmount": "updates state.customAmountInput; validated on each keystroke",
+    "tapConfirm": "calls onConfirm; disabled while custom amount is invalid"
+  },
+  "accessibility": {
+    "chipGroup": "role='radiogroup'; each chip role='radio' with accessibilityState.selected",
+    "currencyInput": "role='none'; inner TextInput has accessibilityLabel='Amount in US dollars'",
+    "confirmButton": "accessibilityState.disabled when submitDisabled"
+  }
+}

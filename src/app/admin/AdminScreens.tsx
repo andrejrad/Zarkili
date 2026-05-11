@@ -1,26 +1,37 @@
+import { useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 
 import type { Location } from "../../domains/locations";
 import type { StaffMember } from "../../domains/staff";
 import type { Service } from "../../domains/services";
+import {
+  AdminDataTable,
+  AdminEmptyState,
+  AdminErrorState,
+  AdminLoadingState,
+  BulkActionBar,
+  BulkConfirmModal,
+  type AdminDataTableColumn,
+} from "./AdminPatterns";
 import { brandTypography } from "../../shared/ui/brandTypography";
 
-function PrimaryButton({ label, onPress, disabled = false }: { label: string; onPress: () => void; disabled?: boolean }) {
+function PrimaryButton({ label, onPress, disabled = false, testID }: { label: string; onPress: () => void; disabled?: boolean; testID?: string }) {
   return (
     <Pressable
       accessibilityRole="button"
       disabled={disabled}
       onPress={onPress}
       style={[styles.button, disabled ? styles.buttonDisabled : null]}
+      testID={testID}
     >
       <Text style={styles.buttonLabel}>{label}</Text>
     </Pressable>
   );
 }
 
-function SecondaryButton({ label, onPress }: { label: string; onPress: () => void }) {
+function SecondaryButton({ label, onPress, testID }: { label: string; onPress: () => void; testID?: string }) {
   return (
-    <Pressable accessibilityRole="button" onPress={onPress} style={styles.secondaryButton}>
+    <Pressable accessibilityRole="button" onPress={onPress} style={styles.secondaryButton} testID={testID}>
       <Text style={styles.secondaryButtonLabel}>{label}</Text>
     </Pressable>
   );
@@ -222,6 +233,9 @@ type StaffListScreenProps = {
   staffList: StaffMember[];
   onRetry: () => void;
   onCreateStaff: () => void;
+  onInviteStaff: () => void;
+  onSelectStaff: (member: StaffMember) => void;
+  onBulkDeactivate: (staffIds: string[]) => void;
   onBack: () => void;
 };
 
@@ -231,41 +245,75 @@ export function StaffListScreen({
   staffList,
   onRetry,
   onCreateStaff,
+  onInviteStaff,
+  onSelectStaff,
+  onBulkDeactivate,
   onBack,
 }: StaffListScreenProps) {
+  const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
+  const [confirmBulkDeactivate, setConfirmBulkDeactivate] = useState(false);
+
+  const columns: AdminDataTableColumn<StaffMember>[] = [
+    { header: "Name", render: (m) => m.displayName, flex: 2 },
+    { header: "Role", render: (m) => m.role, flex: 1 },
+    { header: "Status", render: (m) => m.status, flex: 1 },
+  ];
+
   return (
-    <ScrollView contentContainerStyle={styles.rootContent}>
+    <ScrollView contentContainerStyle={styles.rootContent} testID="staff-list-screen">
       <Text style={styles.title}>Staff</Text>
       <Text style={styles.subtitle}>Tenant-scoped staff list.</Text>
 
-      <PrimaryButton label="Add staff member" onPress={onCreateStaff} />
+      <View style={styles.rowActions}>
+        <PrimaryButton label="Add staff" onPress={onCreateStaff} testID="staff-list-add-btn" />
+        <SecondaryButton label="Invite" onPress={onInviteStaff} testID="staff-list-invite-btn" />
+      </View>
 
-      {loading ? <Text style={styles.body}>Loading staff...</Text> : null}
+      {loading ? <AdminLoadingState label="Loading staff…" /> : null}
+      {errorMessage ? <AdminErrorState message={errorMessage} onRetry={onRetry} /> : null}
 
-      {errorMessage ? (
-        <View style={styles.card}>
-          <Text style={styles.error}>{errorMessage}</Text>
-          <PrimaryButton label="Retry" onPress={onRetry} />
-        </View>
+      {!loading && !errorMessage ? (
+        <AdminDataTable
+          columns={columns}
+          rows={staffList}
+          keyExtractor={(m) => m.staffId}
+          selectable
+          selectedKeys={selectedKeys}
+          onSelectionChange={setSelectedKeys}
+          onRowPress={onSelectStaff}
+          emptyLabel="No staff members yet."
+          testID="staff-table"
+        />
       ) : null}
 
-      {!loading && !errorMessage && staffList.length === 0 ? (
-        <View style={styles.card}>
-          <Text style={styles.body}>No staff members yet.</Text>
-        </View>
-      ) : null}
+      <BulkActionBar
+        selectedCount={selectedKeys.size}
+        actions={[
+          {
+            label: "Deactivate",
+            destructive: true,
+            onPress: () => setConfirmBulkDeactivate(true),
+            testID: "bulk-deactivate-btn",
+          },
+        ]}
+        onClearSelection={() => setSelectedKeys(new Set())}
+        testID="staff-bulk-bar"
+      />
 
-      {!loading && !errorMessage && staffList.length > 0 ? (
-        <View style={styles.cardList}>
-          {staffList.map((member) => (
-            <View key={member.staffId} style={styles.card}>
-              <Text style={styles.sectionTitle}>{member.displayName}</Text>
-              <Text style={styles.body}>Role: {member.role}</Text>
-              <Text style={styles.body}>Status: {member.status}</Text>
-            </View>
-          ))}
-        </View>
-      ) : null}
+      <BulkConfirmModal
+        visible={confirmBulkDeactivate}
+        title="Deactivate staff"
+        body={`Deactivate ${selectedKeys.size} staff member${selectedKeys.size === 1 ? "" : "s"}? They will no longer appear in booking flows.`}
+        confirmLabel="Deactivate"
+        destructive
+        onConfirm={() => {
+          onBulkDeactivate([...selectedKeys]);
+          setSelectedKeys(new Set());
+          setConfirmBulkDeactivate(false);
+        }}
+        onCancel={() => setConfirmBulkDeactivate(false)}
+        testID="bulk-deactivate-modal"
+      />
 
       <SecondaryButton label="Back" onPress={onBack} />
     </ScrollView>
@@ -333,6 +381,11 @@ type StaffEditScreenProps = {
   onRoleChange: (value: string) => void;
   onSubmit: () => void;
   onDeactivate: () => void;
+  onReactivate?: () => void;
+  onSchedule?: () => void;
+  onPerformance?: () => void;
+  onCommission?: () => void;
+  onRole?: () => void;
   onBack: () => void;
 };
 
@@ -365,7 +418,28 @@ export function StaffEditScreen(props: StaffEditScreenProps) {
             label={props.submitting ? "Saving..." : "Save changes"}
             onPress={props.onSubmit}
           />
-          <SecondaryButton label="Deactivate staff member" onPress={props.onDeactivate} />
+
+          {/* W41 — Staff sub-screen navigation */}
+          {props.onSchedule ? (
+            <SecondaryButton label="Manage schedule" onPress={props.onSchedule} />
+          ) : null}
+          {props.onPerformance ? (
+            <SecondaryButton label="Performance metrics" onPress={props.onPerformance} />
+          ) : null}
+          {props.onCommission ? (
+            <SecondaryButton label="Commission & payout" onPress={props.onCommission} />
+          ) : null}
+          {props.onRole ? (
+            <SecondaryButton label="Role & audit trail" onPress={props.onRole} />
+          ) : null}
+
+          {props.staffMember.status === "active" ? (
+            <SecondaryButton label="Deactivate staff member" onPress={props.onDeactivate} />
+          ) : (
+            props.onReactivate ? (
+              <SecondaryButton label="Reactivate staff member" onPress={props.onReactivate} />
+            ) : null
+          )}
         </View>
       ) : null}
 
@@ -378,55 +452,90 @@ export function StaffEditScreen(props: StaffEditScreenProps) {
 
 type ServiceListScreenProps = {
   loading: boolean;
-  errorMessage: string | null;
-  servicesList: Service[];
-  onRetry: () => void;
-  onCreateService: () => void;
+  error: string | null;
+  services: Service[];
+  onSelectService: (service: Service) => void;
+  onImportCsv: () => void;
+  onExportCsv: () => void;
+  onBulkArchive: (serviceIds: string[]) => void;
   onBack: () => void;
 };
 
 export function ServiceListScreen({
   loading,
-  errorMessage,
-  servicesList,
-  onRetry,
-  onCreateService,
+  error,
+  services,
+  onSelectService,
+  onImportCsv,
+  onExportCsv,
+  onBulkArchive,
   onBack,
 }: ServiceListScreenProps) {
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [showArchiveModal, setShowArchiveModal] = useState(false);
+
+  const columns: AdminDataTableColumn<Service>[] = [
+    { header: "Name", flex: 2, render: (s) => s.name },
+    { header: "Category", flex: 1, render: (s) => s.category },
+    { header: "Price", flex: 1, render: (s) => `${s.price} ${s.currency}` },
+    { header: "Status", flex: 1, render: (s) => (s.active ? "Active" : "Inactive") },
+  ];
+
+  function confirmArchive() {
+    onBulkArchive([...selectedIds]);
+    setSelectedIds(new Set());
+    setShowArchiveModal(false);
+  }
+
   return (
     <ScrollView contentContainerStyle={styles.rootContent}>
       <Text style={styles.title}>Services</Text>
-      <Text style={styles.subtitle}>Tenant-scoped services list.</Text>
+      <Text style={styles.subtitle}>Manage your tenant-scoped service catalog.</Text>
 
-      <PrimaryButton label="Add service" onPress={onCreateService} />
+      <View style={styles.rowActions}>
+        <SecondaryButton label="Import CSV" onPress={onImportCsv} />
+        <SecondaryButton label="Export CSV" onPress={onExportCsv} />
+      </View>
 
       {loading ? <Text style={styles.body}>Loading services...</Text> : null}
 
-      {errorMessage ? (
+      {error ? (
         <View style={styles.card}>
-          <Text style={styles.error}>{errorMessage}</Text>
-          <PrimaryButton label="Retry" onPress={onRetry} />
+          <Text style={styles.error}>{error}</Text>
         </View>
       ) : null}
 
-      {!loading && !errorMessage && servicesList.length === 0 ? (
-        <View style={styles.card}>
-          <Text style={styles.body}>No services yet.</Text>
-        </View>
+      {!loading && !error && services.length === 0 ? (
+        <AdminEmptyState title="No services yet" body="Create your first service above." />
       ) : null}
 
-      {!loading && !errorMessage && servicesList.length > 0 ? (
-        <View style={styles.cardList}>
-          {servicesList.map((service) => (
-            <View key={service.serviceId} style={styles.card}>
-              <Text style={styles.sectionTitle}>{service.name}</Text>
-              <Text style={styles.body}>Category: {service.category}</Text>
-              <Text style={styles.body}>Duration: {service.durationMinutes} min</Text>
-              <Text style={styles.body}>Price: {service.price} {service.currency}</Text>
-            </View>
-          ))}
-        </View>
+      {!loading && !error && services.length > 0 ? (
+        <AdminDataTable
+          columns={columns}
+          rows={services}
+          keyExtractor={(s) => s.serviceId}
+          selectable
+          selectedKeys={selectedIds}
+          onSelectionChange={setSelectedIds}
+          onRowPress={(s) => onSelectService(s)}
+        />
       ) : null}
+
+      <BulkActionBar
+        selectedCount={selectedIds.size}
+        actions={[{ label: "Archive", onPress: () => setShowArchiveModal(true), destructive: true }]}
+        onClearSelection={() => setSelectedIds(new Set())}
+      />
+
+      <BulkConfirmModal
+        visible={showArchiveModal}
+        title="Archive services?"
+        body={`Archive ${selectedIds.size} service${selectedIds.size === 1 ? "" : "s"}? They will be hidden from bookings.`}
+        confirmLabel="Archive"
+        destructive
+        onConfirm={confirmArchive}
+        onCancel={() => setShowArchiveModal(false)}
+      />
 
       <SecondaryButton label="Back" onPress={onBack} />
     </ScrollView>
@@ -509,6 +618,14 @@ type ServiceEditScreenProps = {
   onSubmit: () => void;
   onArchive: () => void;
   onBack: () => void;
+  // W42 — optional sub-nav callbacks
+  onBookingRules?: () => void;
+  onVisibility?: () => void;
+  onPhotos?: () => void;
+  onAddOns?: () => void;
+  onSeasonalRules?: () => void;
+  onPricing?: () => void;
+  onCategories?: () => void;
 };
 
 export function ServiceEditScreen(props: ServiceEditScreenProps) {
@@ -550,6 +667,20 @@ export function ServiceEditScreen(props: ServiceEditScreenProps) {
         </View>
       ) : null}
 
+      {/* W42 sub-navigation */}
+      {(props.onBookingRules || props.onVisibility || props.onPhotos || props.onAddOns || props.onSeasonalRules || props.onPricing || props.onCategories) ? (
+        <View style={styles.card}>
+          <Text style={styles.sectionTitle}>Catalog settings</Text>
+          {props.onCategories ? <SecondaryButton label="Categories" onPress={props.onCategories} /> : null}
+          {props.onPricing ? <SecondaryButton label="Price overrides" onPress={props.onPricing} /> : null}
+          {props.onAddOns ? <SecondaryButton label="Add-ons" onPress={props.onAddOns} /> : null}
+          {props.onSeasonalRules ? <SecondaryButton label="Seasonal rules" onPress={props.onSeasonalRules} /> : null}
+          {props.onPhotos ? <SecondaryButton label="Photos" onPress={props.onPhotos} /> : null}
+          {props.onBookingRules ? <SecondaryButton label="Booking rules" onPress={props.onBookingRules} /> : null}
+          {props.onVisibility ? <SecondaryButton label="Visibility" onPress={props.onVisibility} /> : null}
+        </View>
+      ) : null}
+
       <SecondaryButton label="Back" onPress={props.onBack} />
     </ScrollView>
   );
@@ -574,6 +705,11 @@ const styles = StyleSheet.create({
   },
   cardList: {
     gap: 12,
+  },
+  rowActions: {
+    flexDirection: "row",
+    gap: 8,
+    marginBottom: 8,
   },
   card: {
     borderWidth: 1,

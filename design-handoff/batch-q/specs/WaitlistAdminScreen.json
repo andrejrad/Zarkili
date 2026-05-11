@@ -1,0 +1,64 @@
+{
+  "screen": "WaitlistAdminScreen",
+  "route": "AdminWaitlist",
+  "device": {
+    "primary": "iPad 1024×768",
+    "secondary": "iPhone 14 390×844"
+  },
+  "stateNames": [
+    "default",
+    "reordering",
+    "empty",
+    "loading",
+    "error"
+  ],
+  "layout": {
+    "header": {
+      "title": "strings.waitlist.title",
+      "right": { "type": "button", "label": "strings.waitlist.exportButton", "variant": "secondary" }
+    },
+    "filterBar": {
+      "chips": [
+        { "type": "filter", "key": "status", "label": "Status" },
+        { "type": "filter", "key": "service", "label": "Service" },
+        { "type": "dateRangeFilter", "format": "US" }
+      ]
+    },
+    "list": {
+      "component": "waitlist-priority-drag-list",
+      "row": {
+        "height": 72,
+        "dragHandle": { "size": "components.waitlistDragHandleSize", "position": "left" },
+        "priorityBadge": { "background": "waitlist.[priority]Bg", "color": "waitlist.[priority]" },
+        "clientAvatar": { "size": 36 },
+        "clientName": { "variant": "body", "weight": "bold" },
+        "requestedService": { "type": "category-pill" },
+        "requestedWindow": { "type": "chip", "variant": "label-small" },
+        "joinedDate": { "variant": "label-small", "color": "muted" },
+        "statusPill": { "background": "waitlist.[status]Bg", "color": "waitlist.[status]" },
+        "kebabMenu": {
+          "options": [
+            { "label": "strings.waitlist.action.convert", "action": "convertToBooking" },
+            { "label": "strings.waitlist.action.editPriority", "action": "editPriority" },
+            { "label": "strings.waitlist.action.remove", "variant": "destructive" }
+          ]
+        }
+      }
+    }
+  },
+  "states": {
+    "reordering": {
+      "activeRow": { "elevation": 4, "scale": 1.02 },
+      "otherRows": { "opacity": 0.7 }
+    },
+    "empty": {
+      "illustration": true,
+      "message": "strings.waitlist.emptyMessage",
+      "link": { "label": "strings.waitlist.addToWaitlistLink" }
+    }
+  },
+  "onConvertToBooking": {
+    "navigate": "ConvertWaitlistScreen",
+    "context": "waitlistEntryId"
+  }
+}

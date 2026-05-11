@@ -1,0 +1,117 @@
+{
+  "schemaVersion": "1.0.0",
+  "screenId": "M.18",
+  "screenName": "RefundDisputeAdminScreen",
+  "route": "admin/connect/disputes",
+  "designSystem": "Zarkili v1.0.0",
+  "device": "iPad 768x1024",
+  "engineeringStatus": "designed",
+  "description": "Master-detail screen for admins to review open disputes, upload evidence, and submit responses to Stripe before deadline.",
+  "layout": {
+    "type": "master-detail",
+    "padding": {
+      "top": 24,
+      "right": 32,
+      "bottom": 40,
+      "left": 32
+    },
+    "maxContentWidth": 960,
+    "gap": 24,
+    "detailPanel": {
+      "width": 320,
+      "placement": "right-iPad",
+      "placement-iPhone": "bottom-sheet"
+    }
+  },
+  "sections": [
+    {
+      "id": "disputes-table",
+      "type": "data-table",
+      "title": null,
+      "component": "MC.1",
+      "columns": [
+        {
+          "key": "clientName",
+          "label": "Client",
+          "type": "text"
+        },
+        {
+          "key": "bookingDate",
+          "label": "Booking date",
+          "type": "date",
+          "format": "MM/DD/YYYY"
+        },
+        {
+          "key": "amount",
+          "label": "Amount",
+          "type": "currency",
+          "currencyCode": "USD"
+        },
+        {
+          "key": "reason",
+          "label": "Reason",
+          "type": "text"
+        },
+        {
+          "key": "responseDeadline",
+          "label": "Response deadline",
+          "type": "date",
+          "format": "MM/DD/YYYY",
+          "countdownChip": true
+        },
+        {
+          "key": "status",
+          "label": "Status",
+          "type": "status-pill"
+        }
+      ]
+    },
+    {
+      "id": "detail-panel",
+      "type": "form-section",
+      "title": "Dispute detail",
+      "component": null,
+      "subSections": [
+        {
+          "id": "evidence-upload",
+          "component": "MC.4",
+          "multiple": true,
+          "label": "Upload evidence"
+        },
+        {
+          "id": "response-composer",
+          "type": "textarea",
+          "label": "Your response to Stripe",
+          "maxChars": 1500,
+          "showCounter": true
+        },
+        {
+          "id": "submit-cta",
+          "label": "Submit to Stripe",
+          "variant": "primary"
+        }
+      ]
+    },
+    {
+      "id": "evidence-needed-banner",
+      "type": "status-banner",
+      "title": null,
+      "component": null,
+      "condition": "state === evidence-needed",
+      "text": "Response required by {{responseDeadline}}.",
+      "variant": "admin.warning"
+    }
+  ],
+  "stateNames": [
+    "open",
+    "evidence-needed",
+    "submitted",
+    "won",
+    "lost",
+    "error"
+  ],
+  "accessibility": {
+    "screenReaderLabel": "Disputes and refunds",
+    "detailPanelRole": "complementary"
+  }
+}

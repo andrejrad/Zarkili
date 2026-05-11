@@ -1,0 +1,101 @@
+{
+  "schemaVersion": "1.0.0",
+  "screenId": "M.11",
+  "screenName": "SubscriptionPlanSelectionScreen",
+  "route": "admin/billing/plan",
+  "designSystem": "Zarkili v1.0.0",
+  "device": "iPad 768x1024",
+  "engineeringStatus": "designed",
+  "description": "Billing screen where owners compare and select a subscription plan tier with monthly or annual billing toggle.",
+  "layout": {
+    "type": "scrollable-column",
+    "padding": {
+      "top": 24,
+      "right": 32,
+      "bottom": 40,
+      "left": 32
+    },
+    "maxContentWidth": 960,
+    "gap": 24
+  },
+  "sections": [
+    {
+      "id": "billing-toggle",
+      "type": "tab-bar",
+      "title": null,
+      "component": null,
+      "options": [
+        "Monthly",
+        "Annual"
+      ],
+      "annualBadge": "Save 20%"
+    },
+    {
+      "id": "plan-card-grid",
+      "type": "plan-card-grid",
+      "title": null,
+      "component": "MC.6",
+      "gridCols": {
+        "iPad": 3,
+        "iPhone": 1
+      },
+      "plans": [
+        {
+          "tier": "Starter",
+          "monthlyPrice": 49,
+          "annualPrice": 39,
+          "currency": "USD",
+          "features": [
+            "Up to 3 staff",
+            "Basic booking",
+            "Email notifications"
+          ]
+        },
+        {
+          "tier": "Growth",
+          "monthlyPrice": 99,
+          "annualPrice": 79,
+          "currency": "USD",
+          "features": [
+            "Up to 10 staff",
+            "SMS notifications",
+            "Basic analytics",
+            "Loyalty program"
+          ]
+        },
+        {
+          "tier": "Pro",
+          "monthlyPrice": 199,
+          "annualPrice": 159,
+          "currency": "USD",
+          "features": [
+            "Unlimited staff",
+            "AI insights",
+            "Advanced analytics",
+            "API access",
+            "Priority support"
+          ]
+        }
+      ],
+      "currentTierKey": "{{currentPlanTier}}"
+    },
+    {
+      "id": "proration-modal",
+      "type": "coach-mark-overlay",
+      "title": "Plan change",
+      "component": null,
+      "trigger": "plan-change-cta",
+      "body": "Your plan changes immediately. You will be charged/credited {{prorationAmount}} for the remainder of the billing period."
+    }
+  ],
+  "stateNames": [
+    "default",
+    "upgrading",
+    "downgrading",
+    "error",
+    "loading"
+  ],
+  "accessibility": {
+    "screenReaderLabel": "Subscription plans"
+  }
+}

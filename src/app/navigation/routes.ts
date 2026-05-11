@@ -57,6 +57,15 @@ export const appRoutes: AppRouteDefinition[] = [
   { name: "Landing", group: "public", path: "/", guard: "none" },
   { name: "Login", group: "public", path: "/login", guard: "none" },
   { name: "Register", group: "public", path: "/register", guard: "none" },
+  // W21 Batch A — Auth surfaces
+  { name: "SignIn", group: "public", path: "/auth/sign-in", guard: "none" },
+  { name: "SignUp", group: "public", path: "/auth/sign-up", guard: "none" },
+  { name: "SocialSignIn", group: "public", path: "/auth/social", guard: "none" },
+  { name: "ForgotPassword", group: "public", path: "/auth/forgot-password", guard: "none" },
+  { name: "ResetPassword", group: "public", path: "/auth/reset-password", guard: "none" },
+  { name: "EmailVerification", group: "public", path: "/auth/verify-email", guard: "none" },
+  { name: "OtpVerification", group: "public", path: "/auth/verify-phone", guard: "none" },
+  { name: "AccountMerge", group: "public", path: "/auth/account-merge", guard: "none" },
   {
     name: "DiscoverBusinesses",
     group: "public",
@@ -69,11 +78,60 @@ export const appRoutes: AppRouteDefinition[] = [
     path: "/discover/tenant-profile",
     guard: "none",
   },
+  // W22 Batch B — Discover, Explore, Profile
+  { name: "DiscoverHome", group: "public", path: "/discover/home", guard: "none" },
+  { name: "DiscoverFeed", group: "public", path: "/discover/feed", guard: "none" },
+  { name: "ExploreResults", group: "public", path: "/discover/explore", guard: "none" },
+  { name: "ExploreMap", group: "public", path: "/discover/explore/map", guard: "none" },
+  { name: "DiscoverFilters", group: "public", path: "/discover/filters", guard: "none" },
+  { name: "SalonProfile", group: "public", path: "/discover/salon", guard: "none" },
+  { name: "ServiceDetail", group: "public", path: "/discover/service", guard: "none" },
+  { name: "StaffDetail", group: "public", path: "/discover/staff", guard: "none" },
+  // W23 Batch C — Booking flow
+  { name: "BookingService", group: "public", path: "/book/service", guard: "none" },
+  { name: "BookingStaff", group: "public", path: "/book/staff", guard: "none" },
+  { name: "BookingDate", group: "public", path: "/book/date", guard: "none" },
+  { name: "BookingReview", group: "public", path: "/book/review", guard: "none" },
+  { name: "BookingPolicies", group: "public", path: "/book/policies", guard: "none" },
+  { name: "BookingPayment", group: "public", path: "/book/payment", guard: "none" },
+  { name: "BookingConfirmation", group: "public", path: "/book/confirmation", guard: "none" },
+  { name: "ManageBooking", group: "public", path: "/book/manage", guard: "none" },
+  { name: "GuestContact", group: "public", path: "/book/guest", guard: "none" },
+  { name: "PostBookingUpgrade", group: "public", path: "/book/upgrade", guard: "none" },
+  // W24 Batch D — Payments, tipping, receipts (consumer)
+  { name: "SavedPaymentMethods", group: "public", path: "/payments/methods", guard: "none" },
+  { name: "AddPaymentMethod", group: "public", path: "/payments/add", guard: "none" },
+  { name: "Tipping", group: "public", path: "/payments/tip", guard: "none" },
+  { name: "Receipt", group: "public", path: "/payments/receipt", guard: "none" },
+  { name: "BookingHistory", group: "public", path: "/bookings/history", guard: "none" },
+  { name: "RefundStatus", group: "public", path: "/payments/refund", guard: "none" },
+  // W25 Batch E — Loyalty, Activities, Reviews (consumer)
+  { name: "LoyaltyLanding", group: "public", path: "/loyalty", guard: "none" },
+  { name: "RewardCatalog", group: "public", path: "/loyalty/rewards", guard: "none" },
+  { name: "RewardRedemption", group: "public", path: "/loyalty/rewards/redeem", guard: "none" },
+  { name: "Activities", group: "public", path: "/loyalty/activities", guard: "none" },
+  { name: "ActivityDetail", group: "public", path: "/loyalty/activities/detail", guard: "none" },
+  { name: "ClaimActivityReward", group: "public", path: "/loyalty/activities/claim", guard: "none" },
+  { name: "ReviewPrompt", group: "public", path: "/reviews/prompt", guard: "none" },
+  { name: "ReviewDetail", group: "public", path: "/reviews/detail", guard: "none" },
+  { name: "Referral", group: "public", path: "/loyalty/referral", guard: "none" },
+  // W26 Batch F — Messaging, Notifications, Waitlist (consumer)
+  { name: "Inbox", group: "public", path: "/messages", guard: "none" },
+  { name: "Thread", group: "public", path: "/messages/thread", guard: "none" },
+  { name: "Compose", group: "public", path: "/messages/compose", guard: "none" },
+  { name: "NotificationCenter", group: "public", path: "/notifications", guard: "none" },
+  { name: "NotificationPreferences", group: "public", path: "/notifications/preferences", guard: "none" },
+  { name: "EditProfile", group: "public", path: "/profile/edit", guard: "none" },
+  { name: "SettingsShell", group: "public", path: "/settings", guard: "none" },
+  { name: "LegalPage", group: "public", path: "/settings/legal", guard: "none" },
+  { name: "Waitlist", group: "public", path: "/waitlist", guard: "none" },
+  { name: "WaitlistJoin", group: "public", path: "/waitlist/join", guard: "none" },
+  { name: "WaitlistPosition", group: "public", path: "/waitlist/position", guard: "none" },
   {
     name: "AppShell",
-    group: "protected",
+    group: "public",
     path: "/app",
-    guard: "authenticated",
+    guard: "none",
   },
   {
     name: "CompleteProfile",
@@ -147,12 +205,110 @@ export const appRoutes: AppRouteDefinition[] = [
     path: "/app/salon-dashboard",
     guard: "authenticated",
   },
+  // W38 Phase 3 — Owner console
+  { name: "OwnerHome", group: "owner", path: "/owner/home", guard: "authenticated" },
+  { name: "TenantSettingsShell", group: "owner", path: "/owner/settings", guard: "authenticated" },
+  { name: "BusinessProfile", group: "owner", path: "/owner/settings/profile", guard: "authenticated" },
+  { name: "BrandSettings", group: "owner", path: "/owner/settings/brand", guard: "authenticated" },
+  { name: "TaxSettings", group: "owner", path: "/owner/settings/tax", guard: "authenticated" },
+  { name: "CurrencySettings", group: "owner", path: "/owner/settings/currency", guard: "authenticated" },
+  { name: "LegalDocuments", group: "owner", path: "/owner/settings/legal-docs", guard: "authenticated" },
+  { name: "DomainSettings", group: "owner", path: "/owner/settings/domain", guard: "authenticated" },
+  { name: "OwnerNotificationPreferences", group: "owner", path: "/owner/settings/notifications", guard: "authenticated" },
   {
     name: "OwnerAiBudgetSettings",
     group: "owner",
     path: "/owner/ai-budget",
     guard: "platform-admin",
   },
+  // W39 — Billing & payouts admin
+  { name: "BillingHub", group: "owner", path: "/owner/billing", guard: "authenticated" },
+  { name: "SubscriptionPlan", group: "owner", path: "/owner/billing/plan", guard: "authenticated" },
+  { name: "InvoiceHistory", group: "owner", path: "/owner/billing/invoices", guard: "authenticated" },
+  { name: "AdminPaymentMethod", group: "owner", path: "/owner/billing/payment-method", guard: "authenticated" },
+  { name: "CancelSubscription", group: "owner", path: "/owner/billing/cancel", guard: "authenticated" },
+  { name: "StripeConnectOnboarding", group: "owner", path: "/owner/billing/connect", guard: "authenticated" },
+  { name: "ConnectHealth", group: "owner", path: "/owner/billing/connect-health", guard: "authenticated" },
+  { name: "PayoutHistory", group: "owner", path: "/owner/billing/payouts", guard: "authenticated" },
+  { name: "RefundDisputeAdmin", group: "owner", path: "/owner/billing/refunds", guard: "authenticated" },
+  { name: "PrintPdfLayout", group: "owner", path: "/owner/billing/print", guard: "authenticated" },
+  // W40 — Location admin
+  { name: "LocationOverview", group: "owner", path: "/owner/locations/overview", guard: "authenticated" },
+  { name: "LocationDashboard", group: "owner", path: "/owner/locations/dashboard", guard: "authenticated" },
+  { name: "LocationSettings", group: "owner", path: "/owner/locations/settings", guard: "authenticated" },
+  { name: "LocationServiceOverrides", group: "owner", path: "/owner/locations/service-overrides", guard: "authenticated" },
+  { name: "ResourceManagement", group: "owner", path: "/owner/locations/resources", guard: "authenticated" },
+  { name: "AdminWalkInQueue", group: "owner", path: "/owner/locations/walk-in-queue", guard: "authenticated" },
+  { name: "DailyClose", group: "owner", path: "/owner/locations/daily-close", guard: "authenticated" },
+  // W41 — Staff admin
+  { name: "StaffSchedule", group: "owner", path: "/owner/staff/schedule", guard: "authenticated" },
+  { name: "StaffPerformance", group: "owner", path: "/owner/staff/performance", guard: "authenticated" },
+  { name: "StaffCommission", group: "owner", path: "/owner/staff/commission", guard: "authenticated" },
+  { name: "StaffInvite", group: "owner", path: "/owner/staff/invite", guard: "authenticated" },
+  { name: "StaffRole", group: "owner", path: "/owner/staff/role", guard: "authenticated" },
+  // W41-DEBT-6 — Service/skill assignment per staff member
+  { name: "StaffServiceMapping", group: "owner", path: "/owner/staff/service-mapping", guard: "authenticated" },
+  // W42 — Service catalog depth
+  { name: "ServiceCategories", group: "owner", path: "/owner/service/categories", guard: "authenticated" },
+  { name: "ServiceBulkImport", group: "owner", path: "/owner/service/import", guard: "authenticated" },
+  { name: "ServicePricing", group: "owner", path: "/owner/service/pricing", guard: "authenticated" },
+  { name: "ServiceAddOns", group: "owner", path: "/owner/service/addons", guard: "authenticated" },
+  { name: "ServiceSeasonalRules", group: "owner", path: "/owner/service/seasonal", guard: "authenticated" },
+  { name: "ServicePhotos", group: "owner", path: "/owner/service/photos", guard: "authenticated" },
+  { name: "ServiceBookingRules", group: "owner", path: "/owner/service/booking-rules", guard: "authenticated" },
+  { name: "ServiceVisibility", group: "owner", path: "/owner/service/visibility", guard: "authenticated" },
+  // W43 — Booking operations
+  { name: "BookingCalendar", group: "owner", path: "/owner/bookings/calendar", guard: "authenticated" },
+  { name: "BookingDetailAdmin", group: "owner", path: "/owner/bookings/detail", guard: "authenticated" },
+  { name: "ManualBooking", group: "owner", path: "/owner/bookings/manual", guard: "authenticated" },
+  { name: "BlockTime", group: "owner", path: "/owner/bookings/block-time", guard: "authenticated" },
+  { name: "ForceBook", group: "owner", path: "/owner/bookings/force-book", guard: "authenticated" },
+  { name: "NoShowMark", group: "owner", path: "/owner/bookings/no-show", guard: "authenticated" },
+  { name: "CancellationAdmin", group: "owner", path: "/owner/bookings/cancel", guard: "authenticated" },
+  { name: "RescheduleAdmin", group: "owner", path: "/owner/bookings/reschedule", guard: "authenticated" },
+  // W44 — Client / CRM
+  { name: "ClientListAdmin", group: "owner", path: "/owner/clients", guard: "authenticated" },
+  { name: "ClientDetailAdmin", group: "owner", path: "/owner/clients/detail", guard: "authenticated" },
+  { name: "MergeClients", group: "owner", path: "/owner/clients/merge", guard: "authenticated" },
+  { name: "BlockClient", group: "owner", path: "/owner/clients/block", guard: "authenticated" },
+  { name: "GdprExport", group: "owner", path: "/owner/clients/gdpr", guard: "authenticated" },
+  { name: "DeleteClient", group: "owner", path: "/owner/clients/delete", guard: "authenticated" },
+  { name: "SegmentBuilder", group: "owner", path: "/owner/segments/new", guard: "authenticated" },
+  { name: "TargetedMessage", group: "owner", path: "/owner/segments/message", guard: "authenticated" },
+  // W45 — Loyalty admin
+  { name: "LoyaltyConfig", group: "owner", path: "/owner/loyalty/config", guard: "authenticated" },
+  { name: "AdminRewardCatalog", group: "owner", path: "/owner/loyalty/rewards", guard: "authenticated" },
+  { name: "PointAdjustment", group: "owner", path: "/owner/loyalty/points", guard: "authenticated" },
+  { name: "LoyaltyDashboard", group: "owner", path: "/owner/loyalty/dashboard", guard: "authenticated" },
+  { name: "TierMigration", group: "owner", path: "/owner/loyalty/tiers", guard: "authenticated" },
+  // W45 — Activity admin
+  { name: "ActivityCatalog", group: "owner", path: "/owner/activities", guard: "authenticated" },
+  { name: "ActivityAnalytics", group: "owner", path: "/owner/activities/analytics", guard: "authenticated" },
+  // W45 — Campaign admin
+  { name: "CampaignList", group: "owner", path: "/owner/campaigns", guard: "authenticated" },
+  { name: "CampaignBuilder", group: "owner", path: "/owner/campaigns/new", guard: "authenticated" },
+  { name: "CampaignPerformance", group: "owner", path: "/owner/campaigns/performance", guard: "authenticated" },
+  // W45 — Transactional templates & Promotions
+  { name: "TransactionalTemplates", group: "owner", path: "/owner/templates/transactional", guard: "authenticated" },
+  { name: "PromotionAdmin", group: "owner", path: "/owner/promotions", guard: "authenticated" },
+  // W46 — Review admin
+  { name: "ReviewQueue", group: "owner", path: "/owner/reviews", guard: "authenticated" },
+  { name: "ReviewReply", group: "owner", path: "/owner/reviews/reply", guard: "authenticated" },
+  { name: "ReviewFlag", group: "owner", path: "/owner/reviews/flag", guard: "authenticated" },
+  { name: "ReviewAutomation", group: "owner", path: "/owner/reviews/automation", guard: "authenticated" },
+  { name: "ReputationDashboard", group: "owner", path: "/owner/reputation", guard: "authenticated" },
+  // W46 — Messaging admin
+  { name: "InboxTriage", group: "owner", path: "/owner/inbox/triage", guard: "authenticated" },
+  { name: "ThreadAssign", group: "owner", path: "/owner/inbox/assign", guard: "authenticated" },
+  { name: "CannedReplies", group: "owner", path: "/owner/replies/canned", guard: "authenticated" },
+  { name: "AutoReplyConfig", group: "owner", path: "/owner/autoreply", guard: "authenticated" },
+  { name: "MessageArchive", group: "owner", path: "/owner/messages/archive", guard: "authenticated" },
+  // W46 — Waitlist admin
+  { name: "WaitlistAdminList", group: "owner", path: "/owner/waitlist/admin", guard: "authenticated" },
+  { name: "WaitlistConvert", group: "owner", path: "/owner/waitlist/convert", guard: "authenticated" },
+  { name: "WaitlistPolicies", group: "owner", path: "/owner/waitlist/policies", guard: "authenticated" },
+  // W15-DEBT-1 — Onboarding admin (status dashboard + action buttons)
+  { name: "OnboardingAdmin", group: "owner", path: "/owner/onboarding/admin", guard: "authenticated" },
   ...salonOnboardingRoutes,
   ...clientOnboardingRoutes,
 ];
@@ -177,14 +333,8 @@ export function getAccessibleRoutes(context: RouteAccessContext): AppRouteDefini
   return appRoutes.filter((route) => canAccessRoute(route, context));
 }
 
-export function resolvePreferredRoute(context: RouteAccessContext): AppRouteDefinition {
-  const accessibleRoutes = getAccessibleRoutes(context);
-  const authRoute = accessibleRoutes.find((route) => route.guard === "authenticated");
-  if (authRoute) {
-    return authRoute;
-  }
-
-  return appRoutes[0];
+export function resolvePreferredRoute(_context: RouteAccessContext): AppRouteDefinition {
+  return appRoutes.find((r) => r.name === "AppShell")!;
 }
 
 function normalizePath(path: string): string {

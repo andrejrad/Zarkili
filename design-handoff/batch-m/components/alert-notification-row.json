@@ -1,0 +1,87 @@
+{
+  "schemaVersion": "1.0.0",
+  "componentId": "MC.8",
+  "componentName": "AlertNotificationRow",
+  "exportedAs": "AlertNotificationRow",
+  "category": "admin-feedback",
+  "description": "Severity-coded notification row with left border accent used in Owner Home and the Operator Notification Center.",
+  "props": {
+    "severity": {
+      "type": "'info' | 'warning' | 'error'",
+      "required": true,
+      "description": "Drives left-border color and severity icon"
+    },
+    "body": {
+      "type": "string",
+      "required": true,
+      "description": "Notification body text, truncated at 2 lines"
+    },
+    "timestamp": {
+      "type": "string",
+      "required": true,
+      "description": "Formatted timestamp in 12-hour US format e.g. 9:41 AM"
+    },
+    "actionLabel": {
+      "type": "string | null",
+      "required": false,
+      "default": null,
+      "description": "Optional label for the inline action chip"
+    },
+    "onAction": {
+      "type": "(() => void) | null",
+      "required": false,
+      "default": null,
+      "description": "Callback when the action chip is tapped"
+    },
+    "onDismiss": {
+      "type": "(() => void) | null",
+      "required": false,
+      "default": null,
+      "description": "Callback when the dismiss button is tapped"
+    },
+    "isRead": {
+      "type": "boolean",
+      "required": false,
+      "default": false,
+      "description": "Switches background from unread warm tint to default surface"
+    }
+  },
+  "tokens": {
+    "borderInfo": "info",
+    "borderWarning": "warning",
+    "borderError": "error",
+    "unreadBg": "surface",
+    "readBg": "surface",
+    "iconInfo": "info",
+    "iconWarning": "warning",
+    "iconError": "error",
+    "bodyText": "text.primary",
+    "timestampText": "admin.text.muted"
+  },
+  "anatomy": [
+    "left-border (3px severity token color)",
+    "severity-icon (24px)",
+    "body-column (body 2-line truncate + timestamp label-small muted)",
+    "action-chip (optional, accent color)",
+    "dismiss-button (icon 44x44)"
+  ],
+  "sizes": [
+    {
+      "name": "default",
+      "width": "100%",
+      "height": 56,
+      "note": "minHeight; grows with body text"
+    }
+  ],
+  "stateNames": [
+    "unread",
+    "read",
+    "dismissed",
+    "error"
+  ],
+  "accessibility": {
+    "role": "listitem",
+    "ariaLabel": "{{severity}} alert: {{body}}",
+    "ariaLive": "polite"
+  }
+}

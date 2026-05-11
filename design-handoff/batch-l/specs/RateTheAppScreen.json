@@ -1,0 +1,235 @@
+{
+  "screenId": "L.10",
+  "name": "RateTheAppScreen",
+  "device": "iPhone 14",
+  "dimensions": {
+    "width": 390,
+    "height": 844
+  },
+  "description": "2-step rating flow: sentiment first, then 5-star rating or feedback form",
+  "formFactor": "bottom-sheet",
+  "layout": {
+    "type": "vertical-flex",
+    "background": "#FFFFFF",
+    "borderRadiusTop": 24,
+    "padding": 24,
+    "gap": 16
+  },
+  "elements": [
+    {
+      "id": "grabber-handle",
+      "type": "grabber",
+      "width": 36,
+      "height": 4,
+      "background": "#E5E0D1",
+      "borderRadius": 9999,
+      "alignment": "center-top",
+      "marginTop": 12
+    },
+    {
+      "id": "heading",
+      "type": "text",
+      "style": "heading-3",
+      "text": "{ratingHeading}",
+      "fontWeight": 600,
+      "color": "#1A1A1A",
+      "alignment": "center"
+    },
+    {
+      "id": "sentiment-buttons",
+      "type": "vertical-flex",
+      "gap": 12,
+      "visibility": "state:sentiment",
+      "marginTop": 8,
+      "children": [
+        {
+          "id": "positive-sentiment-btn",
+          "type": "button",
+          "variant": "outlined",
+          "label": "{positiveSentiment}",
+          "action": "selectPositive",
+          "width": "full",
+          "height": 52,
+          "borderRadius": 12,
+          "borderColor": "#E5E0D1",
+          "borderWidth": 2,
+          "labelWeight": 500,
+          "labelColor": "#1A1A1A"
+        },
+        {
+          "id": "negative-sentiment-btn",
+          "type": "button",
+          "variant": "outlined",
+          "label": "{negativeSentiment}",
+          "action": "selectNegative",
+          "width": "full",
+          "height": 52,
+          "borderRadius": 12,
+          "borderColor": "#E5E0D1",
+          "borderWidth": 2,
+          "labelWeight": 500,
+          "labelColor": "#1A1A1A"
+        }
+      ]
+    },
+    {
+      "id": "star-rating-row",
+      "type": "horizontal-flex",
+      "gap": 8,
+      "visibility": "state:positive-rating",
+      "justifyContent": "center",
+      "marginTop": 16,
+      "children": [
+        {
+          "type": "star-icon",
+          "size": 36,
+          "activeColor": "#E3A9A0",
+          "inactiveColor": "#E5E0D1",
+          "count": 5,
+          "interactive": true,
+          "action": "rateApp",
+          "autoAdvanceOn": "4-5-stars"
+        }
+      ]
+    },
+    {
+      "id": "feedback-form",
+      "type": "vertical-flex",
+      "gap": 16,
+      "visibility": "state:negative-feedback",
+      "children": [
+        {
+          "id": "feedback-textarea",
+          "type": "textarea",
+          "placeholder": "{feedbackPlaceholder}",
+          "rows": 4,
+          "borderRadius": 12,
+          "borderColor": "#E5E0D1",
+          "borderWidth": 1,
+          "padding": 12,
+          "style": "body",
+          "color": "#1A1A1A"
+        },
+        {
+          "id": "cta-row",
+          "type": "horizontal-flex",
+          "gap": 12,
+          "children": [
+            {
+              "id": "skip-link",
+              "type": "button",
+              "variant": "tertiary",
+              "label": "{skipCta}",
+              "action": "dismiss",
+              "height": 52,
+              "labelWeight": 500,
+              "labelColor": "#6B6B6B",
+              "flex": 1
+            },
+            {
+              "id": "send-btn",
+              "type": "button",
+              "variant": "primary",
+              "label": "{sendCta}",
+              "action": "submitFeedback",
+              "height": 52,
+              "borderRadius": 12,
+              "background": "#E3A9A0",
+              "labelWeight": 600,
+              "labelColor": "#FFFFFF",
+              "flex": 1
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "states": [
+    {
+      "name": "sentiment",
+      "description": "Step 1: Ask if user enjoys the app",
+      "visibility": {
+        "sentiment-buttons": true,
+        "star-rating-row": false,
+        "feedback-form": false
+      },
+      "strings": {
+        "ratingHeading": "Enjoying Zarkili?",
+        "positiveSentiment": "❤️ Yes, I love it",
+        "negativeSentiment": "Not really"
+      }
+    },
+    {
+      "name": "positive-rating",
+      "description": "Step 2a: User selected positive, show 5-star rating",
+      "visibility": {
+        "sentiment-buttons": false,
+        "star-rating-row": true,
+        "feedback-form": false
+      },
+      "strings": {
+        "ratingHeading": "Rate Zarkili"
+      },
+      "behavior": {
+        "autoAdvance": "4-5-stars trigger system review dialog"
+      }
+    },
+    {
+      "name": "negative-feedback",
+      "description": "Step 2b: User selected negative, show feedback form",
+      "visibility": {
+        "sentiment-buttons": false,
+        "star-rating-row": false,
+        "feedback-form": true
+      },
+      "strings": {
+        "ratingHeading": "Help us improve",
+        "feedbackPlaceholder": "What can we improve?",
+        "skipCta": "Skip",
+        "sendCta": "Send"
+      }
+    },
+    {
+      "name": "submitted",
+      "description": "Feedback submitted, show success toast and dismiss",
+      "toast": {
+        "text": "{submittedToast}",
+        "icon": "checkmark",
+        "background": "#4CAF50",
+        "color": "#FFFFFF",
+        "duration": 3000
+      },
+      "strings": {
+        "submittedToast": "Thanks for your feedback!"
+      }
+    }
+  ],
+  "accessibility": {
+    "starRating": {
+      "label": "Rate Zarkili from 1 to 5 stars",
+      "hint": "Tap a star to rate"
+    },
+    "feedbackTextarea": {
+      "label": "Feedback text area",
+      "hint": "Describe what we can improve"
+    }
+  },
+  "frames": [
+    {
+      "name": "L-10-sentiment",
+      "state": "sentiment"
+    },
+    {
+      "name": "L-10-positive-rating",
+      "state": "positive-rating"
+    },
+    {
+      "name": "L-10-negative-feedback",
+      "state": "negative-feedback"
+    },
+    {
+      "name": "L-10-submitted",
+      "state": "submitted"
+    }
+  ]
+}

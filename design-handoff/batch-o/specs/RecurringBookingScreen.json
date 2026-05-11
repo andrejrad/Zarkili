@@ -1,0 +1,197 @@
+{
+  "screen": "RecurringBookingScreen",
+  "route": "AdminRecurringSeries",
+  "device": {
+    "primary": "iPad 1024×768",
+    "secondary": "iPhone 14 390×844"
+  },
+  "states": [
+    "active",
+    "paused",
+    "ended",
+    "conflictOnEditAll",
+    "error"
+  ],
+  "layout": {
+    "header": {
+      "title": "strings.recurringBooking.title",
+      "statusBadge": {
+        "position": "right",
+        "variants": {
+          "active": {
+            "background": "booking.confirmedBg",
+            "color": "booking.confirmed"
+          },
+          "paused": {
+            "background": "booking.reschedulePendingBg",
+            "color": "booking.reschedulePending"
+          },
+          "ended": {
+            "background": "booking.cancelledBg",
+            "color": "booking.cancelled"
+          }
+        }
+      },
+      "actionButtons": {
+        "active": [
+          {
+            "label": "strings.recurringBooking.pauseSeries",
+            "variant": "secondary"
+          },
+          {
+            "label": "strings.recurringBooking.endSeries",
+            "variant": "secondary-destructive"
+          }
+        ],
+        "paused": [
+          {
+            "label": "strings.recurringBooking.resumeSeries",
+            "variant": "secondary"
+          },
+          {
+            "label": "strings.recurringBooking.endSeries",
+            "variant": "secondary-destructive"
+          }
+        ],
+        "ended": []
+      }
+    },
+    "seriesSummaryCard": {
+      "background": "surface",
+      "border": {
+        "width": 1,
+        "color": "cardBorder"
+      },
+      "radius": 16,
+      "padding": 16,
+      "fields": [
+        {
+          "key": "service",
+          "variant": "body bold"
+        },
+        {
+          "key": "staff"
+        },
+        {
+          "key": "frequencyLabel"
+        },
+        {
+          "key": "startDate",
+          "format": "MM/DD/YYYY"
+        },
+        {
+          "key": "endDate",
+          "format": "MM/DD/YYYY",
+          "alternative": "ongoingBadge"
+        }
+      ]
+    },
+    "occurrenceList": {
+      "type": "FlatList",
+      "rowHeight": 56,
+      "divider": {
+        "width": 1,
+        "color": "cardBorder"
+      },
+      "cells": [
+        {
+          "field": "date",
+          "format": "MM/DD/YYYY"
+        },
+        {
+          "field": "time",
+          "format": "h:mm AM"
+        },
+        {
+          "field": "statusPill",
+          "background": "booking.[status]Bg",
+          "color": "booking.[status]"
+        },
+        {
+          "field": "editLink",
+          "position": "right",
+          "hiddenWhen": "state.ended"
+        }
+      ],
+      "ended": {
+        "readOnly": true,
+        "editLinks": false
+      }
+    },
+    "editScopeModal": {
+      "type": "sheet",
+      "width": 390,
+      "radius": 20,
+      "trigger": "editLink tap",
+      "title": {
+        "text": "strings.recurringBooking.editScopeTitle",
+        "variant": "heading-4"
+      },
+      "optionCards": {
+        "count": 2,
+        "border": {
+          "width": 1,
+          "color": "cardBorder"
+        },
+        "radius": 16,
+        "padding": 16,
+        "selectedBorder": {
+          "width": 2,
+          "color": "primary"
+        },
+        "options": [
+          {
+            "value": "thisOnly",
+            "label": "strings.recurringBooking.editThisOnly",
+            "description": "strings.recurringBooking.editThisOnlyDesc"
+          },
+          {
+            "value": "allFuture",
+            "label": "strings.recurringBooking.editAllFuture",
+            "description": "strings.recurringBooking.editAllFutureDesc"
+          }
+        ]
+      },
+      "conflictVariant": {
+        "warningBanner": {
+          "text": "strings.recurringBooking.editAllConflictBanner",
+          "interpolation": "N"
+        },
+        "resolveLink": {
+          "navigate": "ConflictResolverScreen"
+        }
+      },
+      "footer": {
+        "actions": [
+          {
+            "type": "button",
+            "label": "strings.recurringBooking.cancel",
+            "variant": "secondary"
+          },
+          {
+            "type": "button",
+            "label": "strings.recurringBooking.continue",
+            "variant": "primary"
+          }
+        ]
+      }
+    },
+    "endSeriesModal": {
+      "type": "destructive confirm sheet",
+      "footer": {
+        "actions": [
+          {
+            "type": "button",
+            "label": "strings.recurringBooking.cancel",
+            "variant": "secondary"
+          },
+          {
+            "type": "button",
+            "label": "strings.recurringBooking.endSeries",
+            "variant": "destructive"
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,78 @@
+{
+  "screen": "AiSuggestionReviewQueueScreen",
+  "route": "/admin/ai/suggestions",
+  "description": "Human review queue for AI-generated suggestions before they go live",
+  "platform": "admin-desktop",
+  "dimensions": { "width": 1280, "contentWidth": "calc(1280 - 240px sidebar)" },
+  "states": ["default", "loading", "empty-queue", "filtering", "row-selected", "bulk-selected"],
+  "accessibility": {
+    "screenReaderLabel": "strings.aiReviewQueue.screenTitle",
+    "semanticRoles": [
+      { "element": "reviewList", "role": "list" },
+      { "element": "detailPanel", "role": "complementary" },
+      { "element": "bulkActionBar", "role": "toolbar" }
+    ]
+  },
+  "rtl": "deferred",
+  "darkMode": "deferred",
+  "layout": {
+    "header": {
+      "component": "AdminHeader",
+      "title": "strings.aiReviewQueue.title",
+      "rightActions": [{ "component": "SecondaryButton", "label": "strings.aiReviewQueue.approveAllPending", "badge": "pending count" }]
+    },
+    "body": {
+      "padding": 24,
+      "filterRow": {
+        "height": 56,
+        "left": { "component": "Tabs", "options": ["strings.aiReviewQueue.filterAll", "strings.aiReviewQueue.filterContent", "strings.aiReviewQueue.filterCampaign", "strings.aiReviewQueue.filterSchedule", "strings.aiReviewQueue.filterPricing"] },
+        "right": { "component": "SearchInput" }
+      },
+      "summaryStrip": {
+        "height": 40,
+        "bg": "admin.tableHeaderBg",
+        "chips": [
+          { "label": "strings.aiReviewQueue.pendingCount", "color": "warning" },
+          { "label": "strings.aiReviewQueue.approvedToday", "color": "success" },
+          { "label": "strings.aiReviewQueue.rejectedToday", "color": "error" }
+        ]
+      },
+      "reviewList": {
+        "component": "AiSuggestionReviewRow list",
+        "groupByType": true,
+        "stickyGroupHeaders": true
+      }
+    },
+    "detailPanel": {
+      "width": 480,
+      "position": "right inline",
+      "sections": [
+        { "title": "strings.aiReviewQueue.detailTitle" },
+        { "label": "strings.aiReviewQueue.fullOutputLabel" },
+        { "component": "Confidence ring", "size": 80 },
+        { "label": "strings.aiReviewQueue.confidenceBreakdown", "component": "table" },
+        { "label": "strings.aiReviewQueue.modelLabel" },
+        { "label": "strings.aiReviewQueue.promptLabel", "font": "mono" },
+        { "label": "strings.aiReviewQueue.generatedAtLabel" },
+        { "label": "strings.aiReviewQueue.reviewerHistoryLabel" }
+      ],
+      "footer": {
+        "buttons": [
+          { "label": "Reject", "component": "DangerButton" },
+          { "label": "Edit", "component": "SecondaryButton" },
+          { "label": "Approve", "component": "PrimaryButton" }
+        ]
+      }
+    },
+    "bulkActionBar": {
+      "position": "fixed bottom",
+      "bg": "admin.bulkActionBarBg",
+      "content": "[n] selected",
+      "actions": ["strings.aiReviewQueue.bulkApprove", "strings.aiReviewQueue.bulkReject", "strings.aiReviewQueue.bulkExport"]
+    }
+  },
+  "components": [
+    { "id": "reviewList", "ref": "AiSuggestionReviewRow", "props": { "groupByType": true, "data": "{{suggestions}}" } }
+  ],
+  "strings": "See strings/en-us.json for aiReviewQueue keys"
+}

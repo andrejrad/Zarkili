@@ -1,0 +1,107 @@
+{
+  "schemaVersion": "1.0.0",
+  "screenId": "M.6",
+  "screenName": "TaxSettingsScreen",
+  "route": "admin/settings/tax",
+  "designSystem": "Zarkili v1.0.0",
+  "device": "iPad 768x1024",
+  "engineeringStatus": "delivered",
+  "description": "Admin screen for managing state tax registrations, with a nexus warning when registration coverage gaps are detected.",
+  "layout": {
+    "type": "scrollable-column",
+    "padding": {
+      "top": 24,
+      "right": 32,
+      "bottom": 40,
+      "left": 32
+    },
+    "maxContentWidth": 960,
+    "gap": 24
+  },
+  "sections": [
+    {
+      "id": "nexus-warning",
+      "type": "status-banner",
+      "title": null,
+      "component": null,
+      "condition": "registeredStateCount < activeLocationCount",
+      "text": "You may have nexus in states where you are not registered.",
+      "variant": "warning"
+    },
+    {
+      "id": "tax-registrations-table",
+      "type": "data-table",
+      "title": null,
+      "component": "MC.1",
+      "columns": [
+        {
+          "key": "state",
+          "label": "State",
+          "type": "text"
+        },
+        {
+          "key": "registrationNumber",
+          "label": "Registration number",
+          "type": "text"
+        },
+        {
+          "key": "status",
+          "label": "Status",
+          "type": "status-pill"
+        },
+        {
+          "key": "effectiveDate",
+          "label": "Effective date",
+          "type": "date",
+          "format": "MM/DD/YYYY"
+        },
+        {
+          "key": "actions",
+          "label": "Actions",
+          "type": "button-row"
+        }
+      ]
+    },
+    {
+      "id": "add-registration-cta",
+      "type": "form-section",
+      "title": null,
+      "component": null,
+      "cta": {
+        "label": "Add registration",
+        "variant": "primary"
+      },
+      "modal": {
+        "fields": [
+          {
+            "id": "state",
+            "type": "picker",
+            "label": "State",
+            "options": "US_STATES_50"
+          },
+          {
+            "id": "registrationNumber",
+            "type": "text-input",
+            "label": "Registration number"
+          },
+          {
+            "id": "effectiveDate",
+            "type": "date-picker",
+            "label": "Effective date",
+            "format": "MM/DD/YYYY"
+          }
+        ]
+      }
+    }
+  ],
+  "stateNames": [
+    "default",
+    "empty",
+    "nexus-warning",
+    "adding",
+    "error"
+  ],
+  "accessibility": {
+    "screenReaderLabel": "Tax settings"
+  }
+}

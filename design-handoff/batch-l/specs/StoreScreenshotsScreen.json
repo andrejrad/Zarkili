@@ -1,0 +1,240 @@
+{
+  "screenId": "L.17",
+  "name": "StoreScreenshotsScreen",
+  "description": "App Store and Play Store screenshot frames with gradient headline bands",
+  "component": "store-screenshot-frame",
+  "devices": [
+    {
+      "name": "iPhone 6.7",
+      "dimensions": {
+        "width": 1290,
+        "height": 2796
+      },
+      "bezel": "iPhone 14 Pro Max",
+      "statusBar": {
+        "time": "9:41 AM",
+        "signal": "full",
+        "wifi": "full",
+        "battery": "100%"
+      }
+    },
+    {
+      "name": "iPad 12.9",
+      "dimensions": {
+        "width": 2048,
+        "height": 2732
+      },
+      "bezel": "iPad Pro 12.9",
+      "statusBar": {
+        "time": "9:41 AM",
+        "signal": "full",
+        "wifi": "full",
+        "battery": "100%"
+      }
+    },
+    {
+      "name": "Pixel 7",
+      "dimensions": {
+        "width": 1080,
+        "height": 2340
+      },
+      "bezel": "Pixel 7",
+      "statusBar": {
+        "time": "9:41 AM",
+        "signal": "full",
+        "wifi": "full",
+        "battery": "100%"
+      }
+    }
+  ],
+  "headlineBand": {
+    "height": 120,
+    "gradient": {
+      "direction": "diagonal-top-left-to-bottom-right",
+      "colorStart": "#E3A9A0",
+      "colorEnd": "#D1BFB3"
+    },
+    "headlineStyle": {
+      "fontSize": 32,
+      "lineHeight": 40,
+      "fontWeight": 600,
+      "color": "#FFFFFF",
+      "maxChars": 24,
+      "alignment": "center"
+    },
+    "subheadlineStyle": {
+      "fontSize": 18,
+      "lineHeight": 24,
+      "fontWeight": 400,
+      "color": "rgba(255,255,255,0.8)",
+      "maxChars": 40,
+      "alignment": "center"
+    }
+  },
+  "screenshots": {
+    "iPhone": [
+      {
+        "id": "iPhone-1",
+        "screenContent": "Home screen with salon cards",
+        "headline": "Discover your next look",
+        "subheadline": "Find salons and styles near you",
+        "overlayGradient": true
+      },
+      {
+        "id": "iPhone-2",
+        "screenContent": "Booking confirmation with checkmark",
+        "headline": "Book in under 60 seconds",
+        "subheadline": "Quick and easy appointments",
+        "overlayGradient": true
+      },
+      {
+        "id": "iPhone-3",
+        "screenContent": "Loyalty screen with progress ring and tier badge",
+        "headline": "Earn rewards with every visit",
+        "subheadline": "Points for every dollar spent",
+        "overlayGradient": true
+      },
+      {
+        "id": "iPhone-4",
+        "screenContent": "Marketplace feed with style posts",
+        "headline": "Style inspo from your city",
+        "subheadline": "See what's trending locally",
+        "overlayGradient": true
+      },
+      {
+        "id": "iPhone-5",
+        "screenContent": "Staff app AI suggestion panel and calendar",
+        "headline": "AI-powered scheduling",
+        "subheadline": "Smarter booking suggestions",
+        "overlayGradient": true
+      }
+    ],
+    "iPad": [
+      {
+        "id": "iPad-1",
+        "screenContent": "Home screen in 2-column tablet layout",
+        "headline": "Beauty at your fingertips",
+        "subheadline": "Optimized for iPad",
+        "overlayGradient": true
+      },
+      {
+        "id": "iPad-2",
+        "screenContent": "Staff master calendar with multi-resource view",
+        "headline": "Professional scheduling",
+        "subheadline": "Manage your salon effortlessly",
+        "overlayGradient": true
+      },
+      {
+        "id": "iPad-3",
+        "screenContent": "Analytics dashboard with charts",
+        "headline": "Data-driven insights",
+        "subheadline": "Track performance in real-time",
+        "overlayGradient": true
+      }
+    ],
+    "Android": [
+      {
+        "id": "Android-1",
+        "screenContent": "Home screen with salon cards",
+        "headline": "Discover your next look",
+        "subheadline": "Find salons and styles near you",
+        "overlayGradient": true
+      },
+      {
+        "id": "Android-2",
+        "screenContent": "Booking confirmation with checkmark",
+        "headline": "Book in under 60 seconds",
+        "subheadline": "Quick and easy appointments",
+        "overlayGradient": true
+      },
+      {
+        "id": "Android-3",
+        "screenContent": "Loyalty screen with progress ring and tier badge",
+        "headline": "Earn rewards with every visit",
+        "subheadline": "Points for every dollar spent",
+        "overlayGradient": true
+      },
+      {
+        "id": "Android-4",
+        "screenContent": "Marketplace feed with style posts",
+        "headline": "Style inspo from your city",
+        "subheadline": "See what's trending locally",
+        "overlayGradient": true
+      },
+      {
+        "id": "Android-5",
+        "screenContent": "Staff app AI suggestion panel and calendar",
+        "headline": "AI-powered scheduling",
+        "subheadline": "Smarter booking suggestions",
+        "overlayGradient": true
+      }
+    ]
+  },
+  "frames": [
+    {
+      "name": "L-17-iPhone-1-discover",
+      "device": "iPhone 6.7",
+      "screenshot": "iPhone-1"
+    },
+    {
+      "name": "L-17-iPhone-2-book",
+      "device": "iPhone 6.7",
+      "screenshot": "iPhone-2"
+    },
+    {
+      "name": "L-17-iPhone-3-rewards",
+      "device": "iPhone 6.7",
+      "screenshot": "iPhone-3"
+    },
+    {
+      "name": "L-17-iPhone-4-style",
+      "device": "iPhone 6.7",
+      "screenshot": "iPhone-4"
+    },
+    {
+      "name": "L-17-iPhone-5-ai",
+      "device": "iPhone 6.7",
+      "screenshot": "iPhone-5"
+    },
+    {
+      "name": "L-17-iPad-1-home",
+      "device": "iPad 12.9",
+      "screenshot": "iPad-1"
+    },
+    {
+      "name": "L-17-iPad-2-calendar",
+      "device": "iPad 12.9",
+      "screenshot": "iPad-2"
+    },
+    {
+      "name": "L-17-iPad-3-analytics",
+      "device": "iPad 12.9",
+      "screenshot": "iPad-3"
+    },
+    {
+      "name": "L-17-Android-1-discover",
+      "device": "Pixel 7",
+      "screenshot": "Android-1"
+    },
+    {
+      "name": "L-17-Android-2-book",
+      "device": "Pixel 7",
+      "screenshot": "Android-2"
+    },
+    {
+      "name": "L-17-Android-3-rewards",
+      "device": "Pixel 7",
+      "screenshot": "Android-3"
+    },
+    {
+      "name": "L-17-Android-4-style",
+      "device": "Pixel 7",
+      "screenshot": "Android-4"
+    },
+    {
+      "name": "L-17-Android-5-ai",
+      "device": "Pixel 7",
+      "screenshot": "Android-5"
+    }
+  ]
+}

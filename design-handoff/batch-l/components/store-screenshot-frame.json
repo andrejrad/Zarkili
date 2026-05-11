@@ -1,0 +1,163 @@
+{
+  "componentId": "store-screenshot-frame",
+  "name": "StoreScreenshotFrame",
+  "description": "Device frame wrapper for App Store and Play Store screenshots with headline band overlay",
+  "category": "marketing",
+  "version": "1.0.0",
+  "variants": [
+    {
+      "id": "iPhone-6.7",
+      "name": "iPhone 6.7-inch",
+      "description": "iPhone 14 Pro Max / 15 Pro Max frame",
+      "dimensions": {
+        "canvasWidth": 1290,
+        "canvasHeight": 2796,
+        "bezelInset": {
+          "top": 56,
+          "bottom": 42,
+          "left": 20,
+          "right": 20
+        }
+      },
+      "statusBar": {
+        "height": 54,
+        "time": "9:41 AM",
+        "dynamicIsland": true
+      },
+      "headlineBandHeight": 120,
+      "platform": "ios"
+    },
+    {
+      "id": "iPhone-5.5",
+      "name": "iPhone 5.5-inch",
+      "description": "iPhone 8 Plus frame — required for older App Store slots",
+      "dimensions": {
+        "canvasWidth": 1242,
+        "canvasHeight": 2208,
+        "bezelInset": {
+          "top": 40,
+          "bottom": 40,
+          "left": 18,
+          "right": 18
+        }
+      },
+      "statusBar": {
+        "height": 40,
+        "time": "9:41 AM",
+        "dynamicIsland": false
+      },
+      "headlineBandHeight": 110,
+      "platform": "ios"
+    },
+    {
+      "id": "iPad-12.9",
+      "name": "iPad Pro 12.9-inch",
+      "description": "iPad Pro 12.9 4th gen or later frame",
+      "dimensions": {
+        "canvasWidth": 2048,
+        "canvasHeight": 2732,
+        "bezelInset": {
+          "top": 44,
+          "bottom": 44,
+          "left": 32,
+          "right": 32
+        }
+      },
+      "statusBar": {
+        "height": 44,
+        "time": "9:41 AM",
+        "dynamicIsland": false
+      },
+      "headlineBandHeight": 128,
+      "platform": "ios"
+    },
+    {
+      "id": "Android-Pixel",
+      "name": "Android Pixel 7",
+      "description": "Google Pixel 7 frame for Play Store screenshots",
+      "dimensions": {
+        "canvasWidth": 1080,
+        "canvasHeight": 2340,
+        "bezelInset": {
+          "top": 36,
+          "bottom": 30,
+          "left": 16,
+          "right": 16
+        }
+      },
+      "statusBar": {
+        "height": 40,
+        "time": "9:41 AM",
+        "dynamicIsland": false
+      },
+      "headlineBandHeight": 112,
+      "platform": "android"
+    }
+  ],
+  "layerStack": [
+    {
+      "order": 1,
+      "id": "background-gradient",
+      "label": "Background Gradient",
+      "type": "gradient-fill",
+      "colorStart": "#E3A9A0",
+      "colorEnd": "#F2EDDD",
+      "direction": "180deg"
+    },
+    {
+      "order": 2,
+      "id": "screen-content",
+      "label": "App Screen Content",
+      "type": "screen-image",
+      "fillMode": "fit-inside-bezel"
+    },
+    {
+      "order": 3,
+      "id": "device-frame",
+      "label": "Device Frame Overlay",
+      "type": "image-overlay",
+      "assetRef": "device-frame-{{variantId}}"
+    },
+    {
+      "order": 4,
+      "id": "headline-band",
+      "label": "Headline Band",
+      "type": "gradient-band",
+      "position": "top",
+      "gradient": {
+        "colorStart": "rgba(0,0,0,0.45)",
+        "colorEnd": "transparent",
+        "direction": "180deg"
+      }
+    },
+    {
+      "order": 5,
+      "id": "headline-text",
+      "label": "Headline Text",
+      "type": "text",
+      "style": "headlineBand",
+      "alignment": "center"
+    },
+    {
+      "order": 6,
+      "id": "subheadline-text",
+      "label": "Subheadline Text",
+      "type": "text",
+      "style": "subheadlineBand",
+      "alignment": "center"
+    },
+    {
+      "order": 7,
+      "id": "status-bar-overlay",
+      "label": "Status Bar Overlay",
+      "type": "status-bar",
+      "theme": "light"
+    }
+  ],
+  "exportSettings": {
+    "format": "PNG",
+    "colorSpace": "sRGB",
+    "scale": 1,
+    "suffix": "-store-screenshot"
+  }
+}

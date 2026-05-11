@@ -1,0 +1,145 @@
+{
+  "screen": "DragRescheduleSpec",
+  "route": null,
+  "device": "iPad 1024×768",
+  "description": "Interaction specification frame — not a navigable route. Render all states as separate annotated subframes.",
+  "states": [
+    "idle",
+    "longPressCharging",
+    "dragging",
+    "validDropTarget",
+    "invalidDropTarget",
+    "conflictDropTarget",
+    "confirmModal",
+    "snapBack",
+    "reduceMotion",
+    "accessibilityAlternative"
+  ],
+  "state": {
+    "idle": {
+      "description": "Normal day-view calendar, no overlay"
+    },
+    "longPressCharging": {
+      "duration": 200,
+      "arcProgressRing": {
+        "position": "block corner top-right",
+        "radius": 16,
+        "stroke": 1,
+        "color": "primary",
+        "animation": "0→360° 200ms"
+      },
+      "haptic": "mediumImpact on complete",
+      "surroundingCells": {
+        "opacity": 0.8
+      }
+    },
+    "dragging": {
+      "cloneBlock": {
+        "opacity": 0.5,
+        "elevation": 8,
+        "shadowBlur": 16,
+        "shadowColor": "rgba(0,0,0,0.15)",
+        "followsPointer": true
+      },
+      "snapIncrement": 32,
+      "snapUnit": "15min",
+      "autoScrollZone": {
+        "distance": 40,
+        "edges": "top/bottom"
+      },
+      "originCell": {
+        "background": "calendar.dropValid 20%",
+        "border": {
+          "width": 1,
+          "style": "dashed",
+          "color": "calendar.dropValidBorder"
+        }
+      }
+    },
+    "validDropTarget": {
+      "hoveredCell": {
+        "background": "calendar.dropValid",
+        "border": {
+          "width": 1,
+          "color": "calendar.dropValidBorder"
+        }
+      }
+    },
+    "invalidDropTarget": {
+      "hoveredCell": {
+        "background": "calendar.dropInvalid",
+        "border": {
+          "width": 1,
+          "color": "calendar.dropInvalidBorder"
+        },
+        "icon": {
+          "name": "x",
+          "size": 16,
+          "color": "error",
+          "position": "center"
+        }
+      }
+    },
+    "conflictDropTarget": {
+      "hoveredCell": {
+        "background": "calendar.conflictHatch",
+        "border": {
+          "width": 2,
+          "color": "calendar.conflictBorder"
+        }
+      },
+      "onRelease": {
+        "navigate": "ConflictResolverScreen"
+      }
+    },
+    "confirmModal": {
+      "sheet": {
+        "width": 390,
+        "radius": 20,
+        "maxHeight": "92vh"
+      },
+      "contents": {
+        "newTimeLabel": {
+          "variant": "body-large",
+          "format": "h:mm AM, ddd MMM D"
+        },
+        "notifyClientToggle": {
+          "default": true
+        }
+      },
+      "actions": [
+        {
+          "type": "button",
+          "label": "strings.dragReschedule.cancel",
+          "variant": "secondary"
+        },
+        {
+          "type": "button",
+          "label": "strings.dragReschedule.confirm",
+          "variant": "primary"
+        }
+      ]
+    },
+    "snapBack": {
+      "animation": "spring 200ms ease-out to origin",
+      "triggers": [
+        "invalidDrop",
+        "confirmModalCancel"
+      ]
+    },
+    "reduceMotion": {
+      "noOpacityTrail": true,
+      "noArcAnimation": true,
+      "noSpring": true,
+      "instantSnap": true,
+      "confirmModalRequired": true,
+      "annotation": "Annotated frame for prefers-reduced-motion fallback"
+    },
+    "accessibilityAlternative": {
+      "interaction": "longPress → contextMenu",
+      "menuItem": "strings.dragReschedule.contextMenuReschedule",
+      "nextStep": "TimePickerModal",
+      "noDragRequired": true
+    }
+  }
+}

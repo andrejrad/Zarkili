@@ -446,6 +446,97 @@ useFocusEffect(
 
 ---
 
+## RatingSelector — Adjustable Role
+
+`RatingSelector` exposes `accessibilityRole="adjustable"` so VoiceOver and TalkBack treat it as a slider control rather than a series of individual buttons.
+
+### Implementation pattern
+
+```javascript
+<View
+  accessible
+  accessibilityRole="adjustable"
+  accessibilityLabel="Rating"
+  accessibilityValue={{
+    min: 0,
+    max: 5,
+    now: rating,
+    text: labelMap[rating], // e.g. "Loved it!" for 5
+  }}
+  accessibilityActions={[
+    { name: 'increment', label: 'increase rating' },
+    { name: 'decrement', label: 'decrease rating' },
+  ]}
+  onAccessibilityAction={(event) => {
+    if (event.nativeEvent.actionName === 'increment') {
+      setRating(Math.min(5, rating + 1));
+    } else if (event.nativeEvent.actionName === 'decrement') {
+      setRating(Math.max(0, rating - 1));
+    }
+  }}
+>
+  {stars}
+</View>
+```
+
+### Label mapping
+
+| Value | Text label |
+|-------|-----------|
+| 0 | *(no label)* |
+| 1 | Not for me |
+| 2 | Meh |
+| 3 | OK |
+| 4 | Great |
+| 5 | Loved it! |
+
+### Notes
+
+- The outer `View` is the single focusable unit; individual star `Pressable` components must have `importantForAccessibility="no-hide-descendants"` inside it to prevent duplicate focus.
+- On TalkBack, swipe up/down adjusts the value. On VoiceOver, swipe up/down does the same.
+- Announce the updated value after each change via `AccessibilityInfo.announceForAccessibility` if the value text label changes.
+- Touch target for each star is 44×44 pt minimum (hitSlop 6 for 32px visual, hitSlop 10 for 24px visual).
+
+---
+
+## TierBadge — Color and Label Pairing Rule
+
+Color alone must never be the sole signal for tier identity. This is required for WCAG 1.4.1 (Use of Color) and for users in high-contrast or grayscale display modes.
+
+### Rule
+
+Every `TierBadge` rendering must include the tier name as visible text alongside (or inside) the colored chip.
+
+| Tier | Background | Text color | Visible label |
+|------|-----------|------------|--------------|
+| Bronze | `#C77A50` | `#FFFFFF` | "Bronze" |
+| Silver | `#9AA3A8` | `#FFFFFF` | "Silver" |
+| Gold | `#D4A24C` | `#1A1A1A` | "Gold" |
+| Platinum | `#5E6B6E` | `#FFFFFF` | "Platinum" |
+| Locked | `#F5F5F5` | `#6B6B6B` | "Locked" |
+
+### Contrast notes
+
+- Silver `#9AA3A8` on `#FFFFFF` text: 3.2:1 (AA large text / UI components). For badge label-small (12 px 500 weight) this meets AA. Do not use the original `#B0B0B0` value — it fails AA at small sizes.
+- Gold `#D4A24C` background uses `#1A1A1A` foreground (ratio 7.3:1, AAA) because yellow-family backgrounds require dark text.
+
+### Accessibility label
+
+When a `TierBadge` is rendered as a non-interactive display element, set:
+
+```javascript
+<TierBadge
+  tier="gold"
+  accessible
+  accessibilityRole="text"
+  accessibilityLabel="Gold tier"
+/>
+```
+
+When rendered inside a parent focusable element (e.g. the hero card on Loyalty Landing), add the tier to the parent's `accessibilityLabel` and set `importantForAccessibility="no"` on the badge to prevent double-reading.
+
+---
+
 ## Testing Checklist
 
 ### VoiceOver (iOS)

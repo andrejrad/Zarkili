@@ -1,0 +1,294 @@
+{
+  "screenId": "L.8",
+  "name": "FirstRunTourScreen",
+  "device": "iPhone 14",
+  "dimensions": {
+    "width": 390,
+    "height": 844
+  },
+  "description": "5-step coach-mark tour for first-time users with spotlight and backdrop",
+  "component": "coach-mark-popover",
+  "backdrop": {
+    "scrim": "rgba(0,0,0,0.5)",
+    "spotlight": {
+      "shape": "circle",
+      "radius": 32,
+      "pulseRing": {
+        "color": "#E3A9A0",
+        "opacityFrom": 0.4,
+        "opacityTo": 0,
+        "duration": "1.5s",
+        "loop": true
+      }
+    }
+  },
+  "steps": [
+    {
+      "id": "step-1",
+      "name": "search-bar",
+      "anchorElement": "search-bar",
+      "anchorPosition": "top-center",
+      "popover": {
+        "position": "below",
+        "arrowDirection": "up",
+        "text": "{step1Text}",
+        "currentStep": 1,
+        "totalSteps": 5
+      },
+      "spotlight": {
+        "target": "search-bar",
+        "radius": 32
+      }
+    },
+    {
+      "id": "step-2",
+      "name": "explore-tab",
+      "anchorElement": "tab-bar-explore",
+      "anchorPosition": "bottom-center",
+      "popover": {
+        "position": "above",
+        "arrowDirection": "down",
+        "text": "{step2Text}",
+        "currentStep": 2,
+        "totalSteps": 5
+      },
+      "spotlight": {
+        "target": "tab-bar-explore",
+        "radius": 32
+      }
+    },
+    {
+      "id": "step-3",
+      "name": "book-cta",
+      "anchorElement": "book-button",
+      "anchorPosition": "right-center",
+      "popover": {
+        "position": "left",
+        "arrowDirection": "right",
+        "text": "{step3Text}",
+        "currentStep": 3,
+        "totalSteps": 5
+      },
+      "spotlight": {
+        "target": "book-button",
+        "radius": 32
+      }
+    },
+    {
+      "id": "step-4",
+      "name": "loyalty-tab",
+      "anchorElement": "tab-bar-loyalty",
+      "anchorPosition": "bottom-center",
+      "popover": {
+        "position": "above",
+        "arrowDirection": "down",
+        "text": "{step4Text}",
+        "currentStep": 4,
+        "totalSteps": 5
+      },
+      "spotlight": {
+        "target": "tab-bar-loyalty",
+        "radius": 32
+      }
+    },
+    {
+      "id": "step-5",
+      "name": "profile-tab",
+      "anchorElement": "tab-bar-profile",
+      "anchorPosition": "bottom-center",
+      "popover": {
+        "position": "above",
+        "arrowDirection": "down",
+        "text": "{step5Text}",
+        "currentStep": 5,
+        "totalSteps": 5,
+        "finalStep": true
+      },
+      "spotlight": {
+        "target": "tab-bar-profile",
+        "radius": 32
+      }
+    }
+  ],
+  "popoverLayout": {
+    "width": 280,
+    "padding": 16,
+    "borderRadius": 16,
+    "background": "#FFFFFF",
+    "shadow": "large",
+    "gap": 12
+  },
+  "popoverElements": [
+    {
+      "id": "heading",
+      "type": "text",
+      "style": "heading-3",
+      "text": "{stepHeading}",
+      "fontWeight": 600,
+      "color": "#1A1A1A"
+    },
+    {
+      "id": "body-message",
+      "type": "text",
+      "style": "body",
+      "text": "{stepText}",
+      "fontWeight": 400,
+      "color": "#6B6B6B",
+      "marginTop": 8
+    },
+    {
+      "id": "step-pips",
+      "type": "horizontal-flex",
+      "gap": 6,
+      "justifyContent": "center",
+      "marginTop": 12,
+      "children": [
+        {
+          "type": "pip",
+          "size": 8,
+          "activeSize": 8,
+          "inactiveSize": 6,
+          "activeColor": "#E3A9A0",
+          "inactiveColor": "#E5E0D1",
+          "count": 5
+        }
+      ]
+    },
+    {
+      "id": "cta-row",
+      "type": "horizontal-flex",
+      "gap": 12,
+      "justifyContent": "space-between",
+      "marginTop": 16,
+      "children": [
+        {
+          "id": "skip-cta",
+          "type": "button",
+          "variant": "tertiary",
+          "label": "{skipCta}",
+          "action": "skipTour",
+          "height": 44,
+          "minWidth": 80,
+          "labelWeight": 500,
+          "labelColor": "#6B6B6B"
+        },
+        {
+          "id": "next-cta",
+          "type": "button",
+          "variant": "primary",
+          "label": "{nextCta}",
+          "action": "nextStep",
+          "height": 44,
+          "minWidth": 80,
+          "borderRadius": 12,
+          "background": "#E3A9A0",
+          "labelWeight": 600,
+          "labelColor": "#FFFFFF"
+        }
+      ]
+    }
+  ],
+  "strings": {
+    "step1": {
+      "stepHeading": "Discover",
+      "stepText": "Discover salons near you",
+      "skipCta": "Skip",
+      "nextCta": "Next"
+    },
+    "step2": {
+      "stepHeading": "Explore",
+      "stepText": "Browse styles from your city",
+      "skipCta": "Skip",
+      "nextCta": "Next"
+    },
+    "step3": {
+      "stepHeading": "Quick Booking",
+      "stepText": "Book in under 60 seconds",
+      "skipCta": "Skip",
+      "nextCta": "Next"
+    },
+    "step4": {
+      "stepHeading": "Rewards",
+      "stepText": "Earn points with every visit",
+      "skipCta": "Skip",
+      "nextCta": "Next"
+    },
+    "step5": {
+      "stepHeading": "Your Profile",
+      "stepText": "Manage your bookings and preferences",
+      "skipCta": "Skip",
+      "nextCta": "Got it"
+    }
+  },
+  "states": [
+    {
+      "name": "step-1",
+      "currentStep": 1,
+      "anchorElement": "search-bar"
+    },
+    {
+      "name": "step-2",
+      "currentStep": 2,
+      "anchorElement": "tab-bar-explore"
+    },
+    {
+      "name": "step-3",
+      "currentStep": 3,
+      "anchorElement": "book-button"
+    },
+    {
+      "name": "step-4",
+      "currentStep": 4,
+      "anchorElement": "tab-bar-loyalty"
+    },
+    {
+      "name": "step-5",
+      "currentStep": 5,
+      "anchorElement": "tab-bar-profile"
+    },
+    {
+      "name": "skipped",
+      "description": "User skipped tour, backdrop dismisses"
+    }
+  ],
+  "accessibility": {
+    "backdrop": {
+      "role": "presentation",
+      "label": "Tour step {currentStep} of {totalSteps}"
+    },
+    "skipCta": {
+      "label": "Skip tour",
+      "hint": "Dismisses onboarding tour"
+    },
+    "nextCta": {
+      "label": "Next step",
+      "hint": "Shows next tour step"
+    }
+  },
+  "frames": [
+    {
+      "name": "L-8-step-1",
+      "state": "step-1"
+    },
+    {
+      "name": "L-8-step-2",
+      "state": "step-2"
+    },
+    {
+      "name": "L-8-step-3",
+      "state": "step-3"
+    },
+    {
+      "name": "L-8-step-4",
+      "state": "step-4"
+    },
+    {
+      "name": "L-8-step-5",
+      "state": "step-5"
+    },
+    {
+      "name": "L-8-skipped",
+      "state": "skipped"
+    }
+  ]
+}

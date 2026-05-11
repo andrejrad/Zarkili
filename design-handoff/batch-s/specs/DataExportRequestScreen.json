@@ -1,0 +1,50 @@
+{
+  "screen": "DataExportRequestScreen",
+  "route": "SuperAdminDataExportRequests",
+  "device": { "primary": "Desktop 1280+", "secondary": "iPad 1024×768" },
+  "stateNames": ["default", "processing", "error"],
+  "layout": {
+    "header": {
+      "title": { "text": "Data Export Requests", "variant": "heading-2" },
+      "tabs": {
+        "type": "tabBar",
+        "tabs": [
+          { "key": "pending", "label": "Pending", "badge": { "type": "count", "color": "primary" } },
+          { "key": "processing", "label": "Processing" },
+          { "key": "completed", "label": "Completed" },
+          { "key": "expired", "label": "Expired" }
+        ]
+      }
+    },
+    "requestTable": {
+      "columns": [
+        { "key": "requestedAt", "format": "datetime local", "font": "mono", "variant": "caption" },
+        { "key": "tenantName", "variant": "body-medium", "weight": "500" },
+        { "key": "requesterName", "type": "userPill" },
+        { "key": "requesterEmail", "variant": "caption", "font": "mono" },
+        { "key": "format", "type": "pill", "values": ["CSV", "JSON", "PDF"] },
+        { "key": "scope", "type": "pill", "values": ["full", "appointments", "clients", "billing"] },
+        { "key": "status", "type": "pill", "values": ["pending", "processing", "ready", "expired"] },
+        { "key": "sizeEstimate", "format": "MB approx", "font": "mono", "align": "right" },
+        { "key": "expiresAt", "type": "relative", "variant": "caption" },
+        { "key": "actions", "type": "button-group", "items": [
+          { "label": "strings.dataExportRequests.processCta", "variant": "filled", "showWhen": "status === pending" },
+          { "label": "strings.dataExportRequests.downloadCta", "variant": "outlined", "icon": "download", "showWhen": "status === ready" },
+          { "label": "strings.dataExportRequests.expireCta", "variant": "outlined", "tone": "destructive", "showWhen": "status === ready" }
+        ]}
+      ]
+    }
+  },
+  "states": {
+    "processing": {
+      "processingRow": { "status": "processing", "progressBar": { "indeterminate": true, "color": "primary" } }
+    },
+    "error": {
+      "inlineBanner": {
+        "background": "error 10%",
+        "borderLeft": { "width": 4, "color": "error" },
+        "message": "strings.dataExportRequests.errorMessage"
+      }
+    }
+  }
+}

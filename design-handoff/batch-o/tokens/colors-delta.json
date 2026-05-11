@@ -1,0 +1,155 @@
+{
+  "delta": "colors-batch-o",
+  "tokens": {
+    "booking": {
+      "confirmed": {
+        "value": "#4CAF50",
+        "token": "booking.confirmed"
+      },
+      "confirmedBg": {
+        "value": "#E8F5E9",
+        "token": "booking.confirmedBg"
+      },
+      "pending": {
+        "value": "#FF9800",
+        "token": "booking.pending"
+      },
+      "pendingBg": {
+        "value": "#FFF3E0",
+        "token": "booking.pendingBg"
+      },
+      "cancelled": {
+        "value": "#9CA3AF",
+        "token": "booking.cancelled"
+      },
+      "cancelledBg": {
+        "value": "#F5F5F5",
+        "token": "booking.cancelledBg"
+      },
+      "noShow": {
+        "value": "#F44336",
+        "token": "booking.noShow"
+      },
+      "noShowBg": {
+        "value": "#FFEBEE",
+        "token": "booking.noShowBg"
+      },
+      "completed": {
+        "value": "#A5C4D4",
+        "token": "booking.completed"
+      },
+      "completedBg": {
+        "value": "#EAF4F8",
+        "token": "booking.completedBg"
+      },
+      "rescheduled": {
+        "value": "#D4A5C9",
+        "token": "booking.rescheduled"
+      },
+      "rescheduledBg": {
+        "value": "#F5EEF8",
+        "token": "booking.rescheduledBg"
+      },
+      "reschedulePending": {
+        "value": "#FF9800",
+        "token": "booking.reschedulePending"
+      },
+      "reschedulePendingBg": {
+        "value": "#FFF3E0",
+        "token": "booking.reschedulePendingBg"
+      },
+      "blockedTime": {
+        "value": "#E5E0D1",
+        "token": "booking.blockedTime"
+      },
+      "blockedTimeBg": {
+        "value": "#F7F4EC",
+        "token": "booking.blockedTimeBg"
+      },
+      "blockedTimeBorder": {
+        "value": "#9CA3AF",
+        "token": "booking.blockedTimeBorder"
+      }
+    },
+    "calendar": {
+      "nowLine": {
+        "value": "#E3A9A0",
+        "token": "calendar.nowLine"
+      },
+      "gridLine": {
+        "value": "#E5E0D1",
+        "token": "calendar.gridLine"
+      },
+      "headerBg": {
+        "value": "#F7F4EC",
+        "token": "calendar.headerBg"
+      },
+      "timeColumnBg": {
+        "value": "#FFFFFF",
+        "token": "calendar.timeColumnBg"
+      },
+      "timeColumnText": {
+        "value": "#6B6B6B",
+        "token": "calendar.timeColumnText"
+      },
+      "dropValid": {
+        "value": "#BBEDDA33",
+        "token": "calendar.dropValid"
+      },
+      "dropValidBorder": {
+        "value": "#BBEDDA",
+        "token": "calendar.dropValidBorder"
+      },
+      "dropInvalid": {
+        "value": "#F4433619",
+        "token": "calendar.dropInvalid"
+      },
+      "dropInvalidBorder": {
+        "value": "#F44336",
+        "token": "calendar.dropInvalidBorder"
+      },
+      "conflictBorder": {
+        "value": "#F44336",
+        "token": "calendar.conflictBorder"
+      },
+      "conflictHatch": {
+        "value": "#F4433626",
+        "token": "calendar.conflictHatch"
+      },
+      "monthHeat0": {
+        "value": "#F7F4EC",
+        "token": "calendar.monthHeat0"
+      },
+      "monthHeat1": {
+        "value": "#BBEDDA",
+        "token": "calendar.monthHeat1"
+      },
+      "monthHeat2": {
+        "value": "#D4CCA5",
+        "token": "calendar.monthHeat2"
+      },
+      "monthHeat3": {
+        "value": "#E3A9A0",
+        "token": "calendar.monthHeat3"
+      },
+      "monthHeat4": {
+        "value": "#CF8B80",
+        "token": "calendar.monthHeat4"
+      }
+    },
+    "audit": {
+      "connector": {
+        "value": "#E5E0D1",
+        "token": "audit.connector"
+      },
+      "actorText": {
+        "value": "#6B6B6B",
+        "token": "audit.actorText"
+      },
+      "timestamp": {
+        "value": "#9CA3AF",
+        "token": "audit.timestamp"
+      }
+    }
+  }
+}

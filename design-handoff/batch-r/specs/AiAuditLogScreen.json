@@ -1,0 +1,71 @@
+{
+  "screen": "AiAuditLogScreen",
+  "route": "/admin/ai/audit",
+  "description": "Full decision audit trail for all AI actions including auto-applied and human-reviewed",
+  "platform": "admin-desktop",
+  "dimensions": { "width": 1280, "contentWidth": "calc(1280 - 240px sidebar)" },
+  "states": ["default", "loading", "empty", "row-expanded", "generating-export"],
+  "accessibility": {
+    "screenReaderLabel": "strings.aiAuditLog.screenTitle",
+    "semanticRoles": [
+      { "element": "filterBar", "role": "search" },
+      { "element": "auditTable", "role": "table" },
+      { "element": "detailDrawer", "role": "dialog" }
+    ]
+  },
+  "rtl": "deferred",
+  "darkMode": "deferred",
+  "layout": {
+    "header": {
+      "component": "AdminHeader",
+      "title": "strings.aiAuditLog.title",
+      "rightActions": [{ "component": "SecondaryButton", "label": "strings.aiAuditLog.exportCsv" }]
+    },
+    "body": {
+      "padding": 24,
+      "filterBar": {
+        "component": "AuditLogFilterBar",
+        "variant": "AI-specific",
+        "filters": ["search text", "DateRangePicker", "feature dropdown", "decision-type dropdown (auto-applied/human-approved/human-rejected/overridden)", "model dropdown", "severity dropdown", "Reset link"]
+      },
+      "summaryStrip": {
+        "height": 40,
+        "bg": "admin.tableHeaderBg",
+        "left": "[n] strings.aiAuditLog.totalEntries",
+        "right": "Dismissible filter chips"
+      },
+      "auditTable": {
+        "component": "DataTable",
+        "rowComponent": "AuditLogRow (AI variant)",
+        "pageSize": 50,
+        "columns": [
+          "strings.aiAuditLog.columnTimestamp",
+          "strings.aiAuditLog.columnFeature",
+          "strings.aiAuditLog.columnModel",
+          "strings.aiAuditLog.columnInputHash (8 chars mono)",
+          "strings.aiAuditLog.columnOutputSnippet (2-line clamp)",
+          "strings.aiAuditLog.columnDecision (badge)",
+          "strings.aiAuditLog.columnActor (name or System)",
+          "strings.aiAuditLog.columnLatency (ms)"
+        ]
+      }
+    },
+    "detailDrawer": {
+      "width": 560,
+      "position": "right overlay",
+      "header": { "title": "strings.aiAuditLog.drawerTitle", "closeX": true },
+      "sections": [
+        { "label": "strings.aiAuditLog.fullInputLabel", "overflow": "scroll", "font": "mono" },
+        { "label": "strings.aiAuditLog.fullOutputLabel", "overflow": "scroll" },
+        { "label": "strings.aiAuditLog.confidenceLabel" },
+        { "label": "strings.aiAuditLog.safetyFlagsLabel" }
+      ],
+      "footer": { "component": "SecondaryButton", "label": "strings.aiAuditLog.copyJson" }
+    }
+  },
+  "components": [
+    { "id": "filterBar", "ref": "AuditLogFilterBar", "props": { "variant": "ai", "onChange": "{{onFilterChange}}" } },
+    { "id": "auditTable", "ref": "DataTable", "props": { "rowComponent": "AuditLogRow", "pageSize": 50, "data": "{{aiAuditData}}" } }
+  ],
+  "strings": "See strings/en-us.json for aiAuditLog keys"
+}

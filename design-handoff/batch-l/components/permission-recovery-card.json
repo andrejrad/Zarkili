@@ -1,0 +1,120 @@
+{
+  "componentId": "permission-recovery-card",
+  "name": "PermissionRecoveryCard",
+  "description": "Card or bottom-sheet for permission denied recovery, explaining what the permission enables and offering a settings deep link",
+  "category": "permission-ui",
+  "version": "1.0.0",
+  "formFactors": [
+    {
+      "id": "bottom-sheet",
+      "name": "Bottom Sheet",
+      "description": "Modal bottom sheet on mobile — preferred when blocking the flow",
+      "maxHeight": 360,
+      "handleVisible": true,
+      "backdropDismissible": false
+    },
+    {
+      "id": "inline-card",
+      "name": "Inline Card",
+      "description": "Inline contextual card embedded in a list or feed — used for non-blocking flows",
+      "borderRadius": 12,
+      "elevation": 2
+    }
+  ],
+  "elements": [
+    {
+      "id": "icon",
+      "label": "Permission Icon",
+      "type": "icon",
+      "size": 48,
+      "color": "#E3A9A0",
+      "marginBottom": 12
+    },
+    {
+      "id": "title",
+      "label": "Title",
+      "type": "text",
+      "style": "headingSmall",
+      "alignment": "center",
+      "maxChars": 36
+    },
+    {
+      "id": "description",
+      "label": "Description",
+      "type": "text",
+      "style": "bodySmall",
+      "alignment": "center",
+      "maxChars": 120,
+      "marginTop": 8,
+      "color": "#6B6B6B"
+    },
+    {
+      "id": "settings-button",
+      "label": "Open Settings Button",
+      "type": "button",
+      "style": "primary",
+      "maxChars": 24,
+      "marginTop": 20,
+      "marginHorizontal": 24
+    },
+    {
+      "id": "dismiss-link",
+      "label": "Dismiss Link",
+      "type": "button",
+      "style": "tertiary",
+      "maxChars": 24,
+      "marginTop": 12
+    }
+  ],
+  "permissionVariants": [
+    {
+      "id": "camera",
+      "name": "Camera",
+      "icon": "camera",
+      "titleKey": "permissionRecovery.camera.title",
+      "descriptionKey": "permissionRecovery.camera.description"
+    },
+    {
+      "id": "photo-library",
+      "name": "Photo Library",
+      "icon": "photo-library",
+      "titleKey": "permissionRecovery.photoLibrary.title",
+      "descriptionKey": "permissionRecovery.photoLibrary.description"
+    },
+    {
+      "id": "contacts",
+      "name": "Contacts",
+      "icon": "contacts",
+      "titleKey": "permissionRecovery.contacts.title",
+      "descriptionKey": "permissionRecovery.contacts.description"
+    },
+    {
+      "id": "calendar",
+      "name": "Calendar",
+      "icon": "calendar",
+      "titleKey": "permissionRecovery.calendar.title",
+      "descriptionKey": "permissionRecovery.calendar.description"
+    },
+    {
+      "id": "notifications",
+      "name": "Notifications",
+      "icon": "bell",
+      "titleKey": "permissionRecovery.notifications.title",
+      "descriptionKey": "permissionRecovery.notifications.description"
+    },
+    {
+      "id": "location",
+      "name": "Location",
+      "icon": "location-pin",
+      "titleKey": "permissionRecovery.location.title",
+      "descriptionKey": "permissionRecovery.location.description"
+    }
+  ],
+  "accessibility": {
+    "semanticRole": "dialog",
+    "focusOnMount": "title",
+    "trapFocus": true,
+    "dismissibleBySwipe": false,
+    "announceLive": "polite"
+  }
+}

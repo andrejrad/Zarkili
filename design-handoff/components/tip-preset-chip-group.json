@@ -1,0 +1,91 @@
+{
+  "component": "TipPresetChipGroup",
+  "batchId": "D.3",
+  "description": "Horizontally wrapping row of tip-preset chips. Each chip acts as a radio button. Selected uses coral-blossom fill. 'No tip' uses destructive-tone dashed outline. Minimum 44pt touch targets per WCAG.",
+  "sourceFile": "src/shared/ui/TipPresetChipGroup.tsx",
+  "variants": {
+    "chipType": {
+      "options": ["percent", "fixed", "none"],
+      "description": "percent = percentage preset (15%, 20%, 25%); fixed = custom amount entry; none = No tip"
+    },
+    "chipState": {
+      "options": ["unselected", "selected", "destructive"],
+      "default": "unselected"
+    }
+  },
+  "layout": {
+    "type": "row",
+    "flexWrap": "wrap",
+    "gap": 8,
+    "accessibilityRole": "radiogroup"
+  },
+  "dimensions": {
+    "chipMinHeight": 44,
+    "chipPaddingHorizontal": 16,
+    "chipPaddingVertical": 8,
+    "chipBorderRadius": 9999,
+    "chipBorderWidth": 1
+  },
+  "chipStates": {
+    "unselected": {
+      "background": "#FFFFFF",
+      "borderColor": "#E5E0D1",
+      "borderStyle": "solid",
+      "textColor": "#1A1A1A",
+      "textFontSize": 14,
+      "textLineHeight": 20,
+      "textFontWeight": "500"
+    },
+    "selected": {
+      "background": "#E3A9A0",
+      "borderColor": "#E3A9A0",
+      "borderStyle": "solid",
+      "textColor": "#FFFFFF",
+      "textFontSize": 14,
+      "textLineHeight": 20,
+      "textFontWeight": "600"
+    },
+    "destructive": {
+      "note": "Applied to 'No tip' chip regardless of selection state",
+      "background": "#FFFFFF",
+      "borderColor": "#D9534F",
+      "borderStyle": "dashed",
+      "textColor": "#D9534F",
+      "textFontSize": 14,
+      "textLineHeight": 20,
+      "textFontWeight": "500"
+    },
+    "pressed": {
+      "transform": "scale(0.97)",
+      "opacity": 0.85
+    }
+  },
+  "defaultOptions": [
+    { "id": "none", "label": "No tip", "kind": "none", "destructive": true },
+    { "id": "15", "label": "15%", "kind": "percent", "value": 0.15 },
+    { "id": "20", "label": "20%", "kind": "percent", "value": 0.20 },
+    { "id": "25", "label": "25%", "kind": "percent", "value": 0.25 },
+    { "id": "custom", "label": "Custom", "kind": "fixed" }
+  ],
+  "tokens": {
+    "surface": "#FFFFFF",
+    "border": "#E5E0D1",
+    "selectedBackground": "#E3A9A0",
+    "selectedText": "#FFFFFF",
+    "destructiveBorder": "#D9534F",
+    "destructiveText": "#D9534F",
+    "foreground": "#1A1A1A",
+    "cornerRadius": 9999,
+    "touchTarget": 44,
+    "gap": 8
+  },
+  "interactions": {
+    "tapChip": "calls onSelect(id) — parent updates selectedId state"
+  },
+  "accessibility": {
+    "groupRole": "radiogroup",
+    "chipRole": "radio",
+    "chipAccessibilityState": "{ selected: id === selectedId }",
+    "chipLabel": "accessibilityLabel prop override — e.g. '20 percent tip, $4.50' for percent presets"
+  }
+}

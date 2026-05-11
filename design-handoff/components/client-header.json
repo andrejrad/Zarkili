@@ -1,0 +1,198 @@
+{
+  "component": "ClientHeader",
+  "description": "Full client identity block: avatar with VIP overlay, name, tier badge, contact action row (Call/Text/Email), and quick-stat strip. Used at the top of client-facing staff screens.",
+  "purpose": "Give staff instant visual identification of a client including tier, contact shortcuts, and key lifetime stats before scrolling into detailed tab content.",
+  "source": {
+    "batch": "G",
+    "screens": ["G.4 Client Detail", "G.5 Client Notes & History"],
+    "promotedFrom": "design-handoff/specs/screen-client-detail.json",
+    "figmaFrames": "code-derived — spec locked from screen-client-detail.json",
+    "lockedAt": "2026-04-28"
+  },
+  "variants": {
+    "state": {
+      "options": ["default", "loading"],
+      "default": "default"
+    },
+    "showVip": {
+      "options": [true, false],
+      "default": false
+    }
+  },
+  "avatarPalette": ["#E3A9A0", "#BBEDDA", "#D1BFB3", "#A8C5BD", "#C4A49B", "#9ED3C0", "#B8D4CE", "#E8C4C0"],
+  "avatarColorAlgorithm": "djb2 hash of clientName mod 8 → AVATAR_PALETTE[index]",
+  "anatomy": {
+    "container": {
+      "background": "#FFFFFF",
+      "paddingHorizontal": 16,
+      "paddingVertical": 16,
+      "borderBottom": { "width": 1, "color": "#E5E0D1" }
+    },
+    "row1": {
+      "flexDirection": "row",
+      "alignItems": "flex-start",
+      "gap": 16,
+      "children": ["avatar", "infoBlock"]
+    },
+    "avatar": {
+      "size": 80,
+      "borderRadius": 9999,
+      "background": "nameHash → AVATAR_PALETTE",
+      "initials": {
+        "style": "heading-2",
+        "fontWeight": 600,
+        "color": "#FFFFFF",
+        "textAlign": "center"
+      },
+      "vipOverlay": {
+        "visible": "{{isVIP}}",
+        "icon": { "name": "star", "size": 20, "color": "#F59E0B" },
+        "background": "#FFFFFF",
+        "borderRadius": 9999,
+        "padding": 2,
+        "position": "absolute",
+        "bottom": 0,
+        "right": 0,
+        "accessibilityLabel": "VIP client",
+        "accessibilityRole": "image"
+      }
+    },
+    "infoBlock": {
+      "flex": 1,
+      "gap": 4,
+      "children": ["name", "badgeRow", "clientSince", "contactRow"]
+    },
+    "name": {
+      "style": "heading-2",
+      "fontWeight": 600,
+      "color": "#1A1A1A"
+    },
+    "badgeRow": {
+      "flexDirection": "row",
+      "alignItems": "center",
+      "gap": 8,
+      "marginTop": 4,
+      "children": ["tierBadge", "vipPill"]
+    },
+    "tierBadge": {
+      "component": "TierBadge",
+      "note": "Reuse Batch E tier-badge component — see design-handoff/components/tier-badge.json"
+    },
+    "vipPill": {
+      "visible": "{{isVIP}}",
+      "content": "VIP",
+      "background": "rgba(245,158,11,0.12)",
+      "color": "#F59E0B",
+      "paddingHorizontal": 8,
+      "height": 22,
+      "borderRadius": 9999,
+      "style": "label-small",
+      "fontWeight": 600
+    },
+    "clientSince": {
+      "style": "body-small",
+      "color": "#6B6B6B",
+      "marginTop": 4,
+      "content": "Client since {{since}}"
+    },
+    "contactRow": {
+      "flexDirection": "row",
+      "gap": 8,
+      "marginTop": 12,
+      "children": ["callButton", "textButton", "emailButton"]
+    },
+    "contactButton": {
+      "flex": 1,
+      "height": 44,
+      "borderRadius": 12,
+      "background": "#F5F5F5",
+      "flexDirection": "column",
+      "alignItems": "center",
+      "justifyContent": "center",
+      "gap": 2,
+      "icon": { "size": 16, "color": "#E3A9A0" },
+      "label": { "style": "label-small", "color": "#1A1A1A" },
+      "accessibilityRole": "link"
+    },
+    "callButton": {
+      "extends": "contactButton",
+      "icon": { "name": "phone" },
+      "label": { "content": "Call" },
+      "href": "tel:{{phone}}",
+      "accessibilityLabel": "Call {{clientName}}"
+    },
+    "textButton": {
+      "extends": "contactButton",
+      "icon": { "name": "message-circle" },
+      "label": { "content": "Text" },
+      "href": "sms:{{phone}}",
+      "accessibilityLabel": "Text {{clientName}}"
+    },
+    "emailButton": {
+      "extends": "contactButton",
+      "icon": { "name": "mail" },
+      "label": { "content": "Email" },
+      "href": "mailto:{{email}}",
+      "accessibilityLabel": "Email {{clientName}}"
+    },
+    "statStrip": {
+      "flexDirection": "row",
+      "gap": 8,
+      "marginTop": 12,
+      "children": ["visitsCard", "ltvCard", "lastVisitCard", "noShowsCard"]
+    },
+    "statCard": {
+      "flex": 1,
+      "background": "#FFFFFF",
+      "borderRadius": 16,
+      "padding": 10,
+      "border": { "width": 1, "color": "#E5E0D1" },
+      "value": { "style": "body", "fontWeight": 600, "color": "#1A1A1A" },
+      "label": { "style": "body-small", "color": "#6B6B6B", "marginTop": 2 },
+      "accessibilityLabel": "{{label}}: {{value}}"
+    },
+    "noShowsCard": {
+      "extends": "statCard",
+      "warningCondition": "noShows > 0",
+      "warningStyle": {
+        "value": { "color": "#FF9800" },
+        "background": "rgba(255,152,0,0.06)"
+      }
+    }
+  },
+  "states": {
+    "default": {},
+    "loading": {
+      "description": "Full shimmer replacing avatar, name, badge row, contact row, and stat strip",
+      "shimmer": {
+        "avatar":      { "size": "80×80", "borderRadius": 9999 },
+        "nameLine":    { "height": 28, "width": "60%", "borderRadius": 8 },
+        "badgeLine":   { "height": 20, "width": "30%", "borderRadius": 9999 },
+        "contactRow":  { "height": 44, "width": "100%", "borderRadius": 12 },
+        "statCards":   { "count": 4, "height": 52, "borderRadius": 16 }
+      },
+      "shimmerStyle": { "background": "#F0EBE1", "animateTo": "#E5E0D1" },
+      "accessibilityLabel": "Loading client profile"
+    }
+  },
+  "accessibility": {
+    "contactButtons": { "role": "link" },
+    "vipOverlay": { "role": "image", "label": "VIP client" },
+    "statCards": { "label": "{{label}}: {{value}}" },
+    "shimmer": { "label": "Loading client profile" }
+  },
+  "props": {
+    "clientName": "string — required",
+    "initials": "string — required",
+    "tier": "Bronze | Silver | Gold | Platinum — required",
+    "isVIP": "boolean — required",
+    "phone": "string — required",
+    "email": "string — required",
+    "since": "string (MM/DD/YYYY) — required",
+    "visits": "number — required",
+    "lifetimeValue": "number (USD) — required",
+    "lastVisit": "string (MM/DD/YYYY) — required",
+    "noShows": "number — required",
+    "loading": "boolean — optional"
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "component": "WaitlistPriorityDragList",
+  "props": {
+    "entries": { "type": "array", "required": true },
+    "onReorder": { "type": "function", "required": true },
+    "onConvert": { "type": "function", "required": true },
+    "onRemove": { "type": "function", "required": true }
+  },
+  "variantNames": ["default", "reordering"],
+  "layout": {
+    "row": {
+      "height": 72,
+      "background": "surface",
+      "divider": { "width": 1, "color": "border" },
+      "dragHandle": {
+        "icon": true,
+        "size": "components.waitlistDragHandleSize",
+        "color": "muted",
+        "position": "left",
+        "touchTarget": "44×44",
+        "longPress": "triggers drag"
+      },
+      "priorityBadge": {
+        "dot": { "size": 8, "color": "waitlist.[priority]" },
+        "label": { "variant": "label-small", "background": "waitlist.[priority]Bg", "radius": "small", "padding": "4×8" }
+      },
+      "clientAvatar": { "size": 36, "radius": "full" },
+      "textBlock": {
+        "flex": 1,
+        "clientName": { "variant": "body", "weight": "bold" },
+        "requestedService": { "type": "category-pill" },
+        "requestedWindow": { "type": "chip", "variant": "label-small" }
+      },
+      "joinedDate": { "variant": "label-small", "color": "muted", "format": "Joined MM/DD/YYYY", "position": "right" },
+      "statusPill": { "background": "waitlist.[status]Bg", "color": "waitlist.[status]" },
+      "kebabMenu": {
+        "options": [
+          { "label": "strings.waitlist.action.convert", "action": "convertToBooking" },
+          { "label": "strings.waitlist.action.editPriority", "action": "editPriority" },
+          { "label": "strings.waitlist.action.remove", "variant": "destructive" }
+        ]
+      }
+    }
+  },
+  "variants": {
+    "reordering": {
+      "activeRow": { "elevation": 8, "shadowBlur": "16px rgba(0,0,0,0.12)", "background": "surface", "scale": 1.02 },
+      "otherRows": { "opacity": 0.7 },
+      "originSlot": { "border": { "width": 1, "style": "dashed", "color": "border" }, "background": "muted 10%" },
+      "snapAnimation": { "type": "spring", "duration": "150ms", "easing": "ease-out", "trigger": "on drop" },
+      "reduceMotion": { "instantReorder": true, "noScale": true, "noShadow": true, "noSpring": true }
+    }
+  },
+  "accessibility": {
+    "dragHandle": {
+      "accessibilityLabel": "strings.waitlist.dragHandleLabel",
+      "accessibilityHint": "strings.waitlist.dragHandleHint"
+    },
+    "row": { "accessibilityLabel": "{clientName}, {priority} priority, {service}, joined {date}" }
+  },
+  "tokens": ["waitlist.*", "surface", "border", "primary", "muted", "foreground"]
+}

@@ -1,0 +1,127 @@
+{
+  "component": "ForceBookReasonForm",
+  "props": {
+    "reason": {
+      "type": "string",
+      "required": true
+    },
+    "onReasonChange": {
+      "type": "function",
+      "required": true
+    },
+    "notes": {
+      "type": "string",
+      "required": true
+    },
+    "onNotesChange": {
+      "type": "function",
+      "required": true
+    },
+    "acknowledged": {
+      "type": "boolean",
+      "required": true
+    },
+    "onAcknowledgeChange": {
+      "type": "function",
+      "required": true
+    },
+    "isValid": {
+      "type": "boolean",
+      "required": true,
+      "description": "reason && notes.length >= 20 && acknowledged"
+    }
+  },
+  "variants": [
+    "default",
+    "error"
+  ],
+  "layout": {
+    "warningBanner": {
+      "background": "error 10%",
+      "borderLeft": "4px solid error",
+      "minHeight": 48,
+      "icon": {
+        "name": "warning",
+        "size": 20,
+        "color": "error"
+      },
+      "text": "strings.forceBook.warningBanner"
+    },
+    "reasonDropdown": {
+      "required": true,
+      "label": "strings.forceBook.reasonLabel",
+      "options": [
+        {
+          "value": "reasonVIP",
+          "label": "strings.forceBook.reasonVIP"
+        },
+        {
+          "value": "reasonEmergency",
+          "label": "strings.forceBook.reasonEmergency"
+        },
+        {
+          "value": "reasonOwnerOverride",
+          "label": "strings.forceBook.reasonOwnerOverride"
+        },
+        {
+          "value": "reasonSystemError",
+          "label": "strings.forceBook.reasonSystemError"
+        },
+        {
+          "value": "reasonOther",
+          "label": "strings.forceBook.reasonOther"
+        }
+      ],
+      "errorState": {
+        "border": "error",
+        "errorText": "below"
+      }
+    },
+    "notesTextarea": {
+      "required": true,
+      "minChars": 20,
+      "maxChars": 500,
+      "placeholder": "strings.forceBook.notesPlaceholder",
+      "counter": {
+        "format": "NN / 500",
+        "position": "right-aligned below",
+        "variant": "label-small",
+        "color": "muted"
+      },
+      "helper": {
+        "text": "strings.forceBook.notesHelper",
+        "position": "below counter",
+        "alwaysVisible": true,
+        "color": {
+          "when": "length < 20",
+          "then": "error",
+          "else": "muted"
+        }
+      }
+    },
+    "acknowledgeCheckbox": {
+      "size": 24,
+      "label": {
+        "text": "strings.forceBook.acknowledgeLabel",
+        "variant": "body-medium",
+        "weight": "bold"
+      },
+      "required": true,
+      "errorState": {
+        "borderColor": "error",
+        "labelColor": "error",
+        "animation": "shake"
+      }
+    }
+  },
+  "submitGate": {
+    "disabledWhen": "!reason || notes.length < 20 || !acknowledged"
+  },
+  "tokens": [
+    "error",
+    "primary",
+    "foreground",
+    "muted",
+    "cardBorder"
+  ]
+}

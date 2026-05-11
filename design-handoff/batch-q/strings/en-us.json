@@ -1,0 +1,280 @@
+{
+  "locale": "en-US",
+  "version": "1.0.0",
+  "strings": {
+    "reviewQueue": {
+      "screenTitle": "Review Queue",
+      "title": "Customer Reviews",
+      "exportButton": "Export",
+      "emptyMessage": "No reviews yet. Start requesting feedback from your clients.",
+      "requestReviewsCTA": "Request Reviews",
+      "status": {
+        "pending": "Pending reply",
+        "replied": "Replied",
+        "flagged": "Flagged",
+        "hidden": "Hidden"
+      },
+      "sentiment": {
+        "positive": "Positive",
+        "neutral": "Neutral",
+        "negative": "Negative"
+      },
+      "bulk": {
+        "replyWithTemplate": "Reply with template",
+        "flag": "Flag",
+        "hide": "Hide",
+        "clearSelection": "Clear selection",
+        "selected": "{N} selected"
+      },
+      "menu": {
+        "reply": "Reply",
+        "flag": "Flag review",
+        "hide": "Hide review",
+        "viewDetail": "View details"
+      }
+    },
+    "replyComposer": {
+      "screenTitle": "Reply to Review",
+      "title": "Write Your Reply",
+      "placeholder": "Write a thoughtful response to this review...",
+      "postedToast": "Reply posted successfully",
+      "saveAsDraft": "Save Draft",
+      "postReply": "Post Reply",
+      "saveAsTemplate": "Save as template",
+      "toneLabel": "AI tone suggestion:",
+      "toneApologetic": "Apologetic",
+      "toneGrateful": "Grateful",
+      "toneProfessional": "Professional",
+      "characterCount": "Character count"
+    },
+    "moderationAction": {
+      "screenTitle": "Report Review",
+      "title": "Report or Hide Review",
+      "flagForPlatform": "Flag for platform review",
+      "flagDesc": "Report to Google/Yelp for policy violation",
+      "dispute": "Dispute with documentation",
+      "disputeDesc": "Challenge factual inaccuracy with evidence",
+      "hideLocally": "Hide from public display",
+      "hideDesc": "Remove from your website and booking pages",
+      "reasonLabel": "Reason for action",
+      "reasonSpam": "Spam or fake review",
+      "reasonPolicyViolation": "Platform policy violation",
+      "reasonDefamatory": "Defamatory or false claims",
+      "reasonOther": "Other (explain below)",
+      "evidenceLabel": "Evidence or explanation",
+      "auditPreviewLabel": "This action will be logged:",
+      "submittedToast": "Moderation action submitted",
+      "submitAction": "Submit",
+      "cancel": "Cancel"
+    },
+    "reviewRequestRules": {
+      "screenTitle": "Review Request Rules",
+      "title": "Automated Review Requests",
+      "addRule": "Add Rule",
+      "savedToast": "Review request rule saved",
+      "trigger": {
+        "appointmentCompleted": "After appointment completed",
+        "checkoutComplete": "After checkout complete"
+      },
+      "channel": {
+        "email": "Email",
+        "sms": "SMS",
+        "push": "Push notification"
+      },
+      "audience": {
+        "allClients": "All clients",
+        "newOnly": "New clients only",
+        "returningOnly": "Returning clients only"
+      },
+      "freqCap": "Max {N} requests per period",
+      "delay": {
+        "hours": "Hours",
+        "days": "Days"
+      },
+      "saveRule": "Save Rule",
+      "cancel": "Cancel"
+    },
+    "reputation": {
+      "screenTitle": "Reputation Dashboard",
+      "title": "Reputation & Reviews",
+      "noDataMessage": "No review data available for this period. Start requesting reviews to see insights.",
+      "requestReviewsLink": "Set up review requests",
+      "kpi": {
+        "avgRating": "Average Rating",
+        "reviewsThisPeriod": "Reviews This Period",
+        "responseRate": "Response Rate",
+        "sentimentBreakdown": "Sentiment Breakdown"
+      },
+      "chart": {
+        "trendTitle": "Rating Trend",
+        "positiveKeywords": "Top Positive Keywords",
+        "negativeKeywords": "Top Negative Keywords",
+        "ratingDistribution": "Rating Distribution"
+      },
+      "sentiment": {
+        "positive": "Positive",
+        "neutral": "Neutral",
+        "negative": "Negative"
+      }
+    },
+    "inboxTriage": {
+      "screenTitle": "Message Inbox",
+      "filter": {
+        "assignedToMe": "Assigned to me",
+        "unassigned": "Unassigned",
+        "myTeam": "My team",
+        "all": "All messages"
+      },
+      "emptyFilter": "No messages match your current filters",
+      "compose": { "placeholder": "Type your message..." },
+      "bulkAssign": "Assign",
+      "bulkArchive": "Archive",
+      "bulkMarkRead": "Mark read",
+      "bulkSnooze": "Snooze",
+      "bulkClearSelection": "Clear selection",
+      "status": {
+        "assigned": "Assigned",
+        "unassigned": "Unassigned",
+        "snoozed": "Snoozed",
+        "archived": "Archived"
+      }
+    },
+    "threadAssignment": {
+      "screenTitle": "Assign Conversation",
+      "title": "Assign to Team Member",
+      "searchPlaceholder": "Search staff...",
+      "messageLabel": "Optional message",
+      "messagePlaceholder": "Add a note for the assignee...",
+      "assignedToast": "Conversation assigned successfully",
+      "assign": "Assign",
+      "cancel": "Cancel"
+    },
+    "cannedReplies": {
+      "screenTitle": "Saved Replies",
+      "title": "Canned Replies",
+      "addReply": "New Reply",
+      "savedToast": "Reply template saved",
+      "nameLabel": "Template name",
+      "bodyLabel": "Reply text",
+      "bodyPlaceholder": "Write your template message...",
+      "insertButton": "Insert",
+      "deleteConfirm": "Delete this template?"
+    },
+    "cannedReplyEditor": {
+      "nameLabel": "Template name",
+      "bodyPlaceholder": "Write your template message here. Use {{variables}} for personalization.",
+      "tagPlaceholder": "Add tags (press Enter)",
+      "saveButton": "Save Template",
+      "cancelButton": "Cancel",
+      "deleteButton": "Delete Template"
+    },
+    "autoReply": {
+      "screenTitle": "Auto-Reply Schedule",
+      "title": "Auto-Reply Settings",
+      "globalEnableLabel": "Enable auto-replies",
+      "holidayListLabel": "Holiday closures",
+      "awayMessageLabel": "Away message",
+      "awayMessagePlaceholder": "We're currently closed. We'll respond when we're back!",
+      "applyAllDays": "Apply to all days",
+      "savedToast": "Auto-reply schedule saved",
+      "save": "Save Schedule",
+      "previewLabel": "Preview:"
+    },
+    "blockFromInbox": {
+      "blockTitle": "Block client",
+      "blockDesc": "Prevent this client from sending new messages",
+      "blockScope": {
+        "thisLocation": "This location only",
+        "allLocations": "All locations"
+      },
+      "blockButton": "Block Client",
+      "reportTitle": "Report to platform",
+      "reportDesc": "Flag this conversation for review by our support team",
+      "reason": {
+        "spam": "Spam messages",
+        "harassment": "Harassment or threats",
+        "inappropriate": "Inappropriate content",
+        "other": "Other"
+      },
+      "evidenceLabel": "Additional details",
+      "submitReport": "Submit Report",
+      "blockedToast": "Client blocked successfully",
+      "reportedToast": "Report submitted for review"
+    },
+    "messageArchive": {
+      "screenTitle": "Message Archive",
+      "title": "Archived Messages",
+      "searchPlaceholder": "Search archived messages...",
+      "noResultsMessage": "No archived messages found",
+      "restoreToInbox": "Restore to inbox",
+      "filter": {
+        "sender": "Filter by sender",
+        "hasAttachments": "Has attachments"
+      }
+    },
+    "waitlist": {
+      "screenTitle": "Waitlist",
+      "title": "Waitlist Management",
+      "exportButton": "Export",
+      "emptyMessage": "No one on the waitlist right now",
+      "addToWaitlistLink": "Add to waitlist",
+      "priority": {
+        "high": "High priority",
+        "medium": "Medium priority",
+        "low": "Low priority"
+      },
+      "status": {
+        "expired": "Expired",
+        "converted": "Converted",
+        "active": "Active"
+      },
+      "dragHandleLabel": "Reorder priority",
+      "dragHandleHint": "Long press and drag to change priority order",
+      "action": {
+        "convert": "Convert to booking",
+        "editPriority": "Change priority",
+        "remove": "Remove from waitlist"
+      }
+    },
+    "convertWaitlist": {
+      "screenTitle": "Convert to Booking",
+      "title": "Create Booking from Waitlist",
+      "suggestedLabel": "Suggested time slots",
+      "noSlotBanner": "No matching slots available. Create a manual booking or adjust the requested time window.",
+      "notifyLabel": "Notify client",
+      "channel": {
+        "sms": "Text message",
+        "email": "Email",
+        "push": "Push notification"
+      },
+      "successToast": "Waitlist entry converted to booking",
+      "confirm": "Create Booking",
+      "cancel": "Cancel"
+    },
+    "waitlistPolicies": {
+      "screenTitle": "Waitlist Policies",
+      "title": "Waitlist Rules & Automation",
+      "maxTimeLabel": "Maximum time on waitlist",
+      "autoExpireLabel": "Auto-expire entries",
+      "autoExpireHelp": "Automatically mark entries as expired after this period",
+      "initialInviteLabel": "Notify within",
+      "reminderFrequencyLabel": "Send reminders every",
+      "maxRemindersLabel": "Maximum reminders",
+      "responseWindowLabel": "Client response window",
+      "responseWindowHelp": "How long clients have to respond before moving to next person",
+      "expiredAction": {
+        "keep": "Keep as expired (for reporting)",
+        "remove": "Remove from list automatically"
+      },
+      "saveAsDraft": "Save Draft",
+      "publish": "Publish Policies",
+      "publishedBadge": "Published"
+    },
+    "assignmentPicker": {
+      "searchPlaceholder": "Search team members...",
+      "messageLabel": "Message to assignee (optional)",
+      "assign": "Assign",
+      "cancel": "Cancel"
+    }
+  }
+}

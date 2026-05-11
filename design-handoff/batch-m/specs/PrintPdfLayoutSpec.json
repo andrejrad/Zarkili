@@ -1,0 +1,257 @@
+{
+  "schemaVersion": "1.0.0",
+  "screenId": "M.19",
+  "screenName": "PrintPdfLayoutSpec",
+  "route": null,
+  "designSystem": "Zarkili v1.0.0",
+  "device": "US Letter 8.5x11 portrait",
+  "engineeringStatus": "designed",
+  "description": "Print-canvas layout spec for generating invoice, payout statement, and refund receipt PDFs via react-pdf.",
+  "layout": {
+    "type": "print-canvas",
+    "padding": {
+      "top": 48,
+      "right": 48,
+      "bottom": 48,
+      "left": 48
+    },
+    "maxContentWidth": 720,
+    "gap": 0
+  },
+  "sections": [
+    {
+      "id": "print-template-invoice",
+      "type": "print-template",
+      "title": "Invoice",
+      "component": "MC.10",
+      "templateKey": "invoice",
+      "header": {
+        "logoSlot": {
+          "width": 120,
+          "height": 40,
+          "align": "left"
+        },
+        "docTitle": "Invoice",
+        "docTitleStyle": "heading-2",
+        "docTitleAlign": "right",
+        "invoiceNumber": {
+          "style": "label-small",
+          "align": "right"
+        },
+        "issueDate": {
+          "format": "MM/DD/YYYY",
+          "style": "label-small",
+          "align": "right"
+        },
+        "dueDate": {
+          "format": "MM/DD/YYYY",
+          "style": "label-small",
+          "align": "right"
+        }
+      },
+      "billTo": {
+        "label": {
+          "text": "Bill to",
+          "style": "label-small",
+          "token": "admin.text.muted"
+        },
+        "clientName": {
+          "style": "body"
+        },
+        "clientAddress": {
+          "style": "body-small"
+        }
+      },
+      "lineItemsTable": {
+        "columns": [
+          {
+            "key": "description",
+            "label": "Description",
+            "type": "text",
+            "flex": true
+          },
+          {
+            "key": "qty",
+            "label": "Qty",
+            "type": "integer",
+            "align": "right",
+            "width": 60
+          },
+          {
+            "key": "unitPrice",
+            "label": "Unit price",
+            "type": "currency",
+            "align": "right",
+            "width": 100
+          },
+          {
+            "key": "total",
+            "label": "Total",
+            "type": "currency",
+            "align": "right",
+            "width": 100
+          }
+        ],
+        "totalsBlock": [
+          "subtotal",
+          "tax",
+          {
+            "key": "total",
+            "style": "heading-4"
+          }
+        ]
+      },
+      "footer": {
+        "tenantLegalName": {
+          "style": "body-small",
+          "align": "left"
+        },
+        "merchantId": {
+          "style": "body-small",
+          "align": "center"
+        },
+        "pagination": {
+          "template": "Page {{n}} of {{m}}",
+          "style": "body-small",
+          "align": "right"
+        },
+        "hairlineRuleAbove": true
+      }
+    },
+    {
+      "id": "print-template-payout-statement",
+      "type": "print-template",
+      "title": "Payout Statement",
+      "component": "MC.10",
+      "templateKey": "payout-statement",
+      "header": {
+        "logoSlot": {
+          "width": 120,
+          "height": 40,
+          "align": "left"
+        },
+        "docTitle": "Payout Statement",
+        "docTitleStyle": "heading-2",
+        "docTitleAlign": "right",
+        "period": {
+          "template": "{{startDate}}-{{endDate}}",
+          "style": "label-small"
+        }
+      },
+      "summaryBlock": {
+        "rows": [
+          {
+            "label": "Gross payout",
+            "key": "grossPayout",
+            "type": "currency"
+          },
+          {
+            "label": "Stripe fees",
+            "key": "stripeFees",
+            "type": "currency"
+          },
+          {
+            "label": "Net payout",
+            "key": "netPayout",
+            "type": "currency",
+            "style": "heading-4"
+          }
+        ]
+      },
+      "transactionTable": {
+        "columns": [
+          {
+            "key": "date",
+            "label": "Date",
+            "type": "date",
+            "format": "MM/DD/YYYY"
+          },
+          {
+            "key": "description",
+            "label": "Description",
+            "type": "text",
+            "flex": true
+          },
+          {
+            "key": "amount",
+            "label": "Amount",
+            "type": "currency",
+            "align": "right"
+          }
+        ]
+      },
+      "footer": {
+        "tenantLegalName": {
+          "style": "body-small",
+          "align": "left"
+        },
+        "merchantId": {
+          "style": "body-small",
+          "align": "center"
+        },
+        "pagination": {
+          "template": "Page {{n}} of {{m}}",
+          "style": "body-small",
+          "align": "right"
+        },
+        "hairlineRuleAbove": true
+      }
+    },
+    {
+      "id": "print-template-refund-receipt",
+      "type": "print-template",
+      "title": "Refund Confirmation",
+      "component": "MC.10",
+      "templateKey": "refund-receipt",
+      "header": {
+        "logoSlot": {
+          "width": 120,
+          "height": 40,
+          "align": "left"
+        },
+        "docTitle": "Refund Confirmation",
+        "docTitleStyle": "heading-2",
+        "docTitleAlign": "right",
+        "originalInvoiceRef": {
+          "style": "label-small",
+          "align": "right"
+        }
+      },
+      "heroAmount": {
+        "template": "{{refundAmount}} refunded",
+        "style": "heading-1",
+        "align": "center"
+      },
+      "reason": {
+        "template": "Reason: {{refundReason}}",
+        "style": "body"
+      },
+      "footer": {
+        "tenantLegalName": {
+          "style": "body-small",
+          "align": "left"
+        },
+        "merchantId": {
+          "style": "body-small",
+          "align": "center"
+        },
+        "pagination": {
+          "template": "Page {{n}} of {{m}}",
+          "style": "body-small",
+          "align": "right"
+        },
+        "hairlineRuleAbove": true
+      }
+    }
+  ],
+  "stateNames": [
+    "preview",
+    "downloading-pdf",
+    "downloaded",
+    "error"
+  ],
+  "accessibility": {
+    "screenReaderLabel": "Printable {{documentTitle}}",
+    "role": "document"
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "screen": "PlatformAuditLogScreen",
+  "route": "SuperAdminAuditLog",
+  "device": { "primary": "Desktop 1280+", "secondary": "iPad 1024×768" },
+  "stateNames": ["default", "detailPanel", "error"],
+  "layout": {
+    "header": {
+      "title": { "text": "Platform Audit Log", "variant": "heading-2" },
+      "exportCta": {
+        "label": "strings.platformAuditLog.exportCsvCta",
+        "type": "button",
+        "variant": "outlined",
+        "icon": "download",
+        "position": "right"
+      },
+      "filters": {
+        "type": "filterRow",
+        "filters": [
+          { "key": "actor", "type": "autocomplete", "placeholder": "Filter by actor..." },
+          { "key": "action", "type": "select", "options": "dynamic from action enum" },
+          { "key": "resourceType", "type": "select", "options": ["tenant", "user", "plan", "feature-flag", "billing", "system"] },
+          { "key": "dateRange", "type": "datePicker", "range": true },
+          { "key": "severity", "type": "filterChip", "options": ["info", "warn", "critical"] }
+        ]
+      }
+    },
+    "auditTable": {
+      "virtualScroll": true,
+      "stickyHeader": true,
+      "columns": [
+        { "key": "timestamp", "format": "ISO8601 local", "font": "mono", "variant": "caption", "width": 180 },
+        { "key": "actor", "type": "userPill", "showAvatar": true },
+        { "key": "actorRole", "type": "pill", "variant": "caption" },
+        { "key": "action", "variant": "body-medium", "font": "mono" },
+        { "key": "resourceType", "variant": "caption", "color": "on-surface-variant" },
+        { "key": "resourceId", "variant": "caption", "font": "mono", "maxChars": 24 },
+        { "key": "severity", "type": "pill", "values": ["info", "warn", "critical"], "colors": { "info": "surface-variant", "warn": "warning", "critical": "error" } },
+        { "key": "ipAddress", "font": "mono", "variant": "caption" }
+      ],
+      "rowAction": { "type": "expand-detail-panel" }
+    },
+    "detailPanel": {
+      "position": "right",
+      "width": 480,
+      "fields": [
+        { "key": "timestamp", "label": "Timestamp", "font": "mono" },
+        { "key": "actor", "label": "Actor" },
+        { "key": "role", "label": "Role" },
+        { "key": "action", "label": "Action", "font": "mono" },
+        { "key": "resource", "label": "Resource" },
+        { "key": "ipAddress", "label": "IP", "font": "mono" },
+        { "key": "userAgent", "label": "User agent", "maxLines": 2 },
+        { "key": "before", "label": "Before", "type": "codeBlock", "language": "json" },
+        { "key": "after", "label": "After", "type": "codeBlock", "language": "json" }
+      ]
+    }
+  },
+  "states": {
+    "detailPanel": {
+      "detailPanel": { "open": true }
+    },
+    "error": {
+      "inlineBanner": {
+        "background": "error 10%",
+        "borderLeft": { "width": 4, "color": "error" },
+        "message": "strings.platformAuditLog.errorMessage"
+      }
+    }
+  }
+}

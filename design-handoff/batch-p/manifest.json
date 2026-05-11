@@ -1,0 +1,85 @@
+{
+  "batch": "P",
+  "phase": 3,
+  "title": "Client / CRM, Loyalty, Activities & Campaigns Admin",
+  "version": "1.0.0",
+  "generatedAt": "2026-05-10T00:00:00Z",
+  "designSystem": "Zarkili v1.0.0",
+  "scope": {
+    "screens": 20,
+    "components": 8,
+    "strings": 1,
+    "tokenDeltas": 2
+  },
+  "dependencies": {
+    "existingComponents": [
+      "badge",
+      "bottom-tab-item",
+      "calendar-grid",
+      "category-pill",
+      "chip",
+      "filter-button",
+      "progress-ring",
+      "queue-card",
+      "reward-card",
+      "search-bar",
+      "service-card",
+      "staff-calendar-grid",
+      "tier-badge",
+      "time-slot-chip",
+      "ai-suggestion-card",
+      "ai-chat-composer",
+      "client-header",
+      "photo-upload-tile",
+      "rating-selector"
+    ],
+    "newComponents": [
+      "segment-filter-row",
+      "merge-conflict-resolver",
+      "channel-preview-tile",
+      "ab-variant-card",
+      "campaign-status-badge",
+      "audit-note-row",
+      "compliance-check-row",
+      "variable-picker-toolbar"
+    ]
+  },
+  "screens": {
+    "crm": [
+      "ClientListScreen",
+      "ClientDetailScreen",
+      "MergeClientsScreen",
+      "BlockClientScreen",
+      "SegmentBuilderScreen",
+      "GdprExportScreen",
+      "ClientListFiltersScreen"
+    ],
+    "loyalty": [
+      "LoyaltyConfigScreen",
+      "RewardCatalogEditorScreen",
+      "ManualPointAdjustmentScreen",
+      "LoyaltyPerformanceDashboardScreen"
+    ],
+    "activity": [
+      "ActivityCatalogScreen"
+    ],
+    "campaigns": [
+      "CampaignListScreen",
+      "CampaignCreateScreen",
+      "MultiChannelTemplateEditorScreen",
+      "AbVariantScreen",
+      "AiContentApprovalQueueScreen",
+      "PreSendComplianceScreen",
+      "CampaignPerformanceDashboardScreen",
+      "TransactionalTemplateEditorScreen"
+    ]
+  },
+  "notes": [
+    "All screens extend locked Zarkili design system",
+    "Admin density pattern enforced from Batch M",
+    "All copy externalized to en-us.json",
+    "RTL and dark mode deferred per design guidance",
+    "All touch targets minimum 44x44px",
+    "WCAG 2.1 AA compliance enforced"
+  ]
+}

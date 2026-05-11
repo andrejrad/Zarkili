@@ -1,0 +1,56 @@
+{
+  "delta": "colors-batch-s",
+  "tokens": {
+    "impersonation": {
+      "bannerBg": { "value": "#FFF3E0", "token": "impersonation.bannerBg" },
+      "bannerBorder": { "value": "#FF9800", "token": "impersonation.bannerBorder" },
+      "bannerText": { "value": "#6B2D00", "token": "impersonation.bannerText" },
+      "timerText": { "value": "#FF9800", "token": "impersonation.timerText" }
+    },
+    "platform": {
+      "healthGreen": { "value": "#4CAF50", "token": "platform.healthGreen" },
+      "healthGreenBg": { "value": "#E8F5E9", "token": "platform.healthGreenBg" },
+      "healthAmber": { "value": "#FF9800", "token": "platform.healthAmber" },
+      "healthAmberBg": { "value": "#FFF3E0", "token": "platform.healthAmberBg" },
+      "healthRed": { "value": "#F44336", "token": "platform.healthRed" },
+      "healthRedBg": { "value": "#FFEBEE", "token": "platform.healthRedBg" },
+      "healthGrey": { "value": "#9CA3AF", "token": "platform.healthGrey" },
+      "healthGreyBg": { "value": "#F5F5F5", "token": "platform.healthGreyBg" }
+    },
+    "incident": {
+      "critical": { "value": "#B71C1C", "token": "incident.critical" },
+      "criticalBg": { "value": "#FFEBEE", "token": "incident.criticalBg" },
+      "major": { "value": "#E65100", "token": "incident.major" },
+      "majorBg": { "value": "#FFF3E0", "token": "incident.majorBg" },
+      "minor": { "value": "#F9A825", "token": "incident.minor" },
+      "minorBg": { "value": "#FFFDE7", "token": "incident.minorBg" },
+      "resolved": { "value": "#2E7D32", "token": "incident.resolved" },
+      "resolvedBg": { "value": "#E8F5E9", "token": "incident.resolvedBg" }
+    },
+    "migration": {
+      "stepPending": { "value": "#9CA3AF", "token": "migration.stepPending" },
+      "stepRunning": { "value": "#E3A9A0", "token": "migration.stepRunning" },
+      "stepDone": { "value": "#4CAF50", "token": "migration.stepDone" },
+      "stepFailed": { "value": "#F44336", "token": "migration.stepFailed" },
+      "stepConnector": { "value": "#E5E0D1", "token": "migration.stepConnector" },
+      "logBg": { "value": "#1E1E1E", "token": "migration.logBg" },
+      "logText": { "value": "#D4D4D4", "token": "migration.logText" }
+    },
+    "flag": {
+      "enabled": { "value": "#4CAF50", "token": "flag.enabled" },
+      "enabledBg": { "value": "#E8F5E9", "token": "flag.enabledBg" },
+      "disabled": { "value": "#9CA3AF", "token": "flag.disabled" },
+      "disabledBg": { "value": "#F5F5F5", "token": "flag.disabledBg" },
+      "partial": { "value": "#FF9800", "token": "flag.partial" },
+      "partialBg": { "value": "#FFF3E0", "token": "flag.partialBg" }
+    },
+    "security": {
+      "alert": { "value": "#F44336", "token": "security.alert" },
+      "alertBg": { "value": "#FFEBEE", "token": "security.alertBg" },
+      "suspicious": { "value": "#FF9800", "token": "security.suspicious" },
+      "suspiciousBg": { "value": "#FFF3E0", "token": "security.suspiciousBg" },
+      "blocked": { "value": "#9CA3AF", "token": "security.blocked" },
+      "blockedBg": { "value": "#F5F5F5", "token": "security.blockedBg" }
+    }
+  }
+}

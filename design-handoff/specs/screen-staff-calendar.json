@@ -1,0 +1,965 @@
+{
+  "source": {
+    "batch": "G",
+    "prompt": "G.2",
+    "figmaFrames": [
+      "G-2-default",
+      "G-2-empty",
+      "G-2-conflict",
+      "G-2-loading",
+      "G-2-error"
+    ],
+    "lockedAt": "2026-04-28",
+    "primaryDevice": "iPad (768×1024)",
+    "fallbackDevice": "iPhone 14 (390×844)"
+  },
+  "screen": "StaffCalendar",
+  "version": "1.0.0",
+  "device": {
+    "primary": {
+      "name": "iPad",
+      "width": 768,
+      "height": 1024,
+      "safeArea": {
+        "top": 24,
+        "bottom": 24
+      }
+    },
+    "fallback": {
+      "name": "iPhone 14",
+      "width": 390,
+      "height": 844,
+      "safeArea": {
+        "top": 47,
+        "bottom": 34
+      }
+    }
+  },
+  "description": "Staff calendar interface for viewing and managing daily/weekly appointments with time grid",
+  "userPersona": "Authenticated staff member (stylist/technician)",
+  "userJob": "View schedule, manage appointments, identify conflicts, book new slots",
+  "states": {
+    "default": {
+      "description": "Normal day with appointments scheduled across various time slots"
+    },
+    "empty": {
+      "description": "No appointments scheduled, shows encouragement and add CTA"
+    },
+    "conflict": {
+      "description": "Overlapping appointments detected, red outline and alert banner"
+    },
+    "loading": {
+      "description": "Loading appointments, skeleton blocks in grid"
+    },
+    "error": {
+      "description": "Failed to load schedule, retry option"
+    }
+  },
+  "layout": {
+    "iPad": {
+      "background": "#F2EDDD",
+      "scrollable": true,
+      "sections": [
+        {
+          "name": "header",
+          "type": "sticky",
+          "height": 80,
+          "paddingHorizontal": 24,
+          "background": "#F2EDDD",
+          "borderBottom": {
+            "width": 1,
+            "color": "#E5E0D1"
+          }
+        },
+        {
+          "name": "calendarGrid",
+          "type": "scrollable",
+          "layout": "two-column",
+          "leftColumn": {
+            "name": "timeColumn",
+            "width": 56,
+            "background": "#FFFFFF",
+            "borderRight": {
+              "width": 1,
+              "color": "#E5E0D1"
+            }
+          },
+          "rightColumn": {
+            "name": "appointmentArea",
+            "flex": 1,
+            "background": "#FFFFFF",
+            "position": "relative"
+          }
+        },
+        {
+          "name": "peekPane",
+          "type": "overlay",
+          "width": 280,
+          "position": "absolute",
+          "right": 0,
+          "height": "100%",
+          "background": "#FFFFFF",
+          "borderLeft": {
+            "width": 1,
+            "color": "#E5E0D1"
+          },
+          "visible": "{{onAppointmentTap}}"
+        },
+        {
+          "name": "toolbar",
+          "type": "fixed",
+          "height": 72,
+          "paddingHorizontal": 24,
+          "background": "#FFFFFF",
+          "borderTop": {
+            "width": 1,
+            "color": "#E5E0D1"
+          },
+          "bottom": 0
+        }
+      ]
+    },
+    "iPhone": {
+      "background": "#F2EDDD",
+      "scrollable": true,
+      "viewMode": "day-only",
+      "peekPane": "bottom-sheet-modal"
+    }
+  },
+  "components": {
+    "header": {
+      "iPad": {
+        "height": 80,
+        "paddingHorizontal": 24,
+        "structure": {
+          "flexDirection": "row",
+          "justifyContent": "space-between",
+          "alignItems": "center"
+        },
+        "leftSection": {
+          "flexDirection": "row",
+          "alignItems": "center",
+          "gap": 12
+        },
+        "todayButton": {
+          "paddingHorizontal": 12,
+          "paddingVertical": 6,
+          "borderRadius": 8,
+          "border": {
+            "width": 1,
+            "color": "#E5E0D1"
+          },
+          "background": "#FFFFFF",
+          "label": {
+            "content": "Today",
+            "style": "label-small",
+            "color": "#1A1A1A"
+          },
+          "onTap": "jumpToToday",
+          "accessibility": {
+            "role": "button",
+            "label": "Jump to today"
+          }
+        },
+        "dateDisplay": {
+          "style": "heading-3",
+          "color": "#1A1A1A",
+          "format": "dddd, MMMM D"
+        },
+        "navButtons": {
+          "flexDirection": "row",
+          "gap": 8,
+          "prevButton": {
+            "icon": "chevron-left",
+            "size": 24,
+            "color": "#1A1A1A",
+            "touchTarget": 44,
+            "accessibilityLabel": "Previous day"
+          },
+          "nextButton": {
+            "icon": "chevron-right",
+            "size": 24,
+            "color": "#1A1A1A",
+            "touchTarget": 44,
+            "accessibilityLabel": "Next day"
+          }
+        },
+        "viewToggle": {
+          "width": 160,
+          "height": 40,
+          "borderRadius": 12,
+          "background": "#FFFFFF",
+          "border": {
+            "width": 1,
+            "color": "#E5E0D1"
+          },
+          "segments": [
+            {
+              "id": "day",
+              "label": "Day"
+            },
+            {
+              "id": "week",
+              "label": "Week"
+            }
+          ],
+          "selectedSegment": {
+            "background": "#E3A9A0",
+            "label": {
+              "color": "#FFFFFF"
+            }
+          },
+          "unselectedSegment": {
+            "background": "transparent",
+            "label": {
+              "color": "#6B6B6B"
+            }
+          }
+        }
+      },
+      "iPhone": {
+        "height": 56,
+        "viewToggle": "hidden"
+      }
+    },
+    "timeColumn": {
+      "width": {
+        "iPad": 56,
+        "iPhone": 48
+      },
+      "background": "#FFFFFF",
+      "borderRight": {
+        "width": 1,
+        "color": "#E5E0D1"
+      },
+      "timeRange": {
+        "start": "5:00 AM",
+        "end": "10:00 PM",
+        "increment": 30,
+        "unit": "minutes"
+      },
+      "rowHeight": 64,
+      "hourLabels": {
+        "style": "body-small",
+        "color": "#6B6B6B",
+        "format": "h A",
+        "position": "top-aligned",
+        "examples": ["5 AM", "6 AM", "7 AM", "8 AM", "9 AM", "10 AM", "11 AM", "12 PM", "1 PM", "2 PM", "3 PM", "4 PM", "5 PM", "6 PM", "7 PM", "8 PM", "9 PM", "10 PM"]
+      },
+      "totalHeight": "34 slots × 64px = 2176px"
+    },
+    "appointmentArea": {
+      "flex": 1,
+      "background": "#FFFFFF",
+      "position": "relative",
+      "gridLines": {
+        "halfHour": {
+          "height": 1,
+          "color": "#F5F5F5",
+          "interval": 64
+        },
+        "hour": {
+          "height": 1,
+          "color": "#E5E0D1",
+          "interval": 128
+        }
+      },
+      "scrollBehavior": {
+        "vertical": true,
+        "initialScroll": "current-time-minus-2-hours"
+      }
+    },
+    "nowLine": {
+      "position": "absolute",
+      "width": "100%",
+      "height": 2,
+      "background": "#E3A9A0",
+      "zIndex": 10,
+      "topPosition": "{{calculateFromCurrentTime}}",
+      "indicator": {
+        "circle": {
+          "size": 8,
+          "background": "#E3A9A0",
+          "position": "left"
+        },
+        "timeLabel": {
+          "style": "label-small",
+          "background": "#E3A9A0",
+          "color": "#FFFFFF",
+          "paddingHorizontal": 6,
+          "paddingVertical": 2,
+          "borderRadius": 4,
+          "position": "left",
+          "marginLeft": 4,
+          "format": "h:mm A"
+        }
+      },
+      "updateInterval": "1 minute"
+    },
+    "appointmentBlock": {
+      "position": "absolute",
+      "width": {
+        "iPad": "calc(100% - 32px)",
+        "iPhone": "calc(100% - 16px)"
+      },
+      "marginHorizontal": {
+        "iPad": 16,
+        "iPhone": 8
+      },
+      "borderRadius": 12,
+      "padding": 12,
+      "structure": {
+        "borderLeft": {
+          "width": 4,
+          "color": "{{categoryColor}}"
+        },
+        "border": {
+          "width": 1,
+          "color": "{{categoryColor}}"
+        },
+        "background": "{{categoryColorAlpha10}}"
+      },
+      "content": {
+        "time": {
+          "style": "label-small",
+          "fontWeight": 500,
+          "color": "#1A1A1A",
+          "format": "h:mm A"
+        },
+        "client": {
+          "style": "body",
+          "color": "#1A1A1A",
+          "marginTop": 4
+        },
+        "service": {
+          "style": "body-small",
+          "color": "#6B6B6B",
+          "marginTop": 2
+        },
+        "duration": {
+          "style": "body-small",
+          "color": "#6B6B6B",
+          "format": "{{hours}}h {{minutes}}m"
+        }
+      },
+      "dragHandles": {
+        "top": {
+          "height": 4,
+          "width": "100%",
+          "cursor": "ns-resize",
+          "hoverIndicator": {
+            "visible": true,
+            "content": "3 dots",
+            "color": "#6B6B6B"
+          }
+        },
+        "bottom": {
+          "height": 4,
+          "width": "100%",
+          "cursor": "ns-resize",
+          "hoverIndicator": {
+            "visible": true,
+            "content": "3 dots",
+            "color": "#6B6B6B"
+          }
+        }
+      },
+      "states": {
+        "default": {
+          "border": {
+            "width": 1
+          }
+        },
+        "hover": {
+          "cursor": "pointer",
+          "opacity": 0.9
+        },
+        "selected": {
+          "border": {
+            "width": 2,
+            "color": "#1A1A1A"
+          }
+        },
+        "conflict": {
+          "border": {
+            "width": 2,
+            "color": "#F44336"
+          },
+          "background": "rgba(244, 67, 54, 0.05)",
+          "zIndex": 20
+        }
+      },
+      "positioning": {
+        "topCalculation": "((startTimeInMinutes - 5:00AM) / 30) × 64px",
+        "heightCalculation": "(durationInMinutes / 30) × 64px"
+      },
+      "categoryColors": {
+        "nails": {
+          "border": "#E3A9A0",
+          "background": "rgba(227, 169, 160, 0.1)"
+        },
+        "hair": {
+          "border": "#D1BFB3",
+          "background": "rgba(209, 191, 179, 0.1)"
+        },
+        "skin": {
+          "border": "#BBEDDA",
+          "background": "rgba(187, 237, 218, 0.1)"
+        },
+        "lashes": {
+          "border": "#2196F3",
+          "background": "rgba(33, 150, 243, 0.1)"
+        },
+        "massage": {
+          "border": "#9C27B0",
+          "background": "rgba(156, 39, 176, 0.1)"
+        },
+        "default": {
+          "border": "#6B6B6B",
+          "background": "rgba(107, 107, 107, 0.1)"
+        }
+      },
+      "accessibility": {
+        "role": "button",
+        "label": "{{time}}, {{duration}}, {{service}} for {{client}}",
+        "hint": "Tap to view details, drag edges to resize",
+        "actions": [
+          {
+            "name": "resize",
+            "label": "Adjust appointment time"
+          }
+        ]
+      }
+    },
+    "peekPane": {
+      "iPad": {
+        "width": 280,
+        "position": "absolute",
+        "right": 0,
+        "height": "100%",
+        "background": "#FFFFFF",
+        "borderLeft": {
+          "width": 1,
+          "color": "#E5E0D1"
+        },
+        "padding": 16,
+        "slideAnimation": {
+          "duration": 300,
+          "easing": "ease-out",
+          "from": "translateX(100%)",
+          "to": "translateX(0)"
+        }
+      },
+      "iPhone": {
+        "type": "bottom-sheet",
+        "height": "auto",
+        "maxHeight": "80%",
+        "borderRadiusTop": 24,
+        "padding": 16
+      },
+      "structure": {
+        "closeButton": {
+          "position": "absolute",
+          "top": 16,
+          "right": 16,
+          "icon": "x",
+          "size": 24,
+          "color": "#6B6B6B",
+          "touchTarget": 44,
+          "accessibilityLabel": "Close details"
+        },
+        "timeRange": {
+          "style": "heading-4",
+          "color": "#1A1A1A",
+          "format": "h:mm A - h:mm A"
+        },
+        "clientSection": {
+          "marginTop": 16,
+          "avatar": {
+            "size": 40,
+            "borderRadius": 9999,
+            "marginRight": 12
+          },
+          "name": {
+            "style": "body",
+            "color": "#1A1A1A"
+          },
+          "phone": {
+            "style": "body-small",
+            "color": "#6B6B6B",
+            "format": "(XXX) XXX-XXXX"
+          }
+        },
+        "serviceSection": {
+          "marginTop": 16,
+          "service": {
+            "style": "body",
+            "color": "#1A1A1A"
+          },
+          "duration": {
+            "style": "body-small",
+            "color": "#6B6B6B",
+            "format": "{{hours}} hour {{minutes}} minutes"
+          },
+          "price": {
+            "style": "body",
+            "color": "#1A1A1A",
+            "format": "${{amount}}"
+          }
+        },
+        "notesSection": {
+          "marginTop": 16,
+          "label": {
+            "content": "NOTES",
+            "style": "label-small",
+            "textTransform": "uppercase",
+            "color": "#6B6B6B"
+          },
+          "text": {
+            "style": "body-small",
+            "color": "#6B6B6B",
+            "marginTop": 4
+          }
+        },
+        "actions": {
+          "marginTop": 24,
+          "gap": 8,
+          "editButton": {
+            "width": "100%",
+            "height": 44,
+            "borderRadius": 12,
+            "background": "#F5F5F5",
+            "label": {
+              "content": "Edit",
+              "style": "label",
+              "color": "#1A1A1A"
+            }
+          },
+          "cancelButton": {
+            "width": "100%",
+            "height": 44,
+            "background": "transparent",
+            "label": {
+              "content": "Cancel appointment",
+              "style": "label-small",
+              "color": "#F44336"
+            }
+          }
+        }
+      }
+    },
+    "toolbar": {
+      "iPad": {
+        "height": 72,
+        "paddingHorizontal": 24,
+        "background": "#FFFFFF",
+        "borderTop": {
+          "width": 1,
+          "color": "#E5E0D1"
+        },
+        "structure": {
+          "flexDirection": "row",
+          "justifyContent": "space-between",
+          "alignItems": "center"
+        },
+        "leftSection": {
+          "flexDirection": "row",
+          "alignItems": "center",
+          "gap": 24
+        },
+        "todayButton": {
+          "label": {
+            "content": "Today",
+            "style": "label",
+            "color": "#E3A9A0"
+          },
+          "touchTarget": 44,
+          "accessibilityLabel": "Jump to today"
+        },
+        "dateJumpButton": {
+          "flexDirection": "row",
+          "alignItems": "center",
+          "gap": 8,
+          "icon": {
+            "name": "calendar",
+            "size": 20,
+            "color": "#6B6B6B"
+          },
+          "label": {
+            "content": "Jump to date",
+            "style": "label-small",
+            "color": "#6B6B6B"
+          },
+          "touchTarget": 44,
+          "accessibilityLabel": "Open date picker"
+        },
+        "rightSection": {
+          "primaryButton": {
+            "paddingHorizontal": 16,
+            "paddingVertical": 12,
+            "borderRadius": 12,
+            "background": "#E3A9A0",
+            "flexDirection": "row",
+            "alignItems": "center",
+            "gap": 8,
+            "icon": {
+              "name": "plus",
+              "size": 20,
+              "color": "#FFFFFF"
+            },
+            "label": {
+              "content": "New appointment",
+              "style": "label",
+              "color": "#FFFFFF"
+            },
+            "states": {
+              "pressed": {
+                "background": "#CF8B80"
+              }
+            }
+          }
+        }
+      },
+      "iPhone": {
+        "type": "fab",
+        "position": "fixed",
+        "bottom": 16,
+        "right": 16,
+        "width": 56,
+        "height": 56,
+        "borderRadius": 28,
+        "background": "#E3A9A0",
+        "shadow": "0px 4px 12px rgba(227, 169, 160, 0.4)",
+        "icon": {
+          "name": "plus",
+          "size": 24,
+          "color": "#FFFFFF"
+        }
+      }
+    },
+    "conflictAlert": {
+      "position": "absolute",
+      "top": 16,
+      "marginHorizontal": 24,
+      "width": "calc(100% - 48px)",
+      "borderRadius": 12,
+      "background": "#FFF5F5",
+      "border": {
+        "width": 1,
+        "color": "#F44336"
+      },
+      "padding": 12,
+      "zIndex": 100,
+      "structure": {
+        "flexDirection": "row",
+        "alignItems": "center",
+        "gap": 12
+      },
+      "icon": {
+        "name": "alert-triangle",
+        "size": 24,
+        "color": "#F44336"
+      },
+      "content": {
+        "flex": 1,
+        "title": {
+          "style": "body",
+          "fontWeight": 500,
+          "color": "#F44336",
+          "content": "Schedule conflict detected"
+        },
+        "message": {
+          "style": "body-small",
+          "color": "#F44336",
+          "content": "{{count}} appointments overlap at {{time}}"
+        }
+      },
+      "resolveButton": {
+        "paddingHorizontal": 12,
+        "paddingVertical": 6,
+        "borderRadius": 8,
+        "background": "#F44336",
+        "label": {
+          "style": "label-small",
+          "color": "#FFFFFF",
+          "content": "Resolve"
+        }
+      }
+    },
+    "emptyState": {
+      "width": 400,
+      "height": 300,
+      "position": "center",
+      "textAlign": "center",
+      "icon": {
+        "name": "calendar",
+        "size": 80,
+        "color": "#6B6B6B"
+      },
+      "title": {
+        "style": "heading-2",
+        "color": "#1A1A1A",
+        "content": "No appointments today",
+        "marginTop": 24
+      },
+      "body": {
+        "style": "body",
+        "color": "#6B6B6B",
+        "content": "Your schedule is clear. Time to relax or reach out to clients!",
+        "marginTop": 8
+      },
+      "cta": {
+        "paddingHorizontal": 20,
+        "paddingVertical": 12,
+        "borderRadius": 12,
+        "background": "#E3A9A0",
+        "marginTop": 24,
+        "label": {
+          "content": "+ Add appointment",
+          "style": "label",
+          "color": "#FFFFFF"
+        }
+      },
+      "encouragementBadge": {
+        "position": "top-of-grid",
+        "marginHorizontal": 24,
+        "marginTop": 16,
+        "paddingHorizontal": 12,
+        "paddingVertical": 8,
+        "borderRadius": 9999,
+        "background": "rgba(187, 237, 218, 0.2)",
+        "border": {
+          "width": 1,
+          "color": "#BBEDDA"
+        },
+        "flexDirection": "row",
+        "alignItems": "center",
+        "gap": 8,
+        "icon": {
+          "name": "coffee",
+          "size": 20,
+          "color": "#2D4A42"
+        },
+        "text": {
+          "content": "Enjoy your free day!",
+          "style": "label-small",
+          "color": "#2D4A42"
+        }
+      }
+    },
+    "errorState": {
+      "width": 400,
+      "height": 300,
+      "position": "center",
+      "textAlign": "center",
+      "icon": {
+        "name": "alert-circle",
+        "size": 80,
+        "color": "#F44336"
+      },
+      "title": {
+        "style": "heading-2",
+        "color": "#F44336",
+        "content": "Couldn't load your schedule",
+        "marginTop": 24
+      },
+      "body": {
+        "style": "body",
+        "color": "#6B6B6B",
+        "content": "There was a problem loading your appointments. Please check your connection and try again.",
+        "marginTop": 8
+      },
+      "retryButton": {
+        "paddingHorizontal": 20,
+        "paddingVertical": 12,
+        "borderRadius": 12,
+        "background": "#E3A9A0",
+        "marginTop": 24,
+        "label": {
+          "content": "Retry",
+          "style": "label",
+          "color": "#FFFFFF"
+        }
+      },
+      "secondaryAction": {
+        "marginTop": 12,
+        "label": {
+          "content": "View offline cache",
+          "style": "label-small",
+          "color": "#6B6B6B"
+        }
+      }
+    },
+    "skeleton": {
+      "shimmer": {
+        "animation": {
+          "duration": 1500,
+          "easing": "ease-in-out",
+          "iterations": "infinite",
+          "gradient": "linear-gradient(90deg, #F5F5F5 0%, #E5E0D1 50%, #F5F5F5 100%)",
+          "backgroundPosition": "-200% 0 to 200% 0"
+        }
+      },
+      "appointmentBlock": {
+        "width": "calc(100% - 32px)",
+        "marginHorizontal": 16,
+        "borderRadius": 12,
+        "background": "#F5F5F5",
+        "heights": [128, 192, 256],
+        "randomPositions": true
+      }
+    }
+  },
+  "interactions": {
+    "appointmentBlock": {
+      "tap": "Open peek pane with details",
+      "drag": "Move appointment to new time slot",
+      "dragTopEdge": "Adjust start time",
+      "dragBottomEdge": "Adjust end time",
+      "longPress": "Show context menu (edit, cancel, duplicate)"
+    },
+    "emptySlot": {
+      "tap": "Open new appointment form with pre-filled time"
+    },
+    "dateNavigation": {
+      "chevronLeft": "Go to previous day",
+      "chevronRight": "Go to next day",
+      "todayButton": "Jump to today",
+      "dateJump": "Open date picker modal"
+    },
+    "viewToggle": {
+      "tap": "Switch between Day and Week views"
+    }
+  },
+  "dataModel": {
+    "appointment": {
+      "id": "string",
+      "startTime": "string (ISO 8601)",
+      "endTime": "string (ISO 8601)",
+      "duration": "number (minutes)",
+      "client": {
+        "id": "string",
+        "name": "string",
+        "phone": "string",
+        "avatar": "string (URL)"
+      },
+      "service": {
+        "id": "string",
+        "name": "string",
+        "category": "string (nails | hair | skin | lashes | massage | etc)",
+        "price": "number",
+        "duration": "number (minutes)"
+      },
+      "status": "string (confirmed | completed | cancelled | noShow)",
+      "notes": "string"
+    },
+    "conflicts": [
+      {
+        "appointmentIds": ["string", "string"],
+        "overlapStart": "string (ISO 8601)",
+        "overlapEnd": "string (ISO 8601)"
+      }
+    ]
+  },
+  "usLocale": {
+    "timeFormat": "12h (h:mm A)",
+    "dateFormat": "dddd, MMMM D",
+    "currency": "USD ($)",
+    "phone": "(XXX) XXX-XXXX"
+  },
+  "accessibility": {
+    "screenLabel": "Calendar view",
+    "appointmentBlock": {
+      "role": "button",
+      "label": "{{time}}, {{duration}}, {{service}} for {{client}}",
+      "hint": "Tap to view details, drag edges to resize",
+      "actions": [
+        {
+          "name": "resize",
+          "label": "Adjust appointment time"
+        }
+      ]
+    },
+    "nowLine": {
+      "accessibilityLabel": "Current time {{time}}",
+      "accessibilityElementsHidden": false
+    },
+    "gridLines": {
+      "accessibilityElementsHidden": true
+    },
+    "peekPane": {
+      "role": "dialog",
+      "label": "Appointment details"
+    },
+    "reduceMotion": {
+      "disablePeekPaneSlideAnimation": true,
+      "disableShimmerAnimation": true,
+      "fallbackToCrossFade": true
+    }
+  },
+  "calculations": {
+    "appointmentTopPosition": "((startTimeInMinutes - 300) / 30) × 64",
+    "appointmentHeight": "(durationInMinutes / 30) × 64",
+    "nowLinePosition": "((currentTimeInMinutes - 300) / 30) × 64",
+    "note": "300 minutes = 5:00 AM start time"
+  },
+  "transitions": {
+    "peekPaneSlide": {
+      "duration": 300,
+      "easing": "ease-out",
+      "properties": ["transform"]
+    },
+    "appointmentDrag": {
+      "duration": 0,
+      "realtime": true
+    },
+    "appointmentResize": {
+      "duration": 0,
+      "realtime": true,
+      "snapToGrid": "30-minute-increments"
+    },
+    "viewSwitch": {
+      "duration": 200,
+      "easing": "ease-in-out",
+      "type": "fade"
+    },
+    "shimmer": {
+      "duration": 1500,
+      "easing": "ease-in-out",
+      "iterations": "infinite"
+    }
+  },
+  "usage": {
+    "navigation": {
+      "from": [
+        "Staff Today screen",
+        "Bottom tab 'Calendar'",
+        "Push notification (appointment reminder)"
+      ],
+      "to": [
+        "Appointment detail (tap appointment block)",
+        "New appointment form (tap + button or empty slot)",
+        "Week view (tap Week toggle)",
+        "Date picker (tap Jump to date)"
+      ]
+    },
+    "rules": [
+      "Time grid: 5 AM to 10 PM, 30-minute increments",
+      "Each 30-min slot = 64px height",
+      "Time column width: 56px (iPad), 48px (iPhone)",
+      "Appointment blocks have 4px left border for category color",
+      "Category colors applied at 10% opacity for background",
+      "Now-line updates every minute, shows current time",
+      "Conflicting appointments outlined in red with alert banner",
+      "Drag handles on top/bottom edges for resize (min 30 min increments)",
+      "Peek pane slides in from right on iPad, bottom sheet on iPhone",
+      "Week view shows 7 columns (Monday-Sunday), Day view shows 1 column",
+      "Empty slots tappable to quick-book with pre-filled time",
+      "Loading shows 5 skeleton blocks at random positions",
+      "Error state centered with retry option",
+      "Empty state shows encouragement badge and add CTA",
+      "All touch targets meet 44×44 minimum",
+      "Respect prefers-reduced-motion for slide animations"
+    ]
+  }
+}

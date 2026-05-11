@@ -1,0 +1,51 @@
+{
+  "schemaVersion": "1.0.0",
+  "componentId": "MC.9",
+  "componentName": "RoleDeniedEmptyState",
+  "exportedAs": "RoleDeniedEmptyState",
+  "category": "admin-feedback",
+  "description": "Full-pane empty state shown when RBAC blocks the current user from accessing a settings section.",
+  "props": {
+    "onRequestAccess": {
+      "type": "(() => void) | null",
+      "required": false,
+      "default": null,
+      "description": "Callback when the request access button is pressed; hides button if null"
+    },
+    "requestAccessLabel": {
+      "type": "string",
+      "required": false,
+      "default": "Request Access",
+      "description": "Label text for the request access CTA button"
+    }
+  },
+  "tokens": {
+    "iconColor": "disabled.fg",
+    "headingColor": "text.primary",
+    "bodyColor": "admin.text.muted",
+    "ctaVariant": "tertiary"
+  },
+  "anatomy": [
+    "container (centered flex-col, gap 16, minHeight 240)",
+    "lock-icon (64px, token disabled.fg)",
+    "heading (heading-3, \"You don't have permission to view this.\")",
+    "body-text (body-small muted, \"Contact your admin to request access.\")",
+    "request-access-button (tertiary)"
+  ],
+  "sizes": [
+    {
+      "name": "default",
+      "width": "100%",
+      "height": 240,
+      "note": "minHeight"
+    }
+  ],
+  "stateNames": [
+    "default",
+    "error"
+  ],
+  "accessibility": {
+    "role": "status",
+    "ariaLabel": "Access denied. You don't have permission to view this section."
+  }
+}

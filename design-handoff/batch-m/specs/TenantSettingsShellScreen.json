@@ -1,0 +1,93 @@
+{
+  "schemaVersion": "1.0.0",
+  "screenId": "M.3",
+  "screenName": "TenantSettingsShellScreen",
+  "route": "admin/settings",
+  "designSystem": "Zarkili v1.0.0",
+  "device": "iPad 768x1024",
+  "engineeringStatus": "delivered",
+  "description": "Master-detail settings shell providing sidebar navigation to all tenant configuration sections.",
+  "layout": {
+    "type": "master-detail",
+    "padding": {
+      "top": 24,
+      "right": 32,
+      "bottom": 40,
+      "left": 32
+    },
+    "maxContentWidth": 960,
+    "gap": 24,
+    "sidebar": {
+      "width": 280,
+      "background": "admin.surface",
+      "border": "admin.border"
+    }
+  },
+  "sections": [
+    {
+      "id": "sidebar-header",
+      "type": "page-header",
+      "title": "Settings",
+      "subtext": "{{tenantName}}"
+    },
+    {
+      "id": "settings-nav",
+      "type": "nav-section-list",
+      "title": null,
+      "component": "MC.3",
+      "items": [
+        {
+          "key": "business-profile",
+          "icon": "building",
+          "label": "Business profile",
+          "badge": null
+        },
+        {
+          "key": "brand",
+          "icon": "palette",
+          "label": "Brand & appearance",
+          "badge": null
+        },
+        {
+          "key": "tax",
+          "icon": "receipt",
+          "label": "Tax settings",
+          "badge": null
+        },
+        {
+          "key": "currency",
+          "icon": "currency-dollar",
+          "label": "Currency",
+          "badge": null
+        },
+        {
+          "key": "legal-docs",
+          "icon": "document",
+          "label": "Legal documents",
+          "badge": "requiredDocsCount > 0 ? requiredDocsCount : null"
+        },
+        {
+          "key": "domain",
+          "icon": "globe",
+          "label": "Domain",
+          "badge": null
+        },
+        {
+          "key": "notifications",
+          "icon": "bell",
+          "label": "Notification preferences",
+          "badge": null
+        }
+      ]
+    }
+  ],
+  "stateNames": [
+    "default",
+    "legalDocsRequired",
+    "error"
+  ],
+  "accessibility": {
+    "screenReaderLabel": "Tenant settings",
+    "navRole": "navigation"
+  }
+}

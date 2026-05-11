@@ -1,0 +1,87 @@
+{
+  "schemaVersion": "1.0.0",
+  "componentId": "MC.11",
+  "componentName": "AdminCoachMark",
+  "exportedAs": "AdminCoachMark",
+  "category": "admin-overlay",
+  "description": "Multi-step onboarding coach-mark overlay with a dark popover anchored to a target element, used for the admin first-run tour.",
+  "props": {
+    "steps": {
+      "type": "CoachMarkStep[]",
+      "required": true,
+      "description": "Array of step objects with shape { step, anchorId, title, body }"
+    },
+    "currentStep": {
+      "type": "number",
+      "required": true,
+      "description": "Index of the currently displayed step (1-based)"
+    },
+    "totalSteps": {
+      "type": "number",
+      "required": true,
+      "description": "Total number of steps in the tour"
+    },
+    "onNext": {
+      "type": "() => void",
+      "required": false,
+      "description": "Callback when the Next button is pressed"
+    },
+    "onBack": {
+      "type": "() => void",
+      "required": false,
+      "description": "Callback when the Back button is pressed"
+    },
+    "onSkip": {
+      "type": "() => void",
+      "required": false,
+      "description": "Callback when the Skip link is tapped"
+    },
+    "onComplete": {
+      "type": "() => void",
+      "required": false,
+      "description": "Callback when the final step's Next is pressed"
+    }
+  },
+  "tokens": {
+    "overlay": "coach.overlay",
+    "popoverBg": "coach.popoverBg",
+    "titleColor": "surface",
+    "bodyColor": "surface",
+    "dotActive": "accent",
+    "dotInactive": "surface",
+    "nextCtaBg": "accent",
+    "backCtaColor": "surface",
+    "skipColor": "surface"
+  },
+  "anatomy": [
+    "overlay-mask (full-screen rgba coach.overlay)",
+    "cut-out (8px padding around anchored element, radius small 8)",
+    "popover (radius medium 12, padding 16, shadow-lg, maxWidth 280)",
+    "title (heading-4 white)",
+    "body (body-small white 80% opacity)",
+    "footer-row (step-dots 6x6 radius full + back tertiary + next primary + skip link label-small)"
+  ],
+  "sizes": [
+    {
+      "name": "default",
+      "width": "popoverMaxWidth 280",
+      "height": 56,
+      "note": "footer-row height; popover height is content-driven"
+    }
+  ],
+  "stateNames": [
+    "step-1",
+    "step-2",
+    "step-3",
+    "step-4",
+    "step-5",
+    "skipped",
+    "completed",
+    "error"
+  ],
+  "accessibility": {
+    "role": "dialog",
+    "ariaLabel": "Onboarding tour step {{currentStep}} of {{totalSteps}}",
+    "ariaModal": true
+  }
+}

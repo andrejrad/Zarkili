@@ -1,0 +1,360 @@
+{
+  "screen": "MasterCalendarScreen",
+  "route": "AdminCalendar",
+  "device": {
+    "primary": "iPad 1024×768",
+    "secondary": "iPhone 14 390×844"
+  },
+  "states": [
+    "default",
+    "fullyBookedBanner",
+    "conflictHighlighted",
+    "loading",
+    "error"
+  ],
+  "layout": {
+    "header": {
+      "height": 56,
+      "background": "surface",
+      "borderBottom": {
+        "width": 1,
+        "color": "calendar.gridLine"
+      },
+      "left": {
+        "elements": [
+          {
+            "type": "button",
+            "icon": "chevron-left",
+            "size": "44×44",
+            "action": "previousPeriod",
+            "accessibilityLabel": "strings.masterCalendar.previous"
+          },
+          {
+            "type": "label",
+            "text": "strings.masterCalendar.dateLabel",
+            "variant": "body-large",
+            "weight": "bold"
+          },
+          {
+            "type": "button",
+            "icon": "chevron-right",
+            "size": "44×44",
+            "action": "nextPeriod",
+            "accessibilityLabel": "strings.masterCalendar.next"
+          },
+          {
+            "type": "button",
+            "label": "strings.masterCalendar.today",
+            "variant": "secondary",
+            "size": "small",
+            "action": "goToToday"
+          }
+        ]
+      },
+      "center": {
+        "type": "segmentedControl",
+        "options": [
+          {
+            "value": "day",
+            "label": "strings.masterCalendar.viewDay"
+          },
+          {
+            "value": "week",
+            "label": "strings.masterCalendar.viewWeek"
+          },
+          {
+            "value": "month",
+            "label": "strings.masterCalendar.viewMonth"
+          }
+        ]
+      },
+      "right": {
+        "elements": [
+          {
+            "type": "segmentedControl",
+            "options": [
+              {
+                "value": "staff",
+                "label": "strings.masterCalendar.viewStaff"
+              },
+              {
+                "value": "rooms",
+                "label": "strings.masterCalendar.viewRooms"
+              }
+            ]
+          },
+          {
+            "type": "button",
+            "icon": "filter",
+            "size": "44×44",
+            "action": "toggleFilterStrip",
+            "accessibilityLabel": "strings.masterCalendar.filter"
+          }
+        ]
+      }
+    },
+    "filterStrip": {
+      "height": 44,
+      "background": "calendar.headerBg",
+      "borderBottom": {
+        "width": 1,
+        "color": "calendar.gridLine"
+      },
+      "chips": [
+        {
+          "type": "dropdown",
+          "label": "strings.masterCalendar.filterLocation",
+          "multiSelect": false
+        },
+        {
+          "type": "multiSelect",
+          "label": "strings.masterCalendar.filterStaff"
+        },
+        {
+          "type": "multiSelect",
+          "label": "strings.masterCalendar.filterResource"
+        }
+      ],
+      "resetLink": {
+        "label": "strings.masterCalendar.filterReset",
+        "visibleWhen": "filtersActive"
+      }
+    },
+    "fullyBookedBanner": {
+      "height": 36,
+      "background": "warning 15%",
+      "borderBottom": {
+        "width": 1,
+        "color": "warning"
+      },
+      "label": "strings.masterCalendar.fullyBookedBanner",
+      "visibleWhen": "state.fullyBookedBanner"
+    },
+    "body": {
+      "component": "master-calendar-grid",
+      "fillRemainingHeight": true
+    },
+    "sideDetailPane": {
+      "width": 320,
+      "position": "right",
+      "background": "surface",
+      "borderLeft": {
+        "width": 1,
+        "color": "border"
+      },
+      "visibleWhen": "appointmentSelected",
+      "contents": [
+        {
+          "type": "statusPill",
+          "color": "booking.[status]",
+          "background": "booking.[status]Bg"
+        },
+        {
+          "type": "label",
+          "field": "clientName",
+          "variant": "body-large"
+        },
+        {
+          "type": "label",
+          "field": "service",
+          "variant": "caption"
+        },
+        {
+          "type": "label",
+          "field": "staff",
+          "variant": "caption"
+        },
+        {
+          "type": "label",
+          "field": "date",
+          "format": "MM/DD/YYYY"
+        },
+        {
+          "type": "label",
+          "field": "time",
+          "format": "h:mm AM"
+        },
+        {
+          "type": "label",
+          "field": "price",
+          "format": "USD"
+        }
+      ],
+      "actions": [
+        {
+          "type": "link",
+          "label": "strings.masterCalendar.fullDetail",
+          "navigate": "BookingDetailAdminScreen"
+        },
+        {
+          "type": "button",
+          "label": "strings.masterCalendar.reschedule",
+          "variant": "secondary"
+        },
+        {
+          "type": "button",
+          "label": "strings.masterCalendar.cancel",
+          "variant": "secondary"
+        }
+      ]
+    },
+    "fabGroup": {
+      "position": "fixed bottom-right",
+      "inset": 24,
+      "buttons": [
+        {
+          "type": "fab",
+          "icon": "plus",
+          "label": "strings.masterCalendar.newBooking",
+          "variant": "primary",
+          "navigate": "ManualBookingScreen"
+        },
+        {
+          "type": "fab",
+          "icon": "block",
+          "label": "strings.masterCalendar.blockTime",
+          "variant": "secondary",
+          "navigate": "BlockTimeScreen"
+        }
+      ]
+    }
+  },
+  "views": {
+    "day": {
+      "timeColumn": {
+        "width": 56,
+        "position": "sticky left",
+        "font": "mono label-small",
+        "labelInterval": "30min",
+        "range": {
+          "start": "5:00 AM",
+          "end": "10:00 PM"
+        }
+      },
+      "resourceColumns": {
+        "type": "staff or room",
+        "cellMinWidth": 120,
+        "scroll": "horizontal"
+      },
+      "resourceHeader": {
+        "height": 56,
+        "position": "sticky top",
+        "avatar": {
+          "size": 28
+        },
+        "name": {
+          "variant": "label-small"
+        }
+      },
+      "cell": {
+        "height": 64,
+        "duration": "30min",
+        "border": {
+          "width": 1,
+          "color": "calendar.gridLine"
+        }
+      },
+      "appointmentBlock": {
+        "borderLeft": {
+          "width": 3,
+          "color": "booking.[status]"
+        },
+        "background": "booking.[status]Bg",
+        "radius": 4,
+        "padding": "6×4",
+        "label": {
+          "format": "h:mm AM · service · client",
+          "truncate": true
+        }
+      },
+      "blockedCell": {
+        "background": "booking.blockedTimeBg",
+        "border": {
+          "width": 1,
+          "style": "dashed",
+          "color": "booking.blockedTimeBorder"
+        },
+        "pattern": "diagonalHatch",
+        "label": {
+          "text": "reason",
+          "variant": "caption",
+          "color": "muted",
+          "align": "center"
+        }
+      },
+      "conflictCell": {
+        "border": {
+          "width": 2,
+          "color": "calendar.conflictBorder"
+        },
+        "background": "calendar.conflictHatch"
+      },
+      "nowLine": {
+        "width": 1,
+        "color": "calendar.nowLine",
+        "fullWidth": true,
+        "leadingDot": {
+          "size": 8,
+          "color": "calendar.nowLine",
+          "position": "timeColumnEdge"
+        }
+      }
+    },
+    "week": {
+      "columns": 7,
+      "dayMinWidth": 140,
+      "todayColumnHeader": {
+        "background": "primary",
+        "shape": "pill"
+      },
+      "appointmentBlock": {
+        "minHeight": 20,
+        "borderLeft": {
+          "width": 2,
+          "color": "booking.[status]"
+        },
+        "label": {
+          "lines": 1,
+          "truncate": true
+        }
+      },
+      "overflow": {
+        "type": "chip",
+        "label": "+N more",
+        "variant": "primary-tinted",
+        "position": "cell bottom"
+      }
+    },
+    "month": {
+      "cellMinHeight": 80,
+      "dateNumber": {
+        "variant": "body-small",
+        "position": "top-left"
+      },
+      "todayDate": {
+        "background": "primary",
+        "shape": "circle"
+      },
+      "previewRows": {
+        "max": 3,
+        "type": "capsule"
+      },
+      "overflowChip": {
+        "label": "+N more",
+        "variant": "chip"
+      },
+      "cellBackground": {
+        "gradient": "calendar.monthHeat*"
+      },
+      "onCellTap": "navigateToDayView"
+    }
+  },
+  "accessibility": {
+    "appointmentBlock": {
+      "accessibilityLabel": "{weekday} {date} h:mm AM, {N} min, {service}, {client}, {staff}"
+    },
+    "emptyCell": {
+      "accessibilityHint": "strings.masterCalendar.emptyCellHint"
+    }
+  }
+}

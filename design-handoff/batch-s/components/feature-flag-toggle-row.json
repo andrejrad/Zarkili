@@ -1,0 +1,43 @@
+{
+  "component": "FeatureFlagToggleRow",
+  "path": "src/components/platform/FeatureFlagToggleRow",
+  "platform": ["iOS", "Android", "Web"],
+  "variantNames": ["global", "tenantOverride"],
+  "variants": {
+    "global": {
+      "layout": {
+        "padding": { "horizontal": 16, "vertical": 12 },
+        "fields": [
+          { "key": "flagKey", "variant": "body-medium", "weight": "500", "font": "mono", "flex": 1 },
+          { "key": "description", "variant": "caption", "color": "on-surface-variant", "maxLines": 1 },
+          { "key": "stage", "type": "pill", "marginRight": 8 },
+          { "key": "globalSwitch", "type": "switch", "label": "Global" }
+        ]
+      }
+    },
+    "tenantOverride": {
+      "layout": {
+        "padding": { "horizontal": 16, "vertical": 12 },
+        "fields": [
+          { "key": "tenantName", "variant": "body-medium", "flex": 1 },
+          { "key": "plan", "type": "pill", "marginRight": 8 },
+          { "key": "overrideSwitch", "type": "switch" },
+          { "key": "overrideSource", "variant": "caption", "color": "on-surface-variant", "values": ["manual", "plan", "beta-group"] }
+        ]
+      }
+    }
+  },
+  "tokens": {
+    "height": { "global": 56, "tenantOverride": 52 },
+    "stage": {
+      "alpha": { "background": "flag.alpha", "color": "on-flag.alpha" },
+      "beta": { "background": "flag.beta", "color": "on-flag.beta" },
+      "stable": { "background": "flag.stable", "color": "on-flag.stable" },
+      "deprecated": { "background": "flag.deprecated", "color": "on-flag.deprecated" }
+    }
+  },
+  "accessibility": {
+    "globalSwitch": { "accessibilityLabel": "{flagKey} — global toggle" },
+    "overrideSwitch": { "accessibilityLabel": "{flagKey} override for {tenantName}" }
+  }
+}

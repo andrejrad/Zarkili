@@ -1,0 +1,56 @@
+{
+  "component": "VariablePickerToolbar",
+  "description": "Horizontal scrollable chip bar for inserting template variables at cursor",
+  "props": {
+    "variables": {
+      "type": "array",
+      "required": true,
+      "description": "Array of variable objects with key and label"
+    },
+    "onVariableSelect": {
+      "type": "function",
+      "required": true,
+      "description": "Callback when variable chip tapped, receives variable key"
+    }
+  },
+  "states": [
+    "default"
+  ],
+  "variants": [],
+  "tokens": {
+    "background": "semantic.surface",
+    "chipBackground": "semantic.surface",
+    "chipBorder": "semantic.cardBorder",
+    "chipText": "semantic.foreground",
+    "chipActiveBackground": "semantic.primary",
+    "chipActiveText": "semantic.surface"
+  },
+  "accessibility": {
+    "role": "toolbar",
+    "label": "Template variables",
+    "hint": "Tap a variable to insert at cursor position"
+  },
+  "dimensions": {
+    "height": 48,
+    "chipHeight": 32,
+    "chipPaddingHorizontal": 12,
+    "chipBorderRadius": 6,
+    "chipGap": 8,
+    "scrollPaddingHorizontal": 16
+  },
+  "examples": [
+    {
+      "variables": [
+        {"key": "first_name", "label": "{{first_name}}"},
+        {"key": "salon_name", "label": "{{salon_name}}"},
+        {"key": "booking_date", "label": "{{booking_date}}"},
+        {"key": "service_name", "label": "{{service_name}}"},
+        {"key": "staff_name", "label": "{{staff_name}}"},
+        {"key": "points_balance", "label": "{{points_balance}}"},
+        {"key": "reward_name", "label": "{{reward_name}}"},
+        {"key": "promo_code", "label": "{{promo_code}}"}
+      ],
+      "onVariableSelect": "(key) => {}"
+    }
+  ]
+}

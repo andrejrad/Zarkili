@@ -1,0 +1,69 @@
+{
+  "schemaVersion": "1.0.0",
+  "componentId": "MC.5",
+  "componentName": "StatusPill",
+  "exportedAs": "StatusPill",
+  "category": "admin-feedback",
+  "description": "Semantic status indicator pill with 6 variants covering all entity states in Batch M admin screens.",
+  "props": {
+    "variant": {
+      "type": "'active' | 'restricted' | 'pending' | 'error' | 'disabled' | 'info'",
+      "required": true,
+      "description": "Determines color palette and semantic meaning of the pill"
+    },
+    "label": {
+      "type": "string | null",
+      "required": false,
+      "default": null,
+      "description": "Auto-uses variant name if null"
+    },
+    "size": {
+      "type": "'default' | 'sm'",
+      "required": false,
+      "default": "default",
+      "description": "Controls pill height; sm used in dense table rows"
+    }
+  },
+  "tokens": {
+    "active.bg": "pill.active.bg",
+    "active.text": "pill.active.text",
+    "restricted.bg": "pill.restricted.bg",
+    "restricted.text": "pill.restricted.text",
+    "pending.bg": "pill.pending.bg",
+    "pending.text": "pill.pending.text",
+    "error.bg": "pill.error.bg",
+    "error.text": "pill.error.text",
+    "disabled.bg": "pill.disabled.bg",
+    "disabled.text": "pill.disabled.text",
+    "info.bg": "pill.info.bg",
+    "info.text": "pill.info.text"
+  },
+  "anatomy": [
+    "pill-container (height 24, horizontal-padding 8, radius full)",
+    "label-text (label-small uppercase weight 500)"
+  ],
+  "sizes": [
+    {
+      "name": "default",
+      "width": "fit-content",
+      "height": 24
+    },
+    {
+      "name": "sm",
+      "width": "fit-content",
+      "height": 18
+    }
+  ],
+  "stateNames": [
+    "active",
+    "restricted",
+    "pending",
+    "error",
+    "disabled",
+    "info"
+  ],
+  "accessibility": {
+    "role": "status",
+    "ariaLabel": "Status: {{label}}"
+  }
+}

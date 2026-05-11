@@ -1,0 +1,63 @@
+{
+  "screen": "GeneralAuditLogScreen",
+  "route": "SuperAdminGeneralAuditLog",
+  "device": { "primary": "Desktop 1280+", "secondary": "iPad 1024×768" },
+  "stateNames": ["default", "detailPanel", "error"],
+  "layout": {
+    "header": {
+      "title": { "text": "General Audit Log", "variant": "heading-2" },
+      "note": { "variant": "caption", "color": "on-surface-variant", "text": "Tenant-facing audit events across all tenants" },
+      "filters": {
+        "type": "filterRow",
+        "filters": [
+          { "key": "tenantId", "type": "autocomplete", "placeholder": "Filter by tenant..." },
+          { "key": "userId", "type": "textInput", "placeholder": "Filter by user ID..." },
+          { "key": "category", "type": "select", "options": ["appointment", "client", "billing", "inventory", "staff", "notification", "settings"] },
+          { "key": "dateRange", "type": "datePicker", "range": true }
+        ]
+      },
+      "exportCta": { "label": "Export CSV", "type": "button", "variant": "outlined", "icon": "download", "position": "right" }
+    },
+    "auditTable": {
+      "virtualScroll": true,
+      "stickyHeader": true,
+      "columns": [
+        { "key": "timestamp", "format": "ISO8601 local", "font": "mono", "variant": "caption", "width": 180 },
+        { "key": "tenantName", "variant": "body-medium" },
+        { "key": "actor", "type": "userPill" },
+        { "key": "category", "type": "pill" },
+        { "key": "action", "variant": "body-medium", "font": "mono" },
+        { "key": "resourceId", "variant": "caption", "font": "mono", "maxChars": 24 },
+        { "key": "ipAddress", "font": "mono", "variant": "caption" }
+      ],
+      "rowAction": { "type": "expand-detail-panel" }
+    },
+    "detailPanel": {
+      "position": "right",
+      "width": 480,
+      "fields": [
+        { "key": "timestamp", "label": "Timestamp", "font": "mono" },
+        { "key": "tenant", "label": "Tenant" },
+        { "key": "actor", "label": "Actor" },
+        { "key": "category", "label": "Category" },
+        { "key": "action", "label": "Action", "font": "mono" },
+        { "key": "resourceId", "label": "Resource ID", "font": "mono" },
+        { "key": "ipAddress", "label": "IP address", "font": "mono" },
+        { "key": "before", "label": "Before", "type": "codeBlock", "language": "json" },
+        { "key": "after", "label": "After", "type": "codeBlock", "language": "json" }
+      ]
+    }
+  },
+  "states": {
+    "detailPanel": {
+      "detailPanel": { "open": true }
+    },
+    "error": {
+      "inlineBanner": {
+        "background": "error 10%",
+        "borderLeft": { "width": 4, "color": "error" },
+        "message": "strings.generalAuditLog.errorMessage"
+      }
+    }
+  }
+}

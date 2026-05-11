@@ -1,0 +1,79 @@
+{
+  "schemaVersion": "1.0.0",
+  "screenId": "M.10",
+  "screenName": "AdminFirstRunTourScreen",
+  "route": null,
+  "designSystem": "Zarkili v1.0.0",
+  "device": "iPad 768x1024",
+  "engineeringStatus": "designed",
+  "description": "First-run onboarding coach-mark overlay rendered over the Owner Home dashboard to orient new admins to key navigation areas.",
+  "layout": {
+    "type": "coach-mark-overlay",
+    "padding": {
+      "top": 0,
+      "right": 0,
+      "bottom": 0,
+      "left": 0
+    },
+    "maxContentWidth": 960,
+    "gap": 0
+  },
+  "sections": [
+    {
+      "id": "coach-mark-overlay",
+      "type": "coach-mark-overlay",
+      "title": null,
+      "component": "MC.11",
+      "totalSteps": 5,
+      "steps": [
+        {
+          "step": 1,
+          "anchorId": "tenant-switcher-pill",
+          "title": "Switch tenants",
+          "body": "Manage multiple salon locations from one account."
+        },
+        {
+          "step": 2,
+          "anchorId": "kpi-grid",
+          "title": "Your KPIs at a glance",
+          "body": "Revenue, bookings, and AI savings update in real time."
+        },
+        {
+          "step": 3,
+          "anchorId": "calendar-nav",
+          "title": "Calendar",
+          "body": "View and manage all appointments."
+        },
+        {
+          "step": 4,
+          "anchorId": "ai-suggestion-slot",
+          "title": "AI insights",
+          "body": "Zarkili AI surfaces revenue and scheduling opportunities here."
+        },
+        {
+          "step": 5,
+          "anchorId": "settings-nav-icon",
+          "title": "Settings",
+          "body": "Configure your business profile, billing, and integrations."
+        }
+      ],
+      "overlayToken": "coach.overlay",
+      "cutoutRadius": 4
+    }
+  ],
+  "stateNames": [
+    "step-1",
+    "step-2",
+    "step-3",
+    "step-4",
+    "step-5",
+    "skipped",
+    "completed",
+    "error"
+  ],
+  "accessibility": {
+    "screenReaderLabel": "Admin onboarding tour",
+    "role": "dialog",
+    "ariaModal": true
+  }
+}

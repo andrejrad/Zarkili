@@ -1,0 +1,381 @@
+{
+  "component": "PhotoUploadTile",
+  "description": "Square tile for uploading review photos, supports up to 5 images in a grid",
+  "purpose": "Allow consumers to attach photos to a review via an 80x80 tile grid; handles empty, filled, uploading, error, disabled, and max-reached states with separate accessibility roles for tile and remove button",
+  "source": {
+    "batch": "E",
+    "screen": "E.7 Review Prompt",
+    "promotedFrom": "documentation/figma-prompts/BATCH_E_LOYALTY_ACTIVITIES_REVIEWS.md",
+    "figmaFrames": [
+      "E-component-photo-upload-tile-empty",
+      "E-component-photo-upload-tile-pressed",
+      "E-component-photo-upload-tile-filled",
+      "E-component-photo-upload-tile-uploading",
+      "E-component-photo-upload-tile-error",
+      "E-component-photo-upload-tile-disabled",
+      "E-component-photo-upload-tile-max"
+    ],
+    "lockedAt": "2026-04-28"
+  },
+  "variants": {
+    "state": {
+      "options": ["empty", "pressed", "filled", "uploading", "error", "disabled", "max-reached"],
+      "default": "empty"
+    },
+    "showLabel": {
+      "options": [true, false],
+      "default": false,
+      "note": "Show 'Add photo' label in empty state for larger single-tile layouts; omit in tight 5-tile grids"
+    }
+  },
+  "states": {
+    "empty": {
+      "border": {
+        "width": 1,
+        "style": "dashed",
+        "color": "#E5E0D1"
+      },
+      "background": "transparent",
+      "icon": {
+        "name": "plus",
+        "size": 24,
+        "color": "#6B6B6B"
+      },
+      "label": {
+        "visible": "{{showLabel}}",
+        "content": "Add photo",
+        "style": "label-small",
+        "color": "#6B6B6B"
+      }
+    },
+    "pressed": {
+      "border": {
+        "width": 1,
+        "style": "dashed",
+        "color": "#E5E0D1"
+      },
+      "background": "#F5F5F5",
+      "icon": {
+        "name": "plus",
+        "size": 24,
+        "color": "#6B6B6B"
+      },
+      "transform": "scale(0.98)"
+    },
+    "filled": {
+      "border": {
+        "width": 1,
+        "style": "solid",
+        "color": "#E5E0D1"
+      },
+      "image": {
+        "visible": true,
+        "opacity": 1,
+        "objectFit": "cover"
+      },
+      "removeButton": {
+        "visible": true,
+        "position": {
+          "top": 8,
+          "right": 8
+        },
+        "size": 24,
+        "background": "#FFFFFF",
+        "shadow": "0px 2px 4px rgba(0, 0, 0, 0.16)",
+        "icon": {
+          "name": "x",
+          "size": 16,
+          "color": "#1A1A1A",
+          "strokeWidth": 2
+        },
+        "touchTarget": {
+          "width": 44,
+          "height": 44,
+          "hitSlop": 10
+        }
+      }
+    },
+    "uploading": {
+      "border": {
+        "width": 1,
+        "style": "solid",
+        "color": "#E5E0D1"
+      },
+      "image": {
+        "visible": true,
+        "opacity": 0.5,
+        "objectFit": "cover"
+      },
+      "spinner": {
+        "visible": true,
+        "size": 24,
+        "color": "#E3A9A0",
+        "animation": "rotate",
+        "position": "center"
+      },
+      "removeButton": {
+        "visible": false
+      }
+    },
+    "error": {
+      "border": {
+        "width": 1,
+        "style": "solid",
+        "color": "#F44336"
+      },
+      "background": "#FFF5F5",
+      "icon": {
+        "name": "refresh-cw",
+        "size": 24,
+        "color": "#F44336"
+      },
+      "label": {
+        "visible": true,
+        "content": "Upload failed",
+        "style": "body-small",
+        "color": "#F44336",
+        "position": "below"
+      }
+    },
+    "disabled": {
+      "border": {
+        "width": 1,
+        "style": "dashed",
+        "color": "#F5F5F5"
+      },
+      "background": "transparent",
+      "icon": {
+        "name": "plus",
+        "size": 24,
+        "color": "#B0B0B0"
+      },
+      "opacity": 0.6,
+      "pointerEvents": "none"
+    },
+    "max-reached": {
+      "border": {
+        "width": 1,
+        "style": "dashed",
+        "color": "#E5E0D1"
+      },
+      "background": "#F5F5F5",
+      "icon": {
+        "name": "plus",
+        "size": 24,
+        "color": "#B0B0B0"
+      },
+      "label": {
+        "visible": true,
+        "content": "Max 5 photos",
+        "style": "label-small",
+        "color": "#B0B0B0",
+        "textAlign": "center"
+      },
+      "opacity": 0.6,
+      "pointerEvents": "none"
+    }
+  },
+  "layout": {
+    "width": 80,
+    "height": 80,
+    "borderRadius": 12,
+    "position": "relative"
+  },
+  "anatomy": {
+    "container": {
+      "width": 80,
+      "height": 80,
+      "borderRadius": 12,
+      "position": "relative",
+      "overflow": "hidden",
+      "display": "flex",
+      "alignItems": "center",
+      "justifyContent": "center"
+    },
+    "image": {
+      "width": "100%",
+      "height": "100%",
+      "objectFit": "cover",
+      "borderRadius": 12
+    },
+    "icon": {
+      "size": 24,
+      "position": "center"
+    },
+    "label": {
+      "style": "label-small",
+      "textAlign": "center",
+      "marginTop": 4,
+      "maxWidth": 70
+    },
+    "spinner": {
+      "size": 24,
+      "position": "absolute",
+      "top": "50%",
+      "left": "50%",
+      "transform": "translate(-50%, -50%)"
+    },
+    "removeButton": {
+      "position": "absolute",
+      "top": 8,
+      "right": 8,
+      "width": 24,
+      "height": 24,
+      "borderRadius": 9999,
+      "display": "flex",
+      "alignItems": "center",
+      "justifyContent": "center",
+      "touchTarget": {
+        "width": 44,
+        "height": 44
+      }
+    }
+  },
+  "grid": {
+    "maxPhotos": 5,
+    "columns": 5,
+    "gap": 12,
+    "behavior": "Last tile remains 'empty' state until max (5) reached, then shows 'max-reached' state"
+  },
+  "interactions": {
+    "empty": {
+      "onTap": "Open image picker",
+      "feedback": "pressed state"
+    },
+    "filled": {
+      "onTap": "Preview image (optional)",
+      "removeButton": {
+        "onTap": "Remove photo from upload queue",
+        "feedback": "scale(0.9) for 100ms"
+      }
+    },
+    "error": {
+      "onTap": "Retry upload",
+      "feedback": "pressed state"
+    },
+    "uploading": {
+      "onTap": "none",
+      "note": "Interaction disabled during upload"
+    }
+  },
+  "accessibility": {
+    "empty": {
+      "role": "button",
+      "label": "Add photo",
+      "hint": "Opens image picker to select a photo"
+    },
+    "filled": {
+      "role": "image",
+      "label": "Photo {{index}} of {{total}}",
+      "removeButton": {
+        "role": "button",
+        "label": "Remove photo {{index}}",
+        "hint": "Removes this photo from upload"
+      }
+    },
+    "uploading": {
+      "role": "progressbar",
+      "label": "Uploading photo",
+      "value": {
+        "busy": true
+      }
+    },
+    "error": {
+      "role": "button",
+      "label": "Upload failed, tap to retry",
+      "hint": "Retries photo upload"
+    },
+    "disabled": {
+      "role": "none",
+      "accessibilityElementsHidden": true
+    },
+    "max-reached": {
+      "role": "none",
+      "label": "Maximum 5 photos reached",
+      "accessibilityElementsHidden": true
+    },
+    "touchTarget": {
+      "minWidth": 44,
+      "minHeight": 44,
+      "note": "Full 80x80 tile meets minimum; removeButton extends hit area with 10px hitSlop"
+    }
+  },
+  "transitions": {
+    "onPress": {
+      "duration": 100,
+      "easing": "ease-out",
+      "properties": ["background", "transform"]
+    },
+    "onUploadStart": {
+      "duration": 200,
+      "easing": "ease-in-out",
+      "properties": ["opacity"]
+    },
+    "onRemove": {
+      "duration": 150,
+      "easing": "ease-out",
+      "properties": ["opacity", "transform"],
+      "exit": "scale(0.9) + fade out",
+      "reduceMotion": "fade out only, no scale"
+    },
+    "spinner": {
+      "duration": 1000,
+      "easing": "linear",
+      "iterations": "infinite",
+      "rotation": "0deg to 360deg",
+      "reduceMotion": "static icon, no rotation"
+    }
+  },
+  "usage": {
+    "context": [
+      "Post-booking review photo upload",
+      "Service feedback with photos",
+      "Profile photo management",
+      "Report issue with visual evidence"
+    ],
+    "rules": [
+      "Maximum 5 photos per review session",
+      "Grid layout: 5 columns with 12px gap",
+      "Last tile shows 'empty' until max reached, then 'max-reached'",
+      "Remove button is a separate accessibility element with role 'button'",
+      "Remove button has 44x44 touch target via 10px hitSlop despite 24x24 visual",
+      "Uploading state disables all interaction",
+      "Error state allows tap-to-retry on the full tile",
+      "Border is dashed for empty/disabled/max-reached; solid for filled/uploading/error",
+      "Spinner uses primary color #E3A9A0; reduce-motion shows static icon",
+      "Remove animation scales to 0.9 + fade; reduce-motion skips scale"
+    ]
+  },
+  "examples": {
+    "reviewPhotoGrid": {
+      "tiles": [
+        { "state": "filled", "imageUrl": "photo1.jpg", "index": 1 },
+        { "state": "filled", "imageUrl": "photo2.jpg", "index": 2 },
+        { "state": "uploading", "imageUrl": "photo3.jpg", "index": 3 },
+        { "state": "error", "index": 4 },
+        { "state": "empty", "showLabel": false }
+      ],
+      "maxPhotos": 5
+    },
+    "maxReached": {
+      "tiles": [
+        { "state": "filled", "imageUrl": "photo1.jpg" },
+        { "state": "filled", "imageUrl": "photo2.jpg" },
+        { "state": "filled", "imageUrl": "photo3.jpg" },
+        { "state": "filled", "imageUrl": "photo4.jpg" },
+        { "state": "max-reached" }
+      ]
+    }
+  },
+  "implementationNotes": [
+    "Remove button is visually 24x24 but needs 44x44 touch target via hitSlop: 10 on all sides.",
+    "Dashed border: empty / disabled / max-reached. Solid border: filled / uploading / error.",
+    "In a 5-tile grid, developer controls state per tile index; last tile flips empty -> max-reached when all 5 are filled.",
+    "Images use objectFit cover, centered crop to fill 80x80 square.",
+    "Remove button shadow 0px 2px 4px rgba(0,0,0,0.16) ensures visibility over light and dark images.",
+    "Spinner rotates continuously 1s linear infinite using primary #E3A9A0; reduce-motion shows static icon.",
+    "Error background #FFF5F5 is a light tint not in the token set — use rgba(244,67,54,0.04) or nearest Cream Silk tint in code.",
+    "Remove exit animation: scale(0.9) + fade 150ms; reduce-motion: fade only.",
+    "showLabel defaults false for 80px tile; enable for single-tile or larger contexts."
+  ]
+}

@@ -1,0 +1,66 @@
+{
+  "screen": "MigrationRunnerScreen",
+  "route": "SuperAdminMigrationRunner",
+  "device": { "primary": "Desktop 1280+", "secondary": "iPad 1024×768" },
+  "stateNames": ["idle", "running", "completed", "failed", "error"],
+  "layout": {
+    "header": {
+      "title": { "text": "Migration Runner", "variant": "heading-2" },
+      "controls": {
+        "position": "right",
+        "items": [
+          { "label": "strings.migrationRunner.dryRunLabel", "type": "switch" },
+          { "label": "strings.migrationRunner.runAllCta", "type": "button", "variant": "filled", "icon": "playArrow", "disabledWhen": "runningCount > 0" }
+        ]
+      }
+    },
+    "migrationList": {
+      "layout": "single column, full width",
+      "item": {
+        "component": "MigrationRunnerStepView",
+        "fields": [
+          { "key": "migrationId", "variant": "body-medium", "weight": "500", "font": "mono" },
+          { "key": "description", "variant": "caption", "color": "on-surface-variant" },
+          { "key": "target", "label": "Target", "type": "pill" },
+          { "key": "status", "type": "progressIndicator", "values": ["pending", "running", "success", "failed", "skipped"] },
+          { "key": "duration", "type": "monoClock", "font": "mono", "variant": "caption" },
+          { "key": "affectedRows", "label": "Rows", "format": "int", "font": "mono" }
+        ],
+        "actions": [
+          { "label": "strings.migrationRunner.runCta", "variant": "outlined", "showWhen": "status === pending" },
+          { "label": "strings.migrationRunner.reRunCta", "variant": "outlined", "showWhen": "status === success || status === skipped" },
+          { "label": "strings.migrationRunner.retryCta", "variant": "filled", "tone": "error", "showWhen": "status === failed" }
+        ]
+      }
+    },
+    "logPane": {
+      "type": "codeBlock",
+      "position": "bottom",
+      "height": 200,
+      "language": "plaintext",
+      "autoScroll": true,
+      "label": "Execution log"
+    }
+  },
+  "states": {
+    "running": {
+      "runAllCta": { "disabled": true },
+      "migrationList": { "activeItem": { "status": "running", "progressBar": { "indeterminate": true, "color": "primary" } } }
+    },
+    "completed": {
+      "toast": { "label": "strings.migrationRunner.completedToast", "tone": "success" },
+      "allItems": { "status": "success" }
+    },
+    "failed": {
+      "toast": { "label": "strings.migrationRunner.failedToast", "tone": "error" },
+      "failedItem": { "status": "failed", "border": { "color": "error" }, "retryCta": { "visible": true } }
+    },
+    "error": {
+      "inlineBanner": {
+        "background": "error 10%",
+        "borderLeft": { "width": 4, "color": "error" },
+        "message": "strings.migrationRunner.errorMessage"
+      }
+    }
+  }
+}

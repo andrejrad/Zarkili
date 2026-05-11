@@ -1,4 +1,4 @@
-# Week 20 Close Report — AI Risk Models and Personalization
+﻿# Week 20 Close Report — AI Risk Models and Personalization
 
 **Status:** Complete — both W20 tasks delivered.
 **Theme:** AI Risk Models and Personalization v1 — no-show / fraud risk scoring (Task 20.1) and marketplace personalization engine (Task 20.2). Both reuse the W17 cost-guard infrastructure (`evaluateAiBudgetGuard` + `buildAiCostTelemetryEvent`) with no changes to `src/shared/ai`.
@@ -122,9 +122,10 @@ Audit checklist for changes introduced this week:
 
 ## 8. Next week (W21)
 
-W21 opens [PHASE2_CONSUMER_UI_PLAN_WEEKS_21_TO_28.md](../PHASE2_CONSUMER_UI_PLAN_WEEKS_21_TO_28.md). Carry-forward into W21:
+W21 opens [PHASE2_CONSUMER_UI_PLAN_WEEKS_21_TO_32.md](../PHASE2_CONSUMER_UI_PLAN_WEEKS_21_TO_32.md). Carry-forward into W21:
 
 1. **W18-DEBT-1** — `stripeTaxCalculate` Cloud Function (high severity, oldest open debt).
 2. **W19-DEBT-4** — `ClientRetentionMetrics` upstream analytics job.
 3. **W19-DEBT-5** — promote `chat-assistance` to its own `aiFeatureKeys` entry (telemetry-driven, post-launch).
 4. **W20-DEBT-1..-4** as above.
+

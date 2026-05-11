@@ -1,5 +1,6 @@
-import type { CreateStaffInput, StaffMember, UpdateStaffInput } from "../../domains/staff";
+import type { CreateStaffInput, StaffMember, StaffScheduleTemplate, UpdateStaffInput, UpsertStaffScheduleTemplateInput } from "../../domains/staff";
 import type { StaffRepository } from "../../domains/staff/repository";
+import type { StaffSchedulesRepository } from "../../domains/staff/staffSchedulesRepository";
 
 type UiResult<T> =
   | { ok: true; data: T }
@@ -26,8 +27,11 @@ function normalizeErrorMessage(error: unknown, fallback: string): string {
   return fallback;
 }
 
-export function createStaffAdminService(input: { staffRepository: StaffRepository }) {
-  const { staffRepository } = input;
+export function createStaffAdminService(input: {
+  staffRepository: StaffRepository;
+  scheduleRepository?: StaffSchedulesRepository;
+}) {
+  const { staffRepository, scheduleRepository } = input;
 
   async function readStaffList(tenantId: string, locationId: string): Promise<UiResult<StaffMember[]>> {
     try {
@@ -75,11 +79,56 @@ export function createStaffAdminService(input: { staffRepository: StaffRepositor
     }
   }
 
+  async function reactivateStaffMember(
+    staffId: string,
+    tenantId: string
+  ): Promise<UiResult<void>> {
+    try {
+      await staffRepository.updateStaff(staffId, tenantId, { status: "active" });
+      return { ok: true, data: undefined };
+    } catch (error) {
+      return { ok: false, message: normalizeErrorMessage(error, "Unable to reactivate staff member right now.") };
+    }
+  }
+
+  async function readSchedule(
+    tenantId: string,
+    staffId: string,
+    locationId: string
+  ): Promise<UiResult<StaffScheduleTemplate | null>> {
+    if (!scheduleRepository) {
+      return { ok: false, message: "Schedule repository not configured." };
+    }
+    try {
+      const template = await scheduleRepository.getScheduleTemplate(tenantId, staffId, locationId);
+      return { ok: true, data: template };
+    } catch (error) {
+      return { ok: false, message: normalizeErrorMessage(error, "Unable to load schedule right now.") };
+    }
+  }
+
+  async function saveSchedule(
+    scheduleInput: UpsertStaffScheduleTemplateInput
+  ): Promise<UiResult<StaffScheduleTemplate>> {
+    if (!scheduleRepository) {
+      return { ok: false, message: "Schedule repository not configured." };
+    }
+    try {
+      const template = await scheduleRepository.upsertScheduleTemplate(scheduleInput);
+      return { ok: true, data: template };
+    } catch (error) {
+      return { ok: false, message: normalizeErrorMessage(error, "Unable to save schedule right now.") };
+    }
+  }
+
   return {
     readStaffList,
     createStaffForTenant,
     updateStaffMember,
     deactivateStaffMember,
+    reactivateStaffMember,
+    readSchedule,
+    saveSchedule,
   };
 }
 

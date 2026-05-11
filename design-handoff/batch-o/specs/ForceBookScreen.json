@@ -1,0 +1,103 @@
+{
+  "screen": "ForceBookScreen",
+  "route": "AdminForceBook",
+  "device": {
+    "type": "modal-sheet",
+    "width": 390,
+    "maxHeight": "92vh",
+    "radius": 20
+  },
+  "stateNames": [
+    "default",
+    "submitting",
+    "error"
+  ],
+  "layout": {
+    "handle": {
+      "width": 36,
+      "height": 4,
+      "radius": 2,
+      "color": "cardBorder",
+      "position": "centered",
+      "marginTop": 12
+    },
+    "header": {
+      "icon": {
+        "name": "warning",
+        "size": 24,
+        "color": "error"
+      },
+      "title": {
+        "text": "strings.forceBook.title",
+        "variant": "body-large",
+        "weight": "bold"
+      }
+    },
+    "bookingSummaryCard": {
+      "background": "surface",
+      "border": {
+        "width": 1,
+        "color": "warning"
+      },
+      "radius": 12,
+      "padding": 16,
+      "fields": [
+        {
+          "key": "date",
+          "format": "MM/DD/YYYY"
+        },
+        {
+          "key": "time",
+          "format": "h:mm AM"
+        },
+        {
+          "key": "staff"
+        },
+        {
+          "key": "service"
+        },
+        {
+          "key": "location"
+        }
+      ]
+    },
+    "form": {
+      "component": "force-book-reason-form"
+    },
+    "footer": {
+      "actions": [
+        {
+          "type": "button",
+          "label": "strings.forceBook.cancel",
+          "variant": "secondary"
+        },
+        {
+          "type": "button",
+          "label": "strings.forceBook.confirmForceBook",
+          "variant": "destructive-primary",
+          "disabledUntil": "reasonSelected AND notesLength >= 20 AND checkboxChecked"
+        }
+      ]
+    }
+  },
+  "states": {
+    "submitting": {
+      "forceBookButton": {
+        "spinner": true
+      },
+      "formFields": {
+        "locked": true,
+        "pointerEvents": "none"
+      }
+    },
+    "error": {
+      "inlineBanner": {
+        "position": "below header",
+        "type": "error"
+      },
+      "form": {
+        "editable": true
+      }
+    }
+  }
+}

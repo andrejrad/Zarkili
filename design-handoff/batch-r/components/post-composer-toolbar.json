@@ -1,0 +1,42 @@
+{
+  "component": "PostComposerToolbar",
+  "description": "Toolbar attached below description rich-text area in marketplace post composer",
+  "props": {
+    "onInsertImage": { "type": "function", "required": true, "description": "Insert image callback" },
+    "onInsertVideo": { "type": "function", "required": true, "description": "Insert video callback" },
+    "onInsertLink": { "type": "function", "required": true, "description": "Insert link callback" },
+    "onAddTag": { "type": "function", "required": true, "description": "Add tag callback" },
+    "onPreview": { "type": "function", "required": true, "description": "Preview callback" },
+    "onSaveDraft": { "type": "function", "required": true, "description": "Save draft callback" },
+    "onPublish": { "type": "function", "required": true, "description": "Publish callback" },
+    "characterCount": { "type": "number", "required": true, "description": "Current character count" },
+    "maxCharacters": { "type": "number", "required": false, "description": "Max characters (default 800)" },
+    "hasUnsavedChanges": { "type": "boolean", "required": false, "description": "Unsaved changes indicator" },
+    "publishDisabled": { "type": "boolean", "required": false, "description": "Publish button disabled" },
+    "publishDisabledReason": { "type": "string", "required": false, "description": "Tooltip when publishDisabled" }
+  },
+  "variants": ["default", "nearLimit", "atLimit", "publishing", "dirty"],
+  "layout": {
+    "height": 56,
+    "borderTop": "semantic.cardBorder",
+    "left": "icon buttons (Image, Video, Link, Tag) 8px gap, 44x44 hit target",
+    "center": "arc progress ring (32px) + [count]/[max] label",
+    "right": "Save Draft SecondaryButton + Publish PrimaryButton"
+  },
+  "tokens": {
+    "bg": "semantic.surface",
+    "borderTop": "semantic.cardBorder",
+    "iconColor": "semantic.muted",
+    "iconHoverColor": "semantic.foreground",
+    "counterSafe": "success",
+    "counterWarning": "warning",
+    "counterError": "error",
+    "publishBg": "primary",
+    "publishHoverBg": "primaryHover"
+  },
+  "accessibility": {
+    "role": "toolbar",
+    "iconButtons": "each has aria-label",
+    "characterCounter": "aria-live=polite"
+  }
+}

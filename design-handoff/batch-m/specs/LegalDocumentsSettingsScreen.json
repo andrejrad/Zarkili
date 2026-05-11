@@ -1,0 +1,83 @@
+{
+  "schemaVersion": "1.0.0",
+  "screenId": "M.7",
+  "screenName": "LegalDocumentsSettingsScreen",
+  "route": "admin/settings/legal-docs",
+  "designSystem": "Zarkili v1.0.0",
+  "device": "iPad 768x1024",
+  "engineeringStatus": "delivered",
+  "description": "Upload screen for owners to submit and manage required legal compliance documents, with warning when any required doc is missing.",
+  "layout": {
+    "type": "scrollable-column",
+    "padding": {
+      "top": 24,
+      "right": 32,
+      "bottom": 40,
+      "left": 32
+    },
+    "maxContentWidth": 960,
+    "gap": 16
+  },
+  "sections": [
+    {
+      "id": "missing-docs-warning",
+      "type": "status-banner",
+      "title": null,
+      "component": null,
+      "condition": "anyRequiredDocAbsent",
+      "text": "Required documents missing.",
+      "variant": "warning"
+    },
+    {
+      "id": "legal-doc-uploads",
+      "type": "upload-list",
+      "title": null,
+      "component": "MC.4",
+      "documents": [
+        {
+          "type": "W-9",
+          "required": true
+        },
+        {
+          "type": "Articles of Incorporation",
+          "required": true
+        },
+        {
+          "type": "ADA Compliance Attestation",
+          "required": true
+        },
+        {
+          "type": "Terms of Service",
+          "required": true
+        },
+        {
+          "type": "Privacy Policy",
+          "required": true
+        }
+      ],
+      "tileFields": [
+        "fileName",
+        "uploadDate",
+        "fileSize",
+        "status-pill",
+        "removeIcon"
+      ],
+      "statusPillVariants": [
+        "uploaded",
+        "missing",
+        "expired"
+      ]
+    }
+  ],
+  "stateNames": [
+    "default",
+    "uploading",
+    "uploaded",
+    "missing",
+    "error",
+    "role-denied"
+  ],
+  "accessibility": {
+    "screenReaderLabel": "Legal documents"
+  }
+}

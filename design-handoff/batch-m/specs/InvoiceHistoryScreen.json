@@ -1,0 +1,94 @@
+{
+  "schemaVersion": "1.0.0",
+  "screenId": "M.12",
+  "screenName": "InvoiceHistoryScreen",
+  "route": "admin/billing/invoices",
+  "designSystem": "Zarkili v1.0.0",
+  "device": "iPad 768x1024",
+  "engineeringStatus": "designed",
+  "description": "Scrollable billing screen showing paginated invoice history with status filtering and individual PDF download actions.",
+  "layout": {
+    "type": "scrollable-column",
+    "padding": {
+      "top": 24,
+      "right": 32,
+      "bottom": 40,
+      "left": 32
+    },
+    "maxContentWidth": 960,
+    "gap": 16
+  },
+  "sections": [
+    {
+      "id": "invoice-filter-bar",
+      "type": "filter-bar",
+      "title": null,
+      "component": null,
+      "dateRangePicker": {
+        "format": "MM/DD/YYYY"
+      },
+      "statusChips": [
+        "paid",
+        "open",
+        "void",
+        "draft"
+      ]
+    },
+    {
+      "id": "outstanding-subheader",
+      "type": "status-banner",
+      "title": null,
+      "component": null,
+      "condition": "outstandingTotal > 0",
+      "label": "Outstanding: {{outstandingTotal}}"
+    },
+    {
+      "id": "invoices-table",
+      "type": "data-table",
+      "title": null,
+      "component": "MC.1",
+      "rowComponent": "MC.7",
+      "columns": [
+        {
+          "key": "date",
+          "label": "Date",
+          "type": "date",
+          "format": "MM/DD/YYYY"
+        },
+        {
+          "key": "invoiceNumber",
+          "label": "Invoice #",
+          "type": "text",
+          "monospace": true
+        },
+        {
+          "key": "amount",
+          "label": "Amount",
+          "type": "currency",
+          "currencyCode": "USD",
+          "align": "right"
+        },
+        {
+          "key": "status",
+          "label": "Status",
+          "type": "status-pill"
+        },
+        {
+          "key": "download",
+          "label": "",
+          "type": "icon-button",
+          "minTouchTarget": "44x44"
+        }
+      ]
+    }
+  ],
+  "stateNames": [
+    "default",
+    "empty",
+    "error",
+    "downloading"
+  ],
+  "accessibility": {
+    "screenReaderLabel": "Invoice history"
+  }
+}

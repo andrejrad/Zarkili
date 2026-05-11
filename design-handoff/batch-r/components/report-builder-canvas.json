@@ -1,0 +1,52 @@
+{
+  "component": "ReportBuilderCanvas",
+  "description": "Drag-and-drop canvas for assembling custom report widgets on 40px grid",
+  "props": {
+    "widgets": { "type": "array", "required": true, "description": "Array of { id, type, x, y, w, h, config }" },
+    "onWidgetAdd": { "type": "function", "required": true, "description": "Callback(type, position)" },
+    "onWidgetMove": { "type": "function", "required": true, "description": "Callback(id, x, y)" },
+    "onWidgetResize": { "type": "function", "required": true, "description": "Callback(id, w, h)" },
+    "onWidgetRemove": { "type": "function", "required": true, "description": "Callback(id)" },
+    "onConfigChange": { "type": "function", "required": true, "description": "Callback(id, config)" },
+    "onSave": { "type": "function", "required": true, "description": "Save callback" },
+    "isReadOnly": { "type": "boolean", "required": false, "description": "Read-only mode" },
+    "isDirty": { "type": "boolean", "required": false, "description": "Unsaved changes indicator" }
+  },
+  "widgetTypes": ["lineChart", "barChart", "funnel", "cohortTable", "kpiTile", "dataTable", "textBlock"],
+  "variants": ["empty-canvas", "editing", "widget-selected", "preview"],
+  "layout": {
+    "leftPalette": {
+      "width": 260,
+      "bg": "semantic.surface",
+      "borderRight": "semantic.cardBorder",
+      "categories": "Charts, KPIs, Tables, Text Block"
+    },
+    "canvas": {
+      "gridSize": 40,
+      "snapToGrid": true,
+      "scrollVertical": true,
+      "emptyState": "Drag a widget to begin"
+    },
+    "toolbar": {
+      "items": "Preview toggle, Zoom (50%/75%/100%), Save button, widget count badge"
+    },
+    "configPopover": {
+      "fields": "title, data-source dropdown, date range override, delete"
+    }
+  },
+  "tokens": {
+    "canvasBg": "report.canvas.bg",
+    "canvasBorder": "report.canvas.border",
+    "gridLine": "report.canvas.border at 40%",
+    "widgetBg": "report.widget.bg",
+    "widgetBorder": "semantic.cardBorder",
+    "selectionBorder": "primary",
+    "handleFill": "primary",
+    "paletteBg": "semantic.surface"
+  },
+  "accessibility": {
+    "canvas": "role=application",
+    "widget": "role=group, aria-label=[type] widget",
+    "keyboard": "arrow keys nudge selected widget"
+  }
+}

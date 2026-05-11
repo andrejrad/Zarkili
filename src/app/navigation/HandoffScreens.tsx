@@ -50,6 +50,7 @@ type HomeScreenProps = {
   onOpenDashboard: () => void;
   onBackToDashboard: () => void;
   onSignOut: () => void;
+  onOpenInbox: () => void;
 };
 
 type ExploreScreenProps = {
@@ -60,6 +61,7 @@ type ExploreScreenProps = {
   onRetryFeed: () => void;
   onBookEnabled: (salon: DiscoverySalonCard) => void;
   onBookUnavailable: (salon: DiscoverySalonCard) => void;
+  onOpenDiscovery: () => void;
   onBack: () => void;
 };
 
@@ -80,22 +82,23 @@ type CompleteProfileRouteScreenProps = {
 };
 
 type ProfileRouteScreenProps = {
-  email: string | null;
   firstName: string | null;
   lastName: string | null;
-  isProfileSubmitting: boolean;
-  isEmailSubmitting: boolean;
-  isPasswordResetSubmitting: boolean;
-  profileErrorMessage: string | null;
-  profileSuccessMessage: string | null;
-  emailErrorMessage: string | null;
-  emailSuccessMessage: string | null;
-  passwordResetErrorMessage: string | null;
-  passwordResetSuccessMessage: string | null;
-  onSubmitProfile: (input: { firstName: string; lastName: string }) => Promise<void>;
-  onSubmitEmail: (input: { email: string }) => Promise<void>;
-  onSendPasswordReset: (input: { email: string }) => Promise<void>;
+  email: string | null;
+  bookingCount?: number;
+  loyaltyPoints?: number;
+  onEditProfile: () => void;
+  onOpenSettings: () => void;
+};
+
+type SettingsShellRouteScreenProps = {
+  onOpenNotifications: () => void;
+  onOpenPaymentMethods: () => void;
+  onOpenTerms: () => void;
+  onOpenPrivacy: () => void;
+  onOpenAbout: () => void;
   onSignOut: () => void;
+  onBack: () => void;
 };
 
 const colors = {
@@ -385,157 +388,117 @@ export function CompleteProfileRouteScreen({
 }
 
 export function ProfileRouteScreen({
-  email,
   firstName,
   lastName,
-  isProfileSubmitting,
-  isEmailSubmitting,
-  isPasswordResetSubmitting,
-  profileErrorMessage,
-  profileSuccessMessage,
-  emailErrorMessage,
-  emailSuccessMessage,
-  passwordResetErrorMessage,
-  passwordResetSuccessMessage,
-  onSubmitProfile,
-  onSubmitEmail,
-  onSendPasswordReset,
-  onSignOut,
+  email,
+  bookingCount = 4,
+  loyaltyPoints = 450,
+  onEditProfile,
+  onOpenSettings,
 }: ProfileRouteScreenProps) {
-  const [draftFirstName, setDraftFirstName] = useState(firstName ?? "");
-  const [draftLastName, setDraftLastName] = useState(lastName ?? "");
-  const [draftEmail, setDraftEmail] = useState(email ?? "");
-
-  useEffect(() => {
-    setDraftFirstName(firstName ?? "");
-  }, [firstName]);
-
-  useEffect(() => {
-    setDraftLastName(lastName ?? "");
-  }, [lastName]);
-
-  useEffect(() => {
-    setDraftEmail(email ?? "");
-  }, [email]);
-
-  const canSubmitProfile =
-    draftFirstName.trim().length > 0 && draftLastName.trim().length > 0 && !isProfileSubmitting;
-  const canSubmitEmail =
-    draftEmail.trim().length > 0 && draftEmail.trim() !== (email ?? "") && !isEmailSubmitting;
-  const canSendPasswordReset = draftEmail.trim().length > 0 && !isPasswordResetSubmitting;
-
-  async function submitProfile() {
-    if (!canSubmitProfile) {
-      return;
-    }
-
-    await onSubmitProfile({
-      firstName: draftFirstName.trim(),
-      lastName: draftLastName.trim(),
-    });
-  }
-
-  async function submitEmail() {
-    if (!canSubmitEmail) {
-      return;
-    }
-
-    await onSubmitEmail({
-      email: draftEmail.trim(),
-    });
-  }
-
-  async function submitPasswordReset() {
-    if (!canSendPasswordReset) {
-      return;
-    }
-
-    await onSendPasswordReset({
-      email: draftEmail.trim(),
-    });
-  }
+  const initials =
+    firstName && lastName
+      ? `${firstName[0]}${lastName[0]}`.toUpperCase()
+      : firstName
+        ? firstName[0].toUpperCase()
+        : "?";
+  const displayName =
+    firstName && lastName ? `${firstName} ${lastName}` : firstName ?? lastName ?? "Guest";
 
   return (
     <ScrollView contentContainerStyle={styles.profileContent} showsVerticalScrollIndicator={false}>
       <View style={styles.profileCard}>
+        {/* Avatar */}
+        <View style={styles.profileAvatarRow}>
+          <View style={styles.profileAvatar}>
+            <Text style={styles.profileAvatarText}>{initials}</Text>
+          </View>
+        </View>
+
+        {/* Identity */}
+        <View style={styles.profileIdentity}>
+          <Text style={styles.profileDisplayName}>{displayName}</Text>
+          {email ? <Text style={styles.profileEmail}>{email}</Text> : null}
+        </View>
+
+        {/* Stats */}
+        <View style={styles.profileStatsRow}>
+          <View style={styles.profileStatPill}>
+            <Text style={styles.profileStatValue}>{bookingCount}</Text>
+            <Text style={styles.profileStatLabel}>Bookings</Text>
+          </View>
+          <View style={styles.profileStatDivider} />
+          <View style={styles.profileStatPill}>
+            <Text style={styles.profileStatValue}>{loyaltyPoints}</Text>
+            <Text style={styles.profileStatLabel}>Points</Text>
+          </View>
+        </View>
+
+        {/* Actions */}
+        <PrimaryButton label="Edit profile" onPress={onEditProfile} />
+        <Pressable
+          accessibilityRole="button"
+          onPress={onOpenSettings}
+          style={styles.profileSettingsRow}
+        >
+          <Text style={styles.profileSettingsLabel}>Settings</Text>
+          <Text style={styles.profileSettingsChevron}>›</Text>
+        </Pressable>
+      </View>
+    </ScrollView>
+  );
+}
+
+export function SettingsShellRouteScreen({
+  onOpenNotifications,
+  onOpenPaymentMethods,
+  onOpenTerms,
+  onOpenPrivacy,
+  onOpenAbout,
+  onSignOut,
+  onBack,
+}: SettingsShellRouteScreenProps) {
+  return (
+    <ScrollView contentContainerStyle={styles.profileContent} showsVerticalScrollIndicator={false}>
+      <View style={styles.profileCard}>
         <Text style={styles.authOverline}>Account</Text>
-        <Text style={styles.authTitle}>Profile</Text>
-        <Text style={styles.authBody}>
-          {email ? `Signed in as ${email}. Update your account details below.` : "Update your account details below."}
-        </Text>
+        <Text style={styles.authTitle}>Settings</Text>
 
-        <View style={styles.authFields}>
-          <View style={styles.authFieldShell}>
-            <Text style={styles.authFieldLabel}>First name</Text>
-            <TextInput
-              autoCapitalize="words"
-              onChangeText={setDraftFirstName}
-              placeholder="Ana"
-              style={styles.authInput}
-              value={draftFirstName}
-            />
-          </View>
-          <View style={styles.authFieldShell}>
-            <Text style={styles.authFieldLabel}>Last name</Text>
-            <TextInput
-              autoCapitalize="words"
-              onChangeText={setDraftLastName}
-              placeholder="Novak"
-              style={styles.authInput}
-              value={draftLastName}
-            />
-          </View>
+        <View style={styles.settingsGroup}>
+          <SettingsRow label="Notifications" onPress={onOpenNotifications} />
+          <SettingsRow label="Payment methods" onPress={onOpenPaymentMethods} />
         </View>
 
-        {profileErrorMessage ? <Text style={styles.authError}>{profileErrorMessage}</Text> : null}
-        {profileSuccessMessage ? <Text style={styles.authSuccess}>{profileSuccessMessage}</Text> : null}
-
-        <View style={styles.authActions}>
-          <PrimaryButton
-            label={isProfileSubmitting ? "Saving..." : "Save profile"}
-            onPress={() => void submitProfile()}
-            disabled={!canSubmitProfile}
-          />
+        <View style={styles.settingsGroup}>
+          <Text style={styles.settingsGroupLabel}>Legal</Text>
+          <SettingsRow label="Terms of Service" onPress={onOpenTerms} />
+          <SettingsRow label="Privacy Policy" onPress={onOpenPrivacy} />
+          <SettingsRow label="About Zarkili" onPress={onOpenAbout} />
         </View>
 
-        <View style={styles.authFields}>
-          <View style={styles.authFieldShell}>
-            <Text style={styles.authFieldLabel}>Email</Text>
-            <TextInput
-              autoCapitalize="none"
-              autoCorrect={false}
-              keyboardType="email-address"
-              onChangeText={setDraftEmail}
-              placeholder="name@example.com"
-              style={styles.authInput}
-              value={draftEmail}
-            />
-          </View>
-        </View>
-
-        {emailErrorMessage ? <Text style={styles.authError}>{emailErrorMessage}</Text> : null}
-        {emailSuccessMessage ? <Text style={styles.authSuccess}>{emailSuccessMessage}</Text> : null}
-
-        <View style={styles.authActions}>
-          <PrimaryButton
-            label={isEmailSubmitting ? "Saving..." : "Save email"}
-            onPress={() => void submitEmail()}
-            disabled={!canSubmitEmail}
-          />
-        </View>
-
-        {passwordResetErrorMessage ? <Text style={styles.authError}>{passwordResetErrorMessage}</Text> : null}
-        {passwordResetSuccessMessage ? <Text style={styles.authSuccess}>{passwordResetSuccessMessage}</Text> : null}
-
-        <View style={styles.authActions}>
-          <SecondaryButton
-            label={isPasswordResetSubmitting ? "Sending..." : "Send password reset email"}
-            onPress={() => void submitPasswordReset()}
-          />
-          <SecondaryButton label="Sign out" onPress={onSignOut} />
+        <View style={styles.settingsGroup}>
+          <Pressable accessibilityRole="button" onPress={onBack} style={styles.settingsBackRow}>
+            <Text style={styles.settingsBackLabel}>‹ Back to profile</Text>
+          </Pressable>
+          <Pressable accessibilityRole="button" onPress={onSignOut} style={styles.settingsSignOutRow}>
+            <Text style={styles.settingsSignOutLabel}>Sign out</Text>
+          </Pressable>
         </View>
       </View>
     </ScrollView>
+  );
+}
+
+function SettingsRow({ label, onPress }: { label: string; onPress: () => void }) {
+  return (
+    <Pressable
+      accessibilityRole="button"
+      onPress={onPress}
+      style={({ pressed }) => [styles.settingsRow, pressed && styles.settingsRowPressed]}
+    >
+      <Text style={styles.settingsRowLabel}>{label}</Text>
+      <Text style={styles.settingsRowChevron}>›</Text>
+    </Pressable>
   );
 }
 
@@ -565,6 +528,7 @@ export function HomeRouteScreen({
   onOpenDashboard,
   onBackToDashboard,
   onSignOut,
+  onOpenInbox,
 }: HomeScreenProps) {
   const { language, t } = useLanguage();
   const copy = getHandoffStrings(language);
@@ -572,16 +536,16 @@ export function HomeRouteScreen({
   return (
     <ScrollView contentContainerStyle={styles.homeContent} showsVerticalScrollIndicator={false}>
       <View style={styles.homeHeader}>
-        <View>
+        <View style={styles.homeHeaderText}>
           <Text style={styles.homeGreeting}>{interpolateHandoffString(copy.home.greeting, { firstName })}</Text>
           <Text style={styles.homeSubcopy}>{t("appShell.protectedPlaceholder")}</Text>
         </View>
-        <View accessibilityLabel={interpolateHandoffString(copy.home.notificationsWithCount, { count: "3" })} style={styles.notificationButton}>
+        <Pressable accessibilityRole="button" accessibilityLabel={interpolateHandoffString(copy.home.notificationsWithCount, { count: "3" })} onPress={onOpenInbox} style={styles.notificationButton}>
           <Text style={styles.notificationIcon}>N</Text>
           <View style={styles.notificationBadge}>
             <Text style={styles.notificationBadgeText}>3</Text>
           </View>
-        </View>
+        </Pressable>
       </View>
 
       <View style={styles.bannerCard}>
@@ -724,6 +688,7 @@ export function ExploreRouteScreen({
   onRetryFeed,
   onBookEnabled,
   onBookUnavailable,
+  onOpenDiscovery,
   onBack,
 }: ExploreScreenProps) {
   const { language, t } = useLanguage();
@@ -833,9 +798,14 @@ export function ExploreRouteScreen({
         <Text style={styles.filterCount}>
           {resultsCount === 0 ? copy.explore.resultsCountZero : interpolateHandoffString(copy.explore.resultsCount, { count: String(resultsCount) })}
         </Text>
-        <Pressable accessibilityRole="button" style={styles.filterButton}>
-          <Text style={styles.filterButtonText}>{copy.explore.filterButton}</Text>
-        </Pressable>
+        <View style={{ flexDirection: "row", gap: 8 }}>
+          <Pressable accessibilityRole="button" onPress={onOpenDiscovery} style={styles.filterButton}>
+            <Text style={styles.filterButtonText}>Map & Discovery</Text>
+          </Pressable>
+          <Pressable accessibilityRole="button" style={styles.filterButton}>
+            <Text style={styles.filterButtonText}>{copy.explore.filterButton}</Text>
+          </Pressable>
+        </View>
       </View>
 
       {isLoadingFeed ? <Text style={styles.utilityBody}>Loading discovery feed...</Text> : null}
@@ -1106,6 +1076,11 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     paddingTop: 8,
+    paddingRight: 4,
+  },
+  homeHeaderText: {
+    flex: 1,
+    marginRight: 12,
   },
   homeGreeting: {
     color: colors.text,
@@ -1129,6 +1104,7 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     alignItems: "center",
     justifyContent: "center",
+    overflow: "visible",
   },
   notificationIcon: {
     color: colors.muted,
@@ -1522,8 +1498,6 @@ const styles = StyleSheet.create({
   searchShell: {
     borderRadius: 999,
     backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
     paddingHorizontal: 16,
   },
   searchInput: {
@@ -1531,6 +1505,16 @@ const styles = StyleSheet.create({
     color: colors.muted,
     fontSize: 14,
     fontFamily: brandTypography.regular,
+    ...({
+      outline: "none",
+      border: "none",
+      appearance: "none",
+      WebkitAppearance: "none",
+      WebkitBoxShadow: "0 0 0 1000px transparent inset",
+      boxShadow: "0 0 0 1000px transparent inset",
+      WebkitTextFillColor: colors.muted,
+      transition: "background-color 9999s ease-in-out 0s, color 9999s ease-in-out 0s",
+    } as object),
   },
   pillRow: {
     gap: 8,
@@ -1584,5 +1568,152 @@ const styles = StyleSheet.create({
   },
   exploreList: {
     gap: 16,
+  },
+  profileAvatarRow: {
+    alignItems: "center",
+    paddingTop: 8,
+    paddingBottom: 4,
+  },
+  profileAvatar: {
+    width: 80,
+    height: 80,
+    borderRadius: 999,
+    backgroundColor: colors.primary,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  profileAvatarText: {
+    color: colors.white,
+    fontSize: 28,
+    fontFamily: brandTypography.semibold,
+  },
+  profileIdentity: {
+    alignItems: "center",
+    gap: 4,
+  },
+  profileDisplayName: {
+    color: colors.text,
+    fontSize: 20,
+    lineHeight: 28,
+    fontFamily: brandTypography.semibold,
+    textAlign: "center",
+  },
+  profileEmail: {
+    color: colors.muted,
+    fontSize: 13,
+    fontFamily: brandTypography.regular,
+    textAlign: "center",
+  },
+  profileStatsRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 0,
+    paddingVertical: 4,
+    backgroundColor: colors.background,
+    borderRadius: 12,
+  },
+  profileStatPill: {
+    flex: 1,
+    alignItems: "center",
+    gap: 2,
+  },
+  profileStatValue: {
+    color: colors.text,
+    fontSize: 18,
+    lineHeight: 24,
+    fontFamily: brandTypography.semibold,
+  },
+  profileStatLabel: {
+    color: colors.muted,
+    fontSize: 11,
+    fontFamily: brandTypography.regular,
+  },
+  profileStatDivider: {
+    width: 1,
+    height: 32,
+    backgroundColor: colors.border,
+  },
+  profileSettingsRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingVertical: 14,
+    paddingHorizontal: 4,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+    marginTop: 4,
+  },
+  profileSettingsLabel: {
+    color: colors.text,
+    fontSize: 15,
+    fontFamily: brandTypography.medium,
+  },
+  profileSettingsChevron: {
+    color: colors.muted,
+    fontSize: 20,
+    lineHeight: 24,
+  },
+  settingsGroup: {
+    gap: 0,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
+  },
+  settingsGroupLabel: {
+    color: colors.muted,
+    fontSize: 11,
+    fontFamily: brandTypography.medium,
+    textTransform: "uppercase",
+    letterSpacing: 0.6,
+    paddingHorizontal: 16,
+    paddingTop: 12,
+    paddingBottom: 4,
+    backgroundColor: colors.surface,
+  },
+  settingsRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+  },
+  settingsRowPressed: {
+    backgroundColor: "rgba(209, 191, 179, 0.15)",
+  },
+  settingsRowLabel: {
+    color: colors.text,
+    fontSize: 15,
+    fontFamily: brandTypography.regular,
+  },
+  settingsRowChevron: {
+    color: colors.muted,
+    fontSize: 20,
+    lineHeight: 24,
+  },
+  settingsBackRow: {
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+  },
+  settingsBackLabel: {
+    color: colors.primary,
+    fontSize: 15,
+    fontFamily: brandTypography.medium,
+  },
+  settingsSignOutRow: {
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+  },
+  settingsSignOutLabel: {
+    color: colors.error,
+    fontSize: 15,
+    fontFamily: brandTypography.medium,
   },
 });

@@ -1,0 +1,393 @@
+{
+  "source": {
+    "batch": "G",
+    "prompt": "G.5",
+    "figmaFrames": [
+      "G-5-notes-default",
+      "G-5-notes-empty",
+      "G-5-editing",
+      "G-5-saving",
+      "G-5-history-default",
+      "G-5-history-empty",
+      "G-5-error",
+      "G-5-notes-loading",
+      "G-5-history-loading"
+    ],
+    "lockedAt": "2026-04-28",
+    "referenceImpl": "design-handoff/reference/ClientNotesHistoryScreen.tsx",
+    "quality": "figma-verified",
+    "note": "Summary provided by user after Figma run. TSX file attachment pending — spec locked from summary."
+  },
+  "screen": "ClientNotesHistory",
+  "version": "1.0.0",
+  "device": {
+    "primary": { "name": "iPhone 14", "width": 390, "height": 844 },
+    "responsive": "iPad 768×1024"
+  },
+  "description": "Dedicated full-screen view for a client's notes and visit history. Accessible from G.4 Client Detail via 'View all notes & history →' / 'View full history →' ghost buttons, and directly from the Notes or History tab in G.4.",
+  "userPersona": "Authenticated staff member (stylist or manager)",
+  "userJob": "Read, add, pin and manage notes about a client; review full visit history by status.",
+  "navigation": {
+    "inbound": [
+      "G.4 Client Detail — Notes tab 'View all notes & history →' ghost button",
+      "G.4 Client Detail — History tab 'View full history →' ghost button"
+    ],
+    "backStack": "Profile → Client Lookup → Client Detail → G.5 (back stack maintained)",
+    "outbound": ["Back to Client Detail (← button)"]
+  },
+  "layout": {
+    "background": "#F2EDDD",
+    "layers": [
+      { "name": "header",   "type": "sticky", "height": 56,  "zIndex": 20, "background": "#FFFFFF", "borderBottom": { "width": 1, "color": "#E5E0D1" } },
+      { "name": "tabBar",   "type": "sticky", "height": 44,  "zIndex": 19, "background": "#FFFFFF", "borderBottom": { "width": 1, "color": "#E5E0D1" } },
+      { "name": "tabContent", "type": "scrollable", "flex": 1 }
+    ]
+  },
+  "components": {
+    "header": {
+      "height": 56,
+      "background": "#FFFFFF",
+      "paddingHorizontal": 16,
+      "structure": { "flexDirection": "row", "justifyContent": "space-between", "alignItems": "center" },
+      "left": {
+        "backButton": { "icon": "chevron-left", "iconSize": 24, "color": "#1A1A1A", "touchTarget": "44×44" }
+      },
+      "center": {
+        "clientName": { "style": "heading-4", "fontWeight": 500, "color": "#1A1A1A" }
+      },
+      "right": {
+        "moreButton": {
+          "icon": "more-horizontal",
+          "iconSize": 24,
+          "color": "#1A1A1A",
+          "touchTarget": "44×44",
+          "dropdown": { "options": ["Export", "Print"] }
+        }
+      }
+    },
+    "tabBar": {
+      "height": 44,
+      "background": "#FFFFFF",
+      "role": "tablist",
+      "split": "50/50",
+      "tabs": [
+        { "key": "notes",   "label": "Notes" },
+        { "key": "history", "label": "History" }
+      ],
+      "selected":   { "borderBottom": { "width": 2, "color": "#E3A9A0" }, "fontWeight": 600, "color": "#1A1A1A" },
+      "unselected": { "fontWeight": 400, "color": "#6B6B6B" }
+    },
+    "notesTab": {
+      "addNoteCta": {
+        "height": 44,
+        "width": "100%",
+        "borderRadius": 12,
+        "background": "rgba(227,169,160,0.12)",
+        "border": "1.5px dashed #E3A9A0",
+        "leadingIcon": { "name": "plus", "size": 16, "color": "#E3A9A0" },
+        "label": { "content": "Add note", "fontWeight": 500, "color": "#E3A9A0" }
+      },
+      "pinnedSection": {
+        "sectionLabel": { "content": "PINNED", "style": "label-small", "uppercase": true, "color": "#6B6B6B", "paddingHorizontal": 16, "paddingVertical": 8 },
+        "noteCard": {
+          "background": "#EDE8D0",
+          "border": "1px solid #D1BFB3",
+          "borderRadius": 16,
+          "paddingHorizontal": 16,
+          "paddingVertical": 14,
+          "marginHorizontal": 16,
+          "marginBottom": 8,
+          "pinIcon": { "name": "pin", "size": 14, "color": "#D1BFB3" },
+          "topRow": {
+            "structure": "pin icon + author (body-small w500 #1A1A1A) + date (body-small #6B6B6B right-aligned)"
+          },
+          "sensitivityBanner": {
+            "visible": "{{isSensitivity}}",
+            "role": "alert",
+            "content": "⚠ Sensitivity",
+            "style": "label-small",
+            "color": "#FF9800",
+            "marginBottom": 6
+          },
+          "body": {
+            "style": "body-small",
+            "fontSize": 12,
+            "lineHeight": 16,
+            "color": "#1A1A1A",
+            "maxLines": 3,
+            "overflow": "ellipsis",
+            "expandToggle": "…more / …less"
+          },
+          "visibilityBadge": {
+            "height": 20,
+            "paddingHorizontal": 6,
+            "borderRadius": 9999,
+            "style": "label-small",
+            "variants": {
+              "staff-only": { "background": "rgba(33,150,243,0.1)",  "color": "#1565C0", "label": "Staff-only" },
+              "all-staff":  { "background": "rgba(76,175,80,0.1)",   "color": "#2E7D32", "label": "All staff"  },
+              "owner-only": { "background": "rgba(255,152,0,0.1)",   "color": "#E65100", "label": "Owner only" }
+            }
+          },
+          "photoStrip": {
+            "visible": "{{photos.length > 0}}",
+            "thumbnails": { "size": "48×48", "borderRadius": 8, "maxVisible": 3 },
+            "overflow": { "label": "+N", "background": "rgba(0,0,0,0.5)", "color": "#FFFFFF", "style": "label-small" }
+          },
+          "contextMenu": {
+            "trigger": "⋯ icon or long-press",
+            "options": ["Pin / Unpin", "Edit", "Delete"],
+            "role": "menu",
+            "scrim": { "background": "rgba(0,0,0,0.5)", "visible": true }
+          }
+        }
+      },
+      "regularSection": {
+        "sectionLabel": { "content": "NOTES", "style": "label-small", "uppercase": true, "color": "#6B6B6B", "paddingHorizontal": 16, "paddingVertical": 8 },
+        "noteCard": {
+          "background": "#FFFFFF",
+          "border": "1px solid #E5E0D1",
+          "borderRadius": 16,
+          "paddingHorizontal": 16,
+          "paddingVertical": 14,
+          "marginHorizontal": 16,
+          "marginBottom": 8,
+          "note": "Same structure as pinnedSection.noteCard. No pin icon."
+        }
+      },
+      "emptryState": {
+        "icon": { "name": "sticky-note", "size": 64, "color": "#6B6B6B", "strokeWidth": 1.25 },
+        "title": { "content": "No notes yet", "style": "heading-2", "color": "#1A1A1A", "marginTop": 24 },
+        "body":  { "content": "Add internal notes visible only to staff.", "style": "body", "color": "#6B6B6B", "marginTop": 8, "maxWidth": 260, "textAlign": "center" },
+        "cta":   { "label": "Add first note", "height": 48, "borderRadius": 12, "background": "#E3A9A0", "color": "#FFFFFF", "marginTop": 20 }
+      },
+      "loading": {
+        "addNoteCta": "real (interactive)",
+        "shimmerCards": [
+          { "height": 96, "borderRadius": 16 },
+          { "height": 72, "borderRadius": 16 },
+          { "height": 72, "borderRadius": 16 }
+        ],
+        "shimmerStyle": { "background": "#F0EBE1", "animateTo": "#E5E0D1", "borderRadius": 16 }
+      }
+    },
+    "noteEditorSheet": {
+      "role": "dialog",
+      "ariaModal": true,
+      "presentation": {
+        "type": "bottom-sheet",
+        "slideUp": { "duration": "300ms", "easing": "ease-out", "transform": "translateY" },
+        "reduceMotion": "100ms cross-fade via useReducedMotion()",
+        "background": "#FFFFFF",
+        "borderRadiusTop": 24
+      },
+      "dragHandle": { "width": 32, "height": 4, "background": "#E5E0D1", "centered": true, "marginTop": 8 },
+      "titleRow": {
+        "height": 56,
+        "paddingHorizontal": 16,
+        "title": { "content": "New note", "style": "heading-4", "fontWeight": 500 },
+        "closeButton": { "icon": "x", "touchTarget": "44×44" }
+      },
+      "textarea": {
+        "minHeight": 120,
+        "background": "#F5F5F5",
+        "borderRadius": 12,
+        "padding": "12px",
+        "border": { "default": "1px solid #E5E0D1", "focus": "1px solid #E3A9A0" },
+        "style": "body",
+        "placeholder": { "content": "Type a note…", "color": "#6B6B6B" }
+      },
+      "sensitivityCheckbox": {
+        "label": "Mark as sensitivity note",
+        "style": "body-small",
+        "color": "#1A1A1A",
+        "checkbox": { "size": "20×20", "checked": { "fill": "#E3A9A0", "checkmarkColor": "#FFFFFF" } },
+        "accessibilityLabel": "Mark this note as a sensitivity alert",
+        "marginTop": 12
+      },
+      "photoRow": {
+        "marginTop": 12,
+        "addTile": { "size": "64×64", "borderRadius": 16, "border": "1.5px dashed #D1BFB3", "background": "#F5F5F5" },
+        "previewSlot": { "size": "64×64", "borderRadius": 16 }
+      },
+      "visibilityPicker": {
+        "label": { "content": "Visible to", "style": "body-small", "color": "#6B6B6B" },
+        "role": "radiogroup",
+        "options": ["Staff-only", "All staff", "Owner only"],
+        "pill": {
+          "height": 32,
+          "borderRadius": 9999,
+          "background": "#F5F5F5",
+          "selectedSegment": { "background": "#E3A9A0", "color": "#FFFFFF" },
+          "unselectedSegment": { "color": "#6B6B6B" }
+        },
+        "marginTop": 12
+      },
+      "actionRow": {
+        "paddingHorizontal": 16,
+        "paddingVertical": 12,
+        "gap": 8,
+        "cancel": { "flex": 1, "height": 44, "borderRadius": 12, "background": "#F5F5F5", "label": { "fontWeight": 500, "color": "#6B6B6B" } },
+        "save": {
+          "flex": 2,
+          "height": 44,
+          "borderRadius": 12,
+          "background": "#E3A9A0",
+          "label": { "fontWeight": 500, "color": "#FFFFFF" },
+          "savingState": {
+            "icon": "Loader2 spinner (animated)",
+            "disabled": true,
+            "accessibilityLabel": "Saving note, please wait"
+          },
+          "successBehavior": "1.2s simulated save → close sheet → prepend note to list with fade-in 150ms"
+        }
+      }
+    },
+    "historyTab": {
+      "filterChips": {
+        "paddingHorizontal": 16,
+        "paddingVertical": 12,
+        "gap": 8,
+        "horizontalScroll": true,
+        "options": [
+          { "key": "all",       "label": "All",       "showCountBadge": true },
+          { "key": "completed", "label": "Completed" },
+          { "key": "no-shows",  "label": "No-shows"  },
+          { "key": "cancelled", "label": "Cancelled" }
+        ],
+        "chip": { "height": 32, "borderRadius": 9999, "paddingHorizontal": 12 },
+        "selected":   { "background": "#E3A9A0", "color": "#FFFFFF", "border": "none" },
+        "unselected": { "background": "#FFFFFF", "color": "#6B6B6B", "border": "1px solid #E5E0D1" }
+      },
+      "appointmentCard": {
+        "borderRadius": 16,
+        "background": "#FFFFFF",
+        "border": "1px solid #E5E0D1",
+        "padding": 16,
+        "marginHorizontal": 16,
+        "marginBottom": 8,
+        "headerRow": {
+          "serviceName": { "style": "body", "fontWeight": 500, "color": "#1A1A1A", "flex": 1 },
+          "statusBadge": { "borderRadius": 8, "height": 22, "paddingHorizontal": 8, "style": "label-small", "fontWeight": 500 }
+        },
+        "statusStyles": {
+          "completed": { "background": "rgba(76,175,80,0.1)",  "color": "#2E7D32", "label": "Completed" },
+          "no-show":   { "background": "rgba(255,152,0,0.1)",  "color": "#FF9800", "label": "No-show"   },
+          "cancelled": { "background": "rgba(244,67,54,0.1)",  "color": "#F44336", "label": "Cancelled" }
+        },
+        "metaRow": { "marginTop": 4, "content": "stylist · date MM/DD/YYYY", "style": "body-small", "color": "#6B6B6B" },
+        "amountRow": { "marginTop": 4, "style": "body", "fontWeight": 500, "color": "#1A1A1A", "format": "$NNN.NN" },
+        "ratingRow": {
+          "visible": "{{rating != null}}",
+          "marginTop": 8,
+          "stars": {
+            "count": 5,
+            "size": 14,
+            "filled":  { "color": "#E3A9A0" },
+            "empty":   { "color": "#E5E0D1" }
+          },
+          "label": { "content": "you rated {{n}}/5", "style": "label-small", "color": "#6B6B6B" },
+          "accessibilityLabel": "{{clientName}} rated {{n}} out of 5 stars"
+        }
+      },
+      "emptyState": {
+        "icon": { "name": "calendar-days", "size": 64, "color": "#6B6B6B", "strokeWidth": 1.25 },
+        "title": { "content": "No visit history", "style": "heading-2", "color": "#1A1A1A", "marginTop": 24 },
+        "body":  { "content": "Completed appointments will appear here.", "style": "body", "color": "#6B6B6B", "marginTop": 8, "maxWidth": 260, "textAlign": "center" }
+      },
+      "loading": {
+        "filterChips": "real (interactive)",
+        "shimmerCards": [
+          { "height": 100, "borderRadius": 16 },
+          { "height": 100, "borderRadius": 16 },
+          { "height": 100, "borderRadius": 16 }
+        ]
+      }
+    },
+    "errorState": {
+      "position": "center",
+      "flex": 1,
+      "paddingHorizontal": 32,
+      "textAlign": "center",
+      "icon": { "name": "wifi-off", "size": 64, "color": "#6B6B6B", "strokeWidth": 1.25 },
+      "title": { "content": "Couldn't load data", "style": "heading-2", "color": "#1A1A1A", "marginTop": 24 },
+      "body":  { "content": "Check your connection and try again.", "style": "body", "color": "#6B6B6B", "marginTop": 8, "maxWidth": 260 },
+      "retryButton": { "label": "Retry", "height": 48, "borderRadius": 12, "background": "#E3A9A0", "color": "#FFFFFF", "paddingHorizontal": 24, "marginTop": 20 }
+    }
+  },
+  "g4Integration": {
+    "description": "G.5 is the full-screen expansion of the two inline sections in G.4 Client Detail.",
+    "notesTabGhostButton": { "label": "View all notes & history →", "style": "label-small", "color": "#E3A9A0", "position": "bottom of notes list in G.4 Overview/Notes tabs" },
+    "historyTabGhostButton": { "label": "View full history →", "style": "label-small", "color": "#E3A9A0", "position": "bottom of history list in G.4 History tab" }
+  },
+  "dataModel": {
+    "note": {
+      "id": "string",
+      "author": "string",
+      "date": "string (MM/DD/YYYY)",
+      "content": "string",
+      "isSensitivity": "boolean",
+      "isPinned": "boolean",
+      "visibility": "staff-only | all-staff | owner-only",
+      "photos": "string[] (URIs, max ~10)"
+    },
+    "appointmentHistory": {
+      "id": "string",
+      "service": "string",
+      "stylist": "string",
+      "date": "string (MM/DD/YYYY)",
+      "amount": "number (USD)",
+      "status": "completed | no-show | cancelled",
+      "rating": "number (1–5) | null"
+    }
+  },
+  "interactions": {
+    "addNote": { "trigger": "tap +Note CTA", "effect": "slide-up note editor bottom sheet 300ms ease-out" },
+    "saveNote": { "trigger": "tap Save in sheet", "effect": "1.2s save simulation → close sheet → prepend note to list fade-in 150ms" },
+    "cancelNote": { "trigger": "tap Cancel or × in sheet", "effect": "close sheet, discard draft" },
+    "toggleNoteExpand": { "trigger": "tap …more / …less", "effect": "expand / collapse note body" },
+    "contextMenu": { "trigger": "tap ⋯ or long-press card", "effect": "show menu (Pin/Unpin · Edit · Delete) with scrim overlay" },
+    "historyFilter": { "trigger": "tap filter chip", "effect": "filter list cross-fade 150ms" },
+    "reduceMotion": "useReducedMotion() — sheet slide 300ms → 100ms cross-fade; all transitions ≤ 100ms"
+  },
+  "accessibility": {
+    "standard": "WCAG 2.1 AA",
+    "minTouchTarget": "44×44px",
+    "tabBar": { "role": "tablist", "tabRole": "tab", "ariaSelected": true },
+    "sensitivityBanner": { "role": "alert" },
+    "noteEditorSheet": { "role": "dialog", "ariaModal": true },
+    "visibilityPicker": { "role": "radiogroup", "optionRole": "radio" },
+    "saveButton": { "savingLabel": "Saving note, please wait" },
+    "sensitivityCheckbox": { "ariaLabel": "Mark this note as a sensitivity alert" },
+    "starRatings": { "ariaLabel": "{{clientName}} rated {{n}} out of 5 stars" },
+    "contextMenu": { "role": "menu" },
+    "decorativeIcons": "accessibilityElementsHidden true"
+  },
+  "engineeringFlags": [],
+  "usLocale": {
+    "dateFormat": "MM/DD/YYYY",
+    "currency": "USD ($NNN.NN)",
+    "timeFormat": "h:mm A"
+  },
+  "transitions": {
+    "sheetSlideUp": { "duration": "300ms", "easing": "ease-out", "reduceMotion": "100ms cross-fade" },
+    "notePrep":     { "duration": "150ms", "type": "fade-in" },
+    "historyFilter": { "duration": "150ms", "type": "cross-fade" },
+    "shimmer":       { "duration": "1500ms", "timing": "linear", "iterations": "infinite" }
+  },
+  "usage": {
+    "rules": [
+      "Pinned notes always appear above regular notes, sorted newest-first within each group",
+      "Sensitivity notes show ⚠ Sensitivity banner (role=alert) above body text",
+      "Note body truncates at 3 lines; tapping …more expands, …less collapses",
+      "PhotoStrip shows max 3 thumbnails; additional photos shown as +N overlay",
+      "Context menu (Pin/Unpin · Edit · Delete) triggered by ⋯ or long-press",
+      "Visibility badge color is never the sole signal — label always present",
+      "Note editor sheet respects prefers-reduced-motion via useReducedMotion()",
+      "Save triggers 1.2s simulated save → prepend note at top of list",
+      "History filter chips: All / Completed / No-shows / Cancelled; All shows total count badge",
+      "Star ratings hidden when rating is null (no rating left yet)",
+      "Cancelled appointments included in history list for full filter demo"
+    ]
+  }
+}

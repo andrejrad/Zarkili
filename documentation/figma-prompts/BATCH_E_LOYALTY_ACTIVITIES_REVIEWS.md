@@ -180,3 +180,27 @@ photo-upload-tile — 80×80 tile with + icon when empty; with image when filled
 - [ ] Reduce-motion fallbacks for celebration animations.
 - [ ] Touch targets ≥44×44 (stars use 44 hit slop even at 32 visual).
 - [ ] Frames named `E-<screen>-<state>`.
+
+---
+
+## Design handoff promoted — 2026-04-28
+
+All Batch E Figma one-pass output has been locked into the design-handoff package. The following files are now the source of truth for W25 engineering:
+
+**Component specs**
+- `design-handoff/components/progress-ring.json`
+- `design-handoff/components/tier-badge.json`
+- `design-handoff/components/reward-card.json`
+- `design-handoff/components/rating-selector.json`
+- `design-handoff/components/photo-upload-tile.json`
+
+**Screen specs**
+- `design-handoff/specs/screen-loyalty-landing.json` (E.1)
+
+**Manifests updated**
+- `design-handoff/HANDOFF_MANIFEST.md` — Batch E rows added to components and screens tables
+- `design-handoff/ASSET_MANIFEST.json` — 5 component entries + 1 screen entry; counts updated to 12 components / 4 screens
+- `design-handoff/ACCESSIBILITY_GUIDE.md` — `RatingSelector (adjustable role)` and `TierBadge (color + label pairing)` sections added
+- `documentation/PROGRAM_TRACKING_BOARD.md` — DESIGN-BATCH-E marked complete
+
+Screens E.2–E.9 remain code-only (no Figma pass). Engineering proceeds using the component specs above plus the screen prompts in this file as build specs.

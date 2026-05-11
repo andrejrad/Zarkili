@@ -1,0 +1,110 @@
+{
+  "componentId": "coach-mark-popover",
+  "name": "CoachMarkPopover",
+  "description": "Contextual coach mark popover that highlights a target UI element during onboarding tours",
+  "category": "onboarding",
+  "version": "1.0.0",
+  "popoverLayout": {
+    "maxWidth": 280,
+    "backgroundColor": "#1A1A1A",
+    "borderRadius": 12,
+    "padding": 16,
+    "elevation": 8
+  },
+  "arrow": {
+    "size": 10,
+    "position": "auto",
+    "color": "#1A1A1A",
+    "positions": ["top", "bottom", "left", "right"]
+  },
+  "elements": [
+    {
+      "id": "step-indicator",
+      "label": "Step Indicator",
+      "type": "text",
+      "style": "labelSmall",
+      "color": "#BBEDDA",
+      "textPattern": "{{current}} of {{total}}",
+      "marginBottom": 6
+    },
+    {
+      "id": "title",
+      "label": "Title",
+      "type": "text",
+      "style": "headingXSmall",
+      "color": "#FFFFFF",
+      "maxChars": 36,
+      "marginBottom": 8
+    },
+    {
+      "id": "body",
+      "label": "Body",
+      "type": "text",
+      "style": "bodySmall",
+      "color": "rgba(255,255,255,0.75)",
+      "maxChars": 100,
+      "lineHeight": 20
+    },
+    {
+      "id": "action-row",
+      "label": "Action Row",
+      "type": "group",
+      "layout": "horizontal-space-between",
+      "marginTop": 16,
+      "children": [
+        {
+          "id": "skip-link",
+          "label": "Skip Link",
+          "type": "button",
+          "style": "ghost-inverse",
+          "maxChars": 12,
+          "visibleWhen": "notLastStep"
+        },
+        {
+          "id": "next-button",
+          "label": "Next / Done Button",
+          "type": "button",
+          "style": "primary-small",
+          "maxChars": 12
+        }
+      ]
+    }
+  ],
+  "backdrop": {
+    "enabled": true,
+    "color": "rgba(0,0,0,0.6)",
+    "spotlight": {
+      "enabled": true,
+      "shape": "rounded-rect",
+      "borderRadius": 8,
+      "padding": 6,
+      "animated": true
+    },
+    "pulseRing": {
+      "enabled": true,
+      "color": "#E3A9A0",
+      "maxScale": 1.6,
+      "duration": 1200,
+      "iterations": "infinite"
+    }
+  },
+  "positioning": {
+    "strategy": "smart",
+    "preferredPlacement": "bottom",
+    "edgePadding": 16,
+    "targetOffset": 12,
+    "flipWhenOffscreen": true
+  },
+  "animation": {
+    "enterEasing": "spring",
+    "exitEasing": "ease-out",
+    "enterDuration": 240,
+    "exitDuration": 180
+  },
+  "accessibility": {
+    "semanticRole": "tooltip",
+    "ariaLive": "polite",
+    "focusOnMount": "title",
+    "dismissOnEscape": true
+  }
+}

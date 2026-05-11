@@ -1,0 +1,166 @@
+{
+  "component": "TimeSlotChip",
+  "description": "Selectable time slot chip for booking appointments",
+  "purpose": "Display available appointment time slots and allow users to select preferred times",
+  "source": {
+    "batch": "C",
+    "screen": "C.4 Time-Slot Picker",
+    "promotedFrom": "documentation/figma-prompts/BATCH_C_BOOKING_FLOW.md",
+    "figmaFrame": "C-component-time-slot-chip",
+    "lockedAt": "2026-04-27"
+  },
+  "variants": {
+    "state": {
+      "options": ["default", "selected", "disabled", "pressed"],
+      "default": "default"
+    }
+  },
+  "states": {
+    "default": {
+      "background": "#FFFFFF",
+      "border": {
+        "width": 1,
+        "color": "#E5E0D1"
+      },
+      "color": "#1A1A1A",
+      "textDecoration": "none"
+    },
+    "selected": {
+      "background": "#E3A9A0",
+      "border": {
+        "width": 0,
+        "color": "transparent"
+      },
+      "color": "#FFFFFF",
+      "textDecoration": "none"
+    },
+    "disabled": {
+      "background": "#F5F5F5",
+      "border": {
+        "width": 0,
+        "color": "transparent"
+      },
+      "color": "#B0B0B0",
+      "textDecoration": "line-through",
+      "pointerEvents": "none"
+    },
+    "pressed": {
+      "background": "#CF8B80",
+      "border": {
+        "width": 0,
+        "color": "transparent"
+      },
+      "color": "#FFFFFF",
+      "textDecoration": "none",
+      "transform": "scale(0.98)"
+    }
+  },
+  "layout": {
+    "height": 40,
+    "minWidth": 80,
+    "paddingHorizontal": 12,
+    "paddingVertical": 10,
+    "borderRadius": 8,
+    "justifyContent": "center",
+    "alignItems": "center"
+  },
+  "structure": {
+    "container": {
+      "type": "button",
+      "height": 40,
+      "minWidth": 80,
+      "paddingHorizontal": 12,
+      "borderRadius": 8,
+      "children": ["timeLabel"]
+    },
+    "timeLabel": {
+      "type": "text",
+      "style": "label",
+      "textAlign": "center",
+      "format": "h:mm A",
+      "examples": ["9:00 AM", "10:30 AM", "2:00 PM", "3:30 PM"],
+      "locale": "en-US"
+    }
+  },
+  "transitions": {
+    "onPress": {
+      "duration": 100,
+      "easing": "ease-out",
+      "properties": ["background", "transform"]
+    },
+    "onSelect": {
+      "duration": 150,
+      "easing": "ease-out",
+      "properties": ["background", "color", "border"]
+    }
+  },
+  "accessibility": {
+    "role": "button",
+    "label": {
+      "available": "{{time}}, available",
+      "unavailable": "{{time}}, unavailable",
+      "selected": "{{time}}, selected"
+    },
+    "hint": {
+      "available": "Tap to select this time slot",
+      "unavailable": "This time slot is not available",
+      "selected": "Tap to deselect this time slot"
+    },
+    "examples": {
+      "available": "9:00 AM, available",
+      "unavailable": "2:00 PM, unavailable",
+      "selected": "10:30 AM, selected"
+    },
+    "state": {
+      "disabled": true,
+      "selected": true
+    },
+    "minimumTouchTarget": "Chip height is 40pt; consumer must wrap chips with min 44x44 hit-slop or vertical gap to satisfy WCAG 2.1 AA."
+  },
+  "tokens": {
+    "colors": {
+      "primary": "#E3A9A0",
+      "primaryPressed": "#CF8B80",
+      "surface": "#FFFFFF",
+      "foreground": "#1A1A1A",
+      "border": "#E5E0D1",
+      "disabledFg": "#B0B0B0",
+      "disabledBg": "#F5F5F5"
+    },
+    "typography": {
+      "label": "14px/20px weight 500"
+    },
+    "spacing": {
+      "paddingHorizontal": 12,
+      "paddingVertical": 10,
+      "minWidth": 80,
+      "height": 40
+    },
+    "borderRadius": {
+      "small": 8
+    }
+  },
+  "interactions": {
+    "onPress": {
+      "action": "Toggle selection if available",
+      "haptic": "light",
+      "condition": "Only if state is not disabled"
+    }
+  },
+  "implementation": {
+    "timeFormat": "12-hour (US locale)",
+    "example": "<TimeSlotChip time=\"9:00 AM\" selected={false} disabled={false} onPress={(time) => handleTimeSelect(time)} accessibilityLabel=\"9:00 AM, available\" />"
+  },
+  "usage": {
+    "context": "Used in time slot selection grids for booking appointments",
+    "grouping": "Typically displayed in horizontal rows or grids with 8-12px gap between chips",
+    "states": "Disabled state indicates fully booked or unavailable times"
+  },
+  "dependencies": {
+    "tokens": [
+      "colors.json",
+      "typography.json",
+      "spacing.json"
+    ]
+  }
+}

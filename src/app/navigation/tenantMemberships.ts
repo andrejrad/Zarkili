@@ -24,9 +24,14 @@ function getDevelopmentDevMembership(userId: string): TenantMembership[] {
 export async function listActiveTenantMembershipsForUser(
   userId: string
 ): Promise<TenantMembership[]> {
-  const memberships = await authRepository.listUserTenantMemberships(userId);
-  if (memberships.length > 0) {
-    return memberships;
+  try {
+    const memberships = await authRepository.listUserTenantMemberships(userId);
+    if (memberships.length > 0) {
+      return memberships;
+    }
+  } catch {
+    // Firebase may reject unauthenticated reads (e.g. sign-in-as-dev bypasses Firebase auth).
+    // Fall through to dev-mode fallback below.
   }
 
   // Dev-mode fallback keeps sign-in-as-dev flows usable before tenantUsers is seeded.

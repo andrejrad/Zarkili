@@ -1,0 +1,31 @@
+{
+  "screen": "ThreadAssignmentScreen",
+  "route": "AdminThreadAssignment",
+  "device": {
+    "iPad": { "type": "popover", "width": 280 },
+    "iPhone": { "type": "bottom-sheet", "width": 390 }
+  },
+  "stateNames": [
+    "default",
+    "assigning",
+    "assigned",
+    "error"
+  ],
+  "layout": {
+    "component": "assignment-picker",
+    "props": { "threadId": "required" }
+  },
+  "states": {
+    "assigning": {
+      "assignCTA": { "spinner": true },
+      "list": { "locked": true }
+    },
+    "assigned": {
+      "toast": "strings.threadAssignment.assignedToast",
+      "action": "dismiss popover/sheet"
+    },
+    "error": {
+      "inlineError": { "variant": "caption", "position": "below staffList" }
+    }
+  }
+}

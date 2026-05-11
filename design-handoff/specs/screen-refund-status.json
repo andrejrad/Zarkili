@@ -1,0 +1,257 @@
+{
+  "screen": "RefundStatus",
+  "batchId": "D.6",
+  "description": "Read-only refund tracking screen. Displays a status banner (Pending / Issued / Denied), a vertical timeline of refund lifecycle events, a booking summary mini-card, refund amount in USD, and a 'Contact support' tertiary link.",
+  "purpose": "Inform the consumer about the current state of their refund. Informs of expected timeline (5-10 business days). State transitions are admin/webhook-driven.",
+  "sourceFile": "src/app/payments/RefundStatusScreen.tsx",
+  "hierarchy": {
+    "container": {
+      "background": "#F2EDDD",
+      "safeArea": true,
+      "flex": 1
+    },
+    "scroll": {
+      "type": "ScrollView",
+      "contentContainerPadding": 16,
+      "contentContainerGap": 12
+    }
+  },
+  "sections": {
+    "header": {
+      "type": "fixed",
+      "height": 56,
+      "background": "#FFFFFF",
+      "paddingHorizontal": 16,
+      "paddingVertical": 12,
+      "borderBottomWidth": 1,
+      "borderBottomColor": "#E5E0D1",
+      "layout": "row",
+      "children": ["backButton", "titleLabel", "headerSpacer"]
+    },
+    "backButton": {
+      "type": "iconButton",
+      "glyph": "←",
+      "size": 44,
+      "color": "#1A1A1A",
+      "optional": true,
+      "accessibility": { "role": "button", "label": "Back" }
+    },
+    "titleLabel": {
+      "type": "text",
+      "content": "Refund details",
+      "fontSize": 18,
+      "lineHeight": 24,
+      "fontWeight": "600",
+      "color": "#1A1A1A",
+      "textAlign": "center",
+      "flex": 1
+    },
+    "headerSpacer": { "type": "view", "width": 44 },
+    "errorBanner": {
+      "type": "Banner",
+      "variant": "error",
+      "optional": true,
+      "showWhen": "errorMessage is set"
+    },
+    "statusBanner": {
+      "type": "Banner",
+      "variants": {
+        "pending": { "variant": "info", "message": "Refund Pending", "background": "#5BC0DE", "icon": "clock" },
+        "issued": { "variant": "success", "message": "Refund Issued", "background": "#5CB85C", "icon": "check-circle" },
+        "denied": { "variant": "error", "message": "Refund Denied", "background": "#D9534F", "icon": "x-circle" }
+      },
+      "alwaysShown": true
+    },
+    "timelineCard": {
+      "type": "card",
+      "background": "#FFFFFF",
+      "borderRadius": 16,
+      "borderWidth": 1,
+      "borderColor": "#E5E0D1",
+      "padding": 16,
+      "children": ["timelineSectionLabel", "timelineList"]
+    },
+    "timelineSectionLabel": {
+      "type": "text",
+      "content": "Timeline",
+      "fontSize": 12,
+      "lineHeight": 16,
+      "fontWeight": "600",
+      "color": "#6B6B6B",
+      "textTransform": "uppercase",
+      "letterSpacing": 0.5,
+      "marginBottom": 8
+    },
+    "timelineList": {
+      "type": "list",
+      "itemComponent": "TimelineRow",
+      "description": "Each step rendered by TimelineRow sub-component. Steps produced by buildRefundTimeline().",
+      "steps": [
+        { "id": "requested", "label": "Refund requested", "alwaysShown": true },
+        { "id": "approved", "label": "Approved", "optional": true },
+        { "id": "issued", "label": "Issued", "optional": true },
+        { "id": "denied", "label": "Denied", "optional": true, "destructiveTone": true }
+      ]
+    },
+    "timelineRow": {
+      "type": "view",
+      "layout": "row",
+      "gap": 12,
+      "paddingVertical": 8,
+      "children": ["timelineDotAndLine", "timelineStepContent"]
+    },
+    "timelineDotAndLine": {
+      "type": "view",
+      "width": 16,
+      "alignItems": "center",
+      "children": [
+        {
+          "type": "view",
+          "width": 12,
+          "height": 12,
+          "borderRadius": 6,
+          "variants": {
+            "completed": { "background": "#E3A9A0" },
+            "pending": { "background": "#E5E0D1" },
+            "denied": { "background": "#D9534F" }
+          }
+        },
+        {
+          "type": "view",
+          "note": "Vertical connector line below dot, hidden for last step",
+          "width": 2,
+          "flex": 1,
+          "background": "#E5E0D1",
+          "marginTop": 4,
+          "showWhen": "not isLast"
+        }
+      ]
+    },
+    "timelineStepContent": {
+      "type": "view",
+      "flex": 1,
+      "paddingBottom": 8,
+      "children": ["stepLabel", "stepDate"]
+    },
+    "stepLabel": {
+      "type": "text",
+      "content": "{step.label}",
+      "fontSize": 14,
+      "lineHeight": 20,
+      "fontWeight": "500",
+      "color": "#1A1A1A"
+    },
+    "stepDate": {
+      "type": "text",
+      "content": "{MM/DD/YYYY · h:mm AM/PM}",
+      "fontSize": 12,
+      "lineHeight": 16,
+      "color": "#6B6B6B",
+      "showWhen": "step has a timestamp"
+    },
+    "bookingCard": {
+      "type": "card",
+      "background": "#FFFFFF",
+      "borderRadius": 16,
+      "borderWidth": 1,
+      "borderColor": "#E5E0D1",
+      "padding": 16,
+      "children": ["bookingSectionLabel", "bookingSalonName", "bookingServiceName", "bookingDateLine"]
+    },
+    "bookingSectionLabel": {
+      "type": "text",
+      "content": "Booking",
+      "fontSize": 12,
+      "lineHeight": 16,
+      "fontWeight": "600",
+      "color": "#6B6B6B",
+      "textTransform": "uppercase",
+      "letterSpacing": 0.5,
+      "marginBottom": 8
+    },
+    "bookingSalonName": {
+      "type": "text",
+      "content": "{booking.salonName}",
+      "fontSize": 15,
+      "lineHeight": 20,
+      "fontWeight": "600",
+      "color": "#1A1A1A"
+    },
+    "bookingServiceName": {
+      "type": "text",
+      "content": "{booking.serviceName}",
+      "fontSize": 14,
+      "lineHeight": 20,
+      "color": "#6B6B6B"
+    },
+    "bookingDateLine": {
+      "type": "text",
+      "content": "{MM/DD/YYYY} · {h:mm AM/PM}",
+      "fontSize": 13,
+      "lineHeight": 18,
+      "color": "#6B6B6B"
+    },
+    "refundAmountCard": {
+      "type": "card",
+      "background": "#FFFFFF",
+      "borderRadius": 16,
+      "borderWidth": 1,
+      "borderColor": "#E5E0D1",
+      "padding": 16,
+      "layout": "row",
+      "justifyContent": "space-between",
+      "children": [
+        { "type": "text", "content": "Refund amount", "fontSize": 14, "color": "#6B6B6B" },
+        { "type": "text", "content": "{amountUsd}", "fontSize": 16, "fontWeight": "600", "color": "#1A1A1A" }
+      ]
+    },
+    "expectationNote": {
+      "type": "text",
+      "content": "Refunds typically appear within 5–10 business days depending on your bank.",
+      "fontSize": 13,
+      "lineHeight": 18,
+      "color": "#6B6B6B",
+      "textAlign": "center"
+    },
+    "denialReasonNote": {
+      "type": "text",
+      "content": "Reason: {denialReason}",
+      "fontSize": 13,
+      "lineHeight": 18,
+      "color": "#D9534F",
+      "optional": true,
+      "showWhen": "status === 'denied' and denialReason is set"
+    },
+    "contactSupportLink": {
+      "type": "pressable",
+      "optional": true,
+      "showWhen": "onPressContactSupport is provided",
+      "children": [
+        { "type": "text", "content": "Contact support", "fontSize": 14, "color": "#6B6B6B", "textDecorationLine": "underline" }
+      ],
+      "accessibility": { "role": "button", "label": "Contact support" }
+    }
+  },
+  "tokens": {
+    "background": "#F2EDDD",
+    "surface": "#FFFFFF",
+    "border": "#E5E0D1",
+    "foreground": "#1A1A1A",
+    "textMuted": "#6B6B6B",
+    "primary": "#E3A9A0",
+    "success": "#5CB85C",
+    "info": "#5BC0DE",
+    "error": "#D9534F",
+    "pageHorizontalPadding": 16,
+    "cornerRadius": { "full": 9999, "lg": 16 }
+  },
+  "interactions": {
+    "tapContactSupport": "calls onPressContactSupport (optional prop)"
+  },
+  "accessibility": {
+    "screenLabel": "Refund details",
+    "statusBanner": "role='alert' or status-summary region",
+    "timelineList": "ordered list of refund lifecycle events",
+    "contactSupportLink": "role='button'"
+  }
+}

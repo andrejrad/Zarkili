@@ -1,0 +1,234 @@
+{
+  "component": "AISuggestionCard",
+  "description": "AI-generated suggestion card with type label, body text, primary/secondary actions, explainability 'Why?' link, and thumbs up/down feedback. Used inline in G.1 Staff Today and as the pattern library in G.7.",
+  "purpose": "Surface proactive AI suggestions to staff with clear action affordances, explainability, and feedback collection in a single composable card.",
+  "source": {
+    "batch": "G",
+    "screens": ["G.1 Staff Today", "G.7 AI Suggestion Patterns"],
+    "promotedFrom": "design-handoff/specs/screen-staff-today.json",
+    "figmaFrames": "code-derived — spec locked from screen-staff-today.json and G.7 batch spec",
+    "lockedAt": "2026-04-28"
+  },
+  "variants": {
+    "suggestionType": {
+      "options": ["scheduling", "retention", "content"],
+      "default": "scheduling"
+    },
+    "state": {
+      "options": ["default", "accepted", "dismissed", "error"],
+      "default": "default"
+    }
+  },
+  "exampleContent": {
+    "scheduling": {
+      "typeLabel": "Scheduling suggestion",
+      "body": "Move 2:00 PM appointment to 4:00 PM to fit a walk-in",
+      "primaryAction": "Accept",
+      "secondaryAction": "Modify"
+    },
+    "retention": {
+      "typeLabel": "Retention suggestion",
+      "body": "Reach out to Jane D. (last visit 90 days ago)",
+      "primaryAction": "Send template",
+      "secondaryAction": "Edit"
+    },
+    "content": {
+      "typeLabel": "Content suggestion",
+      "body": "Draft a post about your new Hydration service",
+      "primaryAction": "Use draft",
+      "secondaryAction": "Edit"
+    }
+  },
+  "anatomy": {
+    "container": {
+      "background": "#FFFFFF",
+      "borderRadius": 16,
+      "border": { "width": 1, "color": "#E5E0D1" },
+      "overflow": "hidden"
+    },
+    "topBar": {
+      "height": 32,
+      "background": "rgba(187,237,218,0.30)",
+      "paddingHorizontal": 12,
+      "flexDirection": "row",
+      "alignItems": "center",
+      "gap": 8,
+      "children": ["aiTag", "typeLabel", "whyButton"]
+    },
+    "aiTag": {
+      "height": 20,
+      "paddingHorizontal": 6,
+      "borderRadius": 9999,
+      "background": "#BBEDDA",
+      "label": { "style": "label-small", "fontWeight": 600, "color": "#2D4A42", "content": "AI" },
+      "accessibilityLabel": "AI generated suggestion"
+    },
+    "typeLabel": {
+      "flex": 1,
+      "style": "label-small",
+      "fontWeight": 500,
+      "color": "#2D4A42"
+    },
+    "whyButton": {
+      "marginLeft": "auto",
+      "label": { "style": "label-small", "fontWeight": 500, "color": "#E3A9A0", "content": "Why?" },
+      "touchTarget": "44×44 with hit slop",
+      "accessibilityLabel": "Explain why this was suggested"
+    },
+    "body": {
+      "paddingHorizontal": 12,
+      "paddingVertical": 12,
+      "style": "body",
+      "fontSize": 14,
+      "lineHeight": 20,
+      "color": "#1A1A1A",
+      "numberOfLines": 3,
+      "overflow": "ellipsis"
+    },
+    "actionRow": {
+      "paddingHorizontal": 12,
+      "paddingBottom": 12,
+      "gap": 8,
+      "flexDirection": "row",
+      "children": ["primaryButton", "secondaryButton", "dismissButton"]
+    },
+    "primaryButton": {
+      "flex": 1,
+      "height": 36,
+      "borderRadius": 12,
+      "background": "#E3A9A0",
+      "label": { "style": "label-small", "fontWeight": 500, "color": "#FFFFFF" }
+    },
+    "secondaryButton": {
+      "flex": 1,
+      "height": 36,
+      "borderRadius": 12,
+      "background": "#F5F5F5",
+      "label": { "style": "label-small", "fontWeight": 500, "color": "#1A1A1A" }
+    },
+    "dismissButton": {
+      "width": 36,
+      "height": 36,
+      "borderRadius": 12,
+      "background": "transparent",
+      "icon": { "name": "x", "size": 16, "color": "#6B6B6B" },
+      "touchTarget": "44×44 with hit slop",
+      "accessibilityLabel": "Dismiss suggestion"
+    },
+    "feedbackRow": {
+      "paddingHorizontal": 12,
+      "paddingBottom": 12,
+      "paddingTop": 4,
+      "gap": 16,
+      "flexDirection": "row",
+      "borderTop": { "width": 1, "color": "#E5E0D1" },
+      "thumbsUp": {
+        "icon": { "name": "thumbs-up", "size": 20, "color": "#6B6B6B" },
+        "selectedColor": "#E3A9A0",
+        "touchTarget": "44×44",
+        "accessibilityLabel": "Mark as helpful"
+      },
+      "thumbsDown": {
+        "icon": { "name": "thumbs-down", "size": 20, "color": "#6B6B6B" },
+        "touchTarget": "44×44",
+        "accessibilityLabel": "Mark as not helpful"
+      }
+    }
+  },
+  "states": {
+    "default": {},
+    "accepted": {
+      "topBar": {
+        "background": "rgba(76,175,80,0.12)",
+        "aiTag": { "background": "#4CAF50", "color": "#FFFFFF" }
+      },
+      "body": {
+        "textDecorationLine": "line-through",
+        "color": "#6B6B6B"
+      },
+      "actionRow": {
+        "replaced": true,
+        "content": {
+          "checkLabel": { "style": "label-small", "color": "#2E7D32", "content": "✓ Accepted" },
+          "undoButton": { "style": "label-small", "color": "#E3A9A0", "content": "Undo", "marginLeft": "auto" }
+        }
+      },
+      "accessibilityNote": "Dismissed state label includes 'Undo available'"
+    },
+    "dismissed": {
+      "container": { "height": 44 },
+      "body": { "visible": false },
+      "actionRow": { "visible": false },
+      "feedbackRow": { "visible": false },
+      "collapsedContent": {
+        "paddingHorizontal": 12,
+        "height": 44,
+        "flexDirection": "row",
+        "alignItems": "center",
+        "label": { "style": "label-small", "color": "#6B6B6B", "content": "Suggestion dismissed" },
+        "undoButton": {
+          "style": "label-small",
+          "color": "#E3A9A0",
+          "content": "Undo",
+          "marginLeft": "auto",
+          "accessibilityLabel": "Undo dismiss"
+        }
+      },
+      "accessibilityNote": "accessibilityLabel includes 'Undo available'"
+    },
+    "error": {
+      "topBar": {
+        "background": "rgba(244,67,54,0.10)"
+      },
+      "body": {
+        "content": "Couldn't load suggestion.",
+        "color": "#F44336"
+      },
+      "actionRow": {
+        "replaced": true,
+        "content": {
+          "retryButton": { "style": "label-small", "color": "#F44336", "content": "Retry ↻" }
+        }
+      }
+    }
+  },
+  "interactions": {
+    "primaryTap": "Trigger primary action (type-specific), transition to accepted state",
+    "secondaryTap": "Trigger secondary action (type-specific)",
+    "dismissTap": "Collapse card to dismissed state with fade 150ms",
+    "undoTap": "Restore card to default state",
+    "whyTap": "Open explainability bottom sheet",
+    "thumbsUpTap": "Fill icon with #E3A9A0, send positive feedback signal",
+    "thumbsDownTap": "Fill icon, open 1-question feedback sheet",
+    "reduceMotion": "accepted/dismissed state changes are instant"
+  },
+  "accessibility": {
+    "aiTag": { "label": "AI generated suggestion" },
+    "whyButton": { "label": "Explain why this was suggested" },
+    "thumbsUp": { "label": "Mark as helpful" },
+    "thumbsDown": { "label": "Mark as not helpful" },
+    "primaryButton": "Descriptive label (not just 'Accept') — use example content labels",
+    "dismissButton": { "label": "Dismiss suggestion" },
+    "dismissedState": "accessibilityLabel includes 'Undo available'"
+  },
+  "engineeringNotes": [
+    "Top bar mint tint uses rgba — no new color token needed",
+    "accepted/dismissed state transitions should respect useReducedMotion()",
+    "Thumbs feedback is fire-and-forget — optimistic update, no loading state needed"
+  ],
+  "props": {
+    "suggestionType": "scheduling | retention | content — required",
+    "typeLabel": "string — required",
+    "body": "string — required",
+    "primaryActionLabel": "string — required",
+    "secondaryActionLabel": "string — required",
+    "state": "default | accepted | dismissed | error — optional (default: default)",
+    "onPrimary": "() => void — required",
+    "onSecondary": "() => void — required",
+    "onDismiss": "() => void — required",
+    "onUndo": "() => void — optional",
+    "onWhy": "() => void — required",
+    "onThumbsUp": "() => void — optional",
+    "onThumbsDown": "() => void — optional"
+  }
+}

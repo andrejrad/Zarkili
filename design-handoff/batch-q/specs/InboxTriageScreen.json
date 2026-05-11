@@ -1,0 +1,111 @@
+{
+  "screen": "InboxTriageScreen",
+  "route": "AdminInboxTriage",
+  "device": {
+    "primary": "iPad 1024×768",
+    "secondary": "iPhone 14 390×844"
+  },
+  "stateNames": [
+    "default",
+    "emptyFilter",
+    "loading",
+    "error"
+  ],
+  "layout": {
+    "iPad": {
+      "type": "3-column",
+      "inboxList": {
+        "width": "components.inboxListWidth",
+        "background": "surface",
+        "borderRight": { "width": 1, "color": "border" },
+        "filterChips": {
+          "type": "row",
+          "chips": [
+            { "label": "strings.inboxTriage.filter.assignedToMe", "value": "assignedToMe" },
+            { "label": "strings.inboxTriage.filter.unassigned", "value": "unassigned" },
+            { "label": "strings.inboxTriage.filter.myTeam", "value": "myTeam" },
+            { "label": "strings.inboxTriage.filter.all", "value": "all" }
+          ],
+          "active": { "background": "primary", "variant": "filled" }
+        },
+        "searchBar": { "fullWidth": true, "position": "above thread rows" },
+        "threadRow": {
+          "height": 72,
+          "clientAvatar": { "size": 40 },
+          "name": { "variant": "body", "boldWhen": "unread" },
+          "lastMessagePreview": { "variant": "body-small", "color": "muted", "lines": 1, "truncate": true },
+          "timestamp": { "variant": "label-small", "color": "muted", "position": "right-aligned" },
+          "unreadDot": { "size": 8, "color": "message.unreadIndicator", "position": "far top-right", "visibleWhen": "unread" },
+          "assignedBadge": { "variant": "label-small", "background": "message.assignedBg", "color": "message.assigned", "label": "strings.inboxTriage.status.assigned", "position": "bottom-right" },
+          "swipeLeft": { "action": "archive", "background": "message.archivedBg", "icon": "archive" },
+          "swipeRight": { "action": "snooze", "background": "message.snoozedBg", "icon": "snooze" }
+        }
+      },
+      "threadPanel": {
+        "flex": 1,
+        "position": "center",
+        "threadHeader": {
+          "height": 56,
+          "clientName": { "variant": "heading-4" },
+          "assignedTo": { "variant": "label-small", "color": "muted" },
+          "statusPill": { "background": "message.[status]Bg", "color": "message.[status]" }
+        },
+        "messageList": {
+          "scrollable": true,
+          "ownMessages": { "position": "right", "background": "primary 15%", "radius": 16 },
+          "clientMessages": { "position": "left", "background": "surface", "border": { "width": 1, "color": "border" }, "radius": 16 }
+        },
+        "composeBar": {
+          "position": "fixed bottom",
+          "height": 56,
+          "textInput": { "flex": 1 },
+          "attachIconButton": true,
+          "sendButton": { "variant": "primary" }
+        }
+      },
+      "infoPanelRight": {
+        "width": "components.inboxInfoPanelWidth",
+        "background": "surface",
+        "borderLeft": { "width": 1, "color": "border" },
+        "clientCard": {
+          "avatar": { "size": 48 },
+          "name": { "variant": "body-medium" },
+          "phone": { "variant": "caption", "format": "US" },
+          "viewClientLink": true
+        },
+        "bookingSummary": {
+          "title": "Last 3 bookings",
+          "rows": { "height": 48, "type": "compact", "fields": ["date", "service", "status"] }
+        },
+        "assignmentRow": {
+          "label": { "text": "Assigned to", "variant": "label-small", "color": "muted" },
+          "avatar": { "size": 24 },
+          "name": true,
+          "changeLink": { "navigate": "ThreadAssignmentScreen" }
+        },
+        "tagRow": { "type": "chip-row", "addTagButton": true }
+      }
+    },
+    "iPhone": {
+      "inboxList": { "fullScreen": true },
+      "threadRow": { "onTap": "navigate to full-screen thread" },
+      "infoPanelRight": { "type": "sheet" }
+    },
+    "bulkActionBar": {
+      "visibleWhen": "multi-select",
+      "actions": [
+        { "label": "strings.inboxTriage.bulkAssign" },
+        { "label": "strings.inboxTriage.bulkArchive" },
+        { "label": "strings.inboxTriage.bulkMarkRead" },
+        { "label": "strings.inboxTriage.bulkSnooze" }
+      ],
+      "clearSelection": { "label": "strings.inboxTriage.bulkClearSelection" }
+    }
+  },
+  "states": {
+    "emptyFilter": {
+      "message": { "variant": "caption", "text": "strings.inboxTriage.emptyFilter" },
+      "clearFiltersLink": true
+    }
+  }
+}

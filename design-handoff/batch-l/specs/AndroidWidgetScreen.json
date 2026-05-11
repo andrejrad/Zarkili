@@ -1,0 +1,199 @@
+{
+  "screenId": "L.15",
+  "name": "AndroidWidgetScreen",
+  "device": "Pixel 7",
+  "dimensions": {
+    "width": 412,
+    "height": 915
+  },
+  "description": "Android home-screen widget showing next booking or empty state",
+  "widgetSize": "4x2",
+  "widgetDimensions": {
+    "columns": 4,
+    "rows": 2,
+    "width": 360,
+    "height": 160
+  },
+  "layout": {
+    "type": "horizontal-flex",
+    "background": "#F2EDDD",
+    "borderRadius": 16,
+    "padding": 16,
+    "gap": 16,
+    "shadow": "rgba(0,0,0,0.12) 0px 4px 12px",
+    "alignment": "center"
+  },
+  "elements": [
+    {
+      "id": "left-section",
+      "type": "vertical-flex",
+      "gap": 4,
+      "flex": 1,
+      "children": [
+        {
+          "id": "zarkili-logomark",
+          "type": "image",
+          "src": "zarkili-logomark",
+          "size": 32
+        },
+        {
+          "id": "next-booking-label",
+          "type": "text",
+          "style": "label-small",
+          "text": "{nextBookingLabel}",
+          "color": "#6B6B6B",
+          "marginTop": 8
+        }
+      ]
+    },
+    {
+      "id": "center-section",
+      "type": "vertical-flex",
+      "gap": 6,
+      "flex": 2,
+      "visibility": "state:has-booking",
+      "children": [
+        {
+          "id": "service-name",
+          "type": "text",
+          "style": "body",
+          "text": "{serviceName}",
+          "fontWeight": 600,
+          "color": "#1A1A1A"
+        },
+        {
+          "id": "staff-name",
+          "type": "text",
+          "style": "body-small",
+          "text": "{staffName}",
+          "color": "#6B6B6B"
+        },
+        {
+          "id": "datetime",
+          "type": "text",
+          "style": "label-small",
+          "text": "{dateTime}",
+          "color": "#6B6B6B",
+          "interpolation": {
+            "date": "MM/DD/YYYY",
+            "time": "h:mm AM/PM"
+          }
+        }
+      ]
+    },
+    {
+      "id": "empty-center-section",
+      "type": "vertical-flex",
+      "gap": 6,
+      "flex": 2,
+      "visibility": "state:no-booking",
+      "justifyContent": "center",
+      "children": [
+        {
+          "id": "empty-message",
+          "type": "text",
+          "style": "body-small",
+          "text": "{emptyMessage}",
+          "color": "#6B6B6B",
+          "alignment": "center"
+        }
+      ]
+    },
+    {
+      "id": "right-section",
+      "type": "vertical-flex",
+      "justifyContent": "center",
+      "children": [
+        {
+          "id": "rebook-cta",
+          "type": "button",
+          "variant": "pill",
+          "label": "{rebookCta}",
+          "visibility": "state:has-booking",
+          "action": "rebookService",
+          "width": 80,
+          "height": 32,
+          "borderRadius": 9999,
+          "background": "#E3A9A0",
+          "labelColor": "#FFFFFF",
+          "labelWeight": 500,
+          "style": "label-small"
+        },
+        {
+          "id": "book-now-cta",
+          "type": "button",
+          "variant": "pill",
+          "label": "{bookNowCta}",
+          "visibility": "state:no-booking",
+          "action": "openBookingFlow",
+          "width": 80,
+          "height": 32,
+          "borderRadius": 9999,
+          "background": "#E3A9A0",
+          "labelColor": "#FFFFFF",
+          "labelWeight": 500,
+          "style": "label-small"
+        }
+      ]
+    }
+  ],
+  "states": [
+    {
+      "name": "has-booking",
+      "description": "User has upcoming booking scheduled",
+      "visibility": {
+        "center-section": true,
+        "empty-center-section": false,
+        "rebook-cta": true,
+        "book-now-cta": false
+      },
+      "strings": {
+        "nextBookingLabel": "Next booking",
+        "serviceName": "Balayage Highlights",
+        "staffName": "with Sarah M.",
+        "dateTime": "05/15/2026 at 2:30 PM",
+        "rebookCta": "Rebook"
+      }
+    },
+    {
+      "name": "no-booking",
+      "description": "No upcoming bookings, showing empty state",
+      "visibility": {
+        "center-section": false,
+        "empty-center-section": true,
+        "rebook-cta": false,
+        "book-now-cta": true
+      },
+      "strings": {
+        "nextBookingLabel": "Next booking",
+        "emptyMessage": "No upcoming bookings",
+        "bookNowCta": "Book now"
+      }
+    }
+  ],
+  "accessibility": {
+    "widget": {
+      "label": "Zarkili booking widget",
+      "hasBooking": "{serviceName} with {staffName} on {dateTime}",
+      "noBooking": "No upcoming bookings. Tap to book."
+    },
+    "rebookCta": {
+      "label": "Rebook {serviceName}",
+      "hint": "Opens rebooking flow"
+    },
+    "bookNowCta": {
+      "label": "Book a new appointment",
+      "hint": "Opens Zarkili app"
+    }
+  },
+  "frames": [
+    {
+      "name": "L-15-has-booking",
+      "state": "has-booking"
+    },
+    {
+      "name": "L-15-no-booking",
+      "state": "no-booking"
+    }
+  ]
+}

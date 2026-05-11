@@ -1,0 +1,79 @@
+{
+  "screen": "ReputationSummaryScreen",
+  "route": "AdminReputation",
+  "device": {
+    "primary": "iPad 1024×768",
+    "secondary": "iPhone 14 390×844"
+  },
+  "stateNames": [
+    "default",
+    "loading",
+    "noData",
+    "error"
+  ],
+  "layout": {
+    "header": {
+      "title": "strings.reputation.title",
+      "right": { "type": "dateRangePicker", "format": "US" }
+    },
+    "kpiRow": {
+      "type": "tiles",
+      "count": 4,
+      "tiles": [
+        { "key": "avgRating", "label": "strings.reputation.kpi.avgRating", "visual": "large star", "value": { "format": "N.N" } },
+        { "key": "reviewsThisPeriod", "label": "strings.reputation.kpi.reviewsThisPeriod", "value": { "type": "count" } },
+        { "key": "responseRate", "label": "strings.reputation.kpi.responseRate", "value": { "format": "%" } },
+        { "key": "sentimentBreakdown", "label": "strings.reputation.kpi.sentimentBreakdown", "visual": "3-segment horizontal bar", "segments": ["sentiment.positive", "sentiment.neutral", "sentiment.negative"] }
+      ]
+    },
+    "trendChart": {
+      "type": "line chart",
+      "title": "strings.reputation.chart.trendTitle",
+      "xAxis": { "type": "dates", "format": "MM/DD", "color": "muted" },
+      "yAxis": { "range": "1-5" },
+      "line": { "color": "primary" },
+      "grid": { "color": "muted", "width": 1 },
+      "tooltip": { "background": "foreground", "color": "surface", "radius": 8, "trigger": "hover" }
+    },
+    "sentimentBar": {
+      "type": "horizontal 3-segment bar",
+      "fullWidth": true,
+      "segments": [
+        { "key": "positive", "color": "success", "label": "%" },
+        { "key": "neutral", "color": "muted", "label": "%" },
+        { "key": "negative", "color": "error", "label": "%" }
+      ],
+      "legend": {
+        "position": "below",
+        "items": [
+          { "label": "strings.reputation.sentiment.positive", "colorSwatch": "success" },
+          { "label": "strings.reputation.sentiment.neutral", "colorSwatch": "muted" },
+          { "label": "strings.reputation.sentiment.negative", "colorSwatch": "error" }
+        ]
+      }
+    },
+    "keywordCloud": {
+      "type": "2 columns",
+      "columns": [
+        { "title": "strings.reputation.chart.positiveKeywords", "variant": "accent-tinted pills", "fontSizeByFrequency": true, "maxKeywords": 20 },
+        { "title": "strings.reputation.chart.negativeKeywords", "variant": "error-tinted pills", "fontSizeByFrequency": true, "maxKeywords": 20 }
+      ]
+    },
+    "ratingDistribution": {
+      "type": "horizontal bar chart",
+      "title": "strings.reputation.chart.ratingDistribution",
+      "rows": 5,
+      "order": "5\u2605 \u2192 1\u2605",
+      "bar": { "color": "primary" },
+      "countLabel": { "position": "right" },
+      "percentLabel": { "color": "muted", "position": "right of count" }
+    }
+  },
+  "states": {
+    "noData": {
+      "illustration": true,
+      "message": "strings.reputation.noDataMessage",
+      "link": { "label": "strings.reputation.requestReviewsLink", "variant": "tertiary" }
+    }
+  }
+}

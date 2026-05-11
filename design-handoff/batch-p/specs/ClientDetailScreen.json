@@ -1,0 +1,165 @@
+{
+  "screen": "ClientDetailScreen",
+  "route": "/admin/clients/:id",
+  "description": "Comprehensive client profile with tabs for history, preferences, loyalty, notes, allergies, gallery, and consents",
+  "dimensions": {
+    "width": 390,
+    "height": "auto-scroll"
+  },
+  "states": [
+    "default",
+    "loading",
+    "empty",
+    "error"
+  ],
+  "accessibility": {
+    "screenReaderLabel": "strings.clientDetail.screenTitle",
+    "semanticRoles": [
+      {"element": "header", "role": "banner"},
+      {"element": "tabs", "role": "tablist"},
+      {"element": "tab", "role": "tab"},
+      {"element": "tabPanel", "role": "tabpanel"}
+    ]
+  },
+  "rtl": "deferred",
+  "darkMode": "deferred",
+  "layout": {
+    "header": {
+      "component": "client-header",
+      "height": "auto",
+      "fields": [
+        "photo",
+        "name",
+        "phone",
+        "email",
+        "sinceDate",
+        "totalSpend",
+        "tierBadge",
+        "statusBadge"
+      ]
+    },
+    "tabs": {
+      "height": 48,
+      "tabs": [
+        "strings.clientDetail.tabHistory",
+        "strings.clientDetail.tabPreferences",
+        "strings.clientDetail.tabLoyalty",
+        "strings.clientDetail.tabNotes",
+        "strings.clientDetail.tabAllergies",
+        "strings.clientDetail.tabGallery",
+        "strings.clientDetail.tabConsents"
+      ]
+    },
+    "tabPanels": {
+      "history": {
+        "component": "booking-card-list",
+        "emptyState": "strings.clientDetail.historyEmpty"
+      },
+      "preferences": {
+        "component": "preference-list",
+        "emptyState": "strings.clientDetail.preferencesEmpty"
+      },
+      "loyalty": {
+        "components": [
+          "progress-ring",
+          "tier-progress-bar",
+          "point-log-list"
+        ]
+      },
+      "notes": {
+        "component": "rich-text-editor",
+        "showTimestamp": true
+      },
+      "allergies": {
+        "component": "chip-group",
+        "chipStyle": "severity",
+        "emptyState": "strings.clientDetail.allergiesEmpty"
+      },
+      "gallery": {
+        "component": "photo-grid",
+        "columns": 3,
+        "gap": 8,
+        "emptyState": "strings.clientDetail.galleryEmpty"
+      },
+      "consents": {
+        "component": "consent-list",
+        "emptyState": "strings.clientDetail.consentsEmpty"
+      }
+    }
+  },
+  "components": [
+    {
+      "id": "navigationHeader",
+      "ref": "navigation-header",
+      "props": {
+        "showBack": true,
+        "title": "{{clientName}}"
+      }
+    },
+    {
+      "id": "clientHeader",
+      "ref": "client-header",
+      "props": {
+        "photoUrl": "{{photoUrl}}",
+        "name": "{{name}}",
+        "phone": "{{phone}}",
+        "email": "{{email}}",
+        "sinceDate": "{{sinceDate}}",
+        "totalSpend": "{{totalSpend}}",
+        "tier": "{{tier}}",
+        "status": "{{status}}"
+      }
+    },
+    {
+      "id": "tabs",
+      "ref": "tabs",
+      "props": {
+        "tabs": [
+          "strings.clientDetail.tabHistory",
+          "strings.clientDetail.tabPreferences",
+          "strings.clientDetail.tabLoyalty",
+          "strings.clientDetail.tabNotes",
+          "strings.clientDetail.tabAllergies",
+          "strings.clientDetail.tabGallery",
+          "strings.clientDetail.tabConsents"
+        ]
+      }
+    }
+  ],
+  "interactions": [
+    {
+      "trigger": "tab.tap",
+      "action": "switchTab"
+    },
+    {
+      "trigger": "bookingCard.tap",
+      "action": "navigate",
+      "target": "/admin/bookings/:bookingId"
+    },
+    {
+      "trigger": "photoThumbnail.tap",
+      "action": "openGalleryViewer"
+    }
+  ],
+  "tokens": {
+    "used": [
+      "semantic.pageBackground",
+      "semantic.surface",
+      "semantic.cardBorder",
+      "semantic.foreground",
+      "semantic.secondaryText",
+      "semantic.primary",
+      "semantic.success",
+      "semantic.warning",
+      "semantic.error"
+    ]
+  },
+  "redlines": {
+    "tabHeight": 48,
+    "tabIndicatorHeight": 2,
+    "sectionGap": 24,
+    "cardPadding": 16,
+    "photoGridColumns": 3,
+    "photoGridGap": 8
+  }
+}

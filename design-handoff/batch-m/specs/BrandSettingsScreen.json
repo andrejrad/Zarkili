@@ -1,0 +1,77 @@
+{
+  "schemaVersion": "1.0.0",
+  "screenId": "M.5",
+  "screenName": "BrandSettingsScreen",
+  "route": "admin/settings/brand",
+  "designSystem": "Zarkili v1.0.0",
+  "device": "iPad 768x1024",
+  "engineeringStatus": "delivered",
+  "description": "Form screen for owners to upload a brand logo, select an accent color from design-system swatches, and write an about blurb.",
+  "layout": {
+    "type": "form",
+    "padding": {
+      "top": 24,
+      "right": 32,
+      "bottom": 40,
+      "left": 32
+    },
+    "maxContentWidth": 960,
+    "gap": 24
+  },
+  "sections": [
+    {
+      "id": "logo-upload",
+      "type": "upload-list",
+      "title": "Brand logo",
+      "component": "MC.4",
+      "accept": "image/png,image/svg+xml",
+      "minSize": "512x512"
+    },
+    {
+      "id": "color-picker",
+      "type": "form-section",
+      "title": "Accent color",
+      "component": null,
+      "swatches": [
+        "accent",
+        "accent.secondary",
+        "surface.background",
+        "accent.fresh",
+        "admin.surface",
+        "text.primary"
+      ],
+      "noCustomHex": true
+    },
+    {
+      "id": "about-copy",
+      "type": "form-section",
+      "title": null,
+      "component": null,
+      "fields": [
+        {
+          "id": "aboutCopy",
+          "type": "textarea",
+          "label": "About",
+          "maxChars": 280,
+          "showCounter": true
+        }
+      ]
+    },
+    {
+      "id": "brand-preview",
+      "type": "form-section",
+      "title": "Preview",
+      "component": null,
+      "previewType": "booking-widget-mock"
+    }
+  ],
+  "stateNames": [
+    "default",
+    "uploading",
+    "saved",
+    "error"
+  ],
+  "accessibility": {
+    "screenReaderLabel": "Brand settings"
+  }
+}

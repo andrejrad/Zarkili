@@ -1,0 +1,76 @@
+{
+  "version": "1.0.0",
+  "description": "New color tokens for Batch L: blocking gates, offline states, permissions, onboarding, and platform-specific features",
+  "tokens": {
+    "gate": {
+      "background": "#F2EDDD",
+      "illustration": {
+        "primary": "#E3A9A0",
+        "secondary": "#D1BFB3",
+        "accent": "#BBEDDA"
+      },
+      "progress": {
+        "fill": "#E3A9A0",
+        "track": "#E5E0D1"
+      }
+    },
+    "offline": {
+      "banner": {
+        "background": "#1A1A1A",
+        "foreground": "#FFFFFF"
+      },
+      "overlay": "#D1BFB340",
+      "reconnecting": {
+        "chip": "#6B6B6B",
+        "text": "#FFFFFF"
+      }
+    },
+    "permission": {
+      "icon": {
+        "container": "#BBEDDA33",
+        "fill": "#BBEDDA"
+      },
+      "card": {
+        "background": "#FFFFFF",
+        "shadow": "rgba(0,0,0,0.08)"
+      }
+    },
+    "coachMark": {
+      "backdrop": "rgba(0,0,0,0.5)",
+      "spotlight": {
+        "ring": "#E3A9A0",
+        "pulse": "rgba(227,169,160,0.4)"
+      },
+      "pip": {
+        "active": "#E3A9A0",
+        "inactive": "#E5E0D1"
+      }
+    },
+    "locale": {
+      "selected": "#E3A9A0",
+      "disabled": "rgba(26,26,26,0.5)",
+      "separator": "#E5E0D1"
+    },
+    "widget": {
+      "background": "#F2EDDD",
+      "shadow": "rgba(0,0,0,0.12)"
+    },
+    "liveActivity": {
+      "compact": {
+        "dot": "#E3A9A0",
+        "text": "#1A1A1A"
+      },
+      "imminent": {
+        "pulse": "#FF9800"
+      }
+    },
+    "store": {
+      "gradient": {
+        "start": "#E3A9A0",
+        "end": "#D1BFB3"
+      },
+      "headline": "#FFFFFF",
+      "subheadline": "rgba(255,255,255,0.8)"
+    }
+  }
+}

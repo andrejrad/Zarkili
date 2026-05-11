@@ -1,0 +1,246 @@
+{
+  "screenId": "L.16",
+  "name": "AppClipCardScreen",
+  "device": "iPhone 14",
+  "dimensions": {
+    "width": 390,
+    "height": 844
+  },
+  "description": "iOS App Clip card for quick booking without full app install",
+  "formFactor": "app-clip-system-card",
+  "layout": {
+    "type": "vertical-flex",
+    "background": "#FFFFFF",
+    "borderRadius": 24,
+    "padding": 24,
+    "gap": 16,
+    "shadow": "large"
+  },
+  "elements": [
+    {
+      "id": "header",
+      "type": "horizontal-flex",
+      "gap": 12,
+      "alignment": "center",
+      "children": [
+        {
+          "id": "app-icon",
+          "type": "image",
+          "src": "zarkili-app-icon",
+          "size": 60,
+          "borderRadius": 16
+        },
+        {
+          "id": "app-info",
+          "type": "vertical-flex",
+          "gap": 2,
+          "children": [
+            {
+              "id": "app-name",
+              "type": "text",
+              "style": "heading-4",
+              "text": "{appName}",
+              "fontWeight": 600,
+              "color": "#1A1A1A"
+            },
+            {
+              "id": "app-clip-label",
+              "type": "text",
+              "style": "label-small",
+              "text": "{appClipLabel}",
+              "color": "#6B6B6B"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "body-message",
+      "type": "text",
+      "style": "body",
+      "text": "{bodyMessage}",
+      "color": "#1A1A1A"
+    },
+    {
+      "id": "service-preview-card",
+      "type": "horizontal-flex",
+      "background": "#F2EDDD",
+      "borderRadius": 12,
+      "padding": 12,
+      "gap": 12,
+      "alignment": "center",
+      "children": [
+        {
+          "id": "service-image",
+          "type": "image",
+          "src": "{serviceImageUrl}",
+          "width": 80,
+          "height": 80,
+          "borderRadius": 8
+        },
+        {
+          "id": "service-info",
+          "type": "vertical-flex",
+          "gap": 4,
+          "flex": 1,
+          "children": [
+            {
+              "id": "service-name",
+              "type": "text",
+              "style": "body",
+              "text": "{serviceName}",
+              "fontWeight": 600,
+              "color": "#1A1A1A"
+            },
+            {
+              "id": "service-price",
+              "type": "text",
+              "style": "body",
+              "text": "{servicePrice}",
+              "color": "#6B6B6B"
+            },
+            {
+              "id": "availability",
+              "type": "text",
+              "style": "label-small",
+              "text": "{availability}",
+              "color": "#4CAF50"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "apple-pay-button",
+      "type": "button",
+      "variant": "apple-pay",
+      "label": "Book with Apple Pay",
+      "action": "initiateApplePay",
+      "width": "full",
+      "height": 52,
+      "borderRadius": 12,
+      "background": "#000000",
+      "accessibility": {
+        "label": "Book with Apple Pay",
+        "hint": "Complete booking using Apple Pay"
+      }
+    },
+    {
+      "id": "get-app-link",
+      "type": "link",
+      "text": "{getAppLink}",
+      "action": "openAppStore",
+      "style": "body",
+      "color": "#E3A9A0",
+      "textDecoration": "underline",
+      "alignment": "center"
+    },
+    {
+      "id": "privacy-footer",
+      "type": "text",
+      "style": "label-small",
+      "text": "{privacyFooter}",
+      "color": "#6B6B6B",
+      "alignment": "center"
+    },
+    {
+      "id": "loading-spinner",
+      "type": "spinner",
+      "visibility": "state:loading",
+      "size": 24,
+      "color": "#E3A9A0",
+      "position": "center-in-cta"
+    },
+    {
+      "id": "success-inline",
+      "type": "horizontal-flex",
+      "visibility": "state:success",
+      "background": "#BBEDDA20",
+      "borderRadius": 12,
+      "padding": 16,
+      "gap": 12,
+      "alignment": "center",
+      "children": [
+        {
+          "type": "icon",
+          "name": "checkmark-circle",
+          "size": 32,
+          "color": "#4CAF50"
+        },
+        {
+          "type": "vertical-flex",
+          "gap": 2,
+          "children": [
+            {
+              "type": "text",
+              "style": "body",
+              "text": "{successHeading}",
+              "fontWeight": 600,
+              "color": "#1A1A1A"
+            },
+            {
+              "type": "text",
+              "style": "body-small",
+              "text": "{successMessage}",
+              "color": "#6B6B6B"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "states": [
+    {
+      "name": "default",
+      "description": "Initial App Clip card with service preview and Apple Pay CTA",
+      "visibility": {
+        "loading-spinner": false,
+        "success-inline": false
+      },
+      "strings": {
+        "appName": "Zarkili",
+        "appClipLabel": "App Clip",
+        "bodyMessage": "Book your nails in seconds — no account needed.",
+        "serviceName": "Classic Manicure",
+        "servicePrice": "$35.00",
+        "availability": "Available today",
+        "getAppLink": "Get full app",
+        "privacyFooter": "No personal data stored after session."
+      }
+    },
+    {
+      "name": "loading",
+      "description": "Processing Apple Pay transaction",
+      "visibility": {
+        "loading-spinner": true,
+        "success-inline": false
+      }
+    },
+    {
+      "name": "success",
+      "description": "Booking confirmed inline",
+      "visibility": {
+        "loading-spinner": false,
+        "success-inline": true
+      },
+      "strings": {
+        "successHeading": "Booking confirmed!",
+        "successMessage": "See you on 05/15 at 2:30 PM"
+      }
+    }
+  ],
+  "frames": [
+    {
+      "name": "L-16-default",
+      "state": "default"
+    },
+    {
+      "name": "L-16-loading",
+      "state": "loading"
+    },
+    {
+      "name": "L-16-success",
+      "state": "success"
+    }
+  ]
+}

@@ -1,0 +1,249 @@
+{
+  "screenId": "L.3",
+  "name": "OfflineStateScreen",
+  "device": "iPhone 14 + iPad",
+  "dimensions": {
+    "iPhone": {
+      "width": 390,
+      "height": 844
+    },
+    "iPad": {
+      "width": 768,
+      "height": 1024
+    }
+  },
+  "description": "Offline state patterns including banner, cached content overlay, and reconnection UI",
+  "subframes": [
+    {
+      "id": "L.3.1",
+      "name": "offline-banner-component",
+      "type": "component",
+      "height": 44,
+      "background": "#1A1A1A",
+      "layout": {
+        "type": "horizontal-flex",
+        "paddingHorizontal": 16,
+        "gap": 12,
+        "alignment": "center"
+      },
+      "elements": [
+        {
+          "id": "wifi-off-icon",
+          "type": "icon",
+          "name": "wifi-off",
+          "size": 16,
+          "color": "#FFFFFF"
+        },
+        {
+          "id": "offline-label",
+          "type": "text",
+          "style": "body-small",
+          "text": "{offlineLabel}",
+          "color": "#FFFFFF",
+          "flex": 1
+        },
+        {
+          "id": "reconnecting-chip",
+          "type": "chip",
+          "text": "{reconnectingLabel}",
+          "visibility": "state:reconnecting",
+          "background": "#6B6B6B",
+          "color": "#FFFFFF",
+          "paddingHorizontal": 12,
+          "paddingVertical": 4,
+          "borderRadius": 8
+        }
+      ]
+    },
+    {
+      "id": "L.3.2",
+      "name": "cached-list-view",
+      "type": "layout",
+      "description": "List view showing cached content with network-dependent elements disabled",
+      "layout": {
+        "type": "vertical-flex",
+        "background": "#F2EDDD"
+      },
+      "elements": [
+        {
+          "id": "offline-banner",
+          "type": "reference",
+          "component": "offline-banner-component",
+          "position": "top-fixed"
+        },
+        {
+          "id": "last-updated",
+          "type": "text",
+          "style": "label-small",
+          "text": "{lastUpdated}",
+          "color": "#6B6B6B",
+          "paddingHorizontal": 16,
+          "paddingVertical": 8,
+          "interpolation": {
+            "date": "MM/DD/YYYY",
+            "time": "h:mm AM/PM"
+          }
+        },
+        {
+          "id": "content-list",
+          "type": "scrollable-list",
+          "items": [
+            {
+              "type": "card",
+              "overlay": "#D1BFB340",
+              "description": "30% Warm Oat overlay on network-dependent cards"
+            }
+          ]
+        },
+        {
+          "id": "network-required-cta",
+          "type": "button",
+          "variant": "primary",
+          "opacity": 0.4,
+          "disabled": true,
+          "longPressTooltip": {
+            "text": "{networkRequiredTooltip}",
+            "background": "#1A1A1A",
+            "color": "#FFFFFF",
+            "borderRadius": 8,
+            "padding": 8
+          }
+        }
+      ]
+    },
+    {
+      "id": "L.3.3",
+      "name": "restored-snackbar",
+      "type": "component",
+      "position": "bottom-fixed",
+      "marginBottom": 16,
+      "marginHorizontal": 16,
+      "layout": {
+        "type": "horizontal-flex",
+        "background": "#1A1A1A",
+        "borderRadius": 9999,
+        "paddingHorizontal": 20,
+        "paddingVertical": 12,
+        "gap": 12,
+        "alignment": "center"
+      },
+      "elements": [
+        {
+          "id": "wifi-on-icon",
+          "type": "icon",
+          "name": "wifi",
+          "size": 20,
+          "color": "#FFFFFF"
+        },
+        {
+          "id": "restored-label",
+          "type": "text",
+          "style": "body",
+          "text": "{restoredLabel}",
+          "color": "#FFFFFF",
+          "flex": 1
+        },
+        {
+          "id": "sync-cta",
+          "type": "button",
+          "variant": "tertiary",
+          "label": "{syncCta}",
+          "labelColor": "#FFFFFF",
+          "action": "syncNow"
+        }
+      ]
+    }
+  ],
+  "states": [
+    {
+      "name": "offline",
+      "description": "Device has lost network connection, showing cached content",
+      "visibility": {
+        "offline-banner": true,
+        "reconnecting-chip": false,
+        "last-updated": true,
+        "content-list": true,
+        "restored-snackbar": false
+      },
+      "strings": {
+        "offlineLabel": "You're offline",
+        "lastUpdated": "Last updated {date} {time}",
+        "networkRequiredTooltip": "Connect to use this feature"
+      }
+    },
+    {
+      "name": "reconnecting",
+      "description": "App is attempting to restore connection",
+      "visibility": {
+        "offline-banner": true,
+        "reconnecting-chip": true,
+        "last-updated": true,
+        "content-list": true,
+        "restored-snackbar": false
+      },
+      "strings": {
+        "offlineLabel": "You're offline",
+        "reconnectingLabel": "Reconnecting…",
+        "lastUpdated": "Last updated {date} {time}",
+        "networkRequiredTooltip": "Connect to use this feature"
+      }
+    },
+    {
+      "name": "restored",
+      "description": "Connection restored, showing snackbar with sync option",
+      "visibility": {
+        "offline-banner": false,
+        "reconnecting-chip": false,
+        "last-updated": false,
+        "content-list": true,
+        "restored-snackbar": true
+      },
+      "strings": {
+        "restoredLabel": "Back online",
+        "syncCta": "Sync now"
+      }
+    }
+  ],
+  "accessibility": {
+    "offlineBanner": {
+      "role": "status",
+      "label": "Network status: offline",
+      "liveRegion": "polite"
+    },
+    "restoredSnackbar": {
+      "role": "status",
+      "label": "Network restored",
+      "liveRegion": "assertive",
+      "autoDismiss": 5000
+    }
+  },
+  "frames": [
+    {
+      "name": "L-3-offline-banner",
+      "subframe": "L.3.1",
+      "state": "offline"
+    },
+    {
+      "name": "L-3-reconnecting-banner",
+      "subframe": "L.3.1",
+      "state": "reconnecting"
+    },
+    {
+      "name": "L-3-cached-list-view",
+      "subframe": "L.3.2",
+      "state": "offline",
+      "device": "iPhone 14"
+    },
+    {
+      "name": "L-3-cached-list-view-iPad",
+      "subframe": "L.3.2",
+      "state": "offline",
+      "device": "iPad"
+    },
+    {
+      "name": "L-3-restored-snackbar",
+      "subframe": "L.3.3",
+      "state": "restored"
+    }
+  ]
+}

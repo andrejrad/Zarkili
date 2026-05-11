@@ -1,0 +1,76 @@
+{
+  "screen": "ConsentPolicyVersionLogScreen",
+  "route": "SuperAdminConsentPolicies",
+  "device": { "primary": "Desktop 1280+", "secondary": "iPad 1024×768" },
+  "stateNames": ["default", "publishDialog", "diffView", "error"],
+  "layout": {
+    "header": {
+      "title": { "text": "Consent Policy Version Log", "variant": "heading-2" },
+      "publishCta": {
+        "label": "strings.consentPolicies.publishNewVersionCta",
+        "type": "button",
+        "variant": "filled",
+        "icon": "publish",
+        "position": "right"
+      },
+      "tabs": {
+        "type": "tabBar",
+        "tabs": [
+          { "key": "privacyPolicy", "label": "Privacy Policy" },
+          { "key": "termsOfService", "label": "Terms of Service" },
+          { "key": "dataProcessing", "label": "Data Processing Agreement" },
+          { "key": "cookiePolicy", "label": "Cookie Policy" }
+        ]
+      }
+    },
+    "versionTable": {
+      "columns": [
+        { "key": "version", "variant": "body-medium", "weight": "500", "font": "mono" },
+        { "key": "publishedAt", "format": "datetime local", "font": "mono", "variant": "caption" },
+        { "key": "publishedBy", "type": "userPill" },
+        { "key": "status", "type": "pill", "values": ["current", "archived"] },
+        { "key": "tenantAcceptanceRate", "format": "N% (N tenants)", "type": "progressBar" },
+        { "key": "summary", "variant": "caption", "maxLines": 2, "color": "on-surface-variant" },
+        { "key": "actions", "type": "overflow-menu", "items": ["View Full Text", "Compare with Current", "Download PDF"] }
+      ]
+    },
+    "publishDialog": {
+      "type": "modal",
+      "title": "Publish New Consent Policy Version",
+      "form": [
+        { "id": "policyType", "type": "select", "label": "Policy type", "required": true },
+        { "id": "versionLabel", "type": "textInput", "label": "Version label (e.g. 2.1.0)", "required": true },
+        { "id": "effectiveDate", "type": "datePicker", "label": "Effective date", "required": true },
+        { "id": "summary", "type": "textArea", "label": "Change summary", "rows": 4, "required": true },
+        { "id": "requireRe-acceptance", "type": "switch", "label": "Require re-acceptance from all tenants" }
+      ],
+      "cta": { "label": "strings.consentPolicies.publishNewVersionCta", "variant": "filled" }
+    },
+    "diffView": {
+      "type": "modal",
+      "title": "Policy Diff",
+      "width": 900,
+      "body": {
+        "type": "splitDiff",
+        "left": { "label": "Previous version", "font": "mono", "variant": "caption" },
+        "right": { "label": "Current version", "font": "mono", "variant": "caption" },
+        "highlights": { "added": "success 15%", "removed": "error 15%" }
+      }
+    }
+  },
+  "states": {
+    "publishDialog": {
+      "publishDialog": { "open": true }
+    },
+    "diffView": {
+      "diffView": { "open": true }
+    },
+    "error": {
+      "inlineBanner": {
+        "background": "error 10%",
+        "borderLeft": { "width": 4, "color": "error" },
+        "message": "strings.consentPolicies.errorMessage"
+      }
+    }
+  }
+}

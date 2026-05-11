@@ -1,0 +1,46 @@
+{
+  "component": "LineChartCard",
+  "description": "Reusable card widget that renders a multi-series line chart",
+  "props": {
+    "title": { "type": "string", "required": true, "description": "Chart title" },
+    "subtitle": { "type": "string", "required": false, "description": "Subtitle shown below title in caption style" },
+    "data": { "type": "array", "required": true, "description": "Array of { label: string, values: number[] }" },
+    "seriesLabels": { "type": "array", "required": true, "description": "Legend labels matched by index to data" },
+    "timeLabels": { "type": "array", "required": true, "description": "X-axis tick labels" },
+    "height": { "type": "number", "required": false, "description": "Chart height in pixels (default 220)" },
+    "showLegend": { "type": "boolean", "required": false, "description": "Show legend below chart (default true)" },
+    "showTooltip": { "type": "boolean", "required": false, "description": "Show tooltip on hover (default true)" },
+    "isLoading": { "type": "boolean", "required": false, "description": "Loading state" },
+    "isEmpty": { "type": "boolean", "required": false, "description": "Empty state" },
+    "onExport": { "type": "function", "required": false, "description": "Export callback, shows icon when provided" }
+  },
+  "variants": ["default", "loading", "empty", "error"],
+  "layout": {
+    "padding": 16,
+    "headerRow": {
+      "title": "bodyMedium",
+      "subtitle": "caption, muted",
+      "exportIcon": "right"
+    },
+    "chartArea": "fills remaining height",
+    "legend": "horizontal pill row below chart if showLegend true"
+  },
+  "tokens": {
+    "bg": "report.widget.bg",
+    "border": "semantic.cardBorder",
+    "titleColor": "semantic.foreground",
+    "subtitleColor": "semantic.muted",
+    "lineColors": "chart.palette",
+    "gridColor": "chart.grid",
+    "axisColor": "chart.axis",
+    "tooltipBg": "chart.tooltip.bg",
+    "tooltipText": "chart.tooltip.text",
+    "legendDotSize": 8
+  },
+  "accessibility": {
+    "role": "img",
+    "ariaLabel": "[title] line chart",
+    "loadingState": "aria-busy=true",
+    "emptyState": "role=status"
+  }
+}

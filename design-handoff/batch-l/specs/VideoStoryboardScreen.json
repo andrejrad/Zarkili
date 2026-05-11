@@ -1,0 +1,191 @@
+{
+  "screenId": "L.18",
+  "name": "VideoStoryboardScreen",
+  "description": "App promo video storyboard with keyframes for 15-second and 30-second edits",
+  "category": "marketing",
+  "aspectRatio": "9:16",
+  "resolution": "1080x1920",
+  "frameRate": 60,
+  "safeAreaAnnotations": {
+    "topSafeZone": 80,
+    "bottomSafeZone": 60,
+    "horizontalSafeZone": 40,
+    "textSafeZone": {
+      "top": 88,
+      "bottom": 80,
+      "left": 48,
+      "right": 48
+    }
+  },
+  "edits": [
+    {
+      "id": "15s-edit",
+      "duration": 15,
+      "title": "15-Second App Store Preview",
+      "keyframes": [
+        {
+          "id": "kf-15-01",
+          "timestamp": "00:00",
+          "duration": 2.5,
+          "screen": "App icon animating in on gradient background",
+          "motion": "scale-up-fade-in",
+          "caption": null
+        },
+        {
+          "id": "kf-15-02",
+          "timestamp": "02:15",
+          "duration": 2.5,
+          "screen": "Home screen salon card scroll",
+          "motion": "slide-up",
+          "caption": "Discover salons near you"
+        },
+        {
+          "id": "kf-15-03",
+          "timestamp": "04:30",
+          "duration": 2.5,
+          "screen": "Service list with pricing",
+          "motion": "slide-left",
+          "caption": "Browse services and prices"
+        },
+        {
+          "id": "kf-15-04",
+          "timestamp": "07:00",
+          "duration": 2.5,
+          "screen": "Booking flow date-time picker",
+          "motion": "slide-left",
+          "caption": "Book in seconds"
+        },
+        {
+          "id": "kf-15-05",
+          "timestamp": "09:30",
+          "duration": 3.0,
+          "screen": "Confirmation screen with checkmark animation",
+          "motion": "pop-in",
+          "caption": "You're all set!"
+        },
+        {
+          "id": "kf-15-06",
+          "timestamp": "12:30",
+          "duration": 2.5,
+          "screen": "Coral Blossom gradient end card with logo and tagline",
+          "motion": "fade-in",
+          "caption": "Download Zarkili free"
+        }
+      ]
+    },
+    {
+      "id": "30s-edit",
+      "duration": 30,
+      "title": "30-Second Social Media Cut",
+      "keyframes": [
+        {
+          "id": "kf-30-01",
+          "timestamp": "00:00",
+          "duration": 2.5,
+          "screen": "App icon animating in on gradient background",
+          "motion": "scale-up-fade-in",
+          "caption": null
+        },
+        {
+          "id": "kf-30-02",
+          "timestamp": "02:15",
+          "duration": 2.5,
+          "screen": "Home screen salon card scroll",
+          "motion": "slide-up",
+          "caption": "Discover salons near you"
+        },
+        {
+          "id": "kf-30-03",
+          "timestamp": "04:30",
+          "duration": 2.5,
+          "screen": "Salon profile hero photo with rating overlay",
+          "motion": "slide-left",
+          "caption": "Read real reviews"
+        },
+        {
+          "id": "kf-30-04",
+          "timestamp": "07:00",
+          "duration": 2.5,
+          "screen": "Service list with pricing",
+          "motion": "slide-left",
+          "caption": "Browse services and prices"
+        },
+        {
+          "id": "kf-30-05",
+          "timestamp": "09:30",
+          "duration": 2.0,
+          "screen": "Booking flow staff picker",
+          "motion": "slide-left",
+          "caption": "Choose your stylist"
+        },
+        {
+          "id": "kf-30-06",
+          "timestamp": "11:30",
+          "duration": 2.0,
+          "screen": "Booking flow date-time picker",
+          "motion": "slide-left",
+          "caption": "Pick your time"
+        },
+        {
+          "id": "kf-30-07",
+          "timestamp": "13:30",
+          "duration": 2.5,
+          "screen": "Confirmation screen with checkmark animation",
+          "motion": "pop-in",
+          "caption": "You're all set!"
+        },
+        {
+          "id": "kf-30-08",
+          "timestamp": "16:00",
+          "duration": 2.5,
+          "screen": "Loyalty progress ring with earned points",
+          "motion": "slide-up",
+          "caption": "Earn rewards every visit"
+        },
+        {
+          "id": "kf-30-09",
+          "timestamp": "18:30",
+          "duration": 2.5,
+          "screen": "Marketplace style feed",
+          "motion": "slide-up",
+          "caption": "Get inspired locally"
+        },
+        {
+          "id": "kf-30-10",
+          "timestamp": "21:00",
+          "duration": 2.5,
+          "screen": "Push notification arriving on home screen mockup",
+          "motion": "drop-in",
+          "caption": "Never miss a reminder"
+        },
+        {
+          "id": "kf-30-11",
+          "timestamp": "23:30",
+          "duration": 3.0,
+          "screen": "Staff app staff revenue chart and AI chat bubble",
+          "motion": "slide-up",
+          "caption": "For salons too"
+        },
+        {
+          "id": "kf-30-12",
+          "timestamp": "26:30",
+          "duration": 3.5,
+          "screen": "Coral Blossom gradient end card with logo and tagline",
+          "motion": "fade-in",
+          "caption": "Download Zarkili free"
+        }
+      ]
+    }
+  ],
+  "brandGuidelines": {
+    "openingLogoMinDuration": 2.0,
+    "closingLogoMinDuration": 2.5,
+    "primaryFont": "Inter",
+    "headlineColor": "#FFFFFF",
+    "backgroundGradientStart": "#E3A9A0",
+    "backgroundGradientEnd": "#D1BFB3",
+    "musicTempo": "upbeat-120bpm",
+    "noVoiceOver": true,
+    "subtitlesRequired": true
+  }
+}

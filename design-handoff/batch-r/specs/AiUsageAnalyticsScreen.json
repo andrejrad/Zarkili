@@ -1,0 +1,73 @@
+{
+  "screen": "AiUsageAnalyticsScreen",
+  "route": "/admin/ai/usage",
+  "description": "Usage, cost, latency, and safety tracking for all AI features",
+  "platform": "admin-desktop",
+  "dimensions": { "width": 1280, "contentWidth": "calc(1280 - 240px sidebar)" },
+  "states": ["default", "loading", "empty", "error"],
+  "accessibility": {
+    "screenReaderLabel": "strings.aiUsage.screenTitle",
+    "semanticRoles": [
+      { "element": "incidentTable", "role": "table" },
+      { "element": "chartCard", "role": "img" }
+    ]
+  },
+  "rtl": "deferred",
+  "darkMode": "deferred",
+  "layout": {
+    "header": {
+      "component": "AdminHeader",
+      "title": "strings.aiUsage.title",
+      "rightActions": ["DateRangePicker", "Export SecondaryButton"]
+    },
+    "body": {
+      "padding": 24,
+      "kpiRow": {
+        "tiles": 5,
+        "metrics": [
+          { "label": "strings.aiUsage.kpiTokens" },
+          { "label": "strings.aiUsage.kpiCost" },
+          { "label": "strings.aiUsage.kpiLatency", "unit": "ms" },
+          { "label": "strings.aiUsage.kpiIncidents", "tint": "warning when > 0" },
+          { "label": "strings.aiUsage.kpiBlocks", "tint": "error when > 0" }
+        ]
+      },
+      "row2": {
+        "layout": "2 columns equal",
+        "left": { "component": "LineChartCard", "title": "strings.aiUsage.chartTokenUsage", "stacked": true, "seriesBy": "feature" },
+        "right": { "component": "BarChartCard", "title": "strings.aiUsage.chartCostByFeature", "orientation": "horizontal", "sort": "desc" }
+      },
+      "row3": {
+        "layout": "2 columns equal",
+        "left": {
+          "component": "LineChartCard",
+          "title": "strings.aiUsage.chartLatency",
+          "series": ["Avg Response Latency ms", "SLA threshold line at 2000ms"]
+        },
+        "right": {
+          "component": "BarChartCard",
+          "title": "strings.aiUsage.chartIncidentTypes",
+          "orientation": "horizontal",
+          "categories": ["prompt injection", "policy violation", "hallucination detected", "PII leak attempt", "other"]
+        }
+      },
+      "incidentTable": {
+        "width": "full",
+        "component": "DataTable",
+        "title": "strings.aiUsage.incidentTableTitle",
+        "columns": [
+          "strings.aiUsage.columnTimestamp",
+          "strings.aiUsage.columnFeature",
+          "strings.aiUsage.columnIncidentType",
+          "strings.aiUsage.columnSeverity (ai.safety.* tokens)",
+          "strings.aiUsage.columnStatus (open/resolved/escalated)",
+          "Actions (View Detail, Escalate)"
+        ]
+      }
+    }
+  },
+  "components": [
+    { "id": "incidentTable", "ref": "DataTable", "props": { "title": "strings.aiUsage.incidentTableTitle", "data": "{{incidents}}" } }
+  ],
+  "strings": "See strings/en-us.json for aiUsage keys"
+}

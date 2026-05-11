@@ -1,0 +1,95 @@
+{
+  "delta": "spacing-batch-o",
+  "tokens": {
+    "timeColumnWidth": {
+      "value": 56,
+      "unit": "px",
+      "token": "timeColumnWidth"
+    },
+    "resourceHeaderHeight": {
+      "value": 56,
+      "unit": "px",
+      "token": "resourceHeaderHeight"
+    },
+    "resourceHeaderMinWidth": {
+      "value": 160,
+      "unit": "px",
+      "token": "resourceHeaderMinWidth"
+    },
+    "cell15min": {
+      "value": 32,
+      "unit": "px",
+      "token": "cell15min"
+    },
+    "cell30min": {
+      "value": 64,
+      "unit": "px",
+      "token": "cell30min"
+    },
+    "cell60min": {
+      "value": 128,
+      "unit": "px",
+      "token": "cell60min"
+    },
+    "cellMinWidth": {
+      "value": 120,
+      "unit": "px",
+      "token": "cellMinWidth"
+    },
+    "appointmentPadH": {
+      "value": 6,
+      "unit": "px",
+      "token": "appointmentPadH"
+    },
+    "appointmentPadV": {
+      "value": 4,
+      "unit": "px",
+      "token": "appointmentPadV"
+    },
+    "appointmentRadius": {
+      "value": 4,
+      "unit": "px",
+      "token": "appointmentRadius"
+    },
+    "appointmentStatusBorder": {
+      "value": 3,
+      "unit": "px",
+      "token": "appointmentStatusBorder"
+    },
+    "nowLineDotSize": {
+      "value": 8,
+      "unit": "px",
+      "token": "nowLineDotSize"
+    },
+    "weekDayMinWidth": {
+      "value": 140,
+      "unit": "px",
+      "token": "weekDayMinWidth"
+    },
+    "monthCellMinHeight": {
+      "value": 80,
+      "unit": "px",
+      "token": "monthCellMinHeight"
+    },
+    "modalSheetRadius": {
+      "value": 20,
+      "unit": "px",
+      "token": "modalSheetRadius"
+    },
+    "modalSheetMaxHeight": {
+      "value": "92vh",
+      "unit": "vh",
+      "token": "modalSheetMaxHeight"
+    },
+    "handleWidth": {
+      "value": 36,
+      "unit": "px",
+      "token": "handleWidth"
+    },
+    "handleHeight": {
+      "value": 4,
+      "unit": "px",
+      "token": "handleHeight"
+    }
+  }
+}

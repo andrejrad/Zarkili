@@ -1,0 +1,87 @@
+{
+  "screen": "AIBudgetOverridesScreen",
+  "route": "SuperAdminAIBudget",
+  "device": { "primary": "Desktop 1280+", "secondary": "iPad 1024×768" },
+  "stateNames": ["default", "editDrawer", "applyPolicy", "error"],
+  "layout": {
+    "header": {
+      "title": { "text": "AI Budget Overrides", "variant": "heading-2" },
+      "applyPolicyCta": {
+        "label": "strings.aiBudgetOverrides.applyPolicyCta",
+        "type": "button",
+        "variant": "outlined",
+        "icon": "policy",
+        "position": "right"
+      }
+    },
+    "summaryBar": {
+      "type": "kpiRow",
+      "items": [
+        { "key": "totalCreditsAllocated", "label": "Total credits allocated this month", "format": "int k", "variant": "heading-3", "font": "mono" },
+        { "key": "tenantsWithOverrides", "label": "Tenants with overrides", "format": "int", "variant": "heading-3" },
+        { "key": "avgOverrideMultiplier", "label": "Avg override multiplier", "format": "x N.N", "font": "mono" }
+      ]
+    },
+    "overrideTable": {
+      "virtualScroll": true,
+      "columns": [
+        { "key": "tenantName", "variant": "body-medium", "weight": "500" },
+        { "key": "plan", "type": "pill" },
+        { "key": "planCredits", "label": "Plan credits", "format": "int k", "font": "mono", "align": "right" },
+        { "key": "overrideCredits", "label": "Override credits", "format": "int k", "font": "mono", "align": "right", "highlightWhen": "overrideCredits > planCredits", "highlightStyle": { "color": "warning", "weight": "600" } },
+        { "key": "overrideMultiplier", "label": "Multiplier", "format": "x N.N", "font": "mono" },
+        { "key": "expiresAt", "type": "date", "label": "Expires", "variant": "caption" },
+        { "key": "overrideSource", "type": "pill", "values": ["manual", "policy"] },
+        { "key": "actions", "type": "overflow-menu", "items": ["Edit Override", "Remove Override"] }
+      ]
+    },
+    "editDrawer": {
+      "width": 480,
+      "position": "right",
+      "title": "Edit AI Budget Override",
+      "form": {
+        "fields": [
+          { "id": "tenantName", "type": "readOnly", "label": "Tenant" },
+          { "id": "planCredits", "type": "readOnly", "label": "Plan credits" },
+          { "id": "overrideCredits", "type": "numberInput", "label": "Override credits", "required": true },
+          { "id": "expiresAt", "type": "datePicker", "label": "Expiry date (leave blank for indefinite)" },
+          { "id": "reason", "type": "textArea", "label": "Reason for override", "rows": 3 }
+        ]
+      },
+      "footer": {
+        "primary": { "label": "Save Override", "variant": "filled" }
+      }
+    },
+    "applyPolicyDrawer": {
+      "width": 520,
+      "position": "right",
+      "title": "Apply Bulk AI Budget Policy",
+      "form": {
+        "fields": [
+          { "id": "targetPlans", "type": "checkboxList", "label": "Apply to plans" },
+          { "id": "multiplier", "type": "numberInput", "label": "Credit multiplier", "suffix": "×" },
+          { "id": "expiresAt", "type": "datePicker", "label": "Policy expiry" }
+        ]
+      },
+      "footer": {
+        "primary": { "label": "strings.aiBudgetOverrides.applyPolicyCta", "variant": "filled" },
+        "toastOnSuccess": "strings.aiBudgetOverrides.overrideAppliedToast"
+      }
+    }
+  },
+  "states": {
+    "editDrawer": {
+      "editDrawer": { "open": true }
+    },
+    "applyPolicy": {
+      "applyPolicyDrawer": { "open": true }
+    },
+    "error": {
+      "inlineBanner": {
+        "background": "error 10%",
+        "borderLeft": { "width": 4, "color": "error" },
+        "message": "strings.aiBudgetOverrides.errorMessage"
+      }
+    }
+  }
+}
