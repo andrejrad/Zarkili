@@ -162,6 +162,20 @@ import type { AdminAuditLogEntry, AdminAuditLogFilter } from "../admin/auditLogR
 import type { StaffPerformanceMetrics, ServicePerformanceMetrics, RetentionMetrics, RebookingMetrics, AtRiskMetrics, VisitIntervalMetrics, ClientRiskEntry } from "../../domains/analytics/model";
 import type { CampaignKpis, ChallengeKpis } from "../../domains/analytics/model";
 import type { ReportKey } from "../../domains/analytics/model";
+// W48 — AI Admin & Marketplace Tenant Tools
+import { AiTogglesScreen } from "../admin/AiTogglesScreen";
+import { AiBudgetConfigScreen } from "../admin/AiBudgetConfigScreen";
+import { AiSuggestionQueueScreen } from "../admin/AiSuggestionQueueScreen";
+import { AiUsageAnalyticsScreen } from "../admin/AiUsageAnalyticsScreen";
+import { AiAuditLogScreen } from "../admin/AiAuditLogScreen";
+import { MarketplacePostComposerScreen } from "../admin/MarketplacePostComposerScreen";
+import { PerPostPerformanceScreen } from "../admin/PerPostPerformanceScreen";
+import { AntiTheftComplianceDashboardScreen } from "../admin/AntiTheftComplianceDashboardScreen";
+import { createAiAdminService } from "../admin/aiAdminService";
+import { createMarketplaceAdminService, checkPostCompliance } from "../admin/marketplaceAdminService";
+import type { AiFeatureToggleConfig, AiSuggestion, AiSuggestionFilter, AiSuggestionQueueSummary, AiUsageKpi, AiUsageByFeature, AiSafetyIncident, AiAuditLogEntry, AiAuditFilter } from "../admin/aiAdminTypes";
+import type { MarketplacePost, PostPerformanceMetrics, PostBookingRow, PostComplianceCheckResult, AntiTheftSignal, AntiTheftKpi } from "../admin/marketplaceAdminTypes";
+import type { AiBudgetGuardConfig } from "../../shared/ai";
 // W15-DEBT-1 — Onboarding admin
 import { OnboardingAdminScreen } from "../admin/OnboardingAdminScreen";
 import {
@@ -1387,6 +1401,57 @@ export function AppNavigatorShell({
   const [auditLogLoading, setAuditLogLoading] = useState(false);
   const [auditLogError, setAuditLogError] = useState<string | null>(null);
   const [auditLogFilters, setAuditLogFilters] = useState<AdminAuditLogFilter>({});
+
+  // ---------------------------------------------------------------------------
+  // W48 — AI Admin & Marketplace Tenant Tools state
+  // ---------------------------------------------------------------------------
+  const aiAdminService = React.useMemo(() => createAiAdminService(db), []);
+  const marketplaceAdminSvc = React.useMemo(() => createMarketplaceAdminService(db), []);
+  // AI Toggles
+  const [aiTogglesLoading, setAiTogglesLoading] = useState(false);
+  const [aiTogglesSaving, setAiTogglesSaving] = useState(false);
+  const [aiToggles, setAiToggles] = useState<AiFeatureToggleConfig[]>([]);
+  const [aiTogglesPending, setAiTogglesPending] = useState<AiFeatureToggleConfig[]>([]);
+  // AI Budget Config
+  const [aiBudgetLoading, setAiBudgetLoading] = useState(false);
+  const [aiBudgetSaving, setAiBudgetSaving] = useState(false);
+  const [aiBudgetError, setAiBudgetError] = useState<string | null>(null);
+  const [aiBudgetConfig, setAiBudgetConfig] = useState<AiBudgetGuardConfig | null>(null);
+  const [aiBudgetUsage, setAiBudgetUsage] = useState<AiUsageByFeature[]>([]);
+  // AI Suggestion Queue
+  const [aiSuggestionsLoading, setAiSuggestionsLoading] = useState(false);
+  const [aiSuggestionsSaving, setAiSuggestionsSaving] = useState(false);
+  const [aiSuggestionsError, setAiSuggestionsError] = useState<string | null>(null);
+  const [aiSuggestions, setAiSuggestions] = useState<AiSuggestion[]>([]);
+  const [aiSuggestionFilter, setAiSuggestionFilter] = useState<AiSuggestionFilter>({});
+  const [aiSuggestionSummary, setAiSuggestionSummary] = useState<AiSuggestionQueueSummary>({ pendingCount: 0, approvedToday: 0, rejectedToday: 0 });
+  // AI Usage Analytics
+  const [aiUsageLoading, setAiUsageLoading] = useState(false);
+  const [aiUsageError, setAiUsageError] = useState<string | null>(null);
+  const [aiUsageKpi, setAiUsageKpi] = useState<AiUsageKpi | null>(null);
+  const [aiUsageByFeature, setAiUsageByFeature] = useState<AiUsageByFeature[]>([]);
+  const [aiSafetyIncidents, setAiSafetyIncidents] = useState<AiSafetyIncident[]>([]);
+  // AI Audit Log
+  const [aiAuditLoading, setAiAuditLoading] = useState(false);
+  const [aiAuditError, setAiAuditError] = useState<string | null>(null);
+  const [aiAuditEntries, setAiAuditEntries] = useState<AiAuditLogEntry[]>([]);
+  const [aiAuditFilter, setAiAuditFilter] = useState<AiAuditFilter>({});
+  const [aiAuditTotalCount, setAiAuditTotalCount] = useState(0);
+  // Marketplace Post Composer
+  const [mpComposerSaving, setMpComposerSaving] = useState(false);
+  const [mpComposerError, setMpComposerError] = useState<string | null>(null);
+  const [mpComposerInitialPost, setMpComposerInitialPost] = useState<Partial<MarketplacePost> | null>(null);
+  // Per-Post Performance
+  const [ppfLoading, setPpfLoading] = useState(false);
+  const [ppfError, setPpfError] = useState<string | null>(null);
+  const [ppfPost, setPpfPost] = useState<MarketplacePost | null>(null);
+  const [ppfMetrics, setPpfMetrics] = useState<PostPerformanceMetrics | null>(null);
+  const [ppfBookings, setPpfBookings] = useState<PostBookingRow[]>([]);
+  // Anti-Theft Compliance
+  const [antiTheftLoading, setAntiTheftLoading] = useState(false);
+  const [antiTheftError, setAntiTheftError] = useState<string | null>(null);
+  const [antiTheftKpi, setAntiTheftKpi] = useState<AntiTheftKpi | null>(null);
+  const [antiTheftSignals, setAntiTheftSignals] = useState<AntiTheftSignal[]>([]);
 
   // ---------------------------------------------------------------------------
   // W15-DEBT-1 — Onboarding admin state
@@ -3428,6 +3493,102 @@ export function AppNavigatorShell({
       }).catch(() => {
         setAuditLogLoading(false);
         setAuditLogError("Failed to load audit log.");
+      });
+    }
+
+    // -------------------------------------------------------------------------
+    // W48 — AI Admin & Marketplace route activators
+    // -------------------------------------------------------------------------
+    const w48AiRoutes = ["AiToggles", "AiBudgetConfig", "AiSuggestionQueue", "AiUsageAnalytics", "AiAuditLog"];
+    if (w48AiRoutes.includes(activeRoute.name) && tenantId) {
+      const role = "tenant_owner" as const;
+
+      if (activeRoute.name === "AiToggles") {
+        setAiTogglesLoading(true);
+        void aiAdminService.getAiToggles(tenantId, role).then((toggles) => {
+          setAiToggles(toggles);
+          setAiTogglesPending([]);
+          setAiTogglesLoading(false);
+        }).catch(() => setAiTogglesLoading(false));
+      }
+
+      if (activeRoute.name === "AiBudgetConfig") {
+        setAiBudgetLoading(true);
+        setAiBudgetError(null);
+        void Promise.all([
+          aiAdminService.getAiUsageKpi(tenantId, role),
+          aiAdminService.getAiUsageByFeature(tenantId, role),
+        ]).then(([kpi, usage]) => {
+          setAiBudgetUsage(usage);
+          setAiBudgetLoading(false);
+        }).catch(() => {
+          setAiBudgetLoading(false);
+          setAiBudgetError("Failed to load budget data.");
+        });
+      }
+
+      if (activeRoute.name === "AiSuggestionQueue") {
+        setAiSuggestionsLoading(true);
+        setAiSuggestionsError(null);
+        void Promise.all([
+          aiAdminService.listAiSuggestions(tenantId, role, aiSuggestionFilter),
+          aiAdminService.getAiSuggestionQueueSummary(tenantId, role),
+        ]).then(([suggestions, summary]) => {
+          setAiSuggestions(suggestions);
+          setAiSuggestionSummary(summary);
+          setAiSuggestionsLoading(false);
+        }).catch(() => {
+          setAiSuggestionsLoading(false);
+          setAiSuggestionsError("Failed to load suggestion queue.");
+        });
+      }
+
+      if (activeRoute.name === "AiUsageAnalytics") {
+        setAiUsageLoading(true);
+        setAiUsageError(null);
+        void Promise.all([
+          aiAdminService.getAiUsageKpi(tenantId, role),
+          aiAdminService.getAiUsageByFeature(tenantId, role),
+          aiAdminService.listAiSafetyIncidents(tenantId, role),
+        ]).then(([kpi, usage, incidents]) => {
+          setAiUsageKpi(kpi);
+          setAiUsageByFeature(usage);
+          setAiSafetyIncidents(incidents);
+          setAiUsageLoading(false);
+        }).catch(() => {
+          setAiUsageLoading(false);
+          setAiUsageError("Failed to load usage analytics.");
+        });
+      }
+
+      if (activeRoute.name === "AiAuditLog") {
+        setAiAuditLoading(true);
+        setAiAuditError(null);
+        void aiAdminService.listAiAuditLog(tenantId, role, aiAuditFilter).then((rows) => {
+          setAiAuditEntries(rows);
+          setAiAuditTotalCount(rows.length);
+          setAiAuditLoading(false);
+        }).catch(() => {
+          setAiAuditLoading(false);
+          setAiAuditError("Failed to load audit log.");
+        });
+      }
+    }
+
+    if (activeRoute.name === "AntiTheftCompliance" && tenantId) {
+      const role = "tenant_owner" as const;
+      setAntiTheftLoading(true);
+      setAntiTheftError(null);
+      void Promise.all([
+        marketplaceAdminSvc.getAntiTheftKpi(tenantId, role),
+        marketplaceAdminSvc.listAntiTheftSignals(tenantId, role),
+      ]).then(([kpi, signals]) => {
+        setAntiTheftKpi(kpi);
+        setAntiTheftSignals(signals);
+        setAntiTheftLoading(false);
+      }).catch(() => {
+        setAntiTheftLoading(false);
+        setAntiTheftError("Failed to load anti-theft data.");
       });
     }
   }, [
@@ -8680,6 +8841,347 @@ export function AppNavigatorShell({
             });
           }}
           onBack={() => navigate("RevenueDashboard")}
+        />
+      );
+    }
+
+    // -------------------------------------------------------------------------
+    // W48 — AI Admin & Marketplace Tenant Tools
+    // -------------------------------------------------------------------------
+    if (activeRoute.name === "AiToggles") {
+      return (
+        <AiTogglesScreen
+          loading={aiTogglesLoading}
+          saving={aiTogglesSaving}
+          toggles={aiToggles}
+          pendingChanges={aiTogglesPending}
+          onToggle={(featureKey, enabled) => {
+            setAiTogglesPending((prev) => {
+              const existing = prev.findIndex((t) => t.featureKey === featureKey);
+              const next = [...prev];
+              if (existing >= 0) {
+                next[existing] = { ...next[existing], enabled };
+              } else {
+                next.push({ featureKey, enabled });
+              }
+              return next;
+            });
+          }}
+          onSaveAll={() => {
+            if (!tenantId || aiTogglesPending.length === 0) return;
+            setAiTogglesSaving(true);
+            void aiAdminService.updateAiToggles(tenantId, "tenant_owner", aiTogglesPending).then(() => {
+              setAiToggles((prev) => {
+                const updated = [...prev];
+                for (const change of aiTogglesPending) {
+                  const idx = updated.findIndex((t) => t.featureKey === change.featureKey);
+                  if (idx >= 0) updated[idx] = { ...updated[idx], enabled: change.enabled };
+                  else updated.push(change);
+                }
+                return updated;
+              });
+              setAiTogglesPending([]);
+              setAiTogglesSaving(false);
+            }).catch(() => setAiTogglesSaving(false));
+          }}
+          onBack={() => navigate("AppShell")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "AiBudgetConfig") {
+      return (
+        <AiBudgetConfigScreen
+          loading={aiBudgetLoading}
+          saving={aiBudgetSaving}
+          error={aiBudgetError}
+          budgetConfig={aiBudgetConfig}
+          usageByFeature={aiBudgetUsage}
+          onUpdateGlobalCap={(cap) => {
+            setAiBudgetConfig((prev) => prev ? { ...prev, globalMonthlyBudgetUsd: cap } : null);
+          }}
+          onUpdateFeatureCap={(featureKey, cap) => {
+            setAiBudgetConfig((prev) => {
+              if (!prev) return prev;
+              const features = { ...prev.featureBudgets, [featureKey]: { ...(prev.featureBudgets?.[featureKey] ?? {}), monthlyBudgetUsd: cap } };
+              return { ...prev, featureBudgets: features };
+            });
+          }}
+          onSave={() => {
+            if (!tenantId || !aiBudgetConfig) return;
+            setAiBudgetSaving(true);
+            setAiBudgetError(null);
+            // Budget config persisted via shared ai service; stub write for now
+            setTimeout(() => setAiBudgetSaving(false), 500);
+          }}
+          onRetry={() => {
+            if (!tenantId) return;
+            setAiBudgetLoading(true);
+            setAiBudgetError(null);
+            void Promise.all([
+              aiAdminService.getAiUsageKpi(tenantId, "tenant_owner"),
+              aiAdminService.getAiUsageByFeature(tenantId, "tenant_owner"),
+            ]).then(([, usage]) => {
+              setAiBudgetUsage(usage);
+              setAiBudgetLoading(false);
+            }).catch(() => {
+              setAiBudgetLoading(false);
+              setAiBudgetError("Failed to load budget data.");
+            });
+          }}
+          onBack={() => navigate("AppShell")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "AiSuggestionQueue") {
+      return (
+        <AiSuggestionQueueScreen
+          loading={aiSuggestionsLoading}
+          saving={aiSuggestionsSaving}
+          error={aiSuggestionsError}
+          suggestions={aiSuggestions}
+          summary={aiSuggestionSummary}
+          filter={aiSuggestionFilter}
+          onChangeFilter={(f) => {
+            setAiSuggestionFilter(f);
+            if (!tenantId) return;
+            setAiSuggestionsLoading(true);
+            void aiAdminService.listAiSuggestions(tenantId, "tenant_owner", f).then((rows) => {
+              setAiSuggestions(rows);
+              setAiSuggestionsLoading(false);
+            }).catch(() => setAiSuggestionsLoading(false));
+          }}
+          onApprove={(id, note) => {
+            if (!tenantId) return;
+            setAiSuggestionsSaving(true);
+            void aiAdminService.approveAiSuggestion(tenantId, "tenant_owner", id, note).then(() => {
+              setAiSuggestions((prev) => prev.map((s) => s.suggestionId === id ? { ...s, status: "approved" } : s));
+              setAiSuggestionSummary((prev) => ({ ...prev, pendingCount: Math.max(0, prev.pendingCount - 1) }));
+              setAiSuggestionsSaving(false);
+            }).catch(() => setAiSuggestionsSaving(false));
+          }}
+          onReject={(id, note) => {
+            if (!tenantId) return;
+            setAiSuggestionsSaving(true);
+            void aiAdminService.rejectAiSuggestion(tenantId, "tenant_owner", id, note).then(() => {
+              setAiSuggestions((prev) => prev.map((s) => s.suggestionId === id ? { ...s, status: "rejected" } : s));
+              setAiSuggestionSummary((prev) => ({ ...prev, pendingCount: Math.max(0, prev.pendingCount - 1) }));
+              setAiSuggestionsSaving(false);
+            }).catch(() => setAiSuggestionsSaving(false));
+          }}
+          onApproveAllPending={() => {
+            const pending = aiSuggestions.filter((s) => s.status === "pending");
+            if (!tenantId || pending.length === 0) return;
+            setAiSuggestionsSaving(true);
+            void Promise.all(
+              pending.map((s) => aiAdminService.approveAiSuggestion(tenantId, "tenant_owner", s.suggestionId))
+            ).then(() => {
+              setAiSuggestions((prev) => prev.map((s) => s.status === "pending" ? { ...s, status: "approved" } : s));
+              setAiSuggestionSummary((prev) => ({ ...prev, pendingCount: 0 }));
+              setAiSuggestionsSaving(false);
+            }).catch(() => setAiSuggestionsSaving(false));
+          }}
+          onRetry={() => {
+            if (!tenantId) return;
+            setAiSuggestionsLoading(true);
+            setAiSuggestionsError(null);
+            void aiAdminService.listAiSuggestions(tenantId, "tenant_owner", aiSuggestionFilter).then((rows) => {
+              setAiSuggestions(rows);
+              setAiSuggestionsLoading(false);
+            }).catch(() => {
+              setAiSuggestionsLoading(false);
+              setAiSuggestionsError("Failed to load suggestion queue.");
+            });
+          }}
+          onBack={() => navigate("AppShell")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "AiUsageAnalytics") {
+      return (
+        <AiUsageAnalyticsScreen
+          loading={aiUsageLoading}
+          error={aiUsageError}
+          kpi={aiUsageKpi}
+          usageByFeature={aiUsageByFeature}
+          incidents={aiSafetyIncidents}
+          onRetry={() => {
+            if (!tenantId) return;
+            setAiUsageLoading(true);
+            setAiUsageError(null);
+            void Promise.all([
+              aiAdminService.getAiUsageKpi(tenantId, "tenant_owner"),
+              aiAdminService.getAiUsageByFeature(tenantId, "tenant_owner"),
+              aiAdminService.listAiSafetyIncidents(tenantId, "tenant_owner"),
+            ]).then(([kpi, usage, incidents]) => {
+              setAiUsageKpi(kpi);
+              setAiUsageByFeature(usage);
+              setAiSafetyIncidents(incidents);
+              setAiUsageLoading(false);
+            }).catch(() => {
+              setAiUsageLoading(false);
+              setAiUsageError("Failed to load usage analytics.");
+            });
+          }}
+          onBack={() => navigate("AppShell")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "AiAuditLog") {
+      return (
+        <AiAuditLogScreen
+          loading={aiAuditLoading}
+          error={aiAuditError}
+          entries={aiAuditEntries}
+          filter={aiAuditFilter}
+          totalCount={aiAuditTotalCount}
+          onChangeFilter={(f) => {
+            setAiAuditFilter(f);
+            if (!tenantId) return;
+            setAiAuditLoading(true);
+            void aiAdminService.listAiAuditLog(tenantId, "tenant_owner", f).then((rows) => {
+              setAiAuditEntries(rows);
+              setAiAuditTotalCount(rows.length);
+              setAiAuditLoading(false);
+            }).catch(() => setAiAuditLoading(false));
+          }}
+          onExportCsv={() => {
+            // CSV export: stub — fires exportService in a future week
+          }}
+          onRetry={() => {
+            if (!tenantId) return;
+            setAiAuditLoading(true);
+            setAiAuditError(null);
+            void aiAdminService.listAiAuditLog(tenantId, "tenant_owner", aiAuditFilter).then((rows) => {
+              setAiAuditEntries(rows);
+              setAiAuditTotalCount(rows.length);
+              setAiAuditLoading(false);
+            }).catch(() => {
+              setAiAuditLoading(false);
+              setAiAuditError("Failed to load AI audit log.");
+            });
+          }}
+          onBack={() => navigate("AppShell")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "MarketplacePostComposer") {
+      return (
+        <MarketplacePostComposerScreen
+          saving={mpComposerSaving}
+          error={mpComposerError}
+          initialPost={mpComposerInitialPost ?? undefined}
+          onSaveDraft={(input) => {
+            if (!tenantId) return;
+            setMpComposerSaving(true);
+            setMpComposerError(null);
+            void marketplaceAdminSvc.createMarketplacePost(tenantId, "tenant_owner", { ...input }).then(() => {
+              setMpComposerSaving(false);
+              navigate("AppShell");
+            }).catch(() => {
+              setMpComposerSaving(false);
+              setMpComposerError("Failed to save draft.");
+            });
+          }}
+          onPublish={(input) => {
+            if (!tenantId) return;
+            setMpComposerSaving(true);
+            setMpComposerError(null);
+            void marketplaceAdminSvc.createMarketplacePost(tenantId, "tenant_owner", { ...input }).then(async (post) => {
+              await marketplaceAdminSvc.publishMarketplacePost(tenantId, "tenant_owner", post.postId);
+              setMpComposerSaving(false);
+              navigate("AppShell");
+            }).catch(() => {
+              setMpComposerSaving(false);
+              setMpComposerError("Failed to publish post.");
+            });
+          }}
+          onBack={() => navigate("AppShell")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "PerPostPerformance") {
+      return (
+        <PerPostPerformanceScreen
+          loading={ppfLoading}
+          error={ppfError}
+          post={ppfPost}
+          metrics={ppfMetrics}
+          bookings={ppfBookings}
+          onRetry={() => {
+            if (!tenantId || !ppfPost) return;
+            setPpfLoading(true);
+            setPpfError(null);
+            void Promise.all([
+              marketplaceAdminSvc.getPostPerformance(tenantId, "tenant_owner", ppfPost.postId),
+              marketplaceAdminSvc.getPostBookings(tenantId, "tenant_owner", ppfPost.postId),
+            ]).then(([metrics, bookings]) => {
+              setPpfMetrics(metrics);
+              setPpfBookings(bookings);
+              setPpfLoading(false);
+            }).catch(() => {
+              setPpfLoading(false);
+              setPpfError("Failed to load performance data.");
+            });
+          }}
+          onBack={() => navigate("AppShell")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "AntiTheftCompliance") {
+      return (
+        <AntiTheftComplianceDashboardScreen
+          loading={antiTheftLoading}
+          error={antiTheftError}
+          kpi={antiTheftKpi}
+          signals={antiTheftSignals}
+          onInvestigate={(signalId, userId) => {
+            if (!tenantId) return;
+            void marketplaceAdminSvc.investigateAntiTheftSignal(tenantId, "tenant_owner", signalId, userId).then(() => {
+              setAntiTheftSignals((prev) => prev.map((s) =>
+                s.signalId === signalId ? { ...s, status: "confirmed", investigatedAt: new Date().toISOString(), investigatedBy: userId } : s
+              ));
+            });
+          }}
+          onEscalate={(signalId) => {
+            if (!tenantId) return;
+            void marketplaceAdminSvc.escalateAntiTheftSignal(tenantId, "tenant_owner", signalId).then(() => {
+              setAntiTheftSignals((prev) => prev.map((s) =>
+                s.signalId === signalId ? { ...s, status: "confirmed" } : s
+              ));
+            });
+          }}
+          onDismiss={(signalId) => {
+            if (!tenantId) return;
+            void marketplaceAdminSvc.dismissAntiTheftSignal(tenantId, "tenant_owner", signalId).then(() => {
+              setAntiTheftSignals((prev) => prev.map((s) =>
+                s.signalId === signalId ? { ...s, status: "dismissed" } : s
+              ));
+            });
+          }}
+          onRetry={() => {
+            if (!tenantId) return;
+            setAntiTheftLoading(true);
+            setAntiTheftError(null);
+            void Promise.all([
+              marketplaceAdminSvc.getAntiTheftKpi(tenantId, "tenant_owner"),
+              marketplaceAdminSvc.listAntiTheftSignals(tenantId, "tenant_owner"),
+            ]).then(([kpi, signals]) => {
+              setAntiTheftKpi(kpi);
+              setAntiTheftSignals(signals);
+              setAntiTheftLoading(false);
+            }).catch(() => {
+              setAntiTheftLoading(false);
+              setAntiTheftError("Failed to load anti-theft data.");
+            });
+          }}
+          onBack={() => navigate("AppShell")}
         />
       );
     }

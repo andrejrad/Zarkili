@@ -317,6 +317,15 @@ export const appRoutes: AppRouteDefinition[] = [
   { name: "CustomReportBuilder", group: "owner", path: "/owner/analytics/custom", guard: "authenticated" },
   { name: "ScheduledReports", group: "owner", path: "/owner/analytics/scheduled", guard: "authenticated" },
   { name: "OperatorAuditLog", group: "owner", path: "/owner/analytics/audit", guard: "authenticated" },
+  // W48 — AI Admin & Marketplace Tenant Tools
+  { name: "AiToggles", group: "owner", path: "/owner/ai/toggles", guard: "authenticated" },
+  { name: "AiBudgetConfig", group: "owner", path: "/owner/ai/budget", guard: "authenticated" },
+  { name: "AiSuggestionQueue", group: "owner", path: "/owner/ai/suggestions", guard: "authenticated" },
+  { name: "AiUsageAnalytics", group: "owner", path: "/owner/ai/usage", guard: "authenticated" },
+  { name: "AiAuditLog", group: "owner", path: "/owner/ai/audit", guard: "authenticated" },
+  { name: "MarketplacePostComposer", group: "owner", path: "/owner/marketplace/compose", guard: "authenticated" },
+  { name: "PerPostPerformance", group: "owner", path: "/owner/marketplace/post-performance", guard: "authenticated" },
+  { name: "AntiTheftCompliance", group: "owner", path: "/owner/compliance/anti-theft", guard: "authenticated" },
   // W15-DEBT-1 — Onboarding admin (status dashboard + action buttons)
   { name: "OnboardingAdmin", group: "owner", path: "/owner/onboarding/admin", guard: "authenticated" },
   ...salonOnboardingRoutes,

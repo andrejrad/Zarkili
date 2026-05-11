@@ -309,10 +309,22 @@ W47 delivered the full Analytics, Reporting & Exports cluster (Phase 3 Batch U):
 
 | ID | Source | Description | Severity | Target | Status |
 |----|--------|-------------|----------|--------|--------|
-| W47-DEBT-1 | W47 — [WEEK47_CLOSE_REPORT.md](WEEK47_CLOSE_REPORT.md) | **Marketplace attribution stub data** — `MarketplaceAttributionData.directBookings` and `marketplaceBookings` are always 0/0 because booking source tracking (marketplace vs. direct) is not yet written to Firestore at booking creation time. Requires a `bookingSource` field on the booking document and a corresponding aggregation query in `reportingService`. | Medium | W48 | open |
-| W47-DEBT-2 | W47 — [WEEK47_CLOSE_REPORT.md](WEEK47_CLOSE_REPORT.md) | **Revenue breakdown multi-currency** — `RevenueBreakdown.byCurrency` always returns an empty array because multi-currency billing data does not yet flow through the reporting pipeline. Requires `billingCurrency` on invoice/booking documents and a group-by-currency aggregation in `reportingService`. | Medium | W48 | open |
+| W47-DEBT-1 | W47 — [WEEK47_CLOSE_REPORT.md](WEEK47_CLOSE_REPORT.md) | **Marketplace attribution stub data** — `MarketplaceAttributionData.directBookings` and `marketplaceBookings` are always 0/0 because booking source tracking (marketplace vs. direct) is not yet written to Firestore at booking creation time. Requires a `bookingSource` field on the booking document and a corresponding aggregation query in `reportingService`. | Medium | W48 | **deferred to W49** — W48 focused on AI admin + marketplace tenant tools; booking source write is a cross-cutting model change needing careful migration design |
+| W47-DEBT-2 | W47 — [WEEK47_CLOSE_REPORT.md](WEEK47_CLOSE_REPORT.md) | **Revenue breakdown multi-currency** — `RevenueBreakdown.byCurrency` always returns an empty array because multi-currency billing data does not yet flow through the reporting pipeline. Requires `billingCurrency` on invoice/booking documents and a group-by-currency aggregation in `reportingService`. | Medium | W48 | **deferred to W49** — same rationale as W47-DEBT-1 |
 | W47-DEBT-3 | W47 — [WEEK47_CLOSE_REPORT.md](WEEK47_CLOSE_REPORT.md) | **Booking funnel incomplete stages** — `BookingFunnelData` stages are derived from retention/rebooking metrics only; full funnel (search → profile view → slot selected → confirmed) requires search and profile-view analytics events on booking documents or a separate analytics event collection. | Low | W49 | open |
 | W47-DEBT-4 | W47 — [WEEK47_CLOSE_REPORT.md](WEEK47_CLOSE_REPORT.md) | **CustomReportBuilder desktop canvas** — drag-and-drop column builder from the Figma spec (`design-handoff/batch-r/specs/CustomReportBuilderScreen.json`) is deferred to a web/tablet surface. Mobile version ships a report-key picker + date range + run + export flow only. | Low | web platform | open |
+
+---
+
+## Week 48 — AI Admin & Marketplace Tenant Tools
+
+W48 delivered the AI Admin & Marketplace Tenant Tools cluster (Phase 3 Batch V): 8 admin screens, 2 service factories (aiAdminService, marketplaceAdminService), 2 type modules, 8 routes, AppNavigatorShell wiring, and 50 tests.
+
+| ID | Source | Description | Severity | Target | Status |
+|----|--------|-------------|----------|--------|--------|
+| W48-DEBT-1 | W48 | **AI suggestion approvedToday/rejectedToday counters are stubs** — `AiSuggestionQueueSummary.approvedToday` and `rejectedToday` are always 0 because the service returns static defaults; proper counting requires a date-scoped aggregation query or a daily reset counter in Firestore. | Low | W50 | open |
+| W48-DEBT-2 | W48 | **Per-post analytics aggregation** — `PostPerformanceMetrics` (impressions, clicks, CTR) are not yet written by any real analytics pipeline; the document at `tenants/{tenantId}/postPerformance/{postId}` will be empty until a Cloud Function or client-side event tracking is wired. | Medium | W50 | open |
+| W48-DEBT-3 | W48 | **AiBudgetConfigScreen write path is a stub** — `onSave` in AppNavigatorShell uses a `setTimeout` placeholder; the actual budget config write should go through the shared `budgetGuard` service or a new tenant-scoped budget collection. Requires design decision on whether tenant budget config shares the platform-admin budget path. | Medium | W49 | open |
 
 ---
 
