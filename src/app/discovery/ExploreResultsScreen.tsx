@@ -80,7 +80,7 @@ export function ExploreResultsScreen({
           results.map((salon) => (
             <Pressable
               key={salon.id}
-              onPress={() => onSelectSalon(salon.id)}
+              onPress={() => onSelectSalon(salon.tenantId ?? salon.id)}
               style={styles.resultCard}
               accessibilityRole="button"
               accessibilityLabel={`Open ${salon.name}`}

@@ -58,7 +58,7 @@ export function DiscoverHomeScreen({
         {featuredSalons.map((salon) => (
           <Pressable
             key={salon.id}
-            onPress={() => onSelectSalon(salon.id)}
+            onPress={() => onSelectSalon(salon.tenantId ?? salon.id)}
             style={styles.salonCard}
             accessibilityRole="button"
             accessibilityLabel={`Open ${salon.name}`}

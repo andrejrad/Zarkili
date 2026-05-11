@@ -357,6 +357,8 @@ import { ClientOnboardingAccountGuestScreen } from "../onboarding/ClientOnboardi
 import { ClientOnboardingPhoneVerifyScreen } from "../onboarding/ClientOnboardingPhoneVerifyScreen";
 import { ClientOnboardingLoyaltyScreen } from "../onboarding/ClientOnboardingLoyaltyScreen";
 import { SalonOnboardingWizard } from "../onboarding/SalonOnboardingWizard";
+import { createSalonProfileService } from "../../domains/discovery/salonProfileService";
+import type { SalonProfileData } from "../../domains/discovery/salonProfileService";
 import { SalonOnboardingAccountScreen } from "../onboarding/SalonOnboardingAccountScreen";
 import { SalonOnboardingBusinessProfileScreen } from "../onboarding/SalonOnboardingBusinessProfileScreen";
 import { SalonOnboardingPaymentSetupScreen } from "../onboarding/SalonOnboardingPaymentSetupScreen";
@@ -554,6 +556,7 @@ function toOnboardingStepLabelKey(step: OnboardingStep):
 function toFeaturedSalon(card: DiscoverySalonCard): FeaturedSalon {
   return {
     id: card.id,
+    tenantId: card.tenantId,
     name: card.name,
     city: card.city,
     rating: card.rating,
@@ -1521,6 +1524,13 @@ export function AppNavigatorShell({
   const [exploreMapSelectedSalon, setExploreMapSelectedSalon] = useState<string | null>(null);
   const [salonProfileHeroUrl, setSalonProfileHeroUrl] = useState<string | undefined>(undefined);
   const [salonProfileGalleryUrls, setSalonProfileGalleryUrls] = useState<string[]>([]);
+  // W38-DEBT-2: Salon profile loaded from Firestore
+  const [selectedSalonTenantId, setSelectedSalonTenantId] = useState<string | null>(null);
+  const [salonProfileData, setSalonProfileData] = useState<SalonProfileData | null>(null);
+  const [salonProfileLoading, setSalonProfileLoading] = useState(false);
+  const [salonProfileError, setSalonProfileError] = useState<string | null>(null);
+  const [selectedServiceId, setSelectedServiceId] = useState<string | null>(null);
+  const [selectedStaffId, setSelectedStaffId] = useState<string | null>(null);
 
   // ---------------------------------------------------------------------------
   // Admin booking queue state
@@ -1716,6 +1726,9 @@ export function AppNavigatorShell({
 
   // W38-DEBT-4: Refund data service
   const refundDataService = useMemo(() => createRefundDataService(db), []);
+
+  // W38-DEBT-2: Salon profile service
+  const salonProfileService = useMemo(() => createSalonProfileService(db), []);
 
   // W24-DEBT-3: PDF generation callable
   const receiptsGeneratePdfFn = useMemo(
@@ -2310,17 +2323,30 @@ export function AppNavigatorShell({
   }, [activeRoute.name, waitlistRepository, userId, tenantId, tenantProfile]);
 
   // ---------------------------------------------------------------------------
-  // W36-DEBT-3: Load salon gallery images when SalonProfile opens.
-  // Collection: tenants/{tenantId}/media  docs: { url, type: "hero"|"gallery", sortOrder }
+  // W38-DEBT-2: Load full salon profile + gallery when SalonProfile opens.
   // ---------------------------------------------------------------------------
   useEffect(() => {
-    if (activeRoute.name !== "SalonProfile" || !tenantId) return;
+    if (activeRoute.name !== "SalonProfile" || !selectedSalonTenantId) return;
     let cancelled = false;
-    async function loadGallery() {
+    async function load() {
+      setSalonProfileLoading(true);
+      setSalonProfileData(null);
+      setSalonProfileError(null);
       setSalonProfileHeroUrl(undefined);
       setSalonProfileGalleryUrls([]);
       try {
-        const colRef = collection(db, `tenants/${tenantId}/media`);
+        // Load structured profile data (salon, services, staff, reviews)
+        const result = await salonProfileService.getSalonProfile(selectedSalonTenantId);
+        if (cancelled) return;
+        if (result.type === "ok") {
+          setSalonProfileData(result.data);
+        } else if (result.type === "not_found") {
+          setSalonProfileError("Salon not found.");
+        } else {
+          setSalonProfileError(result.message);
+        }
+        // Load media gallery (non-fatal)
+        const colRef = collection(db, `tenants/${selectedSalonTenantId}/media`);
         const q = query(colRef, orderBy("sortOrder", "asc"));
         const snap = await getDocs(q);
         if (cancelled) return;
@@ -2336,13 +2362,17 @@ export function AppNavigatorShell({
         }
         setSalonProfileHeroUrl(hero);
         setSalonProfileGalleryUrls(gallery);
-      } catch {
-        // Non-fatal: gallery is optional
+      } catch (e) {
+        if (!cancelled) {
+          setSalonProfileError(e instanceof Error ? e.message : "Could not load salon.");
+        }
+      } finally {
+        if (!cancelled) setSalonProfileLoading(false);
       }
     }
-    void loadGallery();
+    void load();
     return () => { cancelled = true; };
-  }, [activeRoute.name, tenantId]);
+  }, [activeRoute.name, selectedSalonTenantId, salonProfileService]);
 
   // ---------------------------------------------------------------------------
   // W37-E: Load salon onboarding state from Firestore (wizardService)
@@ -4911,8 +4941,8 @@ export function AppNavigatorShell({
         <DiscoverHomeScreen
           featuredSalons={(homeFeed?.featuredSalons ?? []).map(toFeaturedSalon)}
           categories={(homeFeed?.categories ?? []).map(toAppCategory)}
-          onSelectSalon={() => navigate("SalonProfile")}
-          onSelectCategory={() => navigate("ExploreResults")}
+          onSelectSalon={(tid) => { setSelectedSalonTenantId(tid); navigate("SalonProfile"); }}
+          onSelectCategory={() => navigate("ExploreResults")}}
         />
       );
     }
@@ -4923,8 +4953,8 @@ export function AppNavigatorShell({
           posts={[]}
           activeFilter={discoveryFeedFilter}
           onFilterChange={setDiscoveryFeedFilter}
-          onSelectPost={() => navigate("SalonProfile")}
-          onSelectSalon={() => navigate("SalonProfile")}
+          onSelectPost={() => { navigate("SalonProfile"); }}
+          onSelectSalon={(tid) => { setSelectedSalonTenantId(tid); navigate("SalonProfile"); }}
         />
       );
     }
@@ -4935,9 +4965,9 @@ export function AppNavigatorShell({
           query=""
           results={(exploreFeed?.salons ?? []).map(toFeaturedSalon)}
           filters={discoveryFilters}
-          onSelectSalon={() => navigate("SalonProfile")}
+          onSelectSalon={(tid) => { setSelectedSalonTenantId(tid); navigate("SalonProfile"); }}
           onChangeFilters={() => navigate("DiscoverFilters")}
-          onOpenMap={() => navigate("ExploreMap")}
+          onOpenMap={() => navigate("ExploreMap")}}
         />
       );
     }
@@ -4966,17 +4996,47 @@ export function AppNavigatorShell({
     }
 
     if (activeRoute.name === "SalonProfile") {
-      // P2: getSalonById backend required (W38+). Inline static until then.
+      // W38-DEBT-2: render real Firestore-backed salon profile.
+      if (salonProfileLoading || (!salonProfileData && !salonProfileError)) {
+        return (
+          <SalonProfileScreen
+            salon={{ id: "", name: "Loading…", city: "", addressLine: "", rating: 0, reviewCount: 0, description: "" }}
+            services={[]}
+            staff={[]}
+            reviews={[]}
+            heroImageUrl={undefined}
+            galleryUrls={[]}
+            onSelectService={() => undefined}
+            onSelectStaff={() => undefined}
+            onBook={() => undefined}
+            onBack={() => navigate("DiscoverHome")}
+          />
+        );
+      }
+      if (salonProfileError || !salonProfileData) {
+        return (
+          <SalonProfileScreen
+            salon={{ id: "", name: salonProfileError ?? "Salon unavailable", city: "", addressLine: "", rating: 0, reviewCount: 0, description: "" }}
+            services={[]}
+            staff={[]}
+            reviews={[]}
+            onSelectService={() => undefined}
+            onSelectStaff={() => undefined}
+            onBook={() => undefined}
+            onBack={() => navigate("DiscoverHome")}
+          />
+        );
+      }
       return (
         <SalonProfileScreen
-          salon={{ id: "salon-1", name: "Zarkili Demo Salon", tagline: "Modern color and care", city: "San Francisco", addressLine: "123 Demo St, San Francisco, CA", rating: 4.8, reviewCount: 132, description: "A neighborhood salon focused on color, balayage, and premium hair care. Walk-ins welcome." }}
-          services={[{ id: "svc-1", name: "Cut & style", durationMinutes: 60, priceCents: 8500 }, { id: "svc-2", name: "Balayage", durationMinutes: 180, priceCents: 28000 }, { id: "svc-3", name: "Gloss treatment", durationMinutes: 45, priceCents: 6500 }]}
-          staff={[{ id: "staff-1", name: "Alex Rivera", role: "Senior stylist", rating: 4.9 }, { id: "staff-2", name: "Sam Chen", role: "Color specialist", rating: 4.7 }]}
-          reviews={[{ id: "rev-1", authorName: "Jordan", rating: 5, text: "Loved my balayage — Alex really listened to what I wanted.", postedAt: "Apr 22" }, { id: "rev-2", authorName: "Riley", rating: 4, text: "Great gloss treatment, clean salon, easy booking.", postedAt: "Apr 18" }]}
+          salon={salonProfileData.salon}
+          services={salonProfileData.services}
+          staff={salonProfileData.staff}
+          reviews={salonProfileData.reviews}
           heroImageUrl={salonProfileHeroUrl}
           galleryUrls={salonProfileGalleryUrls}
-          onSelectService={() => navigate("ServiceDetail")}
-          onSelectStaff={() => navigate("StaffDetail")}
+          onSelectService={(serviceId) => { setSelectedServiceId(serviceId); navigate("ServiceDetail"); }}
+          onSelectStaff={(staffId) => { setSelectedStaffId(staffId); navigate("StaffDetail"); }}
           onBook={() => navigate("BookingService")}
           onBack={() => navigate("DiscoverHome")}
         />
@@ -4984,11 +5044,22 @@ export function AppNavigatorShell({
     }
 
     if (activeRoute.name === "ServiceDetail") {
-      // P2: getServiceById backend required (W38+). Inline static until then.
+      // W38-DEBT-2: use service data from loaded salon profile.
+      const service = salonProfileData?.services.find((s) => s.id === selectedServiceId);
+      if (!service || !salonProfileData) {
+        return (
+          <ServiceDetailScreen
+            service={{ id: "", name: "Service unavailable", durationMinutes: 0, priceCents: 0 }}
+            salon={{ id: "", name: "", city: "" }}
+            onBook={() => navigate("BookingService")}
+            onBack={() => navigate("SalonProfile")}
+          />
+        );
+      }
       return (
         <ServiceDetailScreen
-          service={{ id: "svc-1", name: "Cut & style", durationMinutes: 60, priceCents: 8500, description: "A precision cut tailored to your hair texture and lifestyle." }}
-          salon={{ id: "salon-1", name: "Zarkili Demo Salon", city: "San Francisco" }}
+          service={service}
+          salon={{ id: salonProfileData.salon.id, name: salonProfileData.salon.name, city: salonProfileData.salon.city }}
           onBook={() => navigate("BookingService")}
           onBack={() => navigate("SalonProfile")}
         />
@@ -4996,12 +5067,24 @@ export function AppNavigatorShell({
     }
 
     if (activeRoute.name === "StaffDetail") {
-      // P2: getStaffById backend required (W38+). Inline static until then.
+      // W38-DEBT-2: use staff data from loaded salon profile.
+      const staffMember = salonProfileData?.staff.find((p) => p.id === selectedStaffId);
+      if (!staffMember || !salonProfileData) {
+        return (
+          <StaffDetailScreen
+            staff={{ id: "", name: "Staff unavailable", role: "" }}
+            services={[]}
+            onSelectService={() => undefined}
+            onBook={() => navigate("BookingService")}
+            onBack={() => navigate("SalonProfile")}
+          />
+        );
+      }
       return (
         <StaffDetailScreen
-          staff={{ id: "staff-1", name: "Alex Rivera", role: "Senior stylist", rating: 4.9, bio: "10+ years specializing in modern color and balayage.", salonName: "Zarkili Demo Salon" }}
-          services={[{ id: "svc-1", name: "Cut & style", durationMinutes: 60, priceCents: 8500 }, { id: "svc-2", name: "Balayage", durationMinutes: 180, priceCents: 28000 }, { id: "svc-3", name: "Gloss treatment", durationMinutes: 45, priceCents: 6500 }]}
-          onSelectService={() => navigate("ServiceDetail")}
+          staff={{ ...staffMember, salonName: salonProfileData.salon.name }}
+          services={salonProfileData.services}
+          onSelectService={(serviceId) => { setSelectedServiceId(serviceId); navigate("ServiceDetail"); }}
           onBook={() => navigate("BookingService")}
           onBack={() => navigate("SalonProfile")}
         />

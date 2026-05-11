@@ -13,6 +13,8 @@ export type DiscoveryCategory = {
 
 export type FeaturedSalon = {
   id: string;
+  /** tenantId used to load the full salon profile from Firestore (W38-DEBT-2). */
+  tenantId?: string;
   name: string;
   city: string;
   rating: number;
