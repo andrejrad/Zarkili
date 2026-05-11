@@ -357,6 +357,15 @@ import { ClientOnboardingAccountGuestScreen } from "../onboarding/ClientOnboardi
 import { ClientOnboardingPhoneVerifyScreen } from "../onboarding/ClientOnboardingPhoneVerifyScreen";
 import { ClientOnboardingLoyaltyScreen } from "../onboarding/ClientOnboardingLoyaltyScreen";
 import { SalonOnboardingWizard } from "../onboarding/SalonOnboardingWizard";
+import { SalonOnboardingAccountScreen } from "../onboarding/SalonOnboardingAccountScreen";
+import { SalonOnboardingBusinessProfileScreen } from "../onboarding/SalonOnboardingBusinessProfileScreen";
+import { SalonOnboardingPaymentSetupScreen } from "../onboarding/SalonOnboardingPaymentSetupScreen";
+import { SalonOnboardingServicesScreen } from "../onboarding/SalonOnboardingServicesScreen";
+import { SalonOnboardingStaffScreen } from "../onboarding/SalonOnboardingStaffScreen";
+import { SalonOnboardingPoliciesScreen } from "../onboarding/SalonOnboardingPoliciesScreen";
+import { SalonOnboardingAvailabilityScreen } from "../onboarding/SalonOnboardingAvailabilityScreen";
+import { SalonOnboardingMarketplaceScreen } from "../onboarding/SalonOnboardingMarketplaceScreen";
+import { SalonOnboardingVerificationScreen } from "../onboarding/SalonOnboardingVerificationScreen";
 import type { SalonOnboardingState, OnboardingStep as SalonOnboardingStepKey } from "../../domains/onboarding/model";
 import { ONBOARDING_STEPS, computeCompletionScore, deriveBlockers, buildInitialStepStatuses } from "../../domains/onboarding/model";
 import { DiscoverHomeScreen } from "../discovery/DiscoverHomeScreen";
@@ -8174,8 +8183,22 @@ export function AppNavigatorShell({
 
     const onboardingRoute = parseOnboardingRoute();
     if (onboardingRoute) {
-      // Salon onboarding: render wizard for any step in the salon flow.
+      // Salon onboarding: render a dedicated form screen for each step.
       if (onboardingRoute.flow === "salon") {
+        const totalSalonSteps = 9;
+        const salonStepIndex: Record<string, number> = {
+          "account": 1,
+          "business-profile": 2,
+          "payment-setup": 3,
+          "services": 4,
+          "staff": 5,
+          "policies": 6,
+          "availability": 7,
+          "marketplace": 8,
+          "verification": 9,
+        };
+        const currentSalonStep = salonStepIndex[onboardingRoute.step] ?? 1;
+
         const advanceWizard = (step: SalonOnboardingStepKey, status: "completed" | "skipped") => {
           setSalonWizardState((prev) => {
             const nextStatuses = { ...prev.stepStatuses, [step]: status };
@@ -8194,7 +8217,6 @@ export function AppNavigatorShell({
               canGoLive: nextBlockers.length === 0,
             };
           });
-          // W37-E: Persist step to Firestore if wizardService is available.
           if (wizardService && tenantId) {
             void wizardService
               .submitStep(tenantId, step, {})
@@ -8203,9 +8225,114 @@ export function AppNavigatorShell({
                 // Non-fatal: local state already updated above.
               });
           }
-          // Persist the move-to-next-step draft so the navigator can resume.
           void goToNextOnboardingStep();
         };
+
+        if (onboardingRoute.step === "account") {
+          return (
+            <SalonOnboardingAccountScreen
+              totalSteps={totalSalonSteps}
+              currentStep={currentSalonStep}
+              onContinue={async (_data) => { advanceWizard("ACCOUNT", "completed"); }}
+              onBack={() => navigate("AppShell")}
+            />
+          );
+        }
+
+        if (onboardingRoute.step === "business-profile") {
+          return (
+            <SalonOnboardingBusinessProfileScreen
+              totalSteps={totalSalonSteps}
+              currentStep={currentSalonStep}
+              onContinue={async (_data) => { advanceWizard("BUSINESS_PROFILE", "completed"); }}
+              onBack={() => void goToNextOnboardingStep()}
+            />
+          );
+        }
+
+        if (onboardingRoute.step === "payment-setup") {
+          return (
+            <SalonOnboardingPaymentSetupScreen
+              totalSteps={totalSalonSteps}
+              currentStep={currentSalonStep}
+              onContinue={async (_data) => { advanceWizard("PAYMENT_SETUP", "completed"); }}
+              onSkip={() => advanceWizard("PAYMENT_SETUP", "skipped")}
+              onBack={() => void goToNextOnboardingStep()}
+            />
+          );
+        }
+
+        if (onboardingRoute.step === "services") {
+          return (
+            <SalonOnboardingServicesScreen
+              totalSteps={totalSalonSteps}
+              currentStep={currentSalonStep}
+              onContinue={async (_data) => { advanceWizard("SERVICES", "completed"); }}
+              onBack={() => void goToNextOnboardingStep()}
+            />
+          );
+        }
+
+        if (onboardingRoute.step === "staff") {
+          return (
+            <SalonOnboardingStaffScreen
+              totalSteps={totalSalonSteps}
+              currentStep={currentSalonStep}
+              onContinue={async (_data) => { advanceWizard("STAFF", "completed"); }}
+              onSkip={() => advanceWizard("STAFF", "skipped")}
+              onBack={() => void goToNextOnboardingStep()}
+            />
+          );
+        }
+
+        if (onboardingRoute.step === "policies") {
+          return (
+            <SalonOnboardingPoliciesScreen
+              totalSteps={totalSalonSteps}
+              currentStep={currentSalonStep}
+              onContinue={async (_data) => { advanceWizard("POLICIES", "completed"); }}
+              onBack={() => void goToNextOnboardingStep()}
+            />
+          );
+        }
+
+        if (onboardingRoute.step === "availability") {
+          return (
+            <SalonOnboardingAvailabilityScreen
+              totalSteps={totalSalonSteps}
+              currentStep={currentSalonStep}
+              onContinue={async (_data) => { advanceWizard("AVAILABILITY", "completed"); }}
+              onBack={() => void goToNextOnboardingStep()}
+            />
+          );
+        }
+
+        if (onboardingRoute.step === "marketplace") {
+          return (
+            <SalonOnboardingMarketplaceScreen
+              totalSteps={totalSalonSteps}
+              currentStep={currentSalonStep}
+              onContinue={async (_data) => { advanceWizard("MARKETPLACE_VISIBILITY", "completed"); }}
+              onBack={() => void goToNextOnboardingStep()}
+            />
+          );
+        }
+
+        if (onboardingRoute.step === "verification") {
+          return (
+            <SalonOnboardingVerificationScreen
+              totalSteps={totalSalonSteps}
+              currentStep={currentSalonStep}
+              onContinue={async (_data) => {
+                advanceWizard("VERIFICATION", "completed");
+                navigate("SalonDashboard");
+              }}
+              onBack={() => void goToNextOnboardingStep()}
+            />
+          );
+        }
+
+        // Fallback: wizard overview hub (all steps visible, user can jump in).
         return (
           <SalonOnboardingWizard
             tenantId={tenantId ?? ""}
