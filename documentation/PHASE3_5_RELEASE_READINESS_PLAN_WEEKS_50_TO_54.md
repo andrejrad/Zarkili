@@ -16,8 +16,8 @@ Phase 3.5 is intentionally short and surgical. No new product surfaces are added
 1. Phase 3 close report signed off; operator-ready release candidate produced in Week 46.
 2. No P0/P1 defects open against booking, payments, or admin write paths.
 3. Stripe Billing and Connect verified live in production with at least one real tenant.
-4. Pentest vendor selected and contracted (procurement done before Week 47 to avoid blocking).
-5. Marketing site copy direction approved (so Week 49 implementation does not stall on content).
+4. Pentest vendor selected and contracted (procurement done before Week 50 to avoid blocking).
+5. Marketing site copy direction approved (so Week 52 implementation does not stall on content).
 
 ## Exit Conditions (Definition of Done for Phase 3.5)
 1. Production observability stack live (error reporting, APM, logs, uptime checks, alerting).
@@ -80,11 +80,11 @@ Implements the support surfaces from [AI_SUPPORT_SYSTEM_ARCHITECTURE.md](AI_SUPP
 - Firestore rules: tenant isolation on `supportTickets`, platform-owner-only on `escalationQueue`. Added to rules test suite.
 - `SupportChatScreen` (protected route) for end clients and salon admins/owners — opens or resumes a ticket, posts user messages, renders admin replies. Role- and tenant-aware context captured at ticket creation.
 - `AdminSupportQueueScreen` (platform-owner-only protected route) — cross-tenant queue, full message thread, ticket context (recent bookings, account age, locale), reply composer, status transitions (open / resolved / escalated / closed).
-- Knowledge-base authoring UI (platform-owner-only) — edits the system prompt that the W52 AI router will consume; persists to `platform/aiSupportKb/{versionId}` with version history. KB seeded from the W50 customer support runbook.
+- Knowledge-base authoring UI (platform-owner-only) — edits the system prompt that the W55 AI router will consume; persists to `platform/aiSupportKb/{versionId}` with version history. KB seeded from the W53 customer support runbook.
 - Macros / canned responses authoring UI for the platform owner.
-- All flows are functional **without** AI: tickets created → routed straight to escalation queue → platform owner replies. Proves surfaces, rules, and queue ergonomics before the AI router lands in W52.
-- Begin compliance pack work in parallel (continues into W51).
-- AI budget guard: register a new `aiSupport` feature key with default Healthy thresholds, ready for W52 to consume.
+- All flows are functional **without** AI: tickets created → routed straight to escalation queue → platform owner replies. Proves surfaces, rules, and queue ergonomics before the AI router lands in W55.
+- Begin compliance pack work in parallel (continues into W54).
+- AI budget guard: register a new `aiSupport` feature key with default Healthy thresholds, ready for W55 to consume.
 
 ### Week 54 — Compliance Pack, BI Export, Launch Polish, GA
 - Compliance pack (per [US_PRIMARY_MARKET_ADDENDUM.md](US_PRIMARY_MARKET_ADDENDUM.md)):
@@ -100,10 +100,10 @@ Implements the support surfaces from [AI_SUPPORT_SYSTEM_ARCHITECTURE.md](AI_SUPP
   - Tenant data export download in admin (CSV bundle for top entities) — extends Week 42 export with bulk full-data option.
   - Documented schema reference for exported data.
 - Launch polish:
-  - Final visual QA pass across consumer + admin + super-admin + **support surfaces from W50**.
+  - Final visual QA pass across consumer + admin + super-admin + **support surfaces from W53**.
   - Final accessibility re-audit (includes `SupportChatScreen` and `AdminSupportQueueScreen`).
   - Launch readiness checklist (uses [PILOT_GO_LIVE.md](new-platform/PILOT_GO_LIVE.md) as base, expanded for commercial scale, includes support-tab smoke tests).
-  - Status page (statuspage.io or equivalent) wired to the SLOs from Week 45.
+  - Status page (statuspage.io or equivalent) wired to the SLOs from Week 50.
   - Customer support runbook live; first-line responses templated; KB seed validated against runbook.
   - On-call rotation staffed for launch week (engineering + support tier-1).
 - **Commercial GA release — includes in-app support tab and platform-owner support dashboard.**
@@ -111,17 +111,17 @@ Implements the support surfaces from [AI_SUPPORT_SYSTEM_ARCHITECTURE.md](AI_SUPP
 ## Decision Gates
 | Gate | Decide by | Default if undecided |
 |------|-----------|----------------------|
-| Pentest vendor selected | Before W47 | BLOCKER — must be answered or W48 slips |
-| SLO numeric targets (web availability, booking-create, payment-create) | End of Week 45 | Web 99.9%, booking-create 99.5% (excl. user error), payment-create 99.0% |
-| Status page vendor (statuspage.io vs hosted self) | End of Week 45 | statuspage.io |
-| Self-serve checkout in scope this phase, or sales-assisted only? | End of Week 46 | Self-serve in scope (Week 47 plan assumes yes) |
-| BI export: BigQuery extension vs scheduled export | End of Week 47 | Firestore-to-BigQuery extension |
-| Public comparison page legal review owner | End of Week 46 | External legal counsel review required |
-| Support skeleton scope: ship at GA without AI router | Decided | YES — W50 ships support surfaces human-handled; AI router added in Phase 4 W52 |
-| KB storage location | End of Week 49 | Dedicated `platform/aiSupportKb/{versionId}` collection with `current` pointer (used by W50 KB authoring UI and W52 AI router) |
-| Per-tenant routing default for support tickets | End of Week 48 | Platform-owner first; tenants opt in to "tenant-owner first" later |
-| End-client ticket access (every authenticated client vs only those with a booking) | End of Week 48 | Every authenticated client; rate-limited per user |
-| SOC 2 Type 1 kickoff during or after launch | End of Week 49 | RESOLVED: kickoff in **Phase 5 (W55+)** with auditor selected during W49 (per [US_PRIMARY_MARKET_ADDENDUM.md](US_PRIMARY_MARKET_ADDENDUM.md)) |
+| Pentest vendor selected | Before W50 | BLOCKER — must be answered or W51 slips |
+| SLO numeric targets (web availability, booking-create, payment-create) | End of Week 49 | Web 99.9%, booking-create 99.5% (excl. user error), payment-create 99.0% |
+| Status page vendor (statuspage.io vs hosted self) | End of Week 49 | statuspage.io |
+| Self-serve checkout in scope this phase, or sales-assisted only? | End of Week 49 | Self-serve in scope (Week 50 plan assumes yes) |
+| BI export: BigQuery extension vs scheduled export | End of Week 50 | Firestore-to-BigQuery extension |
+| Public comparison page legal review owner | End of Week 49 | External legal counsel review required |
+| Support skeleton scope: ship at GA without AI router | Decided | YES — W53 ships support surfaces human-handled; AI router added in Phase 4 W55 |
+| KB storage location | End of Week 52 | Dedicated `platform/aiSupportKb/{versionId}` collection with `current` pointer (used by W53 KB authoring UI and W55 AI router) |
+| Per-tenant routing default for support tickets | End of Week 51 | Platform-owner first; tenants opt in to "tenant-owner first" later |
+| End-client ticket access (every authenticated client vs only those with a booking) | End of Week 51 | Every authenticated client; rate-limited per user |
+| SOC 2 Type 1 kickoff during or after launch | End of Week 52 | RESOLVED: kickoff in **Phase 5 (W55+)** with auditor selected during W52 (per [US_PRIMARY_MARKET_ADDENDUM.md](US_PRIMARY_MARKET_ADDENDUM.md)) |
 | Primary target market | Decided | RESOLVED: **US primary, EU secondary** (per [US_PRIMARY_MARKET_ADDENDUM.md](US_PRIMARY_MARKET_ADDENDUM.md)) |
 
 ## Parallel Streams (run alongside Weeks 50–54)
@@ -131,39 +131,39 @@ Implements the support surfaces from [AI_SUPPORT_SYSTEM_ARCHITECTURE.md](AI_SUPP
 
 ## Acceptance Gate Per Week
 1. Week-N close report under `documentation/new-platform/PHASE3_5_WEEKN_CLOSE_REPORT.md`.
-2. Test deltas: SLO synthetic checks live (W47), pentest fixes verified (W48), AI eval baseline recorded (W49), support rules + queue tests (W50), launch checklist signed off (W51).
+2. Test deltas: SLO synthetic checks live (W50), pentest fixes verified (W51), AI eval baseline recorded (W52), support rules + queue tests (W53), launch checklist signed off (W54).
 3. No regressions in Phase 1–3 test suite.
 4. Tracking board updated.
 
 ## Risk Register
 | Risk | Severity | Probability | Mitigation |
 |------|----------|-------------|------------|
-| Pentest finds Critical issue late in W46 | Critical | Medium | Triage and patch in flight; do not wait for final report; budget W47 for residual remediation if needed |
+| Pentest finds Critical issue late in W49 | Critical | Medium | Triage and patch in flight; do not wait for final report; budget W50 for residual remediation if needed |
 | DR drill reveals RPO worse than documented | High | Medium | Adjust backup cadence before launch; document realistic RPO publicly |
 | AI eval reveals quality below product bar | High | Medium | Reduce AI surfaces or downgrade to "human review required" mode for the affected feature until quality bar met |
 | Self-serve checkout edge cases break onboarding wizard | High | Medium | Manual fallback: support team can manually provision tenant from a Stripe payment |
 | Marketing site delays launch | Medium | High | Marketing site is parallelizable; if it slips, soft-launch to a controlled tenant list while the site catches up |
 | Status page misreports incidents | Low | Medium | Manual override; runbook for status updates |
 | On-call coverage gap during launch | Critical | Low | Confirm rotation 4 weeks before launch; cross-train at least two engineers per domain |
-| Support ticket volume at launch overwhelms platform-owner queue | High | Medium | Macros from W50; per-tenant routing flag (W50); tier-1 human responder staffed (W51 on-call); AI router lands W52 |
-| Cross-tenant data leakage in support context (pre-AI) | Critical | Low | Tenant-isolation rules + adversarial rules tests in W50; context snapshot only includes the requester's tenant data |
+| Support ticket volume at launch overwhelms platform-owner queue | High | Medium | Macros from W53; per-tenant routing flag (W53); tier-1 human responder staffed (W54 on-call); AI router lands W55 |
+| Cross-tenant data leakage in support context (pre-AI) | Critical | Low | Tenant-isolation rules + adversarial rules tests in W53; context snapshot only includes the requester's tenant data |
 
 ## Trello Code Convention
 Phase 3.5 cards extend the prefix scheme:
-- `[W47-OPS-001]` Sentry production wiring
-- `[W48-SEC-005]` Pentest remediation: SSRF in webhook handler
-- `[W49-AI-009]` AI chat eval harness baseline
-- `[W50-SUP-001]` Support tickets schema + rules
-- `[W50-SUP-002]` SupportChatScreen v1 (no AI)
-- `[W50-ADM-016]` AdminSupportQueueScreen v1
-- `[W51-GA-012]` Status page wired to SLOs
+- `[W50-OPS-001]` Sentry production wiring
+- `[W51-SEC-005]` Pentest remediation: SSRF in webhook handler
+- `[W52-AI-009]` AI chat eval harness baseline
+- `[W53-SUP-001]` Support tickets schema + rules
+- `[W53-SUP-002]` SupportChatScreen v1 (no AI)
+- `[W53-ADM-016]` AdminSupportQueueScreen v1
+- `[W54-GA-012]` Status page wired to SLOs
 
 New / reused codes: `OPS` (Observability and operations), `SEC` (Security), `GA` (Launch readiness), `MKT` (Marketing site), `SUP` (AI Support System surfaces; AI router is added in Phase 4).
 
 ## What This Phase Does Not Cover
 Explicitly out of scope and tracked as Phase 4 / post-launch:
-- AI router for support (Phase 4 W52) — launch ships human-handled support.
-- AI confidence-scored auto-respond, escalation pipeline, eval, analytics, CSAT (Phase 4 W52–W54).
+- AI router for support (Phase 4 W55) — launch ships human-handled support.
+- AI confidence-scored auto-respond, escalation pipeline, eval, analytics, CSAT (Phase 4 W55–W57).
 - SOC 2 Type 1 / Type 2 audit (separate ~3-month workstream).
 - ISO 27001 certification.
 - Enterprise / franchise tier (multi-brand, white-label, advanced finance integrations).
