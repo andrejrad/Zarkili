@@ -176,6 +176,51 @@ import { createMarketplaceAdminService, checkPostCompliance } from "../admin/mar
 import type { AiFeatureToggleConfig, AiSuggestion, AiSuggestionFilter, AiSuggestionQueueSummary, AiUsageKpi, AiUsageByFeature, AiSafetyIncident, AiAuditLogEntry, AiAuditFilter } from "../admin/aiAdminTypes";
 import type { MarketplacePost, PostPerformanceMetrics, PostBookingRow, PostComplianceCheckResult, AntiTheftSignal, AntiTheftKpi } from "../admin/marketplaceAdminTypes";
 import type { AiBudgetGuardConfig } from "../../shared/ai";
+// W49 — Platform Super-Admin, Compliance, Polish & Release Candidate
+import { TenantDirectoryScreen } from "../admin/TenantDirectoryScreen";
+import { TenantDetailScreen } from "../admin/TenantDetailScreen";
+import { SuspendTenantScreen } from "../admin/SuspendTenantScreen";
+import { ImpersonationScreen } from "../admin/ImpersonationScreen";
+import { CrossTenantAnalyticsScreen } from "../admin/CrossTenantAnalyticsScreen";
+import { PlatformHealthDashboardScreen } from "../admin/PlatformHealthDashboardScreen";
+import { PricingPlanManagementScreen } from "../admin/PricingPlanManagementScreen";
+import { FeatureFlagConsoleScreen } from "../admin/FeatureFlagConsoleScreen";
+import { PlatformAuditLogScreen } from "../admin/PlatformAuditLogScreen";
+import { MarketplaceModerationQueueScreen } from "../admin/MarketplaceModerationQueueScreen";
+import { CrossTenantAiBudgetScreen } from "../admin/CrossTenantAiBudgetScreen";
+import { MigrationRunnerScreen } from "../admin/MigrationRunnerScreen";
+import { BackupRestoreStatusScreen } from "../admin/BackupRestoreStatusScreen";
+import { SupportInboxScreen } from "../admin/SupportInboxScreen";
+import { SecurityEventsDashboardScreen } from "../admin/SecurityEventsDashboardScreen";
+import { DataExportRequestScreen } from "../admin/DataExportRequestScreen";
+import { ConsentPolicyLogScreen } from "../admin/ConsentPolicyLogScreen";
+import { IncidentResponseScreen } from "../admin/IncidentResponseScreen";
+import { AdminSignInScreen } from "../admin/AdminSignInScreen";
+import { RoleDeniedScreen } from "../admin/RoleDeniedScreen";
+import { createPlatformAdminService } from "../admin/platformAdminService";
+import { createImpersonationService } from "../admin/impersonationService";
+import { createFeatureFlagAdminService } from "../admin/featureFlagAdminService";
+import type {
+  TenantRecord,
+  TenantFilter,
+  CrossTenantKpi,
+  PlatformHealthSignal,
+  PricingPlan,
+  FeatureFlag,
+  PlatformAuditEntry,
+  PlatformAuditFilter,
+  ModerationQueueItem,
+  ModerationItemStatus,
+  TenantAiBudgetOverride,
+  MigrationJob,
+  BackupJob,
+  SecurityEvent,
+  SecurityEventFilter,
+  DataExportRequest,
+  ConsentPolicyEntry,
+  IncidentRecord,
+  ImpersonationSession,
+} from "../admin/platformAdminTypes";
 // W15-DEBT-1 — Onboarding admin
 import { OnboardingAdminScreen } from "../admin/OnboardingAdminScreen";
 import {
@@ -1452,6 +1497,90 @@ export function AppNavigatorShell({
   const [antiTheftError, setAntiTheftError] = useState<string | null>(null);
   const [antiTheftKpi, setAntiTheftKpi] = useState<AntiTheftKpi | null>(null);
   const [antiTheftSignals, setAntiTheftSignals] = useState<AntiTheftSignal[]>([]);
+
+  // ---------------------------------------------------------------------------
+  // W49 — Platform Super-Admin, Compliance, Polish & Release Candidate
+  // ---------------------------------------------------------------------------
+  const platformAdminSvc = React.useMemo(() => createPlatformAdminService(db), []);
+  const impersonationSvc = React.useMemo(() => createImpersonationService(db), []);
+  const featureFlagSvc = React.useMemo(() => createFeatureFlagAdminService(db), []);
+  // Tenant Directory
+  const [tenantDirLoading, setTenantDirLoading] = useState(false);
+  const [tenantDirError, setTenantDirError] = useState<string | null>(null);
+  const [tenants, setTenants] = useState<TenantRecord[]>([]);
+  const [tenantFilter, setTenantFilter] = useState<TenantFilter>({});
+  // Tenant Detail
+  const [tenantDetailLoading, setTenantDetailLoading] = useState(false);
+  const [tenantDetailError, setTenantDetailError] = useState<string | null>(null);
+  const [selectedTenant, setSelectedTenant] = useState<TenantRecord | null>(null);
+  // Suspend Tenant
+  const [suspendTenantLoading, setSuspendTenantLoading] = useState(false);
+  const [suspendTenantError, setSuspendTenantError] = useState<string | null>(null);
+  const [suspendTenantId, setSuspendTenantId] = useState<string | null>(null);
+  const [suspendTenantName, setSuspendTenantName] = useState<string>("");
+  // Impersonation
+  const [impersonationLoading, setImpersonationLoading] = useState(false);
+  const [impersonationError, setImpersonationError] = useState<string | null>(null);
+  const [activeImpersonationSession, setActiveImpersonationSession] = useState<ImpersonationSession | null>(null);
+  // Cross-Tenant Analytics
+  const [crossTenantKpiLoading, setCrossTenantKpiLoading] = useState(false);
+  const [crossTenantKpiError, setCrossTenantKpiError] = useState<string | null>(null);
+  const [crossTenantKpi, setCrossTenantKpi] = useState<CrossTenantKpi | null>(null);
+  // Platform Health Dashboard
+  const [platformHealthLoading, setPlatformHealthLoading] = useState(false);
+  const [platformHealthError, setPlatformHealthError] = useState<string | null>(null);
+  const [platformHealthSignals, setPlatformHealthSignals] = useState<PlatformHealthSignal[]>([]);
+  // Pricing Plan Management
+  const [pricingPlansLoading, setPricingPlansLoading] = useState(false);
+  const [pricingPlansError, setPricingPlansError] = useState<string | null>(null);
+  const [pricingPlans, setPricingPlans] = useState<PricingPlan[]>([]);
+  // Feature Flag Console
+  const [featureFlagsLoading, setFeatureFlagsLoading] = useState(false);
+  const [featureFlagsError, setFeatureFlagsError] = useState<string | null>(null);
+  const [platformFlags, setPlatformFlags] = useState<FeatureFlag[]>([]);
+  const [tenantFlags, setTenantFlags] = useState<FeatureFlag[]>([]);
+  // Platform Audit Log
+  const [platformAuditLoading, setPlatformAuditLoading] = useState(false);
+  const [platformAuditError, setPlatformAuditError] = useState<string | null>(null);
+  const [platformAuditEntries, setPlatformAuditEntries] = useState<PlatformAuditEntry[]>([]);
+  const [platformAuditFilter, setPlatformAuditFilter] = useState<PlatformAuditFilter>({});
+  const [platformAuditTotal, setPlatformAuditTotal] = useState(0);
+  // Marketplace Moderation Queue
+  const [moderationQueueLoading, setModerationQueueLoading] = useState(false);
+  const [moderationQueueError, setModerationQueueError] = useState<string | null>(null);
+  const [moderationItems, setModerationItems] = useState<ModerationQueueItem[]>([]);
+  const [moderationStatusFilter, setModerationStatusFilter] = useState<ModerationItemStatus>("pending");
+  // Cross-Tenant AI Budget
+  const [platformAiBudgetLoading, setPlatformAiBudgetLoading] = useState(false);
+  const [platformAiBudgetError, setPlatformAiBudgetError] = useState<string | null>(null);
+  const [platformAiBudgetOverrides, setPlatformAiBudgetOverrides] = useState<TenantAiBudgetOverride[]>([]);
+  // Migration Runner
+  const [migrationJobsLoading, setMigrationJobsLoading] = useState(false);
+  const [migrationJobsError, setMigrationJobsError] = useState<string | null>(null);
+  const [migrationJobs, setMigrationJobs] = useState<MigrationJob[]>([]);
+  // Backup/Restore Status
+  const [backupJobsLoading, setBackupJobsLoading] = useState(false);
+  const [backupJobsError, setBackupJobsError] = useState<string | null>(null);
+  const [backupJobs, setBackupJobs] = useState<BackupJob[]>([]);
+  // Support Inbox — no data state needed (vendor embed)
+  // Security Events Dashboard
+  const [securityEventsLoading, setSecurityEventsLoading] = useState(false);
+  const [securityEventsError, setSecurityEventsError] = useState<string | null>(null);
+  const [securityEvents, setSecurityEvents] = useState<SecurityEvent[]>([]);
+  const [securityEventsFilter, setSecurityEventsFilter] = useState<SecurityEventFilter>({});
+  // Data Export Requests
+  const [dataExportLoading, setDataExportLoading] = useState(false);
+  const [dataExportError, setDataExportError] = useState<string | null>(null);
+  const [dataExportRequests, setDataExportRequests] = useState<DataExportRequest[]>([]);
+  // Consent Policy Log
+  const [consentPolicyLoading, setConsentPolicyLoading] = useState(false);
+  const [consentPolicyError, setConsentPolicyError] = useState<string | null>(null);
+  const [consentPolicyEntries, setConsentPolicyEntries] = useState<ConsentPolicyEntry[]>([]);
+  const [consentTenantFilter, setConsentTenantFilter] = useState<string | undefined>(undefined);
+  // Incident Response
+  const [incidentsLoading, setIncidentsLoading] = useState(false);
+  const [incidentsError, setIncidentsError] = useState<string | null>(null);
+  const [incidents, setIncidents] = useState<IncidentRecord[]>([]);
 
   // ---------------------------------------------------------------------------
   // W15-DEBT-1 — Onboarding admin state
@@ -3602,8 +3731,185 @@ export function AppNavigatorShell({
     activeLocationId,
   ]);
 
-  function getOnboardingGuardMessage(): string {
-    if (membershipsLoading) {
+        setAntiTheftKpi(kpi);
+        setAntiTheftSignals(signals);
+        setAntiTheftLoading(false);
+      }).catch(() => {
+        setAntiTheftLoading(false);
+        setAntiTheftError("Failed to load anti-theft data.");
+      });
+    }
+  }, [
+    activeRoute.name,
+    loadTenantLocations, loadTenantProfile, loadStaffList, loadServicesList,
+    loadQueue, loadDashboard, loadOwnerKpi,
+    loadBillingSubscription, loadBillingInvoices, loadBillingMethods,
+    loadBillingPayouts, loadBillingConnect, loadBillingRefunds,
+    loadLocationList, loadLocationDashboard, loadLocationSettings,
+    loadLocationOverrides, loadLocationResources, loadWalkInQueue, loadDailyClose,
+    activeLocationId,
+  ]);
+
+  // ---------------------------------------------------------------------------
+  // W49 — Platform Super-Admin route activators
+  // ---------------------------------------------------------------------------
+  const w49Routes = [
+    "TenantDirectory", "TenantDetail", "Impersonation", "CrossTenantAnalytics",
+    "PlatformHealthDashboard", "PricingPlanManagement", "FeatureFlagConsole",
+    "PlatformAuditLog", "MarketplaceModerationQueue", "CrossTenantAiBudget",
+    "MigrationRunner", "BackupRestoreStatus", "SecurityEventsDashboard",
+    "DataExportRequests", "ConsentPolicyLog", "IncidentResponse",
+  ];
+  React.useEffect(() => {
+    if (!w49Routes.includes(activeRoute.name)) return;
+    const adminRole = "platform_admin" as const;
+
+    if (activeRoute.name === "TenantDirectory") {
+      setTenantDirLoading(true);
+      setTenantDirError(null);
+      void platformAdminSvc.listTenants(adminRole, tenantFilter).then((list) => {
+        setTenants(list);
+        setTenantDirLoading(false);
+      }).catch(() => { setTenantDirLoading(false); setTenantDirError("Failed to load tenants."); });
+    }
+
+    if (activeRoute.name === "TenantDetail" && selectedTenant) {
+      // already loaded via onSelectTenant handler — nothing to re-fetch
+    }
+
+    if (activeRoute.name === "Impersonation") {
+      setImpersonationLoading(true);
+      setImpersonationError(null);
+      void impersonationSvc.getActiveImpersonationSession(adminRole).then((session) => {
+        setActiveImpersonationSession(session);
+        setImpersonationLoading(false);
+      }).catch(() => { setImpersonationLoading(false); setImpersonationError("Failed to load session."); });
+    }
+
+    if (activeRoute.name === "CrossTenantAnalytics") {
+      setCrossTenantKpiLoading(true);
+      setCrossTenantKpiError(null);
+      void platformAdminSvc.getCrossTenantKpi(adminRole).then((kpi) => {
+        setCrossTenantKpi(kpi);
+        setCrossTenantKpiLoading(false);
+      }).catch(() => { setCrossTenantKpiLoading(false); setCrossTenantKpiError("Failed to load analytics."); });
+    }
+
+    if (activeRoute.name === "PlatformHealthDashboard") {
+      setPlatformHealthLoading(true);
+      setPlatformHealthError(null);
+      void platformAdminSvc.getPlatformHealthSignals(adminRole).then((signals) => {
+        setPlatformHealthSignals(signals);
+        setPlatformHealthLoading(false);
+      }).catch(() => { setPlatformHealthLoading(false); setPlatformHealthError("Failed to load health signals."); });
+    }
+
+    if (activeRoute.name === "PricingPlanManagement") {
+      setPricingPlansLoading(true);
+      setPricingPlansError(null);
+      void platformAdminSvc.listPricingPlans(adminRole).then((plans) => {
+        setPricingPlans(plans);
+        setPricingPlansLoading(false);
+      }).catch(() => { setPricingPlansLoading(false); setPricingPlansError("Failed to load pricing plans."); });
+    }
+
+    if (activeRoute.name === "FeatureFlagConsole") {
+      setFeatureFlagsLoading(true);
+      setFeatureFlagsError(null);
+      void Promise.all([
+        featureFlagSvc.listPlatformFlags(adminRole),
+        featureFlagSvc.listTenantFlags(adminRole, undefined),
+      ]).then(([pFlags, tFlags]) => {
+        setPlatformFlags(pFlags);
+        setTenantFlags(tFlags);
+        setFeatureFlagsLoading(false);
+      }).catch(() => { setFeatureFlagsLoading(false); setFeatureFlagsError("Failed to load feature flags."); });
+    }
+
+    if (activeRoute.name === "PlatformAuditLog") {
+      setPlatformAuditLoading(true);
+      setPlatformAuditError(null);
+      void platformAdminSvc.listPlatformAuditLog(adminRole, platformAuditFilter).then(({ entries, total }) => {
+        setPlatformAuditEntries(entries);
+        setPlatformAuditTotal(total);
+        setPlatformAuditLoading(false);
+      }).catch(() => { setPlatformAuditLoading(false); setPlatformAuditError("Failed to load audit log."); });
+    }
+
+    if (activeRoute.name === "MarketplaceModerationQueue") {
+      setModerationQueueLoading(true);
+      setModerationQueueError(null);
+      void platformAdminSvc.listModerationQueue(adminRole, moderationStatusFilter).then((items) => {
+        setModerationItems(items);
+        setModerationQueueLoading(false);
+      }).catch(() => { setModerationQueueLoading(false); setModerationQueueError("Failed to load moderation queue."); });
+    }
+
+    if (activeRoute.name === "CrossTenantAiBudget") {
+      setPlatformAiBudgetLoading(true);
+      setPlatformAiBudgetError(null);
+      void platformAdminSvc.listTenantAiBudgetOverrides(adminRole).then((overrides) => {
+        setPlatformAiBudgetOverrides(overrides);
+        setPlatformAiBudgetLoading(false);
+      }).catch(() => { setPlatformAiBudgetLoading(false); setPlatformAiBudgetError("Failed to load AI budget overrides."); });
+    }
+
+    if (activeRoute.name === "MigrationRunner") {
+      setMigrationJobsLoading(true);
+      setMigrationJobsError(null);
+      void platformAdminSvc.listMigrationJobs(adminRole).then((jobs) => {
+        setMigrationJobs(jobs);
+        setMigrationJobsLoading(false);
+      }).catch(() => { setMigrationJobsLoading(false); setMigrationJobsError("Failed to load migration jobs."); });
+    }
+
+    if (activeRoute.name === "BackupRestoreStatus") {
+      setBackupJobsLoading(true);
+      setBackupJobsError(null);
+      void platformAdminSvc.listBackupJobs(adminRole).then((jobs) => {
+        setBackupJobs(jobs);
+        setBackupJobsLoading(false);
+      }).catch(() => { setBackupJobsLoading(false); setBackupJobsError("Failed to load backup jobs."); });
+    }
+
+    if (activeRoute.name === "SecurityEventsDashboard") {
+      setSecurityEventsLoading(true);
+      setSecurityEventsError(null);
+      void platformAdminSvc.listSecurityEvents(adminRole, securityEventsFilter).then((events) => {
+        setSecurityEvents(events);
+        setSecurityEventsLoading(false);
+      }).catch(() => { setSecurityEventsLoading(false); setSecurityEventsError("Failed to load security events."); });
+    }
+
+    if (activeRoute.name === "DataExportRequests") {
+      setDataExportLoading(true);
+      setDataExportError(null);
+      void platformAdminSvc.listDataExportRequests(adminRole).then((reqs) => {
+        setDataExportRequests(reqs);
+        setDataExportLoading(false);
+      }).catch(() => { setDataExportLoading(false); setDataExportError("Failed to load data export requests."); });
+    }
+
+    if (activeRoute.name === "ConsentPolicyLog") {
+      setConsentPolicyLoading(true);
+      setConsentPolicyError(null);
+      void platformAdminSvc.listConsentPolicyEntries(adminRole, consentTenantFilter).then((entries) => {
+        setConsentPolicyEntries(entries);
+        setConsentPolicyLoading(false);
+      }).catch(() => { setConsentPolicyLoading(false); setConsentPolicyError("Failed to load consent policy log."); });
+    }
+
+    if (activeRoute.name === "IncidentResponse") {
+      setIncidentsLoading(true);
+      setIncidentsError(null);
+      void platformAdminSvc.listIncidents(adminRole).then((list) => {
+        setIncidents(list);
+        setIncidentsLoading(false);
+      }).catch(() => { setIncidentsLoading(false); setIncidentsError("Failed to load incidents."); });
+    }
+  }, [activeRoute.name]);
+
+
       return t("membership.loading");
     }
 
@@ -9282,6 +9588,491 @@ export function AppNavigatorShell({
           }}
           onBack={() => navigate("AppShell")}
           testID="onboarding-admin-screen"
+        />
+      );
+    }
+
+    // -------------------------------------------------------------------------
+    // W49 — Platform Super-Admin, Compliance, Polish & Release Candidate
+    // -------------------------------------------------------------------------
+    if (activeRoute.name === "TenantDirectory") {
+      return (
+        <TenantDirectoryScreen
+          loading={tenantDirLoading}
+          error={tenantDirError}
+          tenants={tenants}
+          filter={tenantFilter}
+          onChangeFilter={(f) => {
+            setTenantFilter(f);
+            setTenantDirLoading(true);
+            setTenantDirError(null);
+            void platformAdminSvc.listTenants("platform_admin", f).then((list) => {
+              setTenants(list);
+              setTenantDirLoading(false);
+            }).catch(() => { setTenantDirLoading(false); setTenantDirError("Failed to filter tenants."); });
+          }}
+          onSelectTenant={(t) => {
+            setSelectedTenant(t);
+            navigate("TenantDetail");
+          }}
+          onRetry={() => {
+            setTenantDirLoading(true);
+            void platformAdminSvc.listTenants("platform_admin", tenantFilter).then((list) => {
+              setTenants(list); setTenantDirLoading(false);
+            }).catch(() => setTenantDirLoading(false));
+          }}
+          onBack={() => navigate("AppShell")}
+          testID="tenant-directory-screen"
+        />
+      );
+    }
+
+    if (activeRoute.name === "TenantDetail" && selectedTenant) {
+      return (
+        <TenantDetailScreen
+          loading={tenantDetailLoading}
+          error={tenantDetailError}
+          tenant={selectedTenant}
+          onSaveSupportNotes={(notes) => {
+            void platformAdminSvc.updateTenantSupportNotes("platform_admin", selectedTenant.tenantId, notes).then(() => {
+              setSelectedTenant({ ...selectedTenant, supportNotes: notes });
+            });
+          }}
+          onSuspend={() => {
+            setSuspendTenantId(selectedTenant.tenantId);
+            setSuspendTenantName(selectedTenant.name);
+            navigate("SuspendTenant");
+          }}
+          onReactivate={() => {
+            void platformAdminSvc.reactivateTenant("platform_admin", selectedTenant.tenantId).then(() => {
+              setSelectedTenant({ ...selectedTenant, status: "active" });
+            });
+          }}
+          onImpersonate={() => navigate("Impersonation")}
+          onViewAuditLog={() => navigate("PlatformAuditLog")}
+          onBack={() => navigate("TenantDirectory")}
+          testID="tenant-detail-screen"
+        />
+      );
+    }
+
+    if (activeRoute.name === "SuspendTenant" && suspendTenantId) {
+      return (
+        <SuspendTenantScreen
+          loading={suspendTenantLoading}
+          error={suspendTenantError}
+          tenantId={suspendTenantId}
+          tenantName={suspendTenantName}
+          onConfirmSuspend={(reason) => {
+            setSuspendTenantLoading(true);
+            setSuspendTenantError(null);
+            void platformAdminSvc.suspendTenant("platform_admin", suspendTenantId, reason).then(() => {
+              setSuspendTenantLoading(false);
+              if (selectedTenant) setSelectedTenant({ ...selectedTenant, status: "suspended" });
+              navigate("TenantDetail");
+            }).catch(() => { setSuspendTenantLoading(false); setSuspendTenantError("Failed to suspend tenant."); });
+          }}
+          onCancel={() => navigate("TenantDetail")}
+          testID="suspend-tenant-screen"
+        />
+      );
+    }
+
+    if (activeRoute.name === "Impersonation") {
+      return (
+        <ImpersonationScreen
+          loading={impersonationLoading}
+          error={impersonationError}
+          activeSession={activeImpersonationSession}
+          onStartImpersonation={(targetTenantId, targetUserId) => {
+            setImpersonationLoading(true);
+            setImpersonationError(null);
+            void impersonationSvc.startImpersonation("platform_admin", userId ?? "", targetTenantId, targetUserId).then((session) => {
+              setActiveImpersonationSession(session);
+              setImpersonationLoading(false);
+            }).catch(() => { setImpersonationLoading(false); setImpersonationError("Failed to start impersonation."); });
+          }}
+          onEndImpersonation={() => {
+            if (!activeImpersonationSession) return;
+            setImpersonationLoading(true);
+            void impersonationSvc.endImpersonation("platform_admin", activeImpersonationSession.sessionId).then(() => {
+              setActiveImpersonationSession(null);
+              setImpersonationLoading(false);
+            }).catch(() => setImpersonationLoading(false));
+          }}
+          onRetry={() => {
+            setImpersonationLoading(true);
+            void impersonationSvc.getActiveImpersonationSession("platform_admin").then((s) => {
+              setActiveImpersonationSession(s); setImpersonationLoading(false);
+            }).catch(() => setImpersonationLoading(false));
+          }}
+          onBack={() => navigate("TenantDetail")}
+          testID="impersonation-screen"
+        />
+      );
+    }
+
+    if (activeRoute.name === "CrossTenantAnalytics") {
+      return (
+        <CrossTenantAnalyticsScreen
+          loading={crossTenantKpiLoading}
+          error={crossTenantKpiError}
+          kpi={crossTenantKpi}
+          onRetry={() => {
+            setCrossTenantKpiLoading(true);
+            void platformAdminSvc.getCrossTenantKpi("platform_admin").then((kpi) => {
+              setCrossTenantKpi(kpi); setCrossTenantKpiLoading(false);
+            }).catch(() => setCrossTenantKpiLoading(false));
+          }}
+          onBack={() => navigate("AppShell")}
+          testID="cross-tenant-analytics-screen"
+        />
+      );
+    }
+
+    if (activeRoute.name === "PlatformHealthDashboard") {
+      return (
+        <PlatformHealthDashboardScreen
+          loading={platformHealthLoading}
+          error={platformHealthError}
+          signals={platformHealthSignals}
+          onRetry={() => {
+            setPlatformHealthLoading(true);
+            void platformAdminSvc.getPlatformHealthSignals("platform_admin").then((s) => {
+              setPlatformHealthSignals(s); setPlatformHealthLoading(false);
+            }).catch(() => setPlatformHealthLoading(false));
+          }}
+          onBack={() => navigate("AppShell")}
+          testID="platform-health-dashboard-screen"
+        />
+      );
+    }
+
+    if (activeRoute.name === "PricingPlanManagement") {
+      return (
+        <PricingPlanManagementScreen
+          loading={pricingPlansLoading}
+          error={pricingPlansError}
+          plans={pricingPlans}
+          onEditPlan={(planId, updates) => {
+            void platformAdminSvc.updatePricingPlan("platform_admin", planId, updates).then(() => {
+              setPricingPlans((prev) => prev.map((p) => p.planId === planId ? { ...p, ...updates } : p));
+            });
+          }}
+          onTogglePlanActive={(planId, active) => {
+            void platformAdminSvc.updatePricingPlan("platform_admin", planId, { isActive: active }).then(() => {
+              setPricingPlans((prev) => prev.map((p) => p.planId === planId ? { ...p, isActive: active } : p));
+            });
+          }}
+          onRetry={() => {
+            setPricingPlansLoading(true);
+            void platformAdminSvc.listPricingPlans("platform_admin").then((p) => {
+              setPricingPlans(p); setPricingPlansLoading(false);
+            }).catch(() => setPricingPlansLoading(false));
+          }}
+          onBack={() => navigate("AppShell")}
+          testID="pricing-plan-management-screen"
+        />
+      );
+    }
+
+    if (activeRoute.name === "FeatureFlagConsole") {
+      return (
+        <FeatureFlagConsoleScreen
+          loading={featureFlagsLoading}
+          error={featureFlagsError}
+          platformFlags={platformFlags}
+          tenantFlags={tenantFlags}
+          onTogglePlatformFlag={(flagKey, enabled) => {
+            setPlatformFlags((prev) => prev.map((f) => f.flagKey === flagKey ? { ...f, enabled } : f));
+          }}
+          onToggleTenantFlag={(flagKey, tenantId: string, enabled) => {
+            setTenantFlags((prev) => prev.map((f) => f.flagKey === flagKey && f.tenantId === tenantId ? { ...f, enabled } : f));
+          }}
+          onSaveAll={() => {
+            void Promise.all([
+              ...platformFlags.map((f) => featureFlagSvc.setPlatformFlag("platform_admin", f.flagKey, f.enabled)),
+              ...tenantFlags.map((f) => f.tenantId ? featureFlagSvc.setTenantFlag("platform_admin", f.tenantId, f.flagKey, f.enabled) : Promise.resolve()),
+            ]);
+          }}
+          onRetry={() => {
+            setFeatureFlagsLoading(true);
+            void Promise.all([
+              featureFlagSvc.listPlatformFlags("platform_admin"),
+              featureFlagSvc.listTenantFlags("platform_admin", undefined),
+            ]).then(([pf, tf]) => { setPlatformFlags(pf); setTenantFlags(tf); setFeatureFlagsLoading(false); })
+              .catch(() => setFeatureFlagsLoading(false));
+          }}
+          onBack={() => navigate("AppShell")}
+          testID="feature-flag-console-screen"
+        />
+      );
+    }
+
+    if (activeRoute.name === "PlatformAuditLog") {
+      return (
+        <PlatformAuditLogScreen
+          loading={platformAuditLoading}
+          error={platformAuditError}
+          entries={platformAuditEntries}
+          filter={platformAuditFilter}
+          totalCount={platformAuditTotal}
+          onChangeFilter={(f) => {
+            setPlatformAuditFilter(f);
+            setPlatformAuditLoading(true);
+            void platformAdminSvc.listPlatformAuditLog("platform_admin", f).then(({ entries, total }) => {
+              setPlatformAuditEntries(entries); setPlatformAuditTotal(total); setPlatformAuditLoading(false);
+            }).catch(() => setPlatformAuditLoading(false));
+          }}
+          onRetry={() => {
+            setPlatformAuditLoading(true);
+            void platformAdminSvc.listPlatformAuditLog("platform_admin", platformAuditFilter).then(({ entries, total }) => {
+              setPlatformAuditEntries(entries); setPlatformAuditTotal(total); setPlatformAuditLoading(false);
+            }).catch(() => setPlatformAuditLoading(false));
+          }}
+          onBack={() => navigate("AppShell")}
+          testID="platform-audit-log-screen"
+        />
+      );
+    }
+
+    if (activeRoute.name === "MarketplaceModerationQueue") {
+      return (
+        <MarketplaceModerationQueueScreen
+          loading={moderationQueueLoading}
+          error={moderationQueueError}
+          items={moderationItems}
+          statusFilter={moderationStatusFilter}
+          onChangeStatusFilter={(s) => {
+            setModerationStatusFilter(s);
+            setModerationQueueLoading(true);
+            void platformAdminSvc.listModerationQueue("platform_admin", s).then((items) => {
+              setModerationItems(items); setModerationQueueLoading(false);
+            }).catch(() => setModerationQueueLoading(false));
+          }}
+          onFlagItem={(itemId, reason) => {
+            void platformAdminSvc.flagModerationItem("platform_admin", itemId, reason).then(() => {
+              setModerationItems((prev) => prev.map((i) => i.itemId === itemId ? { ...i, status: "flagged" as ModerationItemStatus } : i));
+            });
+          }}
+          onClearItem={(itemId) => {
+            void platformAdminSvc.clearModerationItem("platform_admin", itemId).then(() => {
+              setModerationItems((prev) => prev.map((i) => i.itemId === itemId ? { ...i, status: "cleared" as ModerationItemStatus } : i));
+            });
+          }}
+          onRetry={() => {
+            setModerationQueueLoading(true);
+            void platformAdminSvc.listModerationQueue("platform_admin", moderationStatusFilter).then((items) => {
+              setModerationItems(items); setModerationQueueLoading(false);
+            }).catch(() => setModerationQueueLoading(false));
+          }}
+          onBack={() => navigate("AppShell")}
+          testID="marketplace-moderation-queue-screen"
+        />
+      );
+    }
+
+    if (activeRoute.name === "CrossTenantAiBudget") {
+      return (
+        <CrossTenantAiBudgetScreen
+          loading={platformAiBudgetLoading}
+          error={platformAiBudgetError}
+          overrides={platformAiBudgetOverrides}
+          onSetOverride={(tenantId: string, monthlyTokenCap, enabled) => {
+            void platformAdminSvc.setTenantAiBudgetOverride("platform_admin", tenantId, { monthlyTokenCap, enabled }).then((updated) => {
+              setPlatformAiBudgetOverrides((prev) => prev.some((o) => o.tenantId === tenantId)
+                ? prev.map((o) => o.tenantId === tenantId ? updated : o)
+                : [...prev, updated]);
+            });
+          }}
+          onRetry={() => {
+            setPlatformAiBudgetLoading(true);
+            void platformAdminSvc.listTenantAiBudgetOverrides("platform_admin").then((o) => {
+              setPlatformAiBudgetOverrides(o); setPlatformAiBudgetLoading(false);
+            }).catch(() => setPlatformAiBudgetLoading(false));
+          }}
+          onBack={() => navigate("AppShell")}
+          testID="cross-tenant-ai-budget-screen"
+        />
+      );
+    }
+
+    if (activeRoute.name === "MigrationRunner") {
+      return (
+        <MigrationRunnerScreen
+          loading={migrationJobsLoading}
+          error={migrationJobsError}
+          jobs={migrationJobs}
+          onTriggerJob={(jobId) => {
+            void platformAdminSvc.triggerMigrationJob("platform_admin", jobId).then((updated) => {
+              setMigrationJobs((prev) => prev.map((j) => j.jobId === jobId ? updated : j));
+            });
+          }}
+          onRetry={() => {
+            setMigrationJobsLoading(true);
+            void platformAdminSvc.listMigrationJobs("platform_admin").then((j) => {
+              setMigrationJobs(j); setMigrationJobsLoading(false);
+            }).catch(() => setMigrationJobsLoading(false));
+          }}
+          onBack={() => navigate("AppShell")}
+          testID="migration-runner-screen"
+        />
+      );
+    }
+
+    if (activeRoute.name === "BackupRestoreStatus") {
+      return (
+        <BackupRestoreStatusScreen
+          loading={backupJobsLoading}
+          error={backupJobsError}
+          jobs={backupJobs}
+          onRetry={() => {
+            setBackupJobsLoading(true);
+            void platformAdminSvc.listBackupJobs("platform_admin").then((j) => {
+              setBackupJobs(j); setBackupJobsLoading(false);
+            }).catch(() => setBackupJobsLoading(false));
+          }}
+          onBack={() => navigate("AppShell")}
+          testID="backup-restore-status-screen"
+        />
+      );
+    }
+
+    if (activeRoute.name === "SupportInbox") {
+      return (
+        <SupportInboxScreen
+          vendorEmbedUrl="https://support.example.com/embed"
+          onBack={() => navigate("AppShell")}
+          testID="support-inbox-screen"
+        />
+      );
+    }
+
+    if (activeRoute.name === "SecurityEventsDashboard") {
+      return (
+        <SecurityEventsDashboardScreen
+          loading={securityEventsLoading}
+          error={securityEventsError}
+          events={securityEvents}
+          filter={securityEventsFilter}
+          onChangeFilter={(f) => {
+            setSecurityEventsFilter(f);
+            setSecurityEventsLoading(true);
+            void platformAdminSvc.listSecurityEvents("platform_admin", f).then((events) => {
+              setSecurityEvents(events); setSecurityEventsLoading(false);
+            }).catch(() => setSecurityEventsLoading(false));
+          }}
+          onResolveEvent={(eventId) => {
+            void platformAdminSvc.resolveSecurityEvent("platform_admin", eventId).then(() => {
+              setSecurityEvents((prev) => prev.map((e) => e.eventId === eventId ? { ...e, resolved: true } : e));
+            });
+          }}
+          onRetry={() => {
+            setSecurityEventsLoading(true);
+            void platformAdminSvc.listSecurityEvents("platform_admin", securityEventsFilter).then((events) => {
+              setSecurityEvents(events); setSecurityEventsLoading(false);
+            }).catch(() => setSecurityEventsLoading(false));
+          }}
+          onBack={() => navigate("AppShell")}
+          testID="security-events-dashboard-screen"
+        />
+      );
+    }
+
+    if (activeRoute.name === "DataExportRequests") {
+      return (
+        <DataExportRequestScreen
+          loading={dataExportLoading}
+          error={dataExportError}
+          requests={dataExportRequests}
+          onProcessRequest={(requestId, action) => {
+            void platformAdminSvc.processDataExportRequest("platform_admin", requestId, action).then((updated) => {
+              setDataExportRequests((prev) => prev.map((r) => r.requestId === requestId ? updated : r));
+            });
+          }}
+          onRetry={() => {
+            setDataExportLoading(true);
+            void platformAdminSvc.listDataExportRequests("platform_admin").then((r) => {
+              setDataExportRequests(r); setDataExportLoading(false);
+            }).catch(() => setDataExportLoading(false));
+          }}
+          onBack={() => navigate("AppShell")}
+          testID="data-export-request-screen"
+        />
+      );
+    }
+
+    if (activeRoute.name === "ConsentPolicyLog") {
+      return (
+        <ConsentPolicyLogScreen
+          loading={consentPolicyLoading}
+          error={consentPolicyError}
+          entries={consentPolicyEntries}
+          tenantFilter={consentTenantFilter}
+          onChangeTenantFilter={(tid) => {
+            setConsentTenantFilter(tid);
+            setConsentPolicyLoading(true);
+            void platformAdminSvc.listConsentPolicyEntries("platform_admin", tid).then((entries) => {
+              setConsentPolicyEntries(entries); setConsentPolicyLoading(false);
+            }).catch(() => setConsentPolicyLoading(false));
+          }}
+          onRetry={() => {
+            setConsentPolicyLoading(true);
+            void platformAdminSvc.listConsentPolicyEntries("platform_admin", consentTenantFilter).then((entries) => {
+              setConsentPolicyEntries(entries); setConsentPolicyLoading(false);
+            }).catch(() => setConsentPolicyLoading(false));
+          }}
+          onBack={() => navigate("AppShell")}
+          testID="consent-policy-log-screen"
+        />
+      );
+    }
+
+    if (activeRoute.name === "IncidentResponse") {
+      return (
+        <IncidentResponseScreen
+          loading={incidentsLoading}
+          error={incidentsError}
+          incidents={incidents}
+          onUpdateStatus={(id, status, notes) => {
+            void platformAdminSvc.updateIncidentStatus("platform_admin", id, status, notes).then((updated) => {
+              setIncidents((prev) => prev.map((i) => i.incidentId === id ? updated : i));
+            });
+          }}
+          onRetry={() => {
+            setIncidentsLoading(true);
+            void platformAdminSvc.listIncidents("platform_admin").then((list) => {
+              setIncidents(list); setIncidentsLoading(false);
+            }).catch(() => setIncidentsLoading(false));
+          }}
+          onBack={() => navigate("AppShell")}
+          testID="incident-response-screen"
+        />
+      );
+    }
+
+    if (activeRoute.name === "AdminSignIn") {
+      return (
+        <AdminSignInScreen
+          onSignIn={(email, password) => {
+            // Platform sign-in delegates to Firebase Auth — handled by host layer
+            void Promise.resolve({ email, password });
+          }}
+          onBack={() => navigate("AppShell")}
+          testID="admin-sign-in-screen"
+        />
+      );
+    }
+
+    if (activeRoute.name === "RoleDenied") {
+      return (
+        <RoleDeniedScreen
+          requiredRole="platform_admin"
+          currentRole={role ?? "none"}
+          screenName={activeRoute.name}
+          onGoBack={() => navigate("AppShell")}
+          onGoHome={() => navigate("AppShell")}
+          testID="role-denied-screen"
         />
       );
     }

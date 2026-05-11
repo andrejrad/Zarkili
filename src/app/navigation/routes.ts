@@ -330,6 +330,27 @@ export const appRoutes: AppRouteDefinition[] = [
   { name: "OnboardingAdmin", group: "owner", path: "/owner/onboarding/admin", guard: "authenticated" },
   ...salonOnboardingRoutes,
   ...clientOnboardingRoutes,
+  // W49 — Platform Super-Admin, Compliance, Polish & Release Candidate
+  { name: "TenantDirectory", group: "platform_admin", path: "/platform/tenants", guard: "platform-admin" },
+  { name: "TenantDetail", group: "platform_admin", path: "/platform/tenant/detail", guard: "platform-admin" },
+  { name: "SuspendTenant", group: "platform_admin", path: "/platform/tenant/suspend", guard: "platform-admin" },
+  { name: "Impersonation", group: "platform_admin", path: "/platform/impersonation", guard: "platform-admin" },
+  { name: "CrossTenantAnalytics", group: "platform_admin", path: "/platform/analytics", guard: "platform-admin" },
+  { name: "PlatformHealthDashboard", group: "platform_admin", path: "/platform/health", guard: "platform-admin" },
+  { name: "PricingPlanManagement", group: "platform_admin", path: "/platform/pricing", guard: "platform-admin" },
+  { name: "FeatureFlagConsole", group: "platform_admin", path: "/platform/feature-flags", guard: "platform-admin" },
+  { name: "PlatformAuditLog", group: "platform_admin", path: "/platform/audit", guard: "platform-admin" },
+  { name: "MarketplaceModerationQueue", group: "platform_admin", path: "/platform/marketplace/moderation", guard: "platform-admin" },
+  { name: "CrossTenantAiBudget", group: "platform_admin", path: "/platform/ai/budget", guard: "platform-admin" },
+  { name: "MigrationRunner", group: "platform_admin", path: "/platform/migration", guard: "platform-admin" },
+  { name: "BackupRestoreStatus", group: "platform_admin", path: "/platform/backup", guard: "platform-admin" },
+  { name: "SupportInbox", group: "platform_admin", path: "/platform/support", guard: "platform-admin" },
+  { name: "SecurityEventsDashboard", group: "platform_admin", path: "/platform/security/events", guard: "platform-admin" },
+  { name: "DataExportRequests", group: "platform_admin", path: "/platform/compliance/data-export", guard: "platform-admin" },
+  { name: "ConsentPolicyLog", group: "platform_admin", path: "/platform/compliance/consent", guard: "platform-admin" },
+  { name: "IncidentResponse", group: "platform_admin", path: "/platform/compliance/incidents", guard: "platform-admin" },
+  { name: "AdminSignIn", group: "platform_admin", path: "/platform/sign-in", guard: "none" },
+  { name: "RoleDenied", group: "platform_admin", path: "/role-denied", guard: "none" },
 ];
 
 export function canAccessRoute(route: AppRouteDefinition, context: RouteAccessContext): boolean {
