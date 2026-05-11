@@ -143,6 +143,25 @@ import { MessageArchiveScreen } from "../admin/MessageArchiveScreen";
 import { WaitlistAdminListScreen } from "../admin/WaitlistAdminListScreen";
 import { WaitlistConvertScreen } from "../admin/WaitlistConvertScreen";
 import { WaitlistPoliciesScreen } from "../admin/WaitlistPoliciesScreen";
+// W47 — Analytics & Reporting
+import { RevenueDashboardScreen } from "../admin/RevenueDashboardScreen";
+import { BookingFunnelScreen } from "../admin/BookingFunnelScreen";
+import { StaffProductivityScreen } from "../admin/StaffProductivityScreen";
+import { ServicePerformanceScreen } from "../admin/ServicePerformanceScreen";
+import { ClientRetentionScreen } from "../admin/ClientRetentionScreen";
+import { MarketplaceAttributionScreen } from "../admin/MarketplaceAttributionScreen";
+import { CustomReportBuilderScreen } from "../admin/CustomReportBuilderScreen";
+import { ScheduledReportsScreen } from "../admin/ScheduledReportsScreen";
+import { OperatorAuditLogScreen } from "../admin/OperatorAuditLogScreen";
+import { reportingService, campaignAnalyticsService, exportService } from "../analytics/runtime";
+import { createAuditLogRepository } from "../admin/auditLogRepository";
+import { createScheduledReportRepository } from "../admin/scheduledReportRepository";
+import type { RevenueBreakdown, BookingFunnelData, MarketplaceAttributionData } from "../admin/analyticsTypes";
+import type { ScheduledReportConfig } from "../admin/scheduledReportRepository";
+import type { AdminAuditLogEntry, AdminAuditLogFilter } from "../admin/auditLogRepository";
+import type { StaffPerformanceMetrics, ServicePerformanceMetrics, RetentionMetrics, RebookingMetrics, AtRiskMetrics, VisitIntervalMetrics, ClientRiskEntry } from "../../domains/analytics/model";
+import type { CampaignKpis, ChallengeKpis } from "../../domains/analytics/model";
+import type { ReportKey } from "../../domains/analytics/model";
 // W15-DEBT-1 — Onboarding admin
 import { OnboardingAdminScreen } from "../admin/OnboardingAdminScreen";
 import {
@@ -1311,6 +1330,63 @@ export function AppNavigatorShell({
   const [waitlistPolicySaving, setWaitlistPolicySaving] = useState(false);
   const [waitlistPolicySaveError, setWaitlistPolicySaveError] = useState<string | null>(null);
   const [waitlistPolicySaveSuccess, setWaitlistPolicySaveSuccess] = useState(false);
+
+  // ---------------------------------------------------------------------------
+  // W47 — Analytics & Reporting state
+  // ---------------------------------------------------------------------------
+  const analyticsDateRange = React.useMemo(() => {
+    const end = new Date().toISOString().slice(0, 10);
+    const start = new Date(Date.now() - 30 * 86_400_000).toISOString().slice(0, 10);
+    return { start, end };
+  }, []);
+  const auditLogRepo = React.useMemo(() => createAuditLogRepository(db), []);
+  const scheduledReportRepo = React.useMemo(() => createScheduledReportRepository(db), []);
+  // Revenue dashboard
+  const [revenueDashboardLoading, setRevenueDashboardLoading] = useState(false);
+  const [revenueDashboardError, setRevenueDashboardError] = useState<string | null>(null);
+  const [revenueBreakdown, setRevenueBreakdown] = useState<RevenueBreakdown | null>(null);
+  // Booking funnel
+  const [bookingFunnelLoading, setBookingFunnelLoading] = useState(false);
+  const [bookingFunnelError, setBookingFunnelError] = useState<string | null>(null);
+  const [bookingFunnelData, setBookingFunnelData] = useState<BookingFunnelData | null>(null);
+  // Staff productivity
+  const [staffPerfLoading, setStaffPerfLoading] = useState(false);
+  const [staffPerfError, setStaffPerfError] = useState<string | null>(null);
+  const [staffPerfRows, setStaffPerfRows] = useState<StaffPerformanceMetrics[]>([]);
+  // Service performance
+  const [servicePerfLoading, setServicePerfLoading] = useState(false);
+  const [servicePerfError, setServicePerfError] = useState<string | null>(null);
+  const [servicePerfRows, setServicePerfRows] = useState<ServicePerformanceMetrics[]>([]);
+  // Client retention
+  const [retentionLoading, setRetentionLoading] = useState(false);
+  const [retentionError, setRetentionError] = useState<string | null>(null);
+  const [retentionMetrics, setRetentionMetrics] = useState<RetentionMetrics | null>(null);
+  const [rebookingMetrics, setRebookingMetrics] = useState<RebookingMetrics | null>(null);
+  const [atRiskMetrics, setAtRiskMetrics] = useState<AtRiskMetrics | null>(null);
+  const [visitIntervalMetrics, setVisitIntervalMetrics] = useState<VisitIntervalMetrics | null>(null);
+  const [atRiskList, setAtRiskList] = useState<ClientRiskEntry[]>([]);
+  // Marketplace attribution
+  const [marketplaceAttrLoading, setMarketplaceAttrLoading] = useState(false);
+  const [marketplaceAttrError, setMarketplaceAttrError] = useState<string | null>(null);
+  const [marketplaceAttrData, setMarketplaceAttrData] = useState<MarketplaceAttributionData | null>(null);
+  const [marketplaceCampaigns, setMarketplaceCampaigns] = useState<CampaignKpis[]>([]);
+  const [marketplaceChallenges, setMarketplaceChallenges] = useState<ChallengeKpis[]>([]);
+  // Custom report builder
+  const [customReportLoading, setCustomReportLoading] = useState(false);
+  const [customReportError, setCustomReportError] = useState<string | null>(null);
+  const [customReportSelected, setCustomReportSelected] = useState<ReportKey | null>(null);
+  const [customReportDateStart, setCustomReportDateStart] = useState(analyticsDateRange.start);
+  const [customReportDateEnd, setCustomReportDateEnd] = useState(analyticsDateRange.end);
+  const [customReportResult, setCustomReportResult] = useState<import("../admin/CustomReportBuilderScreen").ReportResult | null>(null);
+  // Scheduled reports
+  const [scheduledReports, setScheduledReports] = useState<ScheduledReportConfig[]>([]);
+  const [scheduledReportsLoading, setScheduledReportsLoading] = useState(false);
+  const [scheduledReportsSaving, setScheduledReportsSaving] = useState(false);
+  // Operator audit log
+  const [auditLogEntries, setAuditLogEntries] = useState<AdminAuditLogEntry[]>([]);
+  const [auditLogLoading, setAuditLogLoading] = useState(false);
+  const [auditLogError, setAuditLogError] = useState<string | null>(null);
+  const [auditLogFilters, setAuditLogFilters] = useState<AdminAuditLogFilter>({});
 
   // ---------------------------------------------------------------------------
   // W15-DEBT-1 — Onboarding admin state
@@ -3227,6 +3303,131 @@ export function AppNavigatorShell({
         setOnboardingAdminStateError("Failed to load onboarding data");
         setOnboardingAdminStateLoading(false);
         setOnboardingAdminTimelineLoading(false);
+      });
+    }
+
+    // -------------------------------------------------------------------------
+    // W47 — Analytics & Reporting route activators
+    // -------------------------------------------------------------------------
+    const w47AnalyticsRoutes = [
+      "RevenueDashboard", "BookingFunnel", "StaffProductivity", "ServicePerformance",
+      "ClientRetention", "MarketplaceAttribution",
+    ];
+    if (w47AnalyticsRoutes.includes(activeRoute.name) && tenantId) {
+      const filter = {
+        tenantId,
+        dateRange: analyticsDateRange,
+      };
+      const role = "tenant_owner" as const;
+
+      if (activeRoute.name === "RevenueDashboard") {
+        setRevenueDashboardLoading(true);
+        setRevenueDashboardError(null);
+        void loadOwnerKpi();
+        // revenueBreakdown is a stub for now (no multi-currency billing data yet)
+        setRevenueBreakdown(null);
+        setRevenueDashboardLoading(false);
+      }
+
+      if (activeRoute.name === "BookingFunnel") {
+        setBookingFunnelLoading(true);
+        setBookingFunnelError(null);
+        void reportingService.getRetentionReport(filter, role).then((ret) => {
+          setBookingFunnelLoading(false);
+          if (ret.ok) {
+            // Build a funnel from available data: total clients → retained → completed bookings
+            setBookingFunnelData({
+              dateRangeLabel: `${analyticsDateRange.start} – ${analyticsDateRange.end}`,
+              stages: [
+                { label: "Total Clients", count: ret.data.totalUniqueClients },
+                { label: "Retained", count: ret.data.retainedClients, dropOffRate: 1 - ret.data.retentionRate },
+              ],
+            });
+          } else {
+            setBookingFunnelError(ret.message);
+          }
+        }).catch(() => setBookingFunnelError("Failed to load funnel data."));
+      }
+
+      if (activeRoute.name === "StaffProductivity") {
+        setStaffPerfLoading(true);
+        setStaffPerfError(null);
+        void reportingService.getStaffPerformanceReport(filter, role).then((r) => {
+          setStaffPerfLoading(false);
+          if (r.ok) setStaffPerfRows(r.data);
+          else setStaffPerfError(r.message);
+        }).catch(() => setStaffPerfError("Failed to load staff performance."));
+      }
+
+      if (activeRoute.name === "ServicePerformance") {
+        setServicePerfLoading(true);
+        setServicePerfError(null);
+        void reportingService.getServicePerformanceReport(filter, role).then((r) => {
+          setServicePerfLoading(false);
+          if (r.ok) setServicePerfRows(r.data);
+          else setServicePerfError(r.message);
+        }).catch(() => setServicePerfError("Failed to load service performance."));
+      }
+
+      if (activeRoute.name === "ClientRetention") {
+        setRetentionLoading(true);
+        setRetentionError(null);
+        void Promise.all([
+          reportingService.getRetentionReport(filter, role),
+          reportingService.getRebookingReport(filter, role),
+          reportingService.getAtRiskReport(tenantId, 60, role),
+          reportingService.getVisitIntervalReport(tenantId, role),
+          reportingService.getClientAttentionList(tenantId, role),
+        ]).then(([ret, reb, risk, interval, list]) => {
+          setRetentionLoading(false);
+          if (ret.ok) setRetentionMetrics(ret.data);
+          if (reb.ok) setRebookingMetrics(reb.data);
+          if (risk.ok) setAtRiskMetrics(risk.data);
+          if (interval.ok) setVisitIntervalMetrics(interval.data);
+          if (list.ok) setAtRiskList(list.data);
+          if (!ret.ok && !reb.ok) setRetentionError(ret.message || reb.message);
+        }).catch(() => {
+          setRetentionLoading(false);
+          setRetentionError("Failed to load retention data.");
+        });
+      }
+
+      if (activeRoute.name === "MarketplaceAttribution") {
+        setMarketplaceAttrLoading(true);
+        setMarketplaceAttrError(null);
+        void Promise.all([
+          campaignAnalyticsService.getCampaignKpis(tenantId, role),
+          campaignAnalyticsService.getChallengeKpis(tenantId, role),
+        ]).then(([camps, challs]) => {
+          setMarketplaceAttrLoading(false);
+          if (camps.ok) setMarketplaceCampaigns(camps.data);
+          if (challs.ok) setMarketplaceChallenges(challs.data);
+          // Marketplace attribution data stub (no tracking source yet)
+          setMarketplaceAttrData({ directBookings: 0, marketplaceBookings: 0, marketplaceAttributionRate: 0, bySource: [] });
+        }).catch(() => {
+          setMarketplaceAttrLoading(false);
+          setMarketplaceAttrError("Failed to load attribution data.");
+        });
+      }
+    }
+
+    if (activeRoute.name === "ScheduledReports" && tenantId) {
+      setScheduledReportsLoading(true);
+      void scheduledReportRepo.listScheduledReports(tenantId).then((rows) => {
+        setScheduledReports(rows);
+        setScheduledReportsLoading(false);
+      }).catch(() => setScheduledReportsLoading(false));
+    }
+
+    if (activeRoute.name === "OperatorAuditLog" && tenantId) {
+      setAuditLogLoading(true);
+      setAuditLogError(null);
+      void auditLogRepo.listAuditLog(tenantId, auditLogFilters).then((rows) => {
+        setAuditLogEntries(rows);
+        setAuditLogLoading(false);
+      }).catch(() => {
+        setAuditLogLoading(false);
+        setAuditLogError("Failed to load audit log.");
       });
     }
   }, [
@@ -8149,6 +8350,336 @@ export function AppNavigatorShell({
             });
           }}
           onBack={() => navigate("AppShell")}
+        />
+      );
+    }
+
+    // -------------------------------------------------------------------------
+    // W47 — Analytics & Reporting
+    // -------------------------------------------------------------------------
+
+    if (activeRoute.name === "RevenueDashboard") {
+      return (
+        <RevenueDashboardScreen
+          loading={revenueDashboardLoading}
+          error={revenueDashboardError}
+          kpi={ownerKpiSummary}
+          revenueBreakdown={revenueBreakdown}
+          onRetry={() => {
+            if (!tenantId) return;
+            setRevenueDashboardLoading(true);
+            setRevenueDashboardError(null);
+            void loadOwnerKpi().then(() => setRevenueDashboardLoading(false));
+          }}
+          onNavigateBookingFunnel={() => navigate("BookingFunnel")}
+          onNavigateStaffProductivity={() => navigate("StaffProductivity")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "BookingFunnel") {
+      return (
+        <BookingFunnelScreen
+          loading={bookingFunnelLoading}
+          error={bookingFunnelError}
+          funnel={bookingFunnelData}
+          onRetry={() => {
+            if (!tenantId) return;
+            setBookingFunnelLoading(true);
+            setBookingFunnelError(null);
+            void reportingService.getRetentionReport({ tenantId, dateRange: analyticsDateRange }, "tenant_owner").then((r) => {
+              setBookingFunnelLoading(false);
+              if (r.ok) {
+                setBookingFunnelData({ dateRangeLabel: `${analyticsDateRange.start} – ${analyticsDateRange.end}`, stages: [
+                  { label: "Total Clients", count: r.data.totalUniqueClients },
+                  { label: "Retained", count: r.data.retainedClients, dropOffRate: 1 - r.data.retentionRate },
+                ]});
+              } else {
+                setBookingFunnelError(r.message);
+              }
+            }).catch(() => setBookingFunnelError("Failed to load funnel."));
+          }}
+          onBack={() => navigate("RevenueDashboard")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "StaffProductivity") {
+      return (
+        <StaffProductivityScreen
+          loading={staffPerfLoading}
+          error={staffPerfError}
+          rows={staffPerfRows}
+          staffNames={{}}
+          dateRangeLabel={`${analyticsDateRange.start} – ${analyticsDateRange.end}`}
+          onRetry={() => {
+            if (!tenantId) return;
+            setStaffPerfLoading(true);
+            setStaffPerfError(null);
+            void reportingService.getStaffPerformanceReport({ tenantId, dateRange: analyticsDateRange }, "tenant_owner").then((r) => {
+              setStaffPerfLoading(false);
+              if (r.ok) setStaffPerfRows(r.data);
+              else setStaffPerfError(r.message);
+            }).catch(() => setStaffPerfError("Failed to load staff performance."));
+          }}
+          onBack={() => navigate("RevenueDashboard")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "ServicePerformance") {
+      return (
+        <ServicePerformanceScreen
+          loading={servicePerfLoading}
+          error={servicePerfError}
+          rows={servicePerfRows}
+          serviceNames={{}}
+          dateRangeLabel={`${analyticsDateRange.start} – ${analyticsDateRange.end}`}
+          onRetry={() => {
+            if (!tenantId) return;
+            setServicePerfLoading(true);
+            setServicePerfError(null);
+            void reportingService.getServicePerformanceReport({ tenantId, dateRange: analyticsDateRange }, "tenant_owner").then((r) => {
+              setServicePerfLoading(false);
+              if (r.ok) setServicePerfRows(r.data);
+              else setServicePerfError(r.message);
+            }).catch(() => setServicePerfError("Failed to load service performance."));
+          }}
+          onBack={() => navigate("RevenueDashboard")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "ClientRetention") {
+      const planLevel = (billingSubscription?.planId ?? "free_trial") as string;
+      const planLockedReports: string[] = [];
+      if (planLevel === "free_trial") planLockedReports.push("at_risk", "visit_interval");
+      if (planLevel === "starter") planLockedReports.push("staff_performance", "service_performance");
+      return (
+        <ClientRetentionScreen
+          loading={retentionLoading}
+          error={retentionError}
+          retention={retentionMetrics}
+          rebooking={rebookingMetrics}
+          atRisk={atRiskMetrics}
+          visitInterval={visitIntervalMetrics}
+          atRiskList={atRiskList}
+          dateRangeLabel={`${analyticsDateRange.start} – ${analyticsDateRange.end}`}
+          planLockedReports={planLockedReports}
+          onRetry={() => {
+            if (!tenantId) return;
+            setRetentionLoading(true);
+            setRetentionError(null);
+            const filter = { tenantId, dateRange: analyticsDateRange };
+            const role = "tenant_owner" as const;
+            void Promise.all([
+              reportingService.getRetentionReport(filter, role),
+              reportingService.getRebookingReport(filter, role),
+              reportingService.getAtRiskReport(tenantId, 60, role),
+              reportingService.getVisitIntervalReport(tenantId, role),
+              reportingService.getClientAttentionList(tenantId, role),
+            ]).then(([ret, reb, risk, interval, list]) => {
+              setRetentionLoading(false);
+              if (ret.ok) setRetentionMetrics(ret.data);
+              if (reb.ok) setRebookingMetrics(reb.data);
+              if (risk.ok) setAtRiskMetrics(risk.data);
+              if (interval.ok) setVisitIntervalMetrics(interval.data);
+              if (list.ok) setAtRiskList(list.data);
+              if (!ret.ok) setRetentionError(ret.message);
+            }).catch(() => {
+              setRetentionLoading(false);
+              setRetentionError("Failed to load retention data.");
+            });
+          }}
+          onBack={() => navigate("RevenueDashboard")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "MarketplaceAttribution") {
+      return (
+        <MarketplaceAttributionScreen
+          loading={marketplaceAttrLoading}
+          error={marketplaceAttrError}
+          attribution={marketplaceAttrData}
+          campaigns={marketplaceCampaigns}
+          challenges={marketplaceChallenges}
+          dateRangeLabel={`${analyticsDateRange.start} – ${analyticsDateRange.end}`}
+          onRetry={() => {
+            if (!tenantId) return;
+            setMarketplaceAttrLoading(true);
+            setMarketplaceAttrError(null);
+            const role = "tenant_owner" as const;
+            void Promise.all([
+              campaignAnalyticsService.getCampaignKpis(tenantId, role),
+              campaignAnalyticsService.getChallengeKpis(tenantId, role),
+            ]).then(([camps, challs]) => {
+              setMarketplaceAttrLoading(false);
+              if (camps.ok) setMarketplaceCampaigns(camps.data);
+              if (challs.ok) setMarketplaceChallenges(challs.data);
+              setMarketplaceAttrData({ directBookings: 0, marketplaceBookings: 0, marketplaceAttributionRate: 0, bySource: [] });
+            }).catch(() => {
+              setMarketplaceAttrLoading(false);
+              setMarketplaceAttrError("Failed to load attribution data.");
+            });
+          }}
+          onBack={() => navigate("RevenueDashboard")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "CustomReportBuilder") {
+      const planLevel = (billingSubscription?.planId ?? "free_trial") as string;
+      const PLAN_REPORTS: Record<string, string[]> = {
+        free_trial:   ["retention", "rebooking"],
+        starter:      ["retention", "rebooking", "at_risk", "visit_interval"],
+        professional: ["retention", "rebooking", "at_risk", "visit_interval", "staff_performance", "service_performance", "campaign_analytics", "challenge_analytics"],
+        enterprise:   ["retention", "rebooking", "at_risk", "visit_interval", "staff_performance", "service_performance", "campaign_analytics", "challenge_analytics", "export"],
+      };
+      const availableReports = (PLAN_REPORTS[planLevel] ?? PLAN_REPORTS.free_trial) as import("../../domains/analytics/model").ReportKey[];
+      return (
+        <CustomReportBuilderScreen
+          loading={customReportLoading}
+          error={customReportError}
+          availableReports={availableReports}
+          planTier={planLevel}
+          selectedReport={customReportSelected}
+          dateRangeStart={customReportDateStart}
+          dateRangeEnd={customReportDateEnd}
+          result={customReportResult}
+          exportEnabled={(billingSubscription?.planId ?? "") === "enterprise"}
+          onSelectReport={(key) => setCustomReportSelected(key)}
+          onChangeDateStart={(v) => setCustomReportDateStart(v)}
+          onChangeDateEnd={(v) => setCustomReportDateEnd(v)}
+          onRunReport={() => {
+            if (!tenantId || !customReportSelected) return;
+            setCustomReportLoading(true);
+            setCustomReportError(null);
+            const filter = { tenantId, dateRange: { start: customReportDateStart, end: customReportDateEnd } };
+            const role = "tenant_owner" as const;
+            const runSelected = async (): Promise<import("../admin/CustomReportBuilderScreen").ReportResult> => {
+              switch (customReportSelected) {
+                case "retention": {
+                  const r = await reportingService.getRetentionReport(filter, role);
+                  if (!r.ok) throw new Error(r.message);
+                  return { columns: ["Metric", "Value"], rows: [
+                    { Metric: "Total Clients", Value: r.data.totalUniqueClients },
+                    { Metric: "Retained Clients", Value: r.data.retainedClients },
+                    { Metric: "Retention Rate", Value: `${(r.data.retentionRate * 100).toFixed(1)}%` },
+                  ]};
+                }
+                case "rebooking": {
+                  const r = await reportingService.getRebookingReport(filter, role);
+                  if (!r.ok) throw new Error(r.message);
+                  return { columns: ["Metric", "Value"], rows: [
+                    { Metric: "Total Clients", Value: r.data.totalUniqueClients },
+                    { Metric: "Rebooked Clients", Value: r.data.rebookedClients },
+                    { Metric: "Rebooking Rate", Value: `${(r.data.rebookingRate * 100).toFixed(1)}%` },
+                  ]};
+                }
+                case "staff_performance": {
+                  const r = await reportingService.getStaffPerformanceReport(filter, role);
+                  if (!r.ok) throw new Error(r.message);
+                  return { columns: ["Staff ID", "Completed", "No-Shows", "Cancellations", "NS Rate"], rows: r.data.map((s) => ({
+                    "Staff ID": s.staffId,
+                    "Completed": s.completedBookings,
+                    "No-Shows": s.noShowCount,
+                    "Cancellations": s.cancellationCount,
+                    "NS Rate": `${(s.noShowRate * 100).toFixed(1)}%`,
+                  }))};
+                }
+                case "service_performance": {
+                  const r = await reportingService.getServicePerformanceReport(filter, role);
+                  if (!r.ok) throw new Error(r.message);
+                  return { columns: ["Service ID", "Completed", "Cancellations", "Rank"], rows: r.data.map((s) => ({
+                    "Service ID": s.serviceId,
+                    "Completed": s.completedBookings,
+                    "Cancellations": s.cancellationCount,
+                    "Rank": s.popularityRank,
+                  }))};
+                }
+                default:
+                  return { columns: ["Info"], rows: [{ Info: "Report not available for this plan tier." }] };
+              }
+            };
+            void runSelected().then((result) => {
+              setCustomReportResult(result);
+              setCustomReportLoading(false);
+            }).catch((err) => {
+              setCustomReportError(err instanceof Error ? err.message : "Report failed.");
+              setCustomReportLoading(false);
+            });
+          }}
+          onExport={() => {
+            if (!tenantId || !customReportResult) return;
+            void exportService.exportBookings(tenantId, analyticsDateRange, "tenant_owner").then((r) => {
+              if (!r.ok) alert(r.message);
+            });
+          }}
+          onBack={() => navigate("RevenueDashboard")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "ScheduledReports") {
+      return (
+        <ScheduledReportsScreen
+          loading={scheduledReportsLoading}
+          saving={scheduledReportsSaving}
+          error={null}
+          reports={scheduledReports}
+          onCreateReport={async (config) => {
+            if (!tenantId) return;
+            setScheduledReportsSaving(true);
+            await scheduledReportRepo.createScheduledReport({ ...config, tenantId });
+            const rows = await scheduledReportRepo.listScheduledReports(tenantId);
+            setScheduledReports(rows);
+            setScheduledReportsSaving(false);
+          }}
+          onDeleteReport={async (reportId) => {
+            if (!tenantId) return;
+            await scheduledReportRepo.deleteScheduledReport(tenantId, reportId);
+            const rows = await scheduledReportRepo.listScheduledReports(tenantId);
+            setScheduledReports(rows);
+          }}
+          onBack={() => navigate("RevenueDashboard")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "OperatorAuditLog") {
+      return (
+        <OperatorAuditLogScreen
+          loading={auditLogLoading}
+          error={auditLogError}
+          entries={auditLogEntries}
+          filters={auditLogFilters}
+          onChangeFilters={(filters) => {
+            setAuditLogFilters(filters);
+            if (!tenantId) return;
+            setAuditLogLoading(true);
+            setAuditLogError(null);
+            void auditLogRepo.listAuditLog(tenantId, filters).then((rows) => {
+              setAuditLogEntries(rows);
+              setAuditLogLoading(false);
+            }).catch(() => {
+              setAuditLogLoading(false);
+              setAuditLogError("Failed to load audit log.");
+            });
+          }}
+          onRetry={() => {
+            if (!tenantId) return;
+            setAuditLogLoading(true);
+            setAuditLogError(null);
+            void auditLogRepo.listAuditLog(tenantId, auditLogFilters).then((rows) => {
+              setAuditLogEntries(rows);
+              setAuditLogLoading(false);
+            }).catch(() => {
+              setAuditLogLoading(false);
+              setAuditLogError("Failed to load audit log.");
+            });
+          }}
+          onBack={() => navigate("RevenueDashboard")}
         />
       );
     }

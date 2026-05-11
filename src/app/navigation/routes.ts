@@ -307,6 +307,16 @@ export const appRoutes: AppRouteDefinition[] = [
   { name: "WaitlistAdminList", group: "owner", path: "/owner/waitlist/admin", guard: "authenticated" },
   { name: "WaitlistConvert", group: "owner", path: "/owner/waitlist/convert", guard: "authenticated" },
   { name: "WaitlistPolicies", group: "owner", path: "/owner/waitlist/policies", guard: "authenticated" },
+  // W47 — Analytics & Reporting
+  { name: "RevenueDashboard", group: "owner", path: "/owner/analytics/revenue", guard: "authenticated" },
+  { name: "BookingFunnel", group: "owner", path: "/owner/analytics/funnel", guard: "authenticated" },
+  { name: "StaffProductivity", group: "owner", path: "/owner/analytics/staff", guard: "authenticated" },
+  { name: "ServicePerformance", group: "owner", path: "/owner/analytics/services", guard: "authenticated" },
+  { name: "ClientRetention", group: "owner", path: "/owner/analytics/retention", guard: "authenticated" },
+  { name: "MarketplaceAttribution", group: "owner", path: "/owner/analytics/marketplace", guard: "authenticated" },
+  { name: "CustomReportBuilder", group: "owner", path: "/owner/analytics/custom", guard: "authenticated" },
+  { name: "ScheduledReports", group: "owner", path: "/owner/analytics/scheduled", guard: "authenticated" },
+  { name: "OperatorAuditLog", group: "owner", path: "/owner/analytics/audit", guard: "authenticated" },
   // W15-DEBT-1 — Onboarding admin (status dashboard + action buttons)
   { name: "OnboardingAdmin", group: "owner", path: "/owner/onboarding/admin", guard: "authenticated" },
   ...salonOnboardingRoutes,
