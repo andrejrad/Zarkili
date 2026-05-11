@@ -27,6 +27,9 @@
     "firebase:deploy:dev": "firebase deploy --project zarkili-dev",
     "firebase:deploy:prod": "firebase deploy --project zarkili-production",
     "seed:discovery:dev": "dotenv -e .env.development -- node scripts/seed-discovery-featured-salons.mjs",
+    "seed:qa:dev": "dotenv -e .env.development -- node scripts/seed-qa-firestore.mjs",
+    "seed:qa:dev:dry": "DRY_RUN=true dotenv -e .env.development -- node scripts/seed-qa-firestore.mjs",
+    "seed:qa:dev:clear": "CLEAR_SEED=true dotenv -e .env.development -- node scripts/seed-qa-firestore.mjs",
     "functions:serve": "npm --prefix functions run serve",
     "functions:build": "npm --prefix functions run build"
   },
