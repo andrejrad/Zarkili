@@ -35,6 +35,8 @@ export type DiscoveryFeedPost = {
   imageUrl?: string;
   likeCount: number;
   postedAt: string;
+  /** True for FTC-compliant sponsored entries — UI should render a "Sponsored" badge */
+  isSponsored?: boolean;
 };
 
 export type DiscoveryFeedFilter = "all" | "trending" | "near-me" | "new";

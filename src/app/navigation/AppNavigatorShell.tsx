@@ -150,9 +150,11 @@ import {
 } from "../../domains/onboarding/adminService";
 import { createOnboardingRepository } from "../../domains/onboarding/repository";
 import type { OnboardingTimelineEvent } from "../../domains/onboarding/model";
-import { createReviewAdminService } from "../admin/reviewAdminService";
-import { createMessagingAdminService } from "../admin/messagingAdminService";
-import { createWaitlistAdminService } from "../admin/waitlistAdminService";
+import {
+  reviewAdminService,
+  messagingAdminService,
+  waitlistAdminService,
+} from "../admin/runtime";
 import type {
   ReviewEntry,
   ReviewQueueFilter,
@@ -302,6 +304,7 @@ import {
 import { ServiceSelectionScreen, type BookingServiceCategoryGroup } from "../booking/ServiceSelectionScreen";
 import { StaffSelectionScreen } from "../booking/StaffSelectionScreen";
 import { BookingDateTimeScreen } from "../booking/BookingDateTimeScreen";
+import { createAvailabilityRepository } from "../booking/availabilityRepository";
 import { BookingReviewScreen } from "../booking/BookingReviewScreen";
 import { BookingPoliciesScreen } from "../booking/BookingPoliciesScreen";
 import { BookingPaymentScreen } from "../booking/BookingPaymentScreen";
@@ -721,6 +724,8 @@ export function AppNavigatorShell({
   const [exploreFeed, setExploreFeed] = useState<Awaited<ReturnType<DiscoveryService["getExploreFeed"]>> | null>(null);
   const [feedLoading, setFeedLoading] = useState(false);
   const [feedErrorMessage, setFeedErrorMessage] = useState<string | null>(null);
+  // W22-DEBT-3: Sponsored posts injected at the top of DiscoverFeedScreen
+  const [sponsoredFeedPosts, setSponsoredFeedPosts] = useState<import("../discovery/discoveryHelpers").DiscoveryFeedPost[]>([]);
   const [selectedDiscoverTenantId, setSelectedDiscoverTenantId] = useState<string | null>(null);
   const [tenantProfileLoading, setTenantProfileLoading] = useState(false);
   const [tenantProfileErrorMessage, setTenantProfileErrorMessage] = useState<string | null>(null);
@@ -1386,6 +1391,8 @@ export function AppNavigatorShell({
   const [batchCSelectedSlotRaw, setBatchCSelectedSlotRaw] = useState<AvailableSlot | null>(null);
   const [batchCSlotsLoading, setBatchCSlotsLoading] = useState(false);
   const [batchCSlotsError, setBatchCSlotsError] = useState<string | null>(null);
+  // W38-DEBT-1: Per-date availability hints (calendar dots)
+  const [batchCAvailabilityMap, setBatchCAvailabilityMap] = useState<Record<string, { slotCount: number }>>({});
   // W36-R1: created booking ID + confirm state
   const [batchCCreatedBookingId, setBatchCCreatedBookingId] = useState<string | null>(null);
   const [batchCConfirmLoading, setBatchCConfirmLoading] = useState(false);
@@ -1706,14 +1713,10 @@ export function AppNavigatorShell({
   // W45 — Campaign admin service (no real repos yet; W45-DEBT-1)
   const campaignAdminService = useMemo(() => createCampaignAdminService(), []);
 
-  // W46 — Review admin service
-  const reviewAdminService = useMemo(() => createReviewAdminService(), []);
+  // W46 — Review / Messaging / Waitlist admin services wired in admin/runtime.ts
 
-  // W46 — Messaging admin service
-  const messagingAdminService = useMemo(() => createMessagingAdminService(), []);
-
-  // W46 — Waitlist admin service
-  const waitlistAdminService = useMemo(() => createWaitlistAdminService(), []);
+  // W38-DEBT-1 — Per-date availability repository (calendar dots)
+  const availabilityRepo = useMemo(() => createAvailabilityRepository(db), []);
 
   // W15-DEBT-1 — Onboarding admin service
   const onboardingAdminService = useMemo(
@@ -1810,14 +1813,17 @@ export function AppNavigatorShell({
       setFeedErrorMessage(null);
 
       try {
-        const [nextHomeFeed, nextExploreFeed] = await Promise.all([
+        const todayIso = new Date().toISOString().slice(0, 10);
+        const [nextHomeFeed, nextExploreFeed, nextSponsoredPosts] = await Promise.all([
           activeDiscoveryService.getHomeFeed(),
           activeDiscoveryService.getExploreFeed(),
+          activeDiscoveryService.getActiveSponsoredPosts(todayIso),
         ]);
 
         if (!cancelled) {
           setHomeFeed(nextHomeFeed);
           setExploreFeed(nextExploreFeed);
+          setSponsoredFeedPosts(nextSponsoredPosts);
         }
       } catch {
         if (!cancelled) {
@@ -2106,6 +2112,17 @@ export function AppNavigatorShell({
     void loadBatchCSlots();
     return () => { cancelled = true; };
   }, [activeRoute.name, clientBookingFlow, tenantId, batchCLocationId, consumerBookingDate, consumerSelectedServiceIds, consumerSelectedStaffId, batchCServices, batchCTechnicians, consumerRescheduleMode]);
+
+  // W38-DEBT-1: Load per-date availability hints (calendar dots) whenever the
+  // month changes while the BookingDate route is active.
+  useEffect(() => {
+    if (activeRoute.name !== "BookingDate" || !tenantId) return;
+    let cancelled = false;
+    availabilityRepo.loadMonthAvailability(tenantId, consumerBookingMonth)
+      .then((map) => { if (!cancelled) setBatchCAvailabilityMap(map); })
+      .catch(() => { /* non-critical: calendar dots stay empty on failure */ });
+    return () => { cancelled = true; };
+  }, [activeRoute.name, tenantId, consumerBookingMonth]);
 
   // ---------------------------------------------------------------------------
   // W36-D: Load booking history when BookingHistory opens
@@ -4029,6 +4046,7 @@ export function AppNavigatorShell({
             })
           }
           availableSlots={batchCSlots}
+          availabilityMap={batchCAvailabilityMap}
           selectedSlot={consumerBookingSlot}
           segment={consumerBookingSegment}
           timezone="UTC"
@@ -4951,7 +4969,7 @@ export function AppNavigatorShell({
     if (activeRoute.name === "DiscoverFeed") {
       return (
         <DiscoverFeedScreen
-          posts={[]}
+          posts={sponsoredFeedPosts}
           activeFilter={discoveryFeedFilter}
           onFilterChange={setDiscoveryFeedFilter}
           onSelectPost={() => { navigate("SalonProfile"); }}

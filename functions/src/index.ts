@@ -9,6 +9,8 @@ export {
 
 export { onBookingWritten } from "./bookingTriggers";
 
+export { updateAvailabilitySummary } from "./availabilitySummaryTrigger";
+
 export { dailyBookingReminders } from "./scheduledReminders";
 
 export { purgeExpiredSlotTokens } from "./purgeSlotTokens";
