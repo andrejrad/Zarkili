@@ -23,27 +23,216 @@ All findings from this sprint feed the debt register before W50 starts. Any P0/P
 | Item | Value |
 |------|-------|
 | Build type | Expo development build (EAS) |
-| Firebase project | **staging** (isolated from production; seeded with representative data) |
-| Data source | Real Firestore + Cloud Functions — no mocks |
+| Firebase project | `zarkili-dev-a1b1c` — dev/staging (isolated from production) |
+| Data source | **Real Firestore + Cloud Functions — no mocks** |
+| Seed script | `npm run seed:qa:dev` (re-runnable; idempotent) |
 | iOS device | iPhone (iOS 16+) — **must be a physical device** |
 | Android device | Physical device preferred; emulator API 33+ acceptable for non-payment flows |
-| Stripe mode | Test mode (`pk_test_…`); use Stripe test card `4242 4242 4242 4242` |
-| Stripe 3DS card | `4000 0027 6000 3184` |
+| Stripe mode | Test mode (`pk_test_…`); see card numbers in §3.5 |
 | Build SHA | _fill at sprint start_ |
 | Tester | _fill at sprint start_ |
 
-### Staging seed data required before testing
-- 1 platform-admin account
-- 2 tenant accounts (1 with Stripe Connect onboarded, 1 not)
-- 1 tenant with: 3 locations, 5 staff members, 10 services, 20 bookings (mix of confirmed/cancelled/completed)
-- 3 consumer accounts (1 with loyalty points, 1 with saved payment method, 1 fresh)
-- Loyalty program configured with 2 tiers, 3 rewards, 2 activities
-- Marketplace posts (3 published, 1 flagged)
-- Support tickets (2 open, 1 resolved)
+---
+
+## 3. Seed Data Reference
+
+> The seed script (`scripts/seed-qa-firestore.mjs`) was executed against `zarkili-dev-a1b1c` on **2026-05-11** and wrote **1,180 Firestore documents** + **88 Firebase Auth users**.  
+> Re-run at any time — all IDs are deterministic and `set()` is used throughout (safe to re-run without duplicates).
 
 ---
 
-## 3. Severity Definitions
+### 3.1 Accounts — Platform Admin
+
+| Role | Email | Password | Notes |
+|------|-------|----------|-------|
+| Platform Super-Admin | `qa-platform-admin@zarkili.dev` | `QaAdmin@Zarkili2026!` | Full platform access; use for all SADM-* TCs |
+
+---
+
+### 3.2 Accounts — Consumers (10 test users)
+
+Each consumer is named for easy identification. All passwords are `QaTest@2026!`.
+
+| UID suffix | Email | Name | Loyalty tier | Points | Saved cards | Special state |
+|------------|-------|------|-------------|--------|-------------|---------------|
+| `alice-00001` | `qa-alice@zarkili.dev` | Alice Martin | **Gold** | 1,250 | 1 (Visa 4242) | Multiple completed bookings; booking history |
+| `bob-00002` | `qa-bob@zarkili.dev` | Bob Chen | **Platinum** | 3,200 | 2 (Visa + MC) | Highest-tier consumer; 2 completed bookings; multiple loyalty transactions |
+| `carol-00003` | `qa-carol@zarkili.dev` | Carol Davis | _none_ | 0 | none | **Completely fresh account** — use for first-run onboarding, zero-state UX TCs |
+| `dave-00004` | `qa-dave@zarkili.dev` | Dave Wilson | **Silver** | 320 | 1 (Visa 4242) | Has a `no_show` booking at Crown Republic |
+| `emma-00005` | `qa-emma@zarkili.dev` | Emma Garcia | **Silver** | 450 | 1 (Visa 4242) | **Active on 2 waitlists** (Velvet & Bloom, Glow District) |
+| `frank-00006` | `qa-frank@zarkili.dev` | Frank Johnson | _none_ | 80 | none | Minimal history; pending booking at Crown Republic |
+| `grace-00007` | `qa-grace@zarkili.dev` | Grace Kim | **Gold** | 940 | 2 (Visa + MC) | Completed bookings at Glow District |
+| `henry-00008` | `qa-henry@zarkili.dev` | Henry Brown | **Bronze** | 130 | none | **Blocked at Crown Republic** (no-show policy); use for SA-CRM-006 block verification |
+| `iris-00009` | `qa-iris@zarkili.dev` | Iris Taylor | _none_ | 0 | **none** | **No Stripe customer, no saved card** — use for AddPaymentMethod first-time flow (PAY-002) |
+| `jack-00010` | `qa-jack@zarkili.dev` | Jack Martinez | **Silver** | 550 | 1 (Visa 4242) | Completed bookings at Aqua Salon + Studio Nico |
+
+---
+
+### 3.3 Accounts — Salon Owners (16 tenants)
+
+All passwords: `QaOwner@2026!`
+
+| Tenant | Email | Salon name | Plan | Region | Status |
+|--------|-------|-----------|------|--------|--------|
+| `qa-owner-vb` | `qa-owner-vb@zarkili.dev` | **Velvet & Bloom** | Professional | New York, NY | Active |
+| `qa-owner-cr` | `qa-owner-cr@zarkili.dev` | **Crown Republic** | Starter | Brooklyn, NY | Active |
+| `qa-owner-gd` | `qa-owner-gd@zarkili.dev` | **Glow District** | Professional | West Hollywood, CA | Active |
+| `qa-owner-bb` | `qa-owner-bb@zarkili.dev` | **Botanika Beauty** | Enterprise | Los Angeles, CA | Active |
+| `qa-owner-sn` | `qa-owner-sn@zarkili.dev` | **Studio Nico** | Enterprise | Chicago, IL | Active |
+| `qa-owner-cs` | `qa-owner-cs@zarkili.dev` | **The Chop Shop** | Starter | Chicago, IL | Active |
+| `qa-owner-as` | `qa-owner-as@zarkili.dev` | **Aqua Salon & Spa** | Enterprise | Miami, FL | Active |
+| `qa-owner-ps` | `qa-owner-ps@zarkili.dev` | **Pigment Studio** | Professional | Miami, FL | Active |
+| `qa-owner-blb` | `qa-owner-blb@zarkili.dev` | **Bloom & Branch** | Professional | Austin, TX | Active |
+| `qa-owner-io` | `qa-owner-io@zarkili.dev` | **Iron & Oak** | Starter | Austin, TX | Active |
+| `qa-owner-mm` | `qa-owner-mm@zarkili.dev` | **Mist & Moss** | Professional | Seattle, WA | Active |
+| `qa-owner-pn` | `qa-owner-pn@zarkili.dev` | **The Parlor Nashville** | Professional | Nashville, TN | Active |
+| `qa-owner-aa` | `qa-owner-aa@zarkili.dev` | **Allure Studio ATL** | Enterprise | Atlanta, GA | Active |
+| `qa-owner-ss` | `qa-owner-ss@zarkili.dev` | **Summit Style** | Professional | Denver, CO | Active |
+| `qa-owner-bm` | `qa-owner-bm@zarkili.dev` | **Beacon Mane** | Professional | Boston, MA | Active |
+| `qa-owner-st` | `qa-owner-st@zarkili.dev` | **Suspended Test Salon** | Starter | Phoenix, AZ | **Suspended** — use for SADM-005/006 |
+
+Staff accounts follow the pattern `{tenantId}-user-s2@zarkili.dev` through `s6`, password `QaStaff@2026!`.
+
+---
+
+### 3.4 Salons — What's in Firestore
+
+#### Multi-location tenants (3)
+
+| Tenant | Locations |
+|--------|-----------|
+| Velvet & Bloom | Upper East Side (loc-vb-ues) · Midtown (loc-vb-midtown) |
+| Studio Nico | Lincoln Park (loc-sn-lp) · Gold Coast (loc-sn-gc) |
+| Aqua Salon & Spa | Brickell (loc-as-brickell) · Coral Gables (loc-as-coral) |
+
+All other tenants have a single location. Every location has:
+- Real street address + lat/lng (map pins will render)
+- Operating hours: Mon–Sat 9 am–7 pm, Sun 10 am–5 pm
+- Timezone aligned to region
+- Phone number
+
+#### Services per tenant
+
+| Tenant type | Category | Service count | Price range |
+|-------------|----------|---------------|-------------|
+| Hair studio (Velvet & Bloom, Studio Nico, Summit Style, Beacon Mane) | Haircut, Color, Treatment, Styling | 10 | $55–$350 |
+| Barbershop (Crown Republic, The Chop Shop, Iron & Oak) | Haircut, Beard, Shave, Scalp | 8 | $25–$80 |
+| Skin / esthetics (Glow District) | Facial, Treatment, Lashes, Brows | 10 | $75–$180 |
+| Wellness / organic (Botanika, Mist & Moss) | Facial, Massage, Body, Treatment | 8 | $95–$175 |
+| Waxing / threading (Bloom & Branch) | Waxing, Brows, Lashes | 8 | $15–$195 |
+| Full-service (Aqua Salon & Spa, Allure Studio ATL) | Hair, Nails, Skin, Massage, Brows, Lashes | 12 | $30–$145 |
+| Color specialist (Pigment Studio) | Fantasy Color, Vivid, Correction, Extensions | 10 | $55–$350 |
+| Blow-dry bar (The Parlor Nashville) | Blowout, Updo, Bridal, Event | 10 | $55–$350 |
+
+#### Staff per tenant
+
+4 staff for single-location tenants, 6 for multi-location. Roles: `owner`, `manager`, `technician`, `assistant`. Each staff member has:
+- Weekly schedule (Mon–Fri 9 am–6 pm, Sat 9 am–3 pm)
+- Service mapping (owner/manager = all services; technician = first 5)
+
+#### Loyalty configuration (all tenants)
+
+| Tier | Min lifetime pts | Max | Benefits |
+|------|-----------------|-----|---------|
+| Bronze | 0 | 499 | Early promo access, birthday bonus |
+| Silver | 500 | 1,499 | 5% product discount, priority booking |
+| Gold | 1,500 | 3,499 | 10% off all services, free product/quarter, VIP access |
+| Platinum | 3,500 | — | 15% off, complimentary add-ons, dedicated stylist |
+
+Redemption options seeded: **Free Blowout** (500 pts) · **$15 Off** (300 pts) · **$30 Off** (600 pts)
+
+Promo codes seeded per tenant: `WELCOME20` (20% off, valid 60 days) · `SAVE15` ($15 fixed, valid 30 days)
+
+---
+
+### 3.5 Bookings — Pre-seeded Scenarios
+
+28 bookings across tenants 1–8, covering every status needed by the QA plan:
+
+| Status | Count | Notes |
+|--------|-------|-------|
+| `confirmed` | 7 | Future-dated; use for reschedule/cancel TCs |
+| `completed` | 13 | Past-dated; have charges, reviews, loyalty credits |
+| `cancelled` | 3 | Some have refunds issued (for RefundStatus TC) |
+| `no_show` | 2 | Dave (tc-014 regression) + another consumer |
+| `reschedule_pending` | 1 | Grace at Glow District |
+| `rescheduled` | 1 | Alice at Aqua |
+| `pending` | 1 | Frank at Crown Republic |
+
+Every `completed`/`confirmed` booking has a corresponding `charges/{id}` document. Cancelled bookings with deposits have a `refunds/{id}` document with `status: "issued"`.
+
+Every `completed` booking has a `reviews/{id}` document in states: `published` (most), `pending_moderation` (some — use for admin review queue TCs).
+
+---
+
+### 3.6 Messaging
+
+8 consumer↔salon thread pairs seeded, each with a 4-message exchange:
+- Global consumer thread at `threads/{threadId}`
+- Mirrored admin thread at `tenants/{tenantId}/threads/{threadId}`
+
+Threads exist for: Alice↔Velvet & Bloom, Bob↔Velvet & Bloom, Alice↔Crown Republic, Grace↔Glow District, Bob↔Botanika, Alice↔Studio Nico, Jack↔Aqua Salon, Emma↔Pigment Studio.
+
+---
+
+### 3.7 Waitlist Entries
+
+| Consumer | Tenant | Status |
+|----------|--------|--------|
+| Emma | Velvet & Bloom | `active` |
+| Frank | Glow District | `active` |
+| Dave | Studio Nico | `matched` (slot available, awaiting confirm) |
+| Jack | Crown Republic | `expired` |
+
+---
+
+### 3.8 Platform / Super-Admin Data
+
+| Collection | What's there |
+|-----------|-------------|
+| `platform/config` | Platform-wide settings doc |
+| `platformAuditLogs` | 4 entries: tenant suspension, impersonation start, AI budget update, feature flag toggle |
+| `securityEvents` | 2 entries: one impersonation (resolved), one auth-abuse alert (open) |
+| `discoveryFeaturedSalons` | 10 featured salon cards with lat/lng, rating, price |
+| `tenants/tenant-suspended-test` | Status = `suspended` — use for SADM-005 reactivate TC |
+
+---
+
+### 3.9 Stripe Test Cards
+
+| Card number | Scenario |
+|------------|---------|
+| `4242 4242 4242 4242` | Visa — always succeeds |
+| `5555 5555 5555 4444` | Mastercard — always succeeds |
+| `3782 822463 10005` | Amex — always succeeds |
+| `4000 0027 6000 3184` | Requires 3DS challenge (BOOK-012) |
+| `4000 0000 0000 0002` | Always declined (PAY-015, BOOK-013) |
+| `4000 0000 0000 9995` | Insufficient funds |
+| `4000 0000 0000 0069` | Expired card |
+| Expiry / CVC | Any future date, any 3-digit CVC |
+
+Saved cards in Firestore are metadata-only (brand, last4, expiry). The actual Stripe test `paymentMethodId` values must be generated via Stripe's test API before running payment TCs — the seed stores placeholder customer IDs (`cus_test_*`).
+
+---
+
+### 3.10 Re-seeding
+
+```bash
+# Re-seed from scratch (idempotent — safe to run multiple times)
+npm run seed:qa:dev
+
+# Dry-run to verify count without writing
+npm run seed:qa:dev:dry
+
+# Print what would be written, then write (clear flag reserved for future wipe logic)
+npm run seed:qa:dev:clear
+```
+
+> Auth users are updated (not duplicated) on re-run via `auth.updateUser()` fallback. All Firestore docs use `set()` with deterministic IDs.
+
+---
+
+## 4. Severity Definitions
 
 | Level | Meaning | Action |
 |-------|---------|--------|
@@ -54,13 +243,13 @@ All findings from this sprint feed the debt register before W50 starts. Any P0/P
 
 ---
 
-## 4. Result Notation
+## 5. Result Notation
 
 ✅ Pass · ❌ Fail · ⏭ Skip (known open debt) · 🔁 Retest needed · 🤖 Android-only finding · 🍎 iOS-only finding
 
 ---
 
-## 5. Platform Coverage Legend
+## 6. Platform Coverage Legend
 
 | Symbol | Platform |
 |--------|----------|
@@ -70,7 +259,7 @@ All findings from this sprint feed the debt register before W50 starts. Any P0/P
 
 ---
 
-## 6. Open Debt Items — Carry-In to This Sprint
+## 7. Open Debt Items — Carry-In to This Sprint
 
 These are known stubs from the debt register. Mark as ⏭ when reached; do not mark as ❌.
 
@@ -86,7 +275,7 @@ These are known stubs from the debt register. Mark as ⏭ when reached; do not m
 
 ---
 
-## 7. Sprint Tracking Summary
+## 8. Sprint Tracking Summary
 
 > Fill in as runs complete. One row per section per platform.
 
@@ -118,7 +307,7 @@ These are known stubs from the debt register. Mark as ⏭ when reached; do not m
 
 ---
 
-## 8. Test Case Catalog
+## 9. Test Case Catalog
 
 ---
 
@@ -1985,7 +2174,7 @@ Expected: Text stored and displayed as plain text. No script execution. No data 
 
 ---
 
-## 9. Findings Log
+## 10. Findings Log
 
 > Use one block per finding. Copy the template, fill it in, do not delete the template.
 
@@ -2009,7 +2198,7 @@ Expected: Text stored and displayed as plain text. No script execution. No data 
 
 ---
 
-## 10. Post-Sprint Actions
+## 11. Post-Sprint Actions
 
 1. **For each P0/P1 finding:** fix before W50 can start.
 2. **For each new deferred item:** log in `DEBT_REGISTER.md` using next available ID in the relevant week section.
@@ -2019,7 +2208,7 @@ Expected: Text stored and displayed as plain text. No script execution. No data 
 
 ---
 
-## 11. Entry Conditions for W50 (post-sprint gate)
+## 12. Entry Conditions for W50 (post-sprint gate)
 
 | Condition | Required |
 |-----------|---------|
