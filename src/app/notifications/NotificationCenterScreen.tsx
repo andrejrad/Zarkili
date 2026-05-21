@@ -11,6 +11,7 @@
 import {
   FlatList,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   View,
@@ -19,7 +20,6 @@ import {
 import {
   Banner,
   NotificationRow,
-  SegmentedControl,
   colors,
   radius,
   spacing,
@@ -118,11 +118,30 @@ export function NotificationCenterScreen({
 
       {/* Tabs */}
       <View style={styles.tabsContainer}>
-        <SegmentedControl
-          options={tabOptions}
-          value={activeTab}
-          onChange={(v) => onTabChange(v as NotificationTab)}
-        />
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.tabsContent}
+          accessibilityRole="tablist"
+        >
+          {tabOptions.map((opt) => {
+            const selected = opt.value === activeTab;
+            return (
+              <Pressable
+                key={opt.value}
+                onPress={() => onTabChange(opt.value as NotificationTab)}
+                accessibilityRole="tab"
+                accessibilityState={{ selected }}
+                accessibilityLabel={opt.label}
+                style={[styles.tabChip, selected && styles.tabChipActive]}
+              >
+                <Text style={[styles.tabChipText, selected && styles.tabChipTextActive]}>
+                  {opt.label}
+                </Text>
+            </Pressable>
+            );
+          })}
+        </ScrollView>
       </View>
 
       {/* Body */}
@@ -215,8 +234,39 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   tabsContainer: {
+    height: 52,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+    justifyContent: "center",
+  },
+  tabsContent: {
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: spacing.pageHorizontal,
-    paddingVertical: spacing.s2,
+    gap: spacing.s2,
+  },
+  tabChip: {
+    height: 32,
+    paddingHorizontal: spacing.s3,
+    borderRadius: radius.full,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  tabChipActive: {
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
+  },
+  tabChipText: {
+    ...textStyles.bodySmall,
+    color: colors.foreground,
+    fontWeight: "500",
+  },
+  tabChipTextActive: {
+    color: colors.white,
+    fontWeight: "600",
   },
   sectionHeader: {
     paddingHorizontal: spacing.pageHorizontal,

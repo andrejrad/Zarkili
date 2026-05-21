@@ -36,6 +36,8 @@ export { StaffAvatarList } from "./StaffAvatarList";
 export type { StaffAvatarItem, StaffAvatarListProps } from "./StaffAvatarList";
 export { StickyCtaBar } from "./StickyCtaBar";
 export type { StickyCtaBarProps } from "./StickyCtaBar";
+export { NotificationIcon } from "./NotificationIcon";
+export type { NotificationIconProps, NotificationIconVariant, NotificationIconColor, NotificationIconSize } from "./NotificationIcon";
 
 // W23 Batch C primitives
 export { CalendarGrid, toIsoDate } from "./CalendarGrid";

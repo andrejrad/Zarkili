@@ -478,39 +478,64 @@ describe("Firestore multi-tenant rules", () => {
     });
   });
 
-  describe("loyaltyStates", () => {
-    it("client may read their own loyalty state (doc id == uid)", async () => {
-      await seedTenantMembership("tenantA", "lsClient1", "client");
+  // NEW-DEBT-B: loyalty state docs moved from tenants/{tid}/loyaltyStates/{uid}
+  // to top-level user_brand_loyalty/{uid}_{bid}. Legacy path is read-locked to
+  // platform admin only. New path mirrors the prior semantics on the spec shape.
+  describe("user_brand_loyalty (v3 path)", () => {
+    it("client may read their own loyalty state (composite docId starts with uid)", async () => {
+      await testEnv.withSecurityRulesDisabled(async (ctx) => {
+        await ctx.firestore()
+          .doc("user_brand_loyalty/lsClient1_tenantA")
+          .set({ userId: "lsClient1", brandId: "tenantA", points: 50, pointsBalance: 50 });
+      });
+      const db = testEnv.authenticatedContext("lsClient1").firestore();
+      await assertSucceeds(db.doc("user_brand_loyalty/lsClient1_tenantA").get());
+    });
+
+    it("client cannot read another user's loyalty state", async () => {
+      await testEnv.withSecurityRulesDisabled(async (ctx) => {
+        await ctx.firestore()
+          .doc("user_brand_loyalty/otherUserLS_tenantA")
+          .set({ userId: "otherUserLS", brandId: "tenantA", points: 50, pointsBalance: 50 });
+      });
+      const db = testEnv.authenticatedContext("lsClient2").firestore();
+      await assertFails(db.doc("user_brand_loyalty/otherUserLS_tenantA").get());
+    });
+
+    it("tenant admin may read any loyalty state for their brand", async () => {
+      await seedTenantMembership("tenantA", "lsAdmin1", "tenant_admin");
+      await testEnv.withSecurityRulesDisabled(async (ctx) => {
+        await ctx.firestore()
+          .doc("user_brand_loyalty/someClientLS_tenantA")
+          .set({ userId: "someClientLS", brandId: "tenantA", points: 30, pointsBalance: 30 });
+      });
+      const db = testEnv.authenticatedContext("lsAdmin1").firestore();
+      await assertSucceeds(db.doc("user_brand_loyalty/someClientLS_tenantA").get());
+    });
+
+    it("client cannot write loyalty state directly", async () => {
+      const db = testEnv.authenticatedContext("lsClient3").firestore();
+      await assertFails(
+        db.doc("user_brand_loyalty/lsClient3_tenantA")
+          .set({ userId: "lsClient3", brandId: "tenantA", points: 999, pointsBalance: 999 })
+      );
+    });
+  });
+
+  describe("loyaltyStates (legacy path \u2014 read-locked post NEW-DEBT-B)", () => {
+    it("client may not read legacy nested loyalty state", async () => {
       await testEnv.withSecurityRulesDisabled(async (ctx) => {
         await ctx.firestore().doc("tenants/tenantA/loyaltyStates/lsClient1").set({ points: 50 });
       });
       const db = testEnv.authenticatedContext("lsClient1").firestore();
-      await assertSucceeds(db.doc("tenants/tenantA/loyaltyStates/lsClient1").get());
+      await assertFails(db.doc("tenants/tenantA/loyaltyStates/lsClient1").get());
     });
 
-    it("client cannot read another user's loyalty state", async () => {
-      await seedTenantMembership("tenantA", "lsClient2", "client");
-      await testEnv.withSecurityRulesDisabled(async (ctx) => {
-        await ctx.firestore().doc("tenants/tenantA/loyaltyStates/otherUserLS").set({ points: 50 });
-      });
-      const db = testEnv.authenticatedContext("lsClient2").firestore();
-      await assertFails(db.doc("tenants/tenantA/loyaltyStates/otherUserLS").get());
-    });
-
-    it("tenant admin may read any loyalty state", async () => {
+    it("tenant admin may not write to legacy nested path", async () => {
       await seedTenantMembership("tenantA", "lsAdmin1", "tenant_admin");
-      await testEnv.withSecurityRulesDisabled(async (ctx) => {
-        await ctx.firestore().doc("tenants/tenantA/loyaltyStates/someClientLS").set({ points: 30 });
-      });
       const db = testEnv.authenticatedContext("lsAdmin1").firestore();
-      await assertSucceeds(db.doc("tenants/tenantA/loyaltyStates/someClientLS").get());
-    });
-
-    it("client cannot write loyalty state directly", async () => {
-      await seedTenantMembership("tenantA", "lsClient3", "client");
-      const db = testEnv.authenticatedContext("lsClient3").firestore();
       await assertFails(
-        db.doc("tenants/tenantA/loyaltyStates/lsClient3").set({ points: 999 })
+        db.doc("tenants/tenantA/loyaltyStates/lsClient1").set({ points: 1 })
       );
     });
   });
@@ -606,6 +631,141 @@ describe("Firestore multi-tenant rules", () => {
       const db = testEnv.authenticatedContext("campClient2").firestore();
       await assertFails(
         db.doc("tenants/tenantA/campaigns/camp-004").set({ name: "Spam" })
+      );
+    });
+  });
+
+  // NEW-DEBT-B B2e: service_types moved from services/{serviceId} to
+  // brands/{brandId}/locations/{locationId}/service_types/{serviceTypeId}.
+  // Legacy services/ path is now read-only for platform admin only (writes locked).
+  describe("service_types (v3 path — brands hierarchy)", () => {
+    it("unauthenticated user may read a service_types doc", async () => {
+      await testEnv.withSecurityRulesDisabled(async (ctx) => {
+        await ctx.firestore()
+          .doc("brands/tenantA/locations/loc1/service_types/svc1")
+          .set({ brandId: "tenantA", locationId: "loc1", name: "Gel manicure", isActive: true });
+      });
+      const db = testEnv.unauthenticatedContext().firestore();
+      await assertSucceeds(db.doc("brands/tenantA/locations/loc1/service_types/svc1").get());
+    });
+
+    it("tenant admin may create a service_types doc with matching brandId + locationId", async () => {
+      await seedTenantMembership("tenantA", "svcAdmin1", "tenant_admin");
+      const db = testEnv.authenticatedContext("svcAdmin1").firestore();
+      await assertSucceeds(
+        db.doc("brands/tenantA/locations/loc1/service_types/svc2").set({
+          brandId: "tenantA",
+          locationId: "loc1",
+          name: "Lash lift",
+          isActive: true,
+        })
+      );
+    });
+
+    it("tenant admin may update a service_types doc", async () => {
+      await seedTenantMembership("tenantA", "svcAdmin2", "tenant_admin");
+      await testEnv.withSecurityRulesDisabled(async (ctx) => {
+        await ctx.firestore()
+          .doc("brands/tenantA/locations/loc1/service_types/svc3")
+          .set({ brandId: "tenantA", locationId: "loc1", name: "Brow tint" });
+      });
+      const db = testEnv.authenticatedContext("svcAdmin2").firestore();
+      await assertSucceeds(
+        db.doc("brands/tenantA/locations/loc1/service_types/svc3").update({ name: "Brow lamination" })
+      );
+    });
+
+    it("client cannot create a service_types doc", async () => {
+      await seedTenantMembership("tenantA", "svcClient1", "client");
+      const db = testEnv.authenticatedContext("svcClient1").firestore();
+      await assertFails(
+        db.doc("brands/tenantA/locations/loc1/service_types/svc-bad").set({
+          brandId: "tenantA",
+          locationId: "loc1",
+          name: "Hack",
+        })
+      );
+    });
+
+    it("tenant admin from a different tenant cannot write", async () => {
+      await seedTenantMembership("tenantB", "svcAdminB", "tenant_admin");
+      const db = testEnv.authenticatedContext("svcAdminB").firestore();
+      await assertFails(
+        db.doc("brands/tenantA/locations/loc1/service_types/svc-bad2").set({
+          brandId: "tenantA",
+          locationId: "loc1",
+          name: "Cross-tenant hack",
+        })
+      );
+    });
+
+    it("unauthenticated user may read a variant", async () => {
+      await testEnv.withSecurityRulesDisabled(async (ctx) => {
+        await ctx.firestore()
+          .doc("brands/tenantA/locations/loc1/service_types/svc1/variants/v1")
+          .set({ name: "Short", price: 2500 });
+      });
+      const db = testEnv.unauthenticatedContext().firestore();
+      await assertSucceeds(
+        db.doc("brands/tenantA/locations/loc1/service_types/svc1/variants/v1").get()
+      );
+    });
+
+    it("tenant admin may write a variant", async () => {
+      await seedTenantMembership("tenantA", "svcAdmin3", "tenant_admin");
+      const db = testEnv.authenticatedContext("svcAdmin3").firestore();
+      await assertSucceeds(
+        db.doc("brands/tenantA/locations/loc1/service_types/svc1/variants/v2").set({
+          name: "Long",
+          price: 3500,
+        })
+      );
+    });
+
+    it("client cannot write a variant", async () => {
+      await seedTenantMembership("tenantA", "svcClient2", "client");
+      const db = testEnv.authenticatedContext("svcClient2").firestore();
+      await assertFails(
+        db.doc("brands/tenantA/locations/loc1/service_types/svc1/variants/v-bad").set({
+          name: "Hack",
+          price: 1,
+        })
+      );
+    });
+  });
+
+  describe("services (legacy path — write-locked post NEW-DEBT-B B2e)", () => {
+    it("unauthenticated user may still read a legacy services doc (migration window)", async () => {
+      await testEnv.withSecurityRulesDisabled(async (ctx) => {
+        await ctx.firestore()
+          .doc("services/svc-legacy-1")
+          .set({ tenantId: "tenantA", name: "Old gel manicure" });
+      });
+      const db = testEnv.unauthenticatedContext().firestore();
+      await assertSucceeds(db.doc("services/svc-legacy-1").get());
+    });
+
+    it("tenant admin cannot write to legacy services path", async () => {
+      await seedTenantMembership("tenantA", "legacyAdmin1", "tenant_admin");
+      const db = testEnv.authenticatedContext("legacyAdmin1").firestore();
+      await assertFails(
+        db.doc("services/svc-legacy-new").set({ tenantId: "tenantA", name: "New service" })
+      );
+    });
+
+    it("client cannot write to legacy services path", async () => {
+      await seedTenantMembership("tenantA", "legacyClient1", "client");
+      const db = testEnv.authenticatedContext("legacyClient1").firestore();
+      await assertFails(
+        db.doc("services/svc-legacy-client").set({ tenantId: "tenantA", name: "Attempt" })
+      );
+    });
+
+    it("tenant admin cannot write to legacy services variant subcollection", async () => {
+      await seedTenantMembership("tenantA", "legacyAdmin2", "tenant_admin");
+      const db = testEnv.authenticatedContext("legacyAdmin2").firestore();
+      await assertFails(
+        db.doc("services/svc-legacy-1/variants/v-old").set({ name: "Short", price: 2500 })
       );
     });
   });

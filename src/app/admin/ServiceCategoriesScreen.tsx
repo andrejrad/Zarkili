@@ -17,7 +17,7 @@ import {
   BulkConfirmModal,
 } from "./AdminPatterns";
 import { brandTypography } from "../../shared/ui/brandTypography";
-import type { ServiceCategory } from "../../domains/services/serviceCatalogModel";
+import type { TenantServiceCategory } from "../../domains/services/serviceCatalogModel";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -26,7 +26,7 @@ import type { ServiceCategory } from "../../domains/services/serviceCatalogModel
 export type ServiceCategoriesScreenProps = {
   loading: boolean;
   error: string | null;
-  categories: ServiceCategory[];
+  categories: TenantServiceCategory[];
   newCategoryName: string;
   submitting: boolean;
   formError: string | null;
@@ -42,7 +42,7 @@ export type ServiceCategoriesScreenProps = {
 // Component
 // ---------------------------------------------------------------------------
 
-const COLUMNS: AdminDataTableColumn<ServiceCategory>[] = [
+const COLUMNS: AdminDataTableColumn<TenantServiceCategory>[] = [
   { header: "Category", flex: 3, render: (c) => c.name },
   { header: "Order", flex: 1, render: (c) => String(c.sortOrder) },
 ];

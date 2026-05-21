@@ -17,6 +17,7 @@ import {
   doc,
   getDoc,
   getDocs,
+  limit as limitQuery,
   orderBy,
   query,
   serverTimestamp,
@@ -35,6 +36,8 @@ import {
   type CreateReviewInput,
   type ModerateReviewInput,
   type RatingAggregate,
+  type ServiceReviewItem,
+  type ServiceReviewBreakdown,
 } from "./model";
 
 // ---------------------------------------------------------------------------
@@ -102,6 +105,27 @@ export type ReviewRepository = {
    * Call from a scheduled Cloud Function for periodic consistency fixes.
    */
   syncLocationAggregate(tenantId: string, locationId: string): Promise<RatingAggregate>;
+
+  /**
+   * List published reviews for a specific service, newest first.
+   * Results are limited to `limit` entries (default 20).
+   */
+  getReviewsForService(
+    tenantId: string,
+    locationId: string,
+    serviceId: string,
+    limit?: number,
+  ): Promise<ServiceReviewItem[]>;
+
+  /**
+   * Compute a star-breakdown aggregate for a specific service.
+   * Returns average (null when no reviews), total count, and per-star counts.
+   */
+  getServiceReviewBreakdown(
+    tenantId: string,
+    locationId: string,
+    serviceId: string,
+  ): Promise<ServiceReviewBreakdown>;
 };
 
 export function createReviewRepository(db: Firestore): ReviewRepository {
@@ -165,10 +189,14 @@ export function createReviewRepository(db: Firestore): ReviewRepository {
       tenantId: input.tenantId,
       locationId: input.locationId,
       staffId: input.staffId,
+      serviceId: input.serviceId ?? null,
       bookingId: input.bookingId,
       customerId: input.customerId,
       rating: input.rating,
+      overallRating: input.rating,
       comment: input.comment ?? null,
+      technicianRating: input.technicianRating ?? null,
+      technicianComment: input.technicianComment ?? null,
       status: "pending_moderation",
       createdAt: now,
       updatedAt: now,
@@ -347,6 +375,80 @@ export function createReviewRepository(db: Firestore): ReviewRepository {
   }
 
   // -------------------------------------------------------------------------
+  // getReviewsForService  (Phase 8.2)
+  // -------------------------------------------------------------------------
+
+  async function getReviewsForService(
+    tenantId: string,
+    locationId: string,
+    serviceId: string,
+    limit: number = 20,
+  ): Promise<ServiceReviewItem[]> {
+    assertNonEmpty(tenantId, "tenantId");
+    assertNonEmpty(serviceId, "serviceId");
+
+    const q = query(
+      reviewsCol(tenantId),
+      where("locationId", "==", locationId),
+      where("serviceId", "==", serviceId),
+      where("status", "==", "published"),
+      orderBy("createdAt", "desc"),
+      limitQuery(limit),
+    );
+    const snap = await getDocs(q);
+    return snap.docs.map((d) => {
+      const r = d.data() as Review;
+      const createdAt =
+        r.createdAt && typeof (r.createdAt as unknown as { toDate?: () => Date }).toDate === "function"
+          ? (r.createdAt as unknown as { toDate: () => Date }).toDate().toISOString()
+          : new Date().toISOString();
+      return {
+        reviewId: r.reviewId,
+        reviewerName: r.customerId, // display name lookup is a UI concern
+        overallRating: r.rating,
+        rating: r.rating,
+        body: r.comment ?? "",
+        technicianComment: r.technicianComment,
+        createdAt,
+      } satisfies ServiceReviewItem;
+    });
+  }
+
+  // -------------------------------------------------------------------------
+  // getServiceReviewBreakdown  (Phase 8.2)
+  // -------------------------------------------------------------------------
+
+  async function getServiceReviewBreakdown(
+    tenantId: string,
+    locationId: string,
+    serviceId: string,
+  ): Promise<ServiceReviewBreakdown> {
+    assertNonEmpty(tenantId, "tenantId");
+    assertNonEmpty(serviceId, "serviceId");
+
+    const q = query(
+      reviewsCol(tenantId),
+      where("locationId", "==", locationId),
+      where("serviceId", "==", serviceId),
+      where("status", "==", "published"),
+    );
+    const snap = await getDocs(q);
+    const reviews = snap.docs.map((d) => d.data() as Review);
+
+    const breakdown = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 } as ServiceReviewBreakdown["breakdown"];
+    let sum = 0;
+    for (const r of reviews) {
+      const star = Math.max(1, Math.min(5, Math.round(r.rating))) as 1 | 2 | 3 | 4 | 5;
+      breakdown[star] = (breakdown[star] ?? 0) + 1;
+      sum += r.rating;
+    }
+    const count = reviews.length;
+    const average = count > 0 ? Math.round((sum / count) * 10) / 10 : null;
+
+    return { average, count, breakdown };
+  }
+
+  // -------------------------------------------------------------------------
   // Public API
   // -------------------------------------------------------------------------
 
@@ -360,5 +462,7 @@ export function createReviewRepository(db: Firestore): ReviewRepository {
     getLocationRatingAggregate,
     syncStaffAggregate,
     syncLocationAggregate,
+    getReviewsForService,
+    getServiceReviewBreakdown,
   };
 }

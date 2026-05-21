@@ -1,0 +1,195 @@
+﻿src/app/admin/aiAdminService.ts(106,27): error TS2345: Argument of type 'QueryFieldFilterConstraint' is not assignable to parameter of type 'QueryOrderByConstraint | QueryLimitConstraint'.
+  Type 'QueryFieldFilterConstraint' is not assignable to type 'QueryLimitConstraint'.
+    Types of property 'type' are incompatible.
+      Type '"where"' is not assignable to type '"limit" | "limitToLast"'.
+src/app/admin/aiAdminService.ts(109,27): error TS2345: Argument of type 'QueryFieldFilterConstraint' is not assignable to parameter of type 'QueryOrderByConstraint | QueryLimitConstraint'.
+  Type 'QueryFieldFilterConstraint' is not assignable to type 'QueryLimitConstraint'.
+    Types of property 'type' are incompatible.
+      Type '"where"' is not assignable to type '"limit" | "limitToLast"'.
+src/app/admin/aiAdminService.ts(244,27): error TS2345: Argument of type 'QueryFieldFilterConstraint' is not assignable to parameter of type 'QueryOrderByConstraint | QueryLimitConstraint'.
+  Type 'QueryFieldFilterConstraint' is not assignable to type 'QueryLimitConstraint'.
+    Types of property 'type' are incompatible.
+      Type '"where"' is not assignable to type '"limit" | "limitToLast"'.
+src/app/admin/aiAdminService.ts(247,27): error TS2345: Argument of type 'QueryFieldFilterConstraint' is not assignable to parameter of type 'QueryOrderByConstraint | QueryLimitConstraint'.
+  Type 'QueryFieldFilterConstraint' is not assignable to type 'QueryLimitConstraint'.
+    Types of property 'type' are incompatible.
+      Type '"where"' is not assignable to type '"limit" | "limitToLast"'.
+src/app/admin/PerPostPerformanceScreen.tsx(152,34): error TS2339: Property 'bookingId' does not exist on type 'PostBookingRow'.
+src/app/admin/PerPostPerformanceScreen.tsx(152,96): error TS2339: Property 'bookingId' does not exist on type 'PostBookingRow'.
+src/app/admin/PerPostPerformanceScreen.tsx(154,72): error TS2551: Property 'serviceDate' does not exist on type 'PostBookingRow'. Did you mean 'serviceName'?
+src/app/admin/PerPostPerformanceScreen.tsx(155,97): error TS2339: Property 'revenueUsd' does not exist on type 'PostBookingRow'.
+src/app/admin/PerPostPerformanceScreen.tsx(157,28): error TS2339: Property 'rating' does not exist on type 'PostBookingRow'.
+src/app/admin/PerPostPerformanceScreen.tsx(157,52): error TS2339: Property 'rating' does not exist on type 'PostBookingRow'.
+src/app/admin/platformAdminService.ts(193,5): error TS2322: Type '{ displayName: string; features: string[]; isActive: boolean; monthlyPriceUsd: number; yearlyPriceUsd: number; maxLocations: number; maxStaff: number; maxMonthlyAiCallsUsd: number; planId: string; }[]' is not assignable to type 'PricingPlan[]'.
+  Type '{ displayName: string; features: string[]; isActive: boolean; monthlyPriceUsd: number; yearlyPriceUsd: number; maxLocations: number; maxStaff: number; maxMonthlyAiCallsUsd: number; planId: string; }' is not assignable to type 'PricingPlan'.
+    Types of property 'planId' are incompatible.
+      Type 'string' is not assignable to type 'TenantPlan'.
+src/app/admin/RevenueDashboardScreen.tsx(150,55): error TS2339: Property 'displayName' does not exist on type '{ staffId: string; bookingsToday: number; }'.
+src/app/admin/ScheduledReportsScreen.tsx(125,20): error TS2345: Argument of type '{ tenantId: string; label: string; reportKey: ReportKey; cadence: ScheduledReportCadence; format: ScheduledReportFormat; recipientEmail: string; }' is not assignable to parameter of type 'Omit<ScheduledReportConfig, "id" | "createdAt">'.
+  Type '{ tenantId: string; label: string; reportKey: ReportKey; cadence: ScheduledReportCadence; format: ScheduledReportFormat; recipientEmail: string; }' is missing the following properties from type 'Omit<ScheduledReportConfig, "id" | "createdAt">': active, createdBy, reportId
+src/app/admin/ScheduledReportsScreen.tsx(147,48): error TS2339: Property 'id' does not exist on type 'ScheduledReportConfig'.
+src/app/admin/ScheduledReportsScreen.tsx(281,30): error TS2339: Property 'id' does not exist on type 'ScheduledReportConfig'.
+src/app/admin/ScheduledReportsScreen.tsx(295,41): error TS2339: Property 'id' does not exist on type 'ScheduledReportConfig'.
+src/app/navigation/__tests__/AppNavigatorShell.test.tsx(28,9): error TS2739: Type '{ getHomeFeed: () => Promise<never>; getExploreFeed: () => Promise<never>; }' is missing the following properties from type '{ getHomeFeed: () => Promise<DiscoveryHomeFeed>; getHomeFeedWithEditorial: () => Promise<DiscoveryHomeFeedWithEditorial>; getExploreFeed: () => Promise<...>; getActiveSponsoredPosts: (todayIso: string) => Promise<...>; }': getHomeFeedWithEditorial, getActiveSponsoredPosts
+src/app/navigation/__tests__/AppNavigatorShell.test.tsx(34,5): error TS2322: Type '{ getHomeFeed: (() => Promise<DiscoveryHomeFeed>) | (() => Promise<{ categories: ({ id: "all"; } | { id: "nails"; } | { id: "massage"; })[]; featuredSalons: { id: string; ... 12 more ...; messageEnabled: true; }[]; recentBookings: never[]; }>); getHomeFeedWithEditorial?: (() => Promise<DiscoveryHomeFeedWithEditorial...' is not assignable to type '{ getHomeFeed: () => Promise<DiscoveryHomeFeed>; getHomeFeedWithEditorial: () => Promise<DiscoveryHomeFeedWithEditorial>; getExploreFeed: () => Promise<DiscoveryExploreFeed>; getActiveSponsoredPosts: (todayIso: string) => Promise<DiscoveryFeedPost[]>; }'.
+  Types of property 'getHomeFeedWithEditorial' are incompatible.
+    Type '(() => Promise<DiscoveryHomeFeedWithEditorial>) | undefined' is not assignable to type '() => Promise<DiscoveryHomeFeedWithEditorial>'.
+      Type 'undefined' is not assignable to type '() => Promise<DiscoveryHomeFeedWithEditorial>'.
+src/app/navigation/__tests__/AppNavigatorShell.test.tsx(99,5): error TS2322: Type '{ getCurrentSession: () => Promise<AuthSession | null>; signIn: (input: SignInInput) => Promise<AuthSession>; createAccount: (input: SignInInput) => Promise<...>; ... 5 more ...; listUserTenantMemberships: (userId: string) => Promise<...>; }' is not assignable to type '{ getCurrentSession: () => Promise<AuthSession | null>; signIn: (input: SignInInput) => Promise<AuthSession>; createAccount: (input: CreateAccountInput) => Promise<AuthSession>; ... 5 more ...; listUserTenantMemberships: (userId: string) => Promise<TenantMembership[]>; }'.
+  Types of property 'signInWithSocialCredential' are incompatible.
+    Type '((credential: AuthCredential) => Promise<AuthSession>) | undefined' is not assignable to type '(credential: AuthCredential) => Promise<AuthSession>'.
+      Type 'undefined' is not assignable to type '(credential: AuthCredential) => Promise<AuthSession>'.
+src/app/navigation/__tests__/AppNavigatorShell.webRouting.test.tsx(23,9): error TS2739: Type '{ getHomeFeed: () => Promise<never>; getExploreFeed: () => Promise<never>; }' is missing the following properties from type '{ getHomeFeed: () => Promise<DiscoveryHomeFeed>; getHomeFeedWithEditorial: () => Promise<DiscoveryHomeFeedWithEditorial>; getExploreFeed: () => Promise<...>; getActiveSponsoredPosts: (todayIso: string) => Promise<...>; }': getHomeFeedWithEditorial, getActiveSponsoredPosts
+src/app/navigation/AppNavigatorShell.tsx(1396,30): error TS2686: 'React' refers to a UMD global, but the current file is a module. Consider adding an import instead.
+src/app/navigation/AppNavigatorShell.tsx(1401,24): error TS2686: 'React' refers to a UMD global, but the current file is a module. Consider adding an import instead.
+src/app/navigation/AppNavigatorShell.tsx(1402,31): error TS2686: 'React' refers to a UMD global, but the current file is a module. Consider adding an import instead.
+src/app/navigation/AppNavigatorShell.tsx(1453,26): error TS2686: 'React' refers to a UMD global, but the current file is a module. Consider adding an import instead.
+src/app/navigation/AppNavigatorShell.tsx(1454,31): error TS2686: 'React' refers to a UMD global, but the current file is a module. Consider adding an import instead.
+src/app/navigation/AppNavigatorShell.tsx(1504,28): error TS2686: 'React' refers to a UMD global, but the current file is a module. Consider adding an import instead.
+src/app/navigation/AppNavigatorShell.tsx(1505,28): error TS2686: 'React' refers to a UMD global, but the current file is a module. Consider adding an import instead.
+src/app/navigation/AppNavigatorShell.tsx(1506,26): error TS2686: 'React' refers to a UMD global, but the current file is a module. Consider adding an import instead.
+src/app/navigation/AppNavigatorShell.tsx(2626,66): error TS2345: Argument of type 'string | null' is not assignable to parameter of type 'string'.
+  Type 'null' is not assignable to type 'string'.
+src/app/navigation/AppNavigatorShell.tsx(3744,3): error TS2686: 'React' refers to a UMD global, but the current file is a module. Consider adding an import instead.
+src/app/navigation/AppNavigatorShell.tsx(3764,29): error TS2554: Expected 2 arguments, but got 1.
+src/app/navigation/AppNavigatorShell.tsx(3802,51): error TS2345: Argument of type 'undefined' is not assignable to parameter of type 'string'.
+src/app/navigation/AppNavigatorShell.tsx(3813,99): error TS2339: Property 'total' does not exist on type 'PlatformAuditEntry[]'.
+src/app/navigation/AppNavigatorShell.tsx(3814,33): error TS2345: Argument of type '() => ArrayIterator<[number, PlatformAuditEntry]>' is not assignable to parameter of type 'SetStateAction<PlatformAuditEntry[]>'.
+  Type '() => ArrayIterator<[number, PlatformAuditEntry]>' is not assignable to type '(prevState: PlatformAuditEntry[]) => PlatformAuditEntry[]'.
+    Type 'ArrayIterator<[number, PlatformAuditEntry]>' is missing the following properties from type 'PlatformAuditEntry[]': length, pop, push, concat, and 26 more.
+src/app/navigation/AppNavigatorShell.tsx(9064,57): error TS2554: Expected 1 arguments, but got 3.
+src/app/navigation/AppNavigatorShell.tsx(9145,11): error TS2322: Type 'AiFeatureToggleConfig[]' is not assignable to type 'boolean'.
+src/app/navigation/AppNavigatorShell.tsx(9153,29): error TS2322: Type 'string' is not assignable to type '"content-creation" | "marketing-orchestration" | "service-recommendations" | "scheduling-optimization" | "retention-insights" | "support-triage" | "no-show-fraud" | "marketplace-personalization"'.
+src/app/navigation/AppNavigatorShell.tsx(9194,42): error TS2339: Property 'featureBudgets' does not exist on type 'AiBudgetGuardConfig'.
+src/app/navigation/AppNavigatorShell.tsx(9194,83): error TS2339: Property 'featureBudgets' does not exist on type 'AiBudgetGuardConfig'.
+src/app/navigation/AppNavigatorShell.tsx(9597,31): error TS2345: Argument of type 'string' is not assignable to parameter of type 'SetStateAction<TenantRecord | null>'.
+src/app/navigation/AppNavigatorShell.tsx(9614,10): error TS2739: Type '{ loading: boolean; error: string | null; tenant: TenantRecord; onSaveSupportNotes: (notes: string) => void; onSuspend: () => void; onReactivate: () => void; onImpersonate: () => void; onViewAuditLog: () => void; onBack: () => void; testID: string; }' is missing the following properties from type 'TenantDetailScreenProps': saving, onRetry
+src/app/navigation/AppNavigatorShell.tsx(9625,49): error TS2339: Property 'name' does not exist on type 'TenantRecord'.
+src/app/navigation/AppNavigatorShell.tsx(9629,35): error TS2554: Expected 3 arguments, but got 2.
+src/app/navigation/AppNavigatorShell.tsx(9644,11): error TS2322: Type '{ loading: boolean; error: string | null; tenantId: string; tenantName: string; onConfirmSuspend: (reason: string) => void; onCancel: () => void; testID: string; }' is not assignable to type 'IntrinsicAttributes & SuspendTenantScreenProps'.
+  Property 'loading' does not exist on type 'IntrinsicAttributes & SuspendTenantScreenProps'.
+src/app/navigation/AppNavigatorShell.tsx(9651,35): error TS2554: Expected 4 arguments, but got 3.
+src/app/navigation/AppNavigatorShell.tsx(9666,11): error TS2322: Type '{ loading: boolean; error: string | null; activeSession: ImpersonationSession | null; onStartImpersonation: (targetTenantId: string, targetUserId: string) => void; onEndImpersonation: () => void; onRetry: () => void; onBack: () => void; testID: string; }' is not assignable to type 'IntrinsicAttributes & ImpersonationScreenProps'.
+  Property 'loading' does not exist on type 'IntrinsicAttributes & ImpersonationScreenProps'.
+src/app/navigation/AppNavigatorShell.tsx(9672,35): error TS2554: Expected 6 arguments, but got 4.
+src/app/navigation/AppNavigatorShell.tsx(9680,35): error TS2554: Expected 3 arguments, but got 2.
+src/app/navigation/AppNavigatorShell.tsx(9687,35): error TS2554: Expected 2 arguments, but got 1.
+src/app/navigation/AppNavigatorShell.tsx(9739,11): error TS2322: Type '(planId: any, updates: any) => void' is not assignable to type '(planId: string) => void'.
+  Target signature provides too few arguments. Expected 2 or more, but got 1.
+src/app/navigation/AppNavigatorShell.tsx(9739,24): error TS7006: Parameter 'planId' implicitly has an 'any' type.
+src/app/navigation/AppNavigatorShell.tsx(9739,32): error TS7006: Parameter 'updates' implicitly has an 'any' type.
+src/app/navigation/AppNavigatorShell.tsx(9763,10): error TS2739: Type '{ loading: boolean; error: string | null; platformFlags: FeatureFlag[]; tenantFlags: FeatureFlag[]; onTogglePlatformFlag: (flagKey: string, enabled: boolean) => void; ... 4 more ...; testID: string; }' is missing the following properties from type 'FeatureFlagConsoleScreenProps': saving, selectedTenantId, selectedTenantName
+src/app/navigation/AppNavigatorShell.tsx(9776,58): error TS2554: Expected 4 arguments, but got 3.
+src/app/navigation/AppNavigatorShell.tsx(9777,69): error TS2554: Expected 5 arguments, but got 4.
+src/app/navigation/AppNavigatorShell.tsx(9784,64): error TS2345: Argument of type 'undefined' is not assignable to parameter of type 'string'.
+src/app/navigation/AppNavigatorShell.tsx(9805,94): error TS2339: Property 'total' does not exist on type 'PlatformAuditEntry[]'.
+src/app/navigation/AppNavigatorShell.tsx(9806,39): error TS2345: Argument of type '() => ArrayIterator<[number, PlatformAuditEntry]>' is not assignable to parameter of type 'SetStateAction<PlatformAuditEntry[]>'.
+  Type '() => ArrayIterator<[number, PlatformAuditEntry]>' is not assignable to type '(prevState: PlatformAuditEntry[]) => PlatformAuditEntry[]'.
+    Type 'ArrayIterator<[number, PlatformAuditEntry]>' is missing the following properties from type 'PlatformAuditEntry[]': length, pop, push, concat, and 26 more.
+src/app/navigation/AppNavigatorShell.tsx(9811,112): error TS2339: Property 'total' does not exist on type 'PlatformAuditEntry[]'.
+src/app/navigation/AppNavigatorShell.tsx(9812,39): error TS2345: Argument of type '() => ArrayIterator<[number, PlatformAuditEntry]>' is not assignable to parameter of type 'SetStateAction<PlatformAuditEntry[]>'.
+  Type '() => ArrayIterator<[number, PlatformAuditEntry]>' is not assignable to type '(prevState: PlatformAuditEntry[]) => PlatformAuditEntry[]'.
+    Type 'ArrayIterator<[number, PlatformAuditEntry]>' is missing the following properties from type 'PlatformAuditEntry[]': length, pop, push, concat, and 26 more.
+src/app/navigation/AppNavigatorShell.tsx(9829,39): error TS2345: Argument of type 'ModerationItemStatus | undefined' is not assignable to parameter of type 'SetStateAction<ModerationItemStatus>'.
+  Type 'undefined' is not assignable to type 'SetStateAction<ModerationItemStatus>'.
+src/app/navigation/AppNavigatorShell.tsx(9835,11): error TS2322: Type '(itemId: any, reason: any) => void' is not assignable to type '(itemId: string) => void'.
+  Target signature provides too few arguments. Expected 2 or more, but got 1.
+src/app/navigation/AppNavigatorShell.tsx(9835,24): error TS7006: Parameter 'itemId' implicitly has an 'any' type.
+src/app/navigation/AppNavigatorShell.tsx(9835,32): error TS7006: Parameter 'reason' implicitly has an 'any' type.
+src/app/navigation/AppNavigatorShell.tsx(9836,35): error TS2554: Expected 4 arguments, but got 3.
+src/app/navigation/AppNavigatorShell.tsx(9841,35): error TS2554: Expected 3 arguments, but got 2.
+src/app/navigation/AppNavigatorShell.tsx(9863,11): error TS2322: Type '(tenantId: string, monthlyTokenCap: any, enabled: any) => void' is not assignable to type '(tenantId: string, capUsd: number) => void'.
+  Target signature provides too few arguments. Expected 3 or more, but got 2.
+src/app/navigation/AppNavigatorShell.tsx(9863,45): error TS7006: Parameter 'monthlyTokenCap' implicitly has an 'any' type.
+src/app/navigation/AppNavigatorShell.tsx(9863,62): error TS7006: Parameter 'enabled' implicitly has an 'any' type.
+src/app/navigation/AppNavigatorShell.tsx(9864,35): error TS2554: Expected 4 arguments, but got 3.
+src/app/navigation/AppNavigatorShell.tsx(9865,44): error TS2345: Argument of type '(prev: TenantAiBudgetOverride[]) => (void | TenantAiBudgetOverride)[]' is not assignable to parameter of type 'SetStateAction<TenantAiBudgetOverride[]>'.
+  Type '(prev: TenantAiBudgetOverride[]) => (void | TenantAiBudgetOverride)[]' is not assignable to type '(prevState: TenantAiBudgetOverride[]) => TenantAiBudgetOverride[]'.
+    Type '(void | TenantAiBudgetOverride)[]' is not assignable to type 'TenantAiBudgetOverride[]'.
+      Type 'void | TenantAiBudgetOverride' is not assignable to type 'TenantAiBudgetOverride'.
+        Type 'void' is not assignable to type 'TenantAiBudgetOverride'.
+src/app/navigation/AppNavigatorShell.tsx(9884,10): error TS2741: Property 'triggering' is missing in type '{ loading: boolean; error: string | null; jobs: MigrationJob[]; onTriggerJob: (jobId: string) => void; onRetry: () => void; onBack: () => void; testID: string; }' but required in type 'MigrationRunnerScreenProps'.
+src/app/navigation/AppNavigatorShell.tsx(9889,35): error TS2554: Expected 3 arguments, but got 2.
+src/app/navigation/AppNavigatorShell.tsx(9890,32): error TS2345: Argument of type '(prev: MigrationJob[]) => (void | MigrationJob)[]' is not assignable to parameter of type 'SetStateAction<MigrationJob[]>'.
+  Type '(prev: MigrationJob[]) => (void | MigrationJob)[]' is not assignable to type '(prevState: MigrationJob[]) => MigrationJob[]'.
+    Type '(void | MigrationJob)[]' is not assignable to type 'MigrationJob[]'.
+      Type 'void | MigrationJob' is not assignable to type 'MigrationJob'.
+        Type 'void' is not assignable to type 'MigrationJob'.
+src/app/navigation/AppNavigatorShell.tsx(9925,10): error TS2739: Type '{ vendorEmbedUrl: string; onBack: () => void; testID: string; }' is missing the following properties from type 'SupportInboxScreenProps': loading, error, onRetry
+src/app/navigation/AppNavigatorShell.tsx(9970,11): error TS2322: Type '(requestId: any, action: any) => void' is not assignable to type '(requestId: string) => void'.
+  Target signature provides too few arguments. Expected 2 or more, but got 1.
+src/app/navigation/AppNavigatorShell.tsx(9970,30): error TS7006: Parameter 'requestId' implicitly has an 'any' type.
+src/app/navigation/AppNavigatorShell.tsx(9970,41): error TS7006: Parameter 'action' implicitly has an 'any' type.
+src/app/navigation/AppNavigatorShell.tsx(9971,89): error TS2554: Expected 2 arguments, but got 3.
+src/app/navigation/AppNavigatorShell.tsx(9972,37): error TS2345: Argument of type '(prev: DataExportRequest[]) => (void | DataExportRequest)[]' is not assignable to parameter of type 'SetStateAction<DataExportRequest[]>'.
+  Type '(prev: DataExportRequest[]) => (void | DataExportRequest)[]' is not assignable to type '(prevState: DataExportRequest[]) => DataExportRequest[]'.
+    Type '(void | DataExportRequest)[]' is not assignable to type 'DataExportRequest[]'.
+      Type 'void | DataExportRequest' is not assignable to type 'DataExportRequest'.
+        Type 'void' is not assignable to type 'DataExportRequest'.
+src/app/navigation/AppNavigatorShell.tsx(9993,11): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/app/navigation/AppNavigatorShell.tsx(10015,10): error TS2741: Property 'saving' is missing in type '{ loading: boolean; error: string | null; incidents: IncidentRecord[]; onUpdateStatus: (id: string, status: IncidentStatus, notes: string | undefined) => void; onRetry: () => void; onBack: () => void; testID: string; }' but required in type 'IncidentResponseScreenProps'.
+src/app/navigation/AppNavigatorShell.tsx(10021,28): error TS2345: Argument of type '(prev: IncidentRecord[]) => (void | IncidentRecord)[]' is not assignable to parameter of type 'SetStateAction<IncidentRecord[]>'.
+  Type '(prev: IncidentRecord[]) => (void | IncidentRecord)[]' is not assignable to type '(prevState: IncidentRecord[]) => IncidentRecord[]'.
+    Type '(void | IncidentRecord)[]' is not assignable to type 'IncidentRecord[]'.
+      Type 'void | IncidentRecord' is not assignable to type 'IncidentRecord'.
+        Type 'void' is not assignable to type 'IncidentRecord'.
+src/app/navigation/AppNavigatorShell.tsx(10043,11): error TS2322: Type '{ onSignIn: (email: string, password: string) => void; onBack: () => void; testID: string; }' is not assignable to type 'IntrinsicAttributes & AdminSignInScreenProps'.
+  Property 'onBack' does not exist on type 'IntrinsicAttributes & AdminSignInScreenProps'.
+src/app/navigation/AppNavigatorShell.tsx(10053,24): error TS2304: Cannot find name 'role'.
+src/app/navigation/routes.ts(331,3): error TS2322: Type 'AppRouteDefinition | { name: string; group: "platform_admin"; path: string; guard: "platform-admin"; } | { name: string; group: "platform_admin"; path: string; guard: "platform-admin"; } | ... 17 more ... | { ...; }' is not assignable to type 'AppRouteDefinition'.
+  Type '{ name: string; group: "platform_admin"; path: string; guard: "platform-admin"; }' is not assignable to type 'AppRouteDefinition'.
+    Types of property 'group' are incompatible.
+      Type '"platform_admin"' is not assignable to type 'AppRouteGroup'.
+src/app/navigation/routes.ts(332,3): error TS2322: Type 'AppRouteDefinition | { name: string; group: "platform_admin"; path: string; guard: "platform-admin"; } | { name: string; group: "platform_admin"; path: string; guard: "platform-admin"; } | ... 17 more ... | { ...; }' is not assignable to type 'AppRouteDefinition'.
+  Type '{ name: string; group: "platform_admin"; path: string; guard: "platform-admin"; }' is not assignable to type 'AppRouteDefinition'.
+    Types of property 'group' are incompatible.
+      Type '"platform_admin"' is not assignable to type 'AppRouteGroup'.
+src/app/navigation/routes.ts(334,30): error TS2322: Type '"platform_admin"' is not assignable to type 'AppRouteGroup'.
+src/app/navigation/routes.ts(335,27): error TS2322: Type '"platform_admin"' is not assignable to type 'AppRouteGroup'.
+src/app/navigation/routes.ts(336,28): error TS2322: Type '"platform_admin"' is not assignable to type 'AppRouteGroup'.
+src/app/navigation/routes.ts(337,28): error TS2322: Type '"platform_admin"' is not assignable to type 'AppRouteGroup'.
+src/app/navigation/routes.ts(338,35): error TS2322: Type '"platform_admin"' is not assignable to type 'AppRouteGroup'.
+src/app/navigation/routes.ts(339,38): error TS2322: Type '"platform_admin"' is not assignable to type 'AppRouteGroup'.
+src/app/navigation/routes.ts(340,36): error TS2322: Type '"platform_admin"' is not assignable to type 'AppRouteGroup'.
+src/app/navigation/routes.ts(341,33): error TS2322: Type '"platform_admin"' is not assignable to type 'AppRouteGroup'.
+src/app/navigation/routes.ts(342,31): error TS2322: Type '"platform_admin"' is not assignable to type 'AppRouteGroup'.
+src/app/navigation/routes.ts(343,41): error TS2322: Type '"platform_admin"' is not assignable to type 'AppRouteGroup'.
+src/app/navigation/routes.ts(344,34): error TS2322: Type '"platform_admin"' is not assignable to type 'AppRouteGroup'.
+src/app/navigation/routes.ts(345,30): error TS2322: Type '"platform_admin"' is not assignable to type 'AppRouteGroup'.
+src/app/navigation/routes.ts(346,34): error TS2322: Type '"platform_admin"' is not assignable to type 'AppRouteGroup'.
+src/app/navigation/routes.ts(347,27): error TS2322: Type '"platform_admin"' is not assignable to type 'AppRouteGroup'.
+src/app/navigation/routes.ts(348,38): error TS2322: Type '"platform_admin"' is not assignable to type 'AppRouteGroup'.
+src/app/navigation/routes.ts(349,33): error TS2322: Type '"platform_admin"' is not assignable to type 'AppRouteGroup'.
+src/app/navigation/routes.ts(350,31): error TS2322: Type '"platform_admin"' is not assignable to type 'AppRouteGroup'.
+src/app/navigation/routes.ts(351,31): error TS2322: Type '"platform_admin"' is not assignable to type 'AppRouteGroup'.
+src/app/navigation/routes.ts(352,26): error TS2322: Type '"platform_admin"' is not assignable to type 'AppRouteGroup'.
+src/app/navigation/routes.ts(353,25): error TS2322: Type '"platform_admin"' is not assignable to type 'AppRouteGroup'.
+src/app/onboarding/SalonOnboardingAccountScreen.tsx(67,11): error TS2322: Type '{ label: string; value: string; onChangeText: Dispatch<SetStateAction<string>>; placeholder: string; keyboardType: string; autoCapitalize: string; disabled: boolean; testID: string; }' is not assignable to type 'IntrinsicAttributes & InputFieldProps'.
+  Property 'keyboardType' does not exist on type 'IntrinsicAttributes & InputFieldProps'.
+src/app/onboarding/SalonOnboardingAccountScreen.tsx(77,11): error TS2322: Type '{ label: string; value: string; onChangeText: Dispatch<SetStateAction<string>>; placeholder: string; keyboardType: string; disabled: boolean; testID: string; }' is not assignable to type 'IntrinsicAttributes & InputFieldProps'.
+  Property 'keyboardType' does not exist on type 'IntrinsicAttributes & InputFieldProps'.
+src/app/onboarding/SalonOnboardingMarketplaceScreen.tsx(126,29): error TS2339: Property 'surfaceMuted' does not exist on type '{ readonly coralBlossom: "#E3A9A0"; readonly warmOat: "#D1BFB3"; readonly creamSilk: "#F2EDDD"; readonly mintFresh: "#BBEDDA"; readonly primary: "#E3A9A0"; readonly primaryHover: "#D99A90"; ... 19 more ...; readonly white: "#FFFFFF"; }'.
+src/app/onboarding/SalonOnboardingMarketplaceScreen.tsx(132,29): error TS2339: Property 'successSurface' does not exist on type '{ readonly coralBlossom: "#E3A9A0"; readonly warmOat: "#D1BFB3"; readonly creamSilk: "#F2EDDD"; readonly mintFresh: "#BBEDDA"; readonly primary: "#E3A9A0"; readonly primaryHover: "#D99A90"; ... 19 more ...; readonly white: "#FFFFFF"; }'.
+src/app/onboarding/SalonOnboardingMarketplaceScreen.tsx(136,46): error TS2339: Property 'successText' does not exist on type '{ readonly coralBlossom: "#E3A9A0"; readonly warmOat: "#D1BFB3"; readonly creamSilk: "#F2EDDD"; readonly mintFresh: "#BBEDDA"; readonly primary: "#E3A9A0"; readonly primaryHover: "#D99A90"; ... 19 more ...; readonly white: "#FFFFFF"; }'.
+src/app/onboarding/SalonOnboardingServicesScreen.tsx(128,17): error TS2322: Type '{ label: string; value: string; onChangeText: (v: string) => void; placeholder: string; keyboardType: string; disabled: boolean; testID: string; }' is not assignable to type 'IntrinsicAttributes & InputFieldProps'.
+  Property 'keyboardType' does not exist on type 'IntrinsicAttributes & InputFieldProps'.
+src/app/onboarding/SalonOnboardingServicesScreen.tsx(139,17): error TS2322: Type '{ label: string; value: string; onChangeText: (v: string) => void; placeholder: string; keyboardType: string; disabled: boolean; testID: string; }' is not assignable to type 'IntrinsicAttributes & InputFieldProps'.
+  Property 'keyboardType' does not exist on type 'IntrinsicAttributes & InputFieldProps'.
+src/app/onboarding/SalonOnboardingStaffScreen.tsx(114,13): error TS2322: Type '{ label: string; value: string; onChangeText: (v: string) => void; placeholder: string; autoCapitalize: string; disabled: boolean; testID: string; }' is not assignable to type 'IntrinsicAttributes & InputFieldProps'.
+  Property 'autoCapitalize' does not exist on type 'IntrinsicAttributes & InputFieldProps'.
+src/app/onboarding/SalonOnboardingStaffScreen.tsx(123,13): error TS2322: Type '{ label: string; value: string; onChangeText: (v: string) => void; placeholder: string; keyboardType: string; autoCapitalize: string; disabled: boolean; testID: string; }' is not assignable to type 'IntrinsicAttributes & InputFieldProps'.
+  Property 'keyboardType' does not exist on type 'IntrinsicAttributes & InputFieldProps'.
+src/app/onboarding/SalonOnboardingStaffScreen.tsx(151,57): error TS2322: Type '"ghost"' is not assignable to type 'ButtonVariant | undefined'.
+src/app/providers/__tests__/AuthProvider.test.tsx(14,3): error TS2322: Type '{ getCurrentSession: () => Promise<AuthSession | null>; signIn: (input: SignInInput) => Promise<AuthSession>; createAccount: (input: SignInInput) => Promise<...>; ... 5 more ...; listUserTenantMemberships: (userId: string) => Promise<...>; }' is not assignable to type '{ getCurrentSession: () => Promise<AuthSession | null>; signIn: (input: SignInInput) => Promise<AuthSession>; createAccount: (input: CreateAccountInput) => Promise<AuthSession>; ... 5 more ...; listUserTenantMemberships: (userId: string) => Promise<TenantMembership[]>; }'.
+  Types of property 'signInWithSocialCredential' are incompatible.
+    Type '((credential: AuthCredential) => Promise<AuthSession>) | undefined' is not assignable to type '(credential: AuthCredential) => Promise<AuthSession>'.
+      Type 'undefined' is not assignable to type '(credential: AuthCredential) => Promise<AuthSession>'.
+src/domains/auth/__tests__/socialAuthService.test.ts(60,27): error TS2352: Conversion of type 'typeof OAuthProvider' to type 'Mock<any, any, any>' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Type 'typeof OAuthProvider' is missing the following properties from type 'Mock<any, any, any>': getMockName, mock, mockClear, mockReset, and 13 more.
+src/domains/auth/index.ts(32,10): error TS2300: Duplicate identifier 'createSocialAuthService'.
+src/domains/auth/index.ts(33,15): error TS2300: Duplicate identifier 'SocialAuthService'.
+src/domains/auth/index.ts(34,10): error TS2300: Duplicate identifier 'createSocialAuthService'.
+src/domains/auth/index.ts(35,15): error TS2300: Duplicate identifier 'SocialAuthService'.
+src/domains/auth/socialAuthService.ts(43,53): error TS2353: Object literal may only specify known properties, and 'useProxy' does not exist in type 'AuthSessionRedirectUriOptions'.
+src/domains/auth/socialAuthService.ts(53,64): error TS2353: Object literal may only specify known properties, and 'useProxy' does not exist in type 'AuthRequestPromptOptions'.

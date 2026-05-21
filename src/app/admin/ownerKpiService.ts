@@ -34,7 +34,7 @@ export type OwnerKpiSummary = {
   revenueEstimatedThisWeekUsd: number | null;
   /** null until W40 per-location slot capacity is wired */
   occupancyTodayPct: number | null;
-  topStaff: Array<{ staffId: string; bookingsToday: number }>;
+  topStaff: Array<{ staffId: string; displayName: string; bookingsToday: number }>;
   alerts: OwnerKpiAlert[];
 };
 
@@ -90,7 +90,7 @@ export function createOwnerKpiService(db: Firestore) {
       staffCounts.set(d.staffId, (staffCounts.get(d.staffId) ?? 0) + 1);
     }
     const topStaff = Array.from(staffCounts.entries())
-      .map(([staffId, count]) => ({ staffId, bookingsToday: count }))
+      .map(([staffId, count]) => ({ staffId, displayName: staffId, bookingsToday: count }))
       .sort((a, b) => b.bookingsToday - a.bookingsToday)
       .slice(0, 3);
 

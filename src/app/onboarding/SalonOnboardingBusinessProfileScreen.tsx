@@ -70,7 +70,7 @@ export function SalonOnboardingBusinessProfileScreen({
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <Stepper totalSteps={totalSteps} currentStep={currentStep} testID="salon-bizprofile-stepper" />
       <Text style={styles.heading} accessibilityRole="header">Business Profile</Text>
-      <Text style={styles.body}>Add the salon legal name, brand name, address and primary contact details.</Text>
+      <Text style={styles.body}>Add the salon's business name, brand name, address and primary contact details.</Text>
 
       {error ? (
         <View style={styles.bannerWrap}>

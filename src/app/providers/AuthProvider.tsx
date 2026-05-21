@@ -1,5 +1,7 @@
 import { createContext, PropsWithChildren, useContext, useEffect, useMemo, useState } from "react";
+import { signInAnonymously } from "firebase/auth";
 
+import { auth } from "../../shared/config/firebase";
 import type {
   AuthRepository,
   CreateAccountInput,
@@ -154,10 +156,26 @@ export function AuthProvider({ children, authRepository = null, socialAuthServic
         await authRepository.sendPasswordReset(input);
       },
       signInAsDev: () => {
-        setUserId("dev-user");
-        setEmail("dev-user@zarkili.local");
-        setFirstName("Dev");
-        setLastName("User");
+        if (!authRepository) {
+          // No real auth configured — local dev session only (no Firestore access)
+          setUserId("dev-user");
+          setEmail("dev-user@zarkili.local");
+          setFirstName("Dev");
+          setLastName("User");
+          return;
+        }
+        void signInAnonymously(auth).then((cred) => {
+          setUserId(cred.user.uid);
+          setEmail("dev-user@zarkili.local");
+          setFirstName("Dev");
+          setLastName("User");
+        }).catch(() => {
+          // Fallback if anonymous auth is disabled in Firebase project
+          setUserId("dev-user");
+          setEmail("dev-user@zarkili.local");
+          setFirstName("Dev");
+          setLastName("User");
+        });
       },
       signOut: async () => {
         if (authRepository) {

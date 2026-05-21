@@ -10,9 +10,9 @@
  * Real repository adapters land in W43.
  */
 import type {
-  ServiceCategory,
-  CreateServiceCategoryInput,
-  UpdateServiceCategoryInput,
+  TenantServiceCategory,
+  CreateTenantServiceCategoryInput,
+  UpdateTenantServiceCategoryInput,
   ServiceAddon,
   CreateServiceAddonInput,
   UpdateServiceAddonInput,
@@ -32,9 +32,9 @@ import type {
 // ---------------------------------------------------------------------------
 
 export type ServiceCategoryRepository = {
-  listCategories(tenantId: string): Promise<ServiceCategory[]>;
-  createCategory(input: CreateServiceCategoryInput): Promise<ServiceCategory>;
-  updateCategory(categoryId: string, tenantId: string, input: UpdateServiceCategoryInput): Promise<void>;
+  listCategories(tenantId: string): Promise<TenantServiceCategory[]>;
+  createCategory(input: CreateTenantServiceCategoryInput): Promise<TenantServiceCategory>;
+  updateCategory(categoryId: string, tenantId: string, input: UpdateTenantServiceCategoryInput): Promise<void>;
   deleteCategory(categoryId: string, tenantId: string): Promise<void>;
 };
 
@@ -176,17 +176,17 @@ export function createServiceCatalogService({
   mediaRepository,
 }: ServiceCatalogServiceInput = {}) {
   // --- Categories ---
-  async function readCategories(tenantId: string): Promise<UiResult<ServiceCategory[]>> {
+  async function readCategories(tenantId: string): Promise<UiResult<TenantServiceCategory[]>> {
     if (!categoryRepository) return notConfigured("Category");
     return wrapAsync(() => categoryRepository!.listCategories(tenantId), "Unable to load categories.");
   }
 
-  async function createCategory(input: CreateServiceCategoryInput): Promise<UiResult<ServiceCategory>> {
+  async function createCategory(input: CreateTenantServiceCategoryInput): Promise<UiResult<TenantServiceCategory>> {
     if (!categoryRepository) return notConfigured("Category");
     return wrapAsync(() => categoryRepository!.createCategory(input), "Unable to create category.");
   }
 
-  async function updateCategory(categoryId: string, tenantId: string, input: UpdateServiceCategoryInput): Promise<UiResult<void>> {
+  async function updateCategory(categoryId: string, tenantId: string, input: UpdateTenantServiceCategoryInput): Promise<UiResult<void>> {
     if (!categoryRepository) return notConfigured("Category");
     return wrapAsync(() => categoryRepository!.updateCategory(categoryId, tenantId, input), "Unable to update category.");
   }

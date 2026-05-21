@@ -36,11 +36,23 @@ export type BookingPaymentScreenProps = {
   applePayAvailable?: boolean;
   loading?: boolean;
   errorMessage?: string;
+  /** Current spendable loyalty points balance (1 pt = $0.01). Null = not loaded. */
+  loyaltyPointsBalance?: number | null;
+  /** Called when the user taps "Apply points". Parent updates pricing.loyaltyDiscount. */
+  onPressApplyLoyalty?: () => void;
+  /** Called when the user taps "Remove" on the applied loyalty discount. */
+  onPressRemoveLoyalty?: () => void;
   onSelectCard: (id: string) => void;
   onPressApplePay?: () => void;
   onPressAddCard: () => void;
   onPressConfirm: () => void;
   onPressBack?: () => void;
+  /** BookingProgressIndicator slot rendered below the header. W50-DEBT-6 */
+  progressIndicator?: React.ReactNode;
+  /** Whether a deposit is required upfront instead of the full amount. W50-DEBT-14 */
+  depositEnabled?: boolean;
+  /** Deposit amount in USD. Only relevant when depositEnabled=true. W50-DEBT-14 */
+  depositAmountUsd?: number;
   testID?: string;
 };
 
@@ -51,15 +63,28 @@ export function BookingPaymentScreen({
   applePayAvailable,
   loading,
   errorMessage,
+  loyaltyPointsBalance,
+  onPressApplyLoyalty,
+  onPressRemoveLoyalty,
   onSelectCard,
   onPressApplePay,
   onPressAddCard,
   onPressConfirm,
   onPressBack,
+  progressIndicator,
+  depositEnabled,
+  depositAmountUsd,
   testID,
 }: BookingPaymentScreenProps) {
   const confirmDisabled =
     Boolean(loading) || (!selectedCardId && !applePayAvailable);
+
+  const depositActive = Boolean(depositEnabled) && typeof depositAmountUsd === "number" && depositAmountUsd > 0;
+  const dueNow = depositActive ? depositAmountUsd! : pricing.total;
+  const dueOnDay = depositActive ? Math.max(0, Math.round((pricing.total - depositAmountUsd!) * 100) / 100) : 0;
+  const confirmLabel = depositActive
+    ? `Confirm and pay deposit · ${formatUsd(dueNow)}`
+    : "Confirm and pay";
 
   return (
     <View style={styles.root} testID={testID}>
@@ -78,6 +103,7 @@ export function BookingPaymentScreen({
         <Text style={styles.title}>Payment</Text>
         <View style={{ width: 44 }} />
       </View>
+      {progressIndicator}
       <ScrollView contentContainerStyle={styles.body}>
         {errorMessage ? (
           <View style={styles.errorBanner} testID={testID ? `${testID}-error` : undefined}>
@@ -142,6 +168,46 @@ export function BookingPaymentScreen({
           <Text style={styles.addCardText}>+ Add new payment method</Text>
         </Pressable>
 
+        {loyaltyPointsBalance != null && loyaltyPointsBalance > 0 ? (
+          <View
+            style={styles.section}
+            testID={testID ? `${testID}-loyalty-section` : undefined}
+          >
+            <Text style={styles.sectionLabel}>Loyalty points</Text>
+            <View style={styles.loyaltyRow}>
+              <Text style={styles.loyaltyBalance}>
+                {loyaltyPointsBalance} pts · {formatUsd(loyaltyPointsBalance / 100)} available
+              </Text>
+              {(pricing.loyaltyDiscount ?? 0) > 0 ? (
+                <Pressable
+                  onPress={onPressRemoveLoyalty}
+                  accessibilityRole="button"
+                  accessibilityLabel="Remove loyalty discount"
+                  testID={testID ? `${testID}-loyalty-remove` : undefined}
+                  style={styles.loyaltyRemoveBtn}
+                >
+                  <Text style={styles.loyaltyRemoveText}>Remove</Text>
+                </Pressable>
+              ) : (
+                <Pressable
+                  onPress={onPressApplyLoyalty}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Apply ${loyaltyPointsBalance} loyalty points`}
+                  testID={testID ? `${testID}-loyalty-apply` : undefined}
+                  style={styles.loyaltyApplyBtn}
+                >
+                  <Text style={styles.loyaltyApplyText}>Apply {loyaltyPointsBalance} pts</Text>
+                </Pressable>
+              )}
+            </View>
+            {(pricing.loyaltyDiscount ?? 0) > 0 ? (
+              <Text style={styles.loyaltyAppliedNote}>
+                {formatUsd(pricing.loyaltyDiscount!)} discount applied
+              </Text>
+            ) : null}
+          </View>
+        ) : null}
+
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>Total</Text>
           <SummaryRow label="Subtotal" value={formatUsd(pricing.subtotal)} />
@@ -151,11 +217,32 @@ export function BookingPaymentScreen({
           {pricing.tip > 0 ? (
             <SummaryRow label="Tip" value={formatUsd(pricing.tip)} />
           ) : null}
+          {(pricing.loyaltyDiscount ?? 0) > 0 ? (
+            <SummaryRow
+              label="Loyalty discount"
+              value={formatUsd(-(pricing.loyaltyDiscount!))}
+            />
+          ) : null}
           <SummaryRow label="Total" value={formatUsd(pricing.total)} noDivider />
+          {depositActive ? (
+            <>
+              <SummaryRow
+                label="Due now (deposit)"
+                value={formatUsd(dueNow)}
+                testID={testID ? `${testID}-due-now` : undefined}
+              />
+              <SummaryRow
+                label="Due on day"
+                value={formatUsd(dueOnDay)}
+                noDivider
+                testID={testID ? `${testID}-due-on-day` : undefined}
+              />
+            </>
+          ) : null}
         </View>
       </ScrollView>
       <StickyFooterCta
-        primaryLabel="Confirm and pay"
+        primaryLabel={confirmLabel}
         totalLabel="Total"
         totalValue={formatUsd(pricing.total)}
         onPrimaryPress={onPressConfirm}
@@ -260,6 +347,30 @@ const styles = StyleSheet.create({
     marginBottom: spacing.s4,
   },
   addCardText: { color: colors.primary, fontWeight: "500" },
+  loyaltyRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginTop: spacing.s2,
+  },
+  loyaltyBalance: { fontSize: 14, color: colors.foreground, flex: 1 },
+  loyaltyApplyBtn: {
+    paddingVertical: spacing.s1,
+    paddingHorizontal: spacing.s3,
+    borderRadius: radius.sm,
+    backgroundColor: colors.primary10,
+  },
+  loyaltyApplyText: { fontSize: 13, fontWeight: "600", color: colors.primary },
+  loyaltyRemoveBtn: {
+    paddingVertical: spacing.s1,
+    paddingHorizontal: spacing.s3,
+  },
+  loyaltyRemoveText: { fontSize: 13, color: colors.textMuted, textDecorationLine: "underline" },
+  loyaltyAppliedNote: {
+    fontSize: 12,
+    color: colors.primary,
+    marginTop: spacing.s2,
+  },
   section: {
     backgroundColor: colors.surface,
     borderRadius: radius.lg,

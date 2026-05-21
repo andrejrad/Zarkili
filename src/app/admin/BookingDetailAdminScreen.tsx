@@ -27,6 +27,7 @@ export type BookingDetailAdminScreenProps = {
   onReschedule: () => void;
   onMarkNoShow: () => void;
   onForceBook: () => void;
+  onFinalizePayment?: () => void;
   onRetry: () => void;
   onBack: () => void;
   testID?: string;
@@ -47,6 +48,7 @@ export function BookingDetailAdminScreen({
   onReschedule,
   onMarkNoShow,
   onForceBook,
+  onFinalizePayment,
   onRetry,
   onBack,
   testID = "booking-detail-admin-screen",
@@ -142,6 +144,15 @@ export function BookingDetailAdminScreen({
           onPress={onCancel}
           testID="cancel-booking-btn"
         />
+        {onFinalizePayment ? (
+          <ActionButton
+            label="Finalize payment"
+            variant="primary"
+            disabled={submitting}
+            onPress={onFinalizePayment}
+            testID="finalize-payment-btn"
+          />
+        ) : null}
       </View>
 
       {/* Lifecycle audit trail */}

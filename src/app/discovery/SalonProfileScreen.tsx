@@ -25,7 +25,6 @@ export type SalonProfileScreenProps = {
   galleryUrls?: string[];
   onSelectService: (serviceId: string) => void;
   onSelectStaff: (staffId: string) => void;
-  onBook: () => void;
   onBack: () => void;
   testID?: string;
 };
@@ -39,7 +38,6 @@ export function SalonProfileScreen({
   galleryUrls,
   onSelectService,
   onSelectStaff,
-  onBook,
   onBack,
   testID,
 }: SalonProfileScreenProps) {
@@ -96,8 +94,6 @@ export function SalonProfileScreen({
         </>
       ) : null}
 
-      <Button label="Book now" onPress={onBook} testID="salon-profile-book" />
-
       <Text style={styles.sectionLabel}>Services</Text>
       <View style={styles.list}>
         {services.map((s) => (
@@ -111,7 +107,17 @@ export function SalonProfileScreen({
           >
             <View style={styles.rowText}>
               <Text style={styles.rowTitle}>{s.name}</Text>
+              {s.staffNames && s.staffNames.length > 0 ? (
+                <Text style={styles.rowMeta}>
+                  {s.staffNames.length <= 3
+                    ? s.staffNames.join(", ")
+                    : `${s.staffNames.slice(0, 3).join(", ")} and ${s.staffNames.length - 3} more`}
+                </Text>
+              ) : null}
               <Text style={styles.rowMeta}>{s.durationMinutes} min</Text>
+              {s.nextAvailableLabel ? (
+                <Text style={styles.rowAvailLabel}>{s.nextAvailableLabel}</Text>
+              ) : null}
             </View>
             <Text style={styles.price}>{formatPrice(s.priceCents)}</Text>
           </Pressable>
@@ -129,6 +135,17 @@ export function SalonProfileScreen({
             accessibilityLabel={p.name}
             testID={`salon-profile-staff-${p.id}`}
           >
+            {p.imageUrl ? (
+              <Image
+                source={{ uri: p.imageUrl }}
+                style={styles.staffAvatar}
+                accessibilityElementsHidden
+              />
+            ) : (
+              <View style={[styles.staffAvatar, styles.staffAvatarFallback]}>
+                <Text style={styles.staffAvatarInitial}>{p.name.charAt(0).toUpperCase()}</Text>
+              </View>
+            )}
             <View style={styles.rowText}>
               <Text style={styles.rowTitle}>{p.name}</Text>
               <Text style={styles.rowMeta}>{p.role}</Text>
@@ -180,8 +197,12 @@ const styles = StyleSheet.create({
   rowText: { flex: 1 },
   rowTitle: { fontSize: 14, fontWeight: "600", color: colors.foreground },
   rowMeta: { fontSize: 12, color: colors.textMuted, marginTop: 2 },
+  rowAvailLabel: { fontSize: 12, color: "#0F6E56", fontWeight: "500", marginTop: 2 },
   price: { fontSize: 14, fontWeight: "600", color: colors.foreground },
   staffRating: { fontSize: 13, color: colors.foreground },
+  staffAvatar: { width: 44, height: 44, borderRadius: radius.full, marginRight: spacing.s3, backgroundColor: colors.surface, overflow: "hidden" },
+  staffAvatarFallback: { backgroundColor: colors.primary10, alignItems: "center", justifyContent: "center" },
+  staffAvatarInitial: { fontSize: 16, fontWeight: "600", color: colors.primary },
   reviewCard: {
     backgroundColor: colors.surface,
     borderRadius: radius.md,

@@ -1,5 +1,8 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Linking, Platform, ScrollView, Share, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { ActivityIndicator, BackHandler, Linking, Platform, ScrollView, Share, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+
+import { useStripe } from "@stripe/stripe-react-native";
+import { WebStripePaymentForm } from "../booking/WebStripePaymentForm";
 
 import type { AiBudgetAdminService, UpdateAiBudgetConfigInput } from "../../domains/ai";
 import type { DiscoveryService, SignInInput } from "../../domains";
@@ -104,7 +107,7 @@ import {
   createServiceMediaRepository,
 } from "../admin/serviceCatalogAdapters";
 import type {
-  ServiceCategory,
+  TenantServiceCategory,
   ServiceAddon,
   ServiceSeasonalRule,
   ServiceBookingRules,
@@ -175,7 +178,7 @@ import { createAiAdminService } from "../admin/aiAdminService";
 import { createMarketplaceAdminService, checkPostCompliance } from "../admin/marketplaceAdminService";
 import type { AiFeatureToggleConfig, AiSuggestion, AiSuggestionFilter, AiSuggestionQueueSummary, AiUsageKpi, AiUsageByFeature, AiSafetyIncident, AiAuditLogEntry, AiAuditFilter } from "../admin/aiAdminTypes";
 import type { MarketplacePost, PostPerformanceMetrics, PostBookingRow, PostComplianceCheckResult, AntiTheftSignal, AntiTheftKpi } from "../admin/marketplaceAdminTypes";
-import type { AiBudgetGuardConfig } from "../../shared/ai";
+import type { AiBudgetGuardConfig, AiFeatureKey, AiFeatureBudgetConfig } from "../../shared/ai";
 // W49 — Platform Super-Admin, Compliance, Polish & Release Candidate
 import { TenantDirectoryScreen } from "../admin/TenantDirectoryScreen";
 import { TenantDetailScreen } from "../admin/TenantDetailScreen";
@@ -213,6 +216,7 @@ import type {
   ModerationItemStatus,
   TenantAiBudgetOverride,
   MigrationJob,
+  MigrationJobStatus,
   BackupJob,
   SecurityEvent,
   SecurityEventFilter,
@@ -311,6 +315,8 @@ import { ForceBookScreen } from "../admin/ForceBookScreen";
 import { NoShowMarkScreen } from "../admin/NoShowMarkScreen";
 import { CancellationAdminScreen } from "../admin/CancellationAdminScreen";
 import { RescheduleAdminScreen } from "../admin/RescheduleAdminScreen";
+import { PaymentSettingsScreen } from "../admin/PaymentSettingsScreen";
+import { FinalizePaymentAdminScreen } from "../admin/FinalizePaymentAdminScreen";
 import { createBookingOpsService } from "../admin/bookingOpsService";
 import type {
   AdminBookingDetailView,
@@ -335,6 +341,7 @@ import {
 import type { ClientBookingFlow, ReserveSlotResult } from "../bookings/clientBookingFlow";
 import { generateBookableDates } from "../bookings/clientBookingFlow";
 import type { Service } from "../../domains/services/model";
+import { serviceAddonsCollectionSegments } from "../../domains/services/paths";
 import type { StaffMember } from "../../domains/staff/model";
 import type { AvailableSlot } from "../../domains/bookings/slotEngine";
 import { AdminBookingQueueScreen } from "../bookings/AdminBookingQueueScreens";
@@ -348,7 +355,7 @@ import { getFriendlyFirebaseAuthMessage } from "../../domains/auth/errorMessages
 import { sendEmailVerification } from "firebase/auth";
 import { auth, db, functions } from "../../shared/config/firebase";
 import { httpsCallable } from "firebase/functions";
-import { collection, doc, getDoc, getDocs, orderBy, query } from "firebase/firestore";
+import { collection, collectionGroup, doc, getDoc, getDocs, limit, orderBy, query, setDoc, where } from "firebase/firestore";
 import { bookingsRepository as appBookingsRepository } from "../bookings/runtime";
 import type { SavedPaymentMethod as AppSavedPaymentMethod } from "../payments/paymentsHelpers";
 
@@ -356,11 +363,14 @@ import {
   AuthRouteScreen,
   CompleteProfileRouteScreen,
   ExploreRouteScreen,
+  GuestBookingsEmptyScreen,
+  GuestRewardsEmptyScreen,
   HomeRouteScreen,
   ProfileRouteScreen,
   SettingsShellRouteScreen,
   WelcomeRouteScreen,
 } from "./HandoffScreens";
+import type { HomeRebookItem } from "./HandoffScreens";
 import { EditProfileScreen } from "../profile/EditProfileScreen";
 import { LegalPageScreen } from "../legal/LegalPageScreen";
 import type { LegalPageType } from "../legal/LegalPageScreen";
@@ -379,21 +389,24 @@ import {
   AccountMergeScreen,
   type AccountMergeChoice,
 } from "../auth/AccountMergeScreen";
+import { GuestBookingGateScreen } from "../auth/GuestBookingGateScreen";
 import { ServiceSelectionScreen, type BookingServiceCategoryGroup } from "../booking/ServiceSelectionScreen";
-import { StaffSelectionScreen } from "../booking/StaffSelectionScreen";
+import { ANY_STAFF_ID, StaffSelectionScreen } from "../booking/StaffSelectionScreen";
 import { BookingDateTimeScreen } from "../booking/BookingDateTimeScreen";
 import { createAvailabilityRepository } from "../booking/availabilityRepository";
 import { BookingReviewScreen } from "../booking/BookingReviewScreen";
 import { BookingPoliciesScreen } from "../booking/BookingPoliciesScreen";
 import { BookingPaymentScreen } from "../booking/BookingPaymentScreen";
 import { BookingConfirmationScreen } from "../booking/BookingConfirmationScreen";
+import { BookingProgressIndicator } from "../booking/BookingProgressIndicator";
+import type { BookingStepDef } from "../booking/BookingProgressIndicator";
 import {
   GuestContactScreen,
   type GuestContactValues,
 } from "../booking/GuestContactScreen";
 import { ManageBookingScreen } from "../booking/ManageBookingScreen";
 import { PostBookingUpgradeScreen } from "../booking/PostBookingUpgradeScreen";
-import { formatTimeOfDay, type TimeSegment } from "../booking/bookingHelpers";
+import { formatLongDateLabel, formatTimeOfDay, type BookingAddOn, type TimeSegment } from "../booking/bookingHelpers";
 import type { BookingHistoryRecord } from "../payments/receiptsHelpers";
 import { SavedPaymentMethodsScreen } from "../payments/SavedPaymentMethodsScreen";
 import {
@@ -457,6 +470,7 @@ import { ExploreMapScreen } from "../discovery/ExploreMapScreen";
 import { DiscoverFiltersScreen } from "../discovery/DiscoverFiltersScreen";
 import { SalonProfileScreen } from "../discovery/SalonProfileScreen";
 import { ServiceDetailScreen } from "../discovery/ServiceDetailScreen";
+import { ServiceDetailScreen as ExploreServiceDetailScreen } from "../discover/ServiceDetailScreen";
 import { StaffDetailScreen } from "../discovery/StaffDetailScreen";
 import {
   DEFAULT_DISCOVERY_FILTERS,
@@ -465,7 +479,7 @@ import {
   type DiscoveryFilters,
   type FeaturedSalon,
 } from "../discovery/discoveryHelpers";
-import type { DiscoverySalonCard, DiscoveryCategory as DomainDiscoveryCategory } from "../../domains/discovery/model";
+import type { DiscoveryCategoryId, DiscoveryCategory as DomainDiscoveryCategory } from "../../domains/discovery/model";
 import {
   DEFAULT_NOTIFICATION_PREFERENCES,
   type InboxTab,
@@ -484,6 +498,8 @@ import {
 import {
   DEFAULT_EARN_ACTIONS,
   EMPTY_REVIEW_DRAFT,
+  deriveTier,
+  pointsToNextTier,
   type Activity,
   type ActivityTab,
   type EarnAction,
@@ -525,6 +541,7 @@ type BookingFlowStep =
   | "date"
   | "slot"
   | "confirm"
+  | "payment"
   | "result";
 
 type AppNavigatorShellProps = {
@@ -552,6 +569,8 @@ type AppNavigatorShellProps = {
   billingAdminService?: BillingAdminService | null;
   // W40 — Location admin service
   locationAdminService?: LocationAdminService | null;
+  /** Stripe publishable key — enables web Stripe Elements checkout when present. */
+  stripePublishableKey?: string;
 };
 
 function isWebRuntime(): boolean {
@@ -633,14 +652,14 @@ function toOnboardingStepLabelKey(step: OnboardingStep):
 // ---------------------------------------------------------------------------
 // W36: Discovery domain → app-layer type adapters
 // ---------------------------------------------------------------------------
-function toFeaturedSalon(card: DiscoverySalonCard): FeaturedSalon {
+function toFeaturedSalon(card: import("../../domains/discovery/model").ServiceTypeCard): FeaturedSalon {
   return {
     id: card.id,
     tenantId: card.tenantId,
-    name: card.name,
-    city: card.city,
-    rating: card.rating,
-    reviewCount: card.reviewCount,
+    name: card.serviceName,
+    city: card.locationDisplayName,
+    rating: card.serviceAverageRating ?? card.locationAverageRating ?? 0,
+    reviewCount: card.serviceReviewCount,
     latitude: card.locationLat,
     longitude: card.locationLng,
   };
@@ -677,9 +696,9 @@ function bookingToHistoryRecord(b: Booking): BookingHistoryRecord {
 function servicesToGroups(services: Service[]): BookingServiceCategoryGroup[] {
   const map = new Map<string, { id: string; name: string; durationMinutes: number; priceUsd: number; category?: string }[]>();
   for (const s of services) {
-    const cat = s.category || "Other";
+    const cat = s.categoryId || "Other";
     if (!map.has(cat)) map.set(cat, []);
-    map.get(cat)!.push({ id: s.serviceId, name: s.name, durationMinutes: s.durationMinutes, priceUsd: s.price, category: s.category });
+    map.get(cat)!.push({ id: s.serviceId, name: s.name, durationMinutes: s.baseDurationMinutes, priceUsd: s.basePrice, category: s.categoryId });
   }
   return Array.from(map.entries()).map(([cat, svcs]) => ({
     category: cat.toLowerCase().replace(/\s+/g, "-"),
@@ -719,6 +738,8 @@ const NO_TAB_ROUTES = new Set([
   "OwnerHome", "TenantSettingsShell", "BusinessProfile", "BrandSettings",
   "TaxSettings", "CurrencySettings", "LegalDocuments", "DomainSettings",
   "OwnerNotificationPreferences",
+  // Payment settings & finalize payment
+  "PaymentSettings", "FinalizePaymentAdmin",
   // W39 — Billing & payouts admin screens
   "BillingHub", "SubscriptionPlan", "InvoiceHistory", "AdminPaymentMethod",
   "CancelSubscription", "StripeConnectOnboarding", "ConnectHealth",
@@ -738,6 +759,26 @@ const NO_TAB_ROUTES = new Set([
   "InboxTriage", "ThreadAssign", "CannedReplies", "AutoReplyConfig", "MessageArchive",
   "WaitlistAdminList", "WaitlistConvert", "WaitlistPolicies",
 ]);
+
+// ---------------------------------------------------------------------------
+// Booking-flow progress indicator constants (W50-DEBT-6)
+// ---------------------------------------------------------------------------
+const BOOKING_STEPS: readonly BookingStepDef[] = [
+  { key: "service", label: "Service",  stepNumber: 1 },
+  { key: "staff",   label: "Staff",    stepNumber: 2 },
+  { key: "date",    label: "Date/Time",stepNumber: 3 },
+  { key: "review",  label: "Review",   stepNumber: 4 },
+  { key: "policies",label: "Policies", stepNumber: 5 },
+  { key: "payment", label: "Payment",  stepNumber: 6 },
+];
+const BOOKING_ROUTE_TO_STEP: Record<string, string> = {
+  BookingService:      "service",
+  BookingStaff:        "staff",
+  BookingDate:         "date",
+  BookingReview:       "review",
+  BookingPolicies:     "policies",
+  BookingPayment:      "payment",
+};
 
 export function AppNavigatorShell({
   onboardingProgressPersistence,
@@ -760,6 +801,7 @@ export function AppNavigatorShell({
   ownerKpiService,
   billingAdminService,
   locationAdminService,
+  stripePublishableKey,
 }: AppNavigatorShellProps) {
   const {
     createAccount,
@@ -774,10 +816,13 @@ export function AppNavigatorShell({
     email,
     firstName,
     lastName,
+    authReady,
   } = useAuth();
   const { t } = useLanguage();
   const { tenantId, setTenantId } = useTenant();
   const [activeRouteName, setActiveRouteName] = useState("AppShell");
+  // Navigation history stack for hardware back button support (Android).
+  const navHistoryRef = useRef<string[]>([]);
   const [completedStepsByFlow, setCompletedStepsByFlow] = useState<
     Partial<Record<OnboardingFlow, OnboardingStep[]>>
   >({});
@@ -802,8 +847,20 @@ export function AppNavigatorShell({
   const [exploreFeed, setExploreFeed] = useState<Awaited<ReturnType<DiscoveryService["getExploreFeed"]>> | null>(null);
   const [feedLoading, setFeedLoading] = useState(false);
   const [feedErrorMessage, setFeedErrorMessage] = useState<string | null>(null);
+  // Explore — pagination
+  const [exploreNextCursor, setExploreNextCursor] = useState<string | null>(null);
+  const [exploreHasMore, setExploreHasMore] = useState(false);
+  const [exploreLoadingMore, setExploreLoadingMore] = useState(false);
+  // Explore — search suggestions
+  const [exploreSuggestions, setExploreSuggestions] = useState<import("../../domains/discovery").SearchSuggestion[]>([]);
+  // Explore — location label (feed is London-centred by default)
+  const [exploreLocationLabel, setExploreLocationLabel] = useState("near London");
+  // Explore — service detail
+  const [exploreDetailLoading, setExploreDetailLoading] = useState(false);
+  const [exploreDetailData, setExploreDetailData] = useState<import("../../domains/discovery").ServiceDetailObject | null>(null);
+  const [exploreDetailError, setExploreDetailError] = useState<string | null>(null);
   // W22-DEBT-3: Sponsored posts injected at the top of DiscoverFeedScreen
-  const [sponsoredFeedPosts, setSponsoredFeedPosts] = useState<import("../discovery/discoveryHelpers").DiscoveryFeedPost[]>([]);
+  const [sponsoredFeedPosts, setSponsoredFeedPosts] = useState<import("../../domains/discovery").DiscoveryFeedPost[]>([]);
   const [selectedDiscoverTenantId, setSelectedDiscoverTenantId] = useState<string | null>(null);
   const [tenantProfileLoading, setTenantProfileLoading] = useState(false);
   const [tenantProfileErrorMessage, setTenantProfileErrorMessage] = useState<string | null>(null);
@@ -914,7 +971,7 @@ export function AppNavigatorShell({
   // ---------------------------------------------------------------------------
 
   // Categories
-  const [serviceCategories, setServiceCategories] = useState<ServiceCategory[]>([]);
+  const [serviceCategories, setServiceCategories] = useState<TenantServiceCategory[]>([]);
   const [serviceCategoriesLoading, setServiceCategoriesLoading] = useState(false);
   const [serviceCategoriesError, setServiceCategoriesError] = useState<string | null>(null);
   const [newCategoryName, setNewCategoryName] = useState("");
@@ -1005,6 +1062,12 @@ export function AppNavigatorShell({
   const [bookingDetailSubmitting, setBookingDetailSubmitting] = useState(false);
   const [bookingDetailActionError, setBookingDetailActionError] = useState<string | null>(null);
 
+  // Finalize payment (admin)
+  const [finalizePaymentBookingId, setFinalizePaymentBookingId] = useState<string>("");
+  const [finalizePaymentServiceTotal, setFinalizePaymentServiceTotal] = useState<number>(0);
+  const [finalizePaymentDepositPaid, setFinalizePaymentDepositPaid] = useState<number>(0);
+  const [finalizePaymentMode, setFinalizePaymentMode] = useState<"deposit" | "full" | "card_on_file" | null>(null);
+
   // Manual booking
   const [manualChannel, setManualChannel] = useState<ManualBookingChannel>("phone_in");
   const [manualStaffId, setManualStaffId] = useState("");
@@ -1078,6 +1141,7 @@ export function AppNavigatorShell({
   const [rescheduleSubmitSuccess, setRescheduleSubmitSuccess] = useState<string | null>(null);
 
   const [activeTab, setActiveTab] = useState<BottomTabName>("Home");
+  const [selectedExploreCategory, setSelectedExploreCategory] = useState<DiscoveryCategoryId>("all");
 
   // ---------------------------------------------------------------------------
   // W44 — Client / CRM state
@@ -1616,6 +1680,13 @@ export function AppNavigatorShell({
   const [bookingSlotsError, setBookingSlotsError] = useState<string | null>(null);
   const [bookingSubmitting, setBookingSubmitting] = useState(false);
   const [bookingResult, setBookingResult] = useState<ReserveSlotResult | null>(null);
+  const [bookingPaymentClientSecret, setBookingPaymentClientSecret] = useState<string | null>(null);
+  const [bookingPaymentEphKey, setBookingPaymentEphKey] = useState<string | null>(null);
+  const [bookingPaymentCustomerId, setBookingPaymentCustomerId] = useState<string | null>(null);
+  const [bookingPaymentMode, setBookingPaymentMode] = useState<"deposit" | "full" | "setup" | null>(null);
+  const [bookingPaymentError, setBookingPaymentError] = useState<string | null>(null);
+
+  const { initPaymentSheet, presentPaymentSheet } = useStripe();
 
   // ---------------------------------------------------------------------------
   // Consumer booking flow state (W23 Batch C — Phase 2.2 wiring, mock-driven)
@@ -1624,6 +1695,8 @@ export function AppNavigatorShell({
     useState<readonly string[]>([]);
   const [consumerSelectedAddOnIds, setConsumerSelectedAddOnIds] =
     useState<readonly string[]>([]);
+  /** Selected variant ID for the current booking (null = base / no variant). W50-DEBT-2 */
+  const [consumerSelectedVariantId, setConsumerSelectedVariantId] = useState<string | null>(null);
   const [consumerSelectedStaffId, setConsumerSelectedStaffId] = useState<string | null>(null);
   const [consumerBookingMonth, setConsumerBookingMonth] = useState<Date>(() => new Date());
   const [consumerBookingDate, setConsumerBookingDate] = useState<Date | null>(null);
@@ -1632,6 +1705,23 @@ export function AppNavigatorShell({
   const [consumerBookingNotes, setConsumerBookingNotes] = useState<string>("");
   const [consumerPoliciesAck, setConsumerPoliciesAck] = useState<boolean>(false);
   const [consumerSelectedCardId, setConsumerSelectedCardId] = useState<string | null>(null);
+  /** Spendable loyalty points balance loaded when navigating to BookingPayment. */
+  const [consumerLoyaltyPoints, setConsumerLoyaltyPoints] = useState<number | null>(null);
+  /** True when the user has toggled "Apply points" on the payment screen. */
+  const [consumerLoyaltyApplied, setConsumerLoyaltyApplied] = useState<boolean>(false);
+  /** Non-blocking note shown on BookingConfirmation when loyalty debit fails. */
+  const [consumerLoyaltyDebitError, setConsumerLoyaltyDebitError] = useState<string | null>(null);
+  /**
+   * Route to navigate to after the guest-gate sign-in / sign-up completes.
+   * Set to "BookingPayment" when a guest reaches BookingPolicies without an account.
+   * Cleared after the post-auth navigation fires.
+   */
+  const [postAuthRoute, setPostAuthRoute] = useState<string | null>(null);
+  /**
+   * When true, a guest just completed sign-in/sign-up from the booking gate.
+   * A useEffect watches this + userId to fetch loyalty balance and then navigate.
+   */
+  const [bookingPaymentPendingAuth, setBookingPaymentPendingAuth] = useState(false);
   const [consumerGuestContact, setConsumerGuestContact] = useState<GuestContactValues>({
     firstName: "",
     lastName: "",
@@ -1667,9 +1757,20 @@ export function AppNavigatorShell({
   const [batchCCreatedBookingId, setBatchCCreatedBookingId] = useState<string | null>(null);
   const [batchCConfirmLoading, setBatchCConfirmLoading] = useState(false);
   const [batchCConfirmError, setBatchCConfirmError] = useState<string | null>(null);
+  // W50-DEBT-3: add-on catalog keyed by serviceId
+  const [batchCAddOnCatalog, setBatchCAddOnCatalog] = useState<Record<string, BookingAddOn[]>>({});
+  // W50-DEBT-10: assigned staff ID when "any available" was chosen and slot resolved
+  const [consumerAssignedStaffId, setConsumerAssignedStaffId] = useState<string | null>(null);
+  // W50-DEBT-13: policy version skip logic
+  const [consumerPoliciesAlreadyAcked, setConsumerPoliciesAlreadyAcked] = useState(false);
+  // W50-DEBT-14: deposit config from brand doc
+  const [batchCBrandDeposit, setBatchCBrandDeposit] = useState<{ enabled: boolean; amountCents: number } | null>(null);
   // Booking history loaded from Firestore (Sprint D)
   const [batchCBookingHistory, setBatchCBookingHistory] = useState<BookingHistoryRecord[]>([]);
   const [batchCBookingHistoryLoading, setBatchCBookingHistoryLoading] = useState(false);
+  // Profile stats — real counts loaded from Firestore
+  const [profileBookingCount, setProfileBookingCount] = useState<number | null>(null);
+  const [profileLoyaltyPoints, setProfileLoyaltyPoints] = useState<number | null>(null);
   // W38-DEBT-3: Receipt data from Firestore
   const [selectedReceiptBookingId, setSelectedReceiptBookingId] = useState<string | null>(null);
   const [receiptData, setReceiptData] = useState<ReceiptData | null>(null);
@@ -1691,6 +1792,7 @@ export function AppNavigatorShell({
     cardComplete: false,
     setAsDefault: false,
   });
+  const [addCardReturnRoute, setAddCardReturnRoute] = useState<string>("SavedPaymentMethods");
   const [tippingState, setTippingState] = useState<TippingScreenState>({
     selectedPresetId: "p20",
     customAmountInput: "",
@@ -1767,6 +1869,15 @@ export function AppNavigatorShell({
   const [threads, setThreads] = useState<ThreadSummary[]>([]);
   const [threadMessages, setThreadMessages] = useState<ConsumerMessage[]>([]);
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+
+  // Combined unread count for the inbox badge: unread messages + unread notifications.
+  // Stays 0 when userId is null (guest), so the badge is hidden for unauthenticated users.
+  const unreadInboxCount = useMemo(() => {
+    if (!userId) return 0;
+    const unreadMessages = threads.reduce((sum, t) => sum + t.unreadCount, 0);
+    const unreadNotifs = notifications.filter((n) => !n.isRead).length;
+    return unreadMessages + unreadNotifs;
+  }, [userId, threads, notifications]);
   const [waitlistPosition, setWaitlistPosition] = useState<WaitlistPositionData | null>(null);
   const [joinedWaitlistEntryId, setJoinedWaitlistEntryId] = useState<string | null>(null);
 
@@ -1803,6 +1914,10 @@ export function AppNavigatorShell({
   const [salonProfileGalleryUrls, setSalonProfileGalleryUrls] = useState<string[]>([]);
   // W38-DEBT-2: Salon profile loaded from Firestore
   const [selectedSalonTenantId, setSelectedSalonTenantId] = useState<string | null>(null);
+  const [bookingComingSoonMessage, setBookingComingSoonMessage] = useState<string | null>(null);
+  // Deferred salon-context navigation: navigation to OwnerHome is gated on
+  // tenantId being committed, preventing stale-closure bugs in route loaders.
+  const [salonContextPendingNav, setSalonContextPendingNav] = useState<string | null>(null);
   const [salonProfileData, setSalonProfileData] = useState<SalonProfileData | null>(null);
   const [salonProfileLoading, setSalonProfileLoading] = useState(false);
   const [salonProfileError, setSalonProfileError] = useState<string | null>(null);
@@ -1825,6 +1940,21 @@ export function AppNavigatorShell({
   // Multi-salon dashboard state (5.5.1 + 5.5.2)
   // ---------------------------------------------------------------------------
   const [salonSummaries, setSalonSummaries] = useState<SalonSummary[]>([]);
+  // Per-salon switcher enrichment: points + tier + upcoming count, keyed by tenantId.
+  const [perSalonSwitcherData, setPerSalonSwitcherData] = useState<
+    Map<string, { points: number; tier: string; upcomingCount: number }>
+  >(new Map());
+
+  // Direct booking query result — populated on sign-in as fallback for when
+  // the Cloud Function hasn't yet denormalised nextAppointmentAt on userTenantAccess.
+  const [homeRawNextBooking, setHomeRawNextBooking] = useState<{
+    tenantId: string;
+    serviceId: string;
+    dateTimeLabel: string;
+    hoursUntil: number;
+  } | null>(null);
+  /** null = still loading; [] = no completed bookings at active tenant */
+  const [homeRebookItems, setHomeRebookItems] = useState<HomeRebookItem[] | null>(null);
   const [dashboardLoading, setDashboardLoading] = useState(false);
   const [dashboardError, setDashboardError] = useState<string | null>(null);
   const [dashboardUnreadFailed, setDashboardUnreadFailed] = useState(false);
@@ -2025,6 +2155,62 @@ export function AppNavigatorShell({
     [activeRouteName, preferredRoute]
   );
 
+  // W50-DEBT-6: Booking progress indicator — computed once per route/state change.
+  // setActiveRouteName is stable (from useState) so it's intentionally omitted from deps.
+  const bookingFlowProgressIndicator = useMemo(() => {
+    const activeStepKey = BOOKING_ROUTE_TO_STEP[activeRoute.name];
+    if (!activeStepKey) return null;
+
+    const prefilledStepKeys: string[] = [];
+    if (consumerSelectedServiceIds.length > 0 && activeStepKey !== "service")
+      prefilledStepKeys.push("service");
+    if (consumerSelectedStaffId && activeStepKey !== "staff")
+      prefilledStepKeys.push("staff");
+    if (consumerBookingSlot && !["service", "staff", "date"].includes(activeStepKey))
+      prefilledStepKeys.push("date");
+
+    const serviceName = batchCServices.find(
+      (s) => s.serviceId === consumerSelectedServiceIds[0],
+    )?.name;
+    const staffLabel =
+      consumerSelectedStaffId === ANY_STAFF_ID
+        ? "Any available"
+        : batchCTechnicians.find((t) => t.staffId === consumerSelectedStaffId)?.displayName;
+
+    const selectionChips: { key: string; label: string; onPress: () => void }[] = [];
+    if (serviceName && prefilledStepKeys.includes("service")) {
+      selectionChips.push({
+        key: "service",
+        label: serviceName,
+        onPress: () => setActiveRouteName("BookingService"),
+      });
+    }
+    if (staffLabel && prefilledStepKeys.includes("staff")) {
+      selectionChips.push({
+        key: "staff",
+        label: staffLabel,
+        onPress: () => setActiveRouteName("BookingStaff"),
+      });
+    }
+
+    return (
+      <BookingProgressIndicator
+        steps={BOOKING_STEPS}
+        activeStepKey={activeStepKey}
+        prefilledStepKeys={prefilledStepKeys}
+        selectionChips={selectionChips}
+      />
+    );
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    activeRoute.name,
+    consumerSelectedServiceIds,
+    consumerSelectedStaffId,
+    consumerBookingSlot,
+    batchCServices,
+    batchCTechnicians,
+  ]);
+
   useEffect(() => {
     if (!isWebRuntime()) {
       return;
@@ -2075,7 +2261,37 @@ export function AppNavigatorShell({
     }
   }, [activeRoute, preferredRoute, routeContext]);
 
+  // Clear nav history whenever we arrive at a root route (e.g. via direct
+  // setActiveRouteName calls after sign-in, sign-out, etc.).
+  const ROOT_ROUTES = useMemo(() => new Set(["AppShell", "Landing"]), []);
   useEffect(() => {
+    if (ROOT_ROUTES.has(activeRouteName)) {
+      navHistoryRef.current = [];
+    }
+  }, [activeRouteName, ROOT_ROUTES]);
+
+  // Android hardware back: pop nav history or let OS exit the app.
+  useEffect(() => {
+    if (Platform.OS !== "android") return;
+    const subscription = BackHandler.addEventListener("hardwareBackPress", () => {
+      if (navHistoryRef.current.length === 0) {
+        return false; // nothing to pop — let Android exit the app
+      }
+      const prev = navHistoryRef.current[navHistoryRef.current.length - 1];
+      navHistoryRef.current = navHistoryRef.current.slice(0, -1);
+      setAuthErrorMessage(null);
+      setActiveRouteName(prev);
+      return true; // consumed — prevent default exit
+    });
+    return () => subscription.remove();
+  }, []);
+
+  useEffect(() => {
+    // Wait for Firebase auth to be ready before loading discovery feeds.
+    // Without this, the first request fires before the anonymous session is
+    // established, hits permission-denied, and shows the error banner.
+    if (!authReady) return;
+
     let cancelled = false;
 
     async function loadDiscoveryFeeds() {
@@ -2084,16 +2300,25 @@ export function AppNavigatorShell({
 
       try {
         const todayIso = new Date().toISOString().slice(0, 10);
-        const [nextHomeFeed, nextExploreFeed, nextSponsoredPosts] = await Promise.all([
-          activeDiscoveryService.getHomeFeed(),
-          activeDiscoveryService.getExploreFeed(),
-          activeDiscoveryService.getActiveSponsoredPosts(todayIso),
+        const [nextHomeFeed, nextExploreFeed] = await Promise.all([
+          activeDiscoveryService.getHomeFeed(userId),
+          activeDiscoveryService.getExploreFeed(userId),
         ]);
 
         if (!cancelled) {
           setHomeFeed(nextHomeFeed);
           setExploreFeed(nextExploreFeed);
-          setSponsoredFeedPosts(nextSponsoredPosts);
+          // Reset pagination cursor when a fresh feed is loaded
+          setExploreNextCursor(null);
+          setExploreHasMore(false);
+        }
+
+        // Sponsored posts are optional — failure must not block core feeds.
+        try {
+          const nextSponsoredPosts = await activeDiscoveryService.getActiveSponsoredPosts(todayIso);
+          if (!cancelled) setSponsoredFeedPosts(nextSponsoredPosts);
+        } catch {
+          // Non-fatal: sponsored posts may be unavailable (no data / rules not yet set).
         }
       } catch {
         if (!cancelled) {
@@ -2111,7 +2336,7 @@ export function AppNavigatorShell({
     return () => {
       cancelled = true;
     };
-  }, [activeDiscoveryService]);
+  }, [activeDiscoveryService, authReady, userId]);
 
   useEffect(() => {
     let cancelled = false;
@@ -2190,6 +2415,10 @@ export function AppNavigatorShell({
   // if the service is absent the dashboard cannot load any data, so we skip.
   const hasAutoNavigatedToDashboard = useRef(false);
   const hasRestoredRouteFromUrl = useRef(false);
+  // Tracks whether a final salon selection has been made (either by the smart
+  // salonSummaries refinement or by the user tapping the picker). Prevents the
+  // refinement effect from overriding a deliberate user choice.
+  const hasRefinedSalonSelection = useRef(false);
   useEffect(() => {
     if (
       !membershipsLoading &&
@@ -2204,15 +2433,49 @@ export function AppNavigatorShell({
   }, [membershipsLoading, availableMemberships.length, unreadAggregationService]);
 
   useEffect(() => {
-    if (!tenantId && availableMemberships.length === 1) {
+    if (!tenantId && availableMemberships.length >= 1) {
+      // Immediately set a provisional tenantId from the first membership so
+      // Quick Rebook and the salon chip are never stuck waiting on the slower
+      // salonSummaries subscription. The refinement effect below will upgrade
+      // this to the best salon (soonest appointment) once that data arrives.
       setTenantId(availableMemberships[0].tenantId);
       return;
     }
 
     if (tenantId && !availableMemberships.some((membership) => membership.tenantId === tenantId)) {
       setTenantId(null);
+      hasRefinedSalonSelection.current = false; // allow re-refinement after reset
     }
   }, [availableMemberships, setTenantId, tenantId]);
+
+  // Refine the provisional salon selection to the best choice once appointment
+  // data is available. Runs at most once per login (guarded by the ref), so it
+  // never overrides a deliberate user picker selection.
+  // Priority: (1) salon with the soonest upcoming appointment, (2) most recently joined.
+  useEffect(() => {
+    if (salonSummaries.length === 0 || hasRefinedSalonSelection.current) return;
+    hasRefinedSalonSelection.current = true;
+
+    const now = Date.now();
+
+    // Salons with a future appointment, sorted soonest first
+    const withUpcoming = salonSummaries
+      .filter((s) => s.nextAppointmentAt && s.nextAppointmentAt.toMillis() > now)
+      .sort((a, b) => a.nextAppointmentAt!.toMillis() - b.nextAppointmentAt!.toMillis());
+
+    if (withUpcoming.length > 0) {
+      setTenantId(withUpcoming[0].tenantId);
+      return;
+    }
+
+    // Fallback: most recently joined salon
+    const latestJoined = salonSummaries
+      .slice()
+      .sort((a, b) => (b.subscribedAt?.toMillis() ?? 0) - (a.subscribedAt?.toMillis() ?? 0));
+    if (latestJoined.length > 0) {
+      setTenantId(latestJoined[0].tenantId);
+    }
+  }, [salonSummaries, setTenantId]);
 
   useEffect(() => {
     const segments = activeRoute.path.split("/").filter(Boolean);
@@ -2222,6 +2485,20 @@ export function AppNavigatorShell({
       setOnboardingGuardMessage(t("onboarding.guard.selectTenant"));
     }
   }, [activeRoute, t, tenantId]);
+
+  // Deferred salon-context navigation: fires when the tenantId commit from
+  // selectSalonContext has propagated through the context tree.  Ensures any
+  // route-triggered data loaders (e.g. loadStaffList) always use the correct
+  // tenant, even when React processes the context update in a separate batch
+  // from the local state update that drives the route text.
+  useEffect(() => {
+    if (!salonContextPendingNav || tenantId !== salonContextPendingNav) return;
+    setSalonContextPendingNav(null);
+    navigate("OwnerHome");
+    // navigate is a render-scope function; we intentionally omit it from deps
+    // (same pattern as other navigation effects in this file).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [salonContextPendingNav, tenantId]);
 
   // Deep-link: /salon/{tenantId}[/{section}] → select that tenant and enter AppShell.
   // Runs whenever the active route changes (e.g. the app is opened via a deep link).
@@ -2236,8 +2513,10 @@ export function AppNavigatorShell({
 
   // W36-C: Load real saved payment methods from Firestore when the user
   // navigates to SavedPaymentMethods and a real paymentsRepository is provided.
+  // GAP-7: also load on BookingPayment so a card added mid-flow appears, and
+  //         auto-select the first card (or default) when nothing is selected.
   useEffect(() => {
-    if (activeRoute.name !== "SavedPaymentMethods") return;
+    if (activeRoute.name !== "SavedPaymentMethods" && activeRoute.name !== "BookingPayment") return;
     if (!paymentsRepository || !userId) return;
 
     let cancelled = false;
@@ -2248,17 +2527,24 @@ export function AppNavigatorShell({
       try {
         const methods = (await paymentsRepository!.getSavedPaymentMethods(userId!)) as DomainSavedPaymentMethod[];
         if (!cancelled) {
-          setSavedPaymentMethods(
-            methods.map((m) => ({
-              id: m.methodId,
-              brand: m.brand,
-              last4: m.last4,
-              expMonth: m.expMonth,
-              expYear: m.expYear,
-              isDefault: m.isDefault,
-              holderName: m.cardholderName ?? undefined,
-            })),
-          );
+          const mapped = methods.map((m) => ({
+            id: m.methodId,
+            brand: m.brand,
+            last4: m.last4,
+            expMonth: m.expMonth,
+            expYear: m.expYear,
+            isDefault: m.isDefault,
+            holderName: m.cardholderName ?? undefined,
+          }));
+          setSavedPaymentMethods(mapped);
+          // GAP-7: if user just returned from AddPaymentMethod (or first load),
+          // auto-select default — or first — so they don't have to tap.
+          if (mapped.length > 0) {
+            setConsumerSelectedCardId((prev) => {
+              if (prev && mapped.some((m) => m.id === prev)) return prev;
+              return (mapped.find((m) => m.isDefault) ?? mapped[0]).id;
+            });
+          }
         }
       } catch {
         if (!cancelled) {
@@ -2278,11 +2564,20 @@ export function AppNavigatorShell({
     };
   }, [activeRoute.name, paymentsRepository, userId]);
 
+  // Reset cached location whenever the target salon changes so we don't reuse
+  // a stale locationId from a previous booking session with a different salon.
+  useEffect(() => {
+    setBatchCLocationId(null);
+    setBatchCLocation(null);
+    setBatchCServices([]);
+  }, [selectedSalonTenantId]);
+
   // ---------------------------------------------------------------------------
   // W36-B: Batch C — load location + services when BookingService opens
   // ---------------------------------------------------------------------------
   useEffect(() => {
-    if (activeRoute.name !== "BookingService" || !clientBookingFlow || !tenantId) return;
+    const bookingTenantId = selectedSalonTenantId ?? tenantId;
+    if (activeRoute.name !== "BookingService" || !clientBookingFlow || !bookingTenantId) return;
     let cancelled = false;
 
     async function loadBatchCServices() {
@@ -2290,7 +2585,7 @@ export function AppNavigatorShell({
       let locationId = batchCLocationId;
       if (!locationId) {
         setBatchCServicesLoading(true);
-        const locResult = await clientBookingFlow!.loadLocations(tenantId!);
+        const locResult = await clientBookingFlow!.loadLocations(bookingTenantId!);
         if (cancelled) return;
         if (locResult.ok && locResult.locations.length > 0) {
           locationId = locResult.locations[0].locationId;
@@ -2305,10 +2600,32 @@ export function AppNavigatorShell({
       // Step 2: load services
       setBatchCServicesLoading(true);
       setBatchCServicesError(null);
-      const svcResult = await clientBookingFlow!.loadServices(tenantId!, locationId);
+      const svcResult = await clientBookingFlow!.loadServices(bookingTenantId!, locationId);
       if (cancelled) return;
       if (svcResult.ok) {
         setBatchCServices(svcResult.services);
+        // W50-DEBT-3: load add-ons for each service
+        const addOnCatalog: Record<string, BookingAddOn[]> = {};
+        await Promise.all(
+          svcResult.services.map(async (svc) => {
+            try {
+              const snap = await getDocs(
+                collection(
+                  db,
+                  ...serviceAddonsCollectionSegments(bookingTenantId!, locationId!, svc.serviceId),
+                ),
+              );
+              addOnCatalog[svc.serviceId] = snap.docs.map((d) => ({
+                id: d.id,
+                name: (d.data().name as string | undefined) ?? "",
+                priceUsd: (d.data().priceUsd as number | undefined) ?? (d.data().price as number | undefined) ?? 0,
+              }));
+            } catch {
+              addOnCatalog[svc.serviceId] = [];
+            }
+          }),
+        );
+        if (!cancelled) setBatchCAddOnCatalog(addOnCatalog);
       } else {
         setBatchCServicesError(svcResult.message);
       }
@@ -2317,13 +2634,52 @@ export function AppNavigatorShell({
 
     void loadBatchCServices();
     return () => { cancelled = true; };
-  }, [activeRoute.name, clientBookingFlow, tenantId, batchCLocationId]);
+  }, [activeRoute.name, clientBookingFlow, selectedSalonTenantId, tenantId, batchCLocationId]);
+
+  // ---------------------------------------------------------------------------
+  // W50-DEBT-1: Resolve location + services when BookingStaff opens WITHOUT having
+  // gone through BookingService (direct entry from SalonProfile service row).
+  // Sets batchCLocationId LAST so the existing technician-loading effect below
+  // fires cleanly on deps change without any mid-stream cancellation issues.
+  // ---------------------------------------------------------------------------
+  useEffect(() => {
+    const bookingTenantId = selectedSalonTenantId ?? tenantId;
+    if (activeRoute.name !== "BookingStaff" || !clientBookingFlow || !bookingTenantId) return;
+    if (batchCLocationId) return; // Already resolved — technician effect below handles this
+    let cancelled = false;
+
+    async function resolveLocationForStaffStep() {
+      setBatchCServicesLoading(true);
+      const locResult = await clientBookingFlow!.loadLocations(bookingTenantId!);
+      if (cancelled) return;
+      if (locResult.ok && locResult.locations.length > 0) {
+        const loc = locResult.locations[0];
+        const locId = loc.locationId;
+        // Load services BEFORE setting location state (avoids mid-stream cancellation)
+        const svcResult = await clientBookingFlow!.loadServices(bookingTenantId!, locId);
+        if (cancelled) return;
+        // Batch all state writes — React 18 automatic batching prevents intermediate renders
+        setBatchCLocation(loc);
+        if (svcResult.ok) setBatchCServices(svcResult.services);
+        setBatchCServicesLoading(false);
+        // Set location LAST — this triggers the technician-loading effect below
+        setBatchCLocationId(locId);
+      } else {
+        setBatchCServicesError(locResult.ok ? "No active location found." : locResult.message);
+        setBatchCServicesLoading(false);
+      }
+    }
+
+    void resolveLocationForStaffStep();
+    return () => { cancelled = true; };
+  }, [activeRoute.name, clientBookingFlow, selectedSalonTenantId, tenantId, batchCLocationId]);
 
   // ---------------------------------------------------------------------------
   // W36-B: Batch C — load technicians when BookingStaff opens (first selected service)
   // ---------------------------------------------------------------------------
   useEffect(() => {
-    if (activeRoute.name !== "BookingStaff" || !clientBookingFlow || !tenantId || !batchCLocationId) return;
+    const bookingTenantId = selectedSalonTenantId ?? tenantId;
+    if (activeRoute.name !== "BookingStaff" || !clientBookingFlow || !bookingTenantId || !batchCLocationId) return;
     const firstServiceId = consumerSelectedServiceIds[0];
     if (!firstServiceId) return;
     let cancelled = false;
@@ -2331,7 +2687,7 @@ export function AppNavigatorShell({
     async function loadBatchCTechnicians() {
       setBatchCTechniciansLoading(true);
       setBatchCTechniciansError(null);
-      const result = await clientBookingFlow!.loadTechnicians(tenantId!, batchCLocationId!, firstServiceId);
+      const result = await clientBookingFlow!.loadTechnicians(bookingTenantId!, batchCLocationId!, firstServiceId);
       if (cancelled) return;
       if (result.ok) {
         setBatchCTechnicians(result.technicians);
@@ -2343,13 +2699,14 @@ export function AppNavigatorShell({
 
     void loadBatchCTechnicians();
     return () => { cancelled = true; };
-  }, [activeRoute.name, clientBookingFlow, tenantId, batchCLocationId, consumerSelectedServiceIds]);
+  }, [activeRoute.name, clientBookingFlow, selectedSalonTenantId, tenantId, batchCLocationId, consumerSelectedServiceIds]);
 
   // ---------------------------------------------------------------------------
   // W36-B: Batch C — load slots when BookingDate opens + date + staff are set
   // ---------------------------------------------------------------------------
   useEffect(() => {
-    if (activeRoute.name !== "BookingDate" || !clientBookingFlow || !tenantId || !batchCLocationId || !consumerBookingDate) return;
+    const bookingTenantId = selectedSalonTenantId ?? tenantId;
+    if (activeRoute.name !== "BookingDate" || !clientBookingFlow || !bookingTenantId || !batchCLocationId || !consumerBookingDate) return;
     const firstServiceId = consumerSelectedServiceIds[0];
     const firstService = batchCServices.find((s) => s.serviceId === firstServiceId);
     if (!firstService) return;
@@ -2366,7 +2723,7 @@ export function AppNavigatorShell({
     async function loadBatchCSlots() {
       setBatchCSlotsLoading(true);
       setBatchCSlotsError(null);
-      const result = await clientBookingFlow!.loadSlots(tenantId!, resolvedStaffId, batchCLocationId!, dateStr, firstService!);
+      const result = await clientBookingFlow!.loadSlots(bookingTenantId!, resolvedStaffId, batchCLocationId!, dateStr, firstService!);
       if (cancelled) return;
       if (result.ok) {
         setBatchCSlots(result.slots.map((sl) => formatTimeOfDay(sl.startMinutes)));
@@ -2381,21 +2738,140 @@ export function AppNavigatorShell({
 
     void loadBatchCSlots();
     return () => { cancelled = true; };
-  }, [activeRoute.name, clientBookingFlow, tenantId, batchCLocationId, consumerBookingDate, consumerSelectedServiceIds, consumerSelectedStaffId, batchCServices, batchCTechnicians, consumerRescheduleMode]);
+  }, [activeRoute.name, clientBookingFlow, selectedSalonTenantId, tenantId, batchCLocationId, consumerBookingDate, consumerSelectedServiceIds, consumerSelectedStaffId, batchCServices, batchCTechnicians, consumerRescheduleMode]);
 
   // W38-DEBT-1: Load per-date availability hints (calendar dots) whenever the
   // month changes while the BookingDate route is active.
   useEffect(() => {
-    if (activeRoute.name !== "BookingDate" || !tenantId) return;
+    const bookingTenantId = selectedSalonTenantId ?? tenantId;
+    if (activeRoute.name !== "BookingDate" || !bookingTenantId) return;
     let cancelled = false;
-    availabilityRepo.loadMonthAvailability(tenantId, consumerBookingMonth)
+    availabilityRepo.loadMonthAvailability(bookingTenantId, consumerBookingMonth)
       .then((map) => { if (!cancelled) setBatchCAvailabilityMap(map); })
       .catch(() => { /* non-critical: calendar dots stay empty on failure */ });
     return () => { cancelled = true; };
-  }, [activeRoute.name, tenantId, consumerBookingMonth]);
+  }, [activeRoute.name, selectedSalonTenantId, tenantId, consumerBookingMonth]);
+
+  // W50-DEBT-14: Load brand deposit config when BookingPayment opens.
+  useEffect(() => {
+    const brandId = selectedSalonTenantId ?? tenantId;
+    if (activeRoute.name !== "BookingPayment" || !brandId) return;
+    let cancelled = false;
+    async function loadBrandDeposit() {
+      try {
+        const snap = await getDoc(doc(db, "brands", brandId!));
+        if (!cancelled && snap.exists()) {
+          setBatchCBrandDeposit({
+            enabled: (snap.data()?.depositEnabled as boolean | undefined) ?? false,
+            amountCents: (snap.data()?.depositAmount as number | undefined) ?? 0,
+          });
+        }
+      } catch {
+        if (!cancelled) setBatchCBrandDeposit(null);
+      }
+    }
+    void loadBrandDeposit();
+    return () => { cancelled = true; };
+  }, [activeRoute.name, selectedSalonTenantId, tenantId]);
+
+  // GAP-1: Ensure loyalty balance is loaded whenever BookingPayment is shown,
+  // including the W50-DEBT-13 skip-policies path where onPressAgreeAndContinue
+  // never runs. Idempotent — skips when balance is already populated.
+  useEffect(() => {
+    const loyaltyTenantId = selectedSalonTenantId ?? tenantId;
+    if (
+      activeRoute.name !== "BookingPayment" ||
+      !userId ||
+      !loyaltyTenantId ||
+      consumerLoyaltyPoints !== null
+    ) {
+      return;
+    }
+    let cancelled = false;
+    async function loadLoyalty() {
+      try {
+        const snap = await getDoc(
+          doc(db, `user_brand_loyalty/${userId}_${loyaltyTenantId}`),
+        );
+        if (!cancelled) {
+          setConsumerLoyaltyPoints(
+            snap.exists() ? ((snap.data()?.points as number | undefined) ?? 0) : 0,
+          );
+        }
+      } catch {
+        if (!cancelled) setConsumerLoyaltyPoints(0);
+      }
+    }
+    void loadLoyalty();
+    return () => { cancelled = true; };
+  }, [activeRoute.name, userId, selectedSalonTenantId, tenantId, consumerLoyaltyPoints]);
+
+  // GAP-4 + GAP-8: Load location policy config (policyVersion + cancellation /
+  // late / no-show fee fields) when entering review or policies routes so the
+  // policy sheet can render tenant-specific numbers instead of hardcoded copy.
+  const [batchCLocationPolicy, setBatchCLocationPolicy] = useState<{
+    policyVersion: string | null;
+    cancellationWindowH: number | null;
+    lateFeePct: number | null;
+    noShowFeePct: number | null;
+  } | null>(null);
+  useEffect(() => {
+    if (
+      (activeRoute.name !== "BookingReview" && activeRoute.name !== "BookingPolicies") ||
+      !batchCLocationId
+    ) {
+      return;
+    }
+    let cancelled = false;
+    async function loadPolicy() {
+      try {
+        const snap = await getDoc(doc(db, "locations", batchCLocationId!));
+        if (!cancelled && snap.exists()) {
+          const d = snap.data();
+          setBatchCLocationPolicy({
+            policyVersion: (d?.policyVersion as string | undefined) ?? null,
+            cancellationWindowH: (d?.cancellationWindowH as number | undefined) ?? null,
+            lateFeePct: (d?.lateFeePct as number | undefined) ?? null,
+            noShowFeePct: (d?.noShowFeePct as number | undefined) ?? null,
+          });
+        }
+      } catch {
+        if (!cancelled) setBatchCLocationPolicy(null);
+      }
+    }
+    void loadPolicy();
+    return () => { cancelled = true; };
+  }, [activeRoute.name, batchCLocationId]);
 
   // ---------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
+  // Guest booking gate: after social/email sign-in, fetch loyalty balance then
+  // navigate to the pending post-auth route (BookingPayment).
+  // ---------------------------------------------------------------------------
+  useEffect(() => {
+    if (!bookingPaymentPendingAuth || !userId) return;
+    setBookingPaymentPendingAuth(false);
+    const targetRoute = postAuthRoute ?? "BookingPayment";
+    setPostAuthRoute(null);
+    const loyaltyTenantId = selectedSalonTenantId ?? tenantId;
+    setConsumerLoyaltyApplied(false);
+    if (loyaltyTenantId) {
+      getDoc(doc(db, `user_brand_loyalty/${userId}_${loyaltyTenantId}`))
+        .then((snap) => {
+          setConsumerLoyaltyPoints(
+            snap.exists() ? ((snap.data()?.points as number | undefined) ?? 0) : 0,
+          );
+        })
+        .catch(() => setConsumerLoyaltyPoints(0))
+        .finally(() => navigate(targetRoute));
+    } else {
+      navigate(targetRoute);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bookingPaymentPendingAuth, userId]);
+
   // W36-D: Load booking history when BookingHistory opens
+  // Uses a cross-tenant query so consumer accounts see all their bookings.
   // ---------------------------------------------------------------------------
   useEffect(() => {
     if (activeRoute.name !== "BookingHistory" || !userId) return;
@@ -2404,10 +2880,28 @@ export function AppNavigatorShell({
     async function loadBookingHistory() {
       setBatchCBookingHistoryLoading(true);
       try {
-        const records = await appBookingsRepository.listBookingsByCustomer(
-          tenantId ?? "global",
-          userId!,
-        );
+        let records: Booking[];
+        if (tenantId) {
+          // Admin/tenant context: restrict to their tenant (top-level collection, exists() ok)
+          records = await appBookingsRepository.listBookingsByCustomer(tenantId, userId!);
+        } else {
+          // Consumer: collection-group queries fail due to exists() in rules.
+          // Fetch tenantUsers first (no exists() in self-read rule), then query
+          // top-level bookings + each tenant's subcollection separately.
+          const membershipsSnap = await getDocs(
+            query(collection(db, "tenantUsers"), where("userId", "==", userId)),
+          );
+          const tenantIds = membershipsSnap.docs.map((d) => d.data()["tenantId"] as string).filter(Boolean);
+
+          // Bookings are seeded to tenants/{tid}/bookings subcollections — skip top-level query
+          records = [];
+          for (const tid of tenantIds) {
+            const subSnap = await getDocs(
+              query(collection(db, `tenants/${tid}/bookings`), where("customerUserId", "==", userId)),
+            );
+            subSnap.docs.forEach((d) => records.push(d.data() as Booking));
+          }
+        }
         if (!cancelled) {
           setBatchCBookingHistory(records.map(bookingToHistoryRecord));
         }
@@ -2421,6 +2915,104 @@ export function AppNavigatorShell({
     void loadBookingHistory();
     return () => { cancelled = true; };
   }, [activeRoute.name, userId, tenantId]);
+
+  // ---------------------------------------------------------------------------
+  // Load real profile stats (booking count, loyalty points) when Profile opens
+  // ---------------------------------------------------------------------------
+  useEffect(() => {
+    if ((activeTab !== "Profile" && activeTab !== "Rewards") || activeRoute.name !== "AppShell" || !userId) return;
+    let cancelled = false;
+
+    async function loadProfileStats() {
+      // -----------------------------------------------------------------------
+      // NOTE: Firestore collection-group queries cannot contain exists()/get()
+      // calls in ANY branch of the security rule (not even behind || with
+      // short-circuit), because Firestore evaluates all branches statically
+      // for query validation. Both /bookings and loyaltyStates rules require
+      // isTenantMember()/isTenantAdmin() (which call exists()) for admin access.
+      //
+      // Solution: use per-tenant queries instead of collectionGroup:
+      //   1. tenantUsers — collection query (resource.data.userId == auth.uid,
+      //      no exists()) to get the list of tenants the consumer belongs to.
+      //   2. Per-tenant subcollection queries for bookings and loyaltyStates
+      //      (single-collection queries allow exists() per-document, so the
+      //      full rule including isTenantAdmin is evaluated safely).
+      // -----------------------------------------------------------------------
+
+      // Step 1: Get consumer's tenant memberships
+      let tenantIds: string[] = [];
+      try {
+        const membershipsSnap = await getDocs(
+          query(collection(db, "tenantUsers"), where("userId", "==", userId)),
+        );
+        tenantIds = membershipsSnap.docs.map((d) => d.data()["tenantId"] as string).filter(Boolean);
+      } catch (err) {
+        console.warn("[ProfileStats] tenantUsers query failed:", err);
+      }
+
+      // Step 2: Booking count — per-tenant subcollection queries only (bookings seeded to subcollections)
+      try {
+        let total = 0;
+        for (const tid of tenantIds) {
+          const subSnap = await getDocs(
+            query(collection(db, `tenants/${tid}/bookings`), where("customerUserId", "==", userId)),
+          );
+          total += subSnap.size;
+        }
+        if (!cancelled) setProfileBookingCount(total);
+      } catch (err) {
+        console.warn("[ProfileStats] bookings query failed:", err);
+      }
+
+      // Step 3: Loyalty points — per-tenant single-doc reads (avoids collectionGroup)
+      try {
+        let totalPoints = 0;
+        for (const tid of tenantIds) {
+          const loyaltyDoc = await getDoc(doc(db, `user_brand_loyalty/${userId}_${tid}`));
+          if (loyaltyDoc.exists()) {
+            totalPoints += (loyaltyDoc.data()["points"] as number) ?? 0;
+          }
+        }
+        console.log("[ProfileStats] loyalty points total:", totalPoints, "across", tenantIds.length, "tenants");
+        if (!cancelled) setProfileLoyaltyPoints(totalPoints);
+      } catch (err) {
+        console.warn("[ProfileStats] loyalty query failed:", err);
+      }
+
+      // Step 4: Loyalty transaction history — per-tenant subcollection queries
+      try {
+        const allEntries: Array<{ id: string; date: string; description: string; eventType?: string; eventData?: Record<string, string>; delta: number }> = [];
+        for (const tid of tenantIds) {
+          const txSnap = await getDocs(
+            query(
+              collection(db, `tenants/${tid}/loyaltyTransactions`),
+              where("userId", "==", userId),
+            ),
+          );
+          for (const d of txSnap.docs) {
+            const tx = d.data();
+            const reason = (tx["reason"] as string) || undefined;
+            allEntries.push({
+              id: d.id,
+              date: tx["createdAt"]?.toDate?.()?.toISOString?.() ?? new Date().toISOString(),
+              description: reason ?? "",
+              // Surface as eventType so getEventTypeLabel renders human copy
+              eventType: reason,
+              eventData: (tx["eventData"] as Record<string, string>) || undefined,
+              delta: tx["type"] === "credit" ? (tx["points"] as number) : -(tx["points"] as number),
+            });
+          }
+        }
+        allEntries.sort((a, b) => b.date.localeCompare(a.date));
+        if (!cancelled) setLoyaltyHistory(allEntries);
+      } catch (err) {
+        console.warn("[ProfileStats] loyalty history query failed:", err);
+      }
+    }
+
+    void loadProfileStats();
+    return () => { cancelled = true; };
+  }, [activeTab, activeRoute.name, userId]);
 
   // ---------------------------------------------------------------------------
   // W38-DEBT-3: Load receipt data when Receipt route opens
@@ -2468,14 +3060,29 @@ export function AppNavigatorShell({
   }, [activeRoute.name, selectedRefundBookingId, tenantId, userId, refundDataService]);
 
   // ---------------------------------------------------------------------------
-  // W37-A: Load loyalty data when signed in
+  // W37-A: Load loyalty data when signed in.
+  // Uses tenantId when already resolved; otherwise self-discovers from
+  // tenantUsers (same pattern as loadRebookItems / loadUpcomingBooking) so
+  // the Home loyalty banner populates immediately for plain consumers whose
+  // tenantId context is not yet set.
   // ---------------------------------------------------------------------------
   useEffect(() => {
-    if (!userId || !tenantId || !consumerLoyaltyService) return;
+    if (!userId || !consumerLoyaltyService) return;
     let cancelled = false;
     async function loadLoyalty() {
       try {
-        const data = await consumerLoyaltyService!.getLoyaltyData(userId!, tenantId!);
+        // Resolve tenant
+        let activeTenantId = tenantId;
+        if (!activeTenantId) {
+          const snap = await getDocs(
+            query(collection(db, "tenantUsers"), where("userId", "==", userId)),
+          );
+          const ids = snap.docs.map((d) => d.data()["tenantId"] as string).filter(Boolean);
+          if (ids.length === 0) return;
+          activeTenantId = ids[0];
+        }
+        if (cancelled) return;
+        const data = await consumerLoyaltyService!.getLoyaltyData(userId!, activeTenantId);
         if (cancelled) return;
         setLoyaltyPoints(data.points);
         setLoyaltyTier(data.tier);
@@ -2493,11 +3100,21 @@ export function AppNavigatorShell({
 
   // W37-A: Load activities when signed in
   useEffect(() => {
-    if (!userId || !tenantId || !consumerLoyaltyService) return;
+    if (!userId || !consumerLoyaltyService) return;
     let cancelled = false;
     async function loadActivities() {
       try {
-        const acts = await consumerLoyaltyService!.getActivities(userId!, tenantId!);
+        let activeTenantId = tenantId;
+        if (!activeTenantId) {
+          const snap = await getDocs(
+            query(collection(db, "tenantUsers"), where("userId", "==", userId)),
+          );
+          const ids = snap.docs.map((d) => d.data()["tenantId"] as string).filter(Boolean);
+          if (ids.length === 0) return;
+          activeTenantId = ids[0];
+        }
+        if (cancelled) return;
+        const acts = await consumerLoyaltyService!.getActivities(userId!, activeTenantId);
         if (!cancelled) setLoyaltyActivities(acts);
       } catch {
         // Non-fatal — keep showing mock fallback
@@ -2507,9 +3124,238 @@ export function AppNavigatorShell({
     return () => { cancelled = true; };
   }, [userId, tenantId, consumerLoyaltyService]);
 
+  // Subscribe to salon summaries (real-time) so the Home tab next-appointment
+  // card is populated as soon as the user signs in, without needing to visit
+  // the SalonDashboard first.
+  useEffect(() => {
+    if (!userId || !unreadAggregationService) return;
+    const unsub = unreadAggregationService.subscribeToSalonSummaries(userId, (result) => {
+      if (result.ok) setSalonSummaries(result.summaries);
+    });
+    return unsub;
+  }, [userId, unreadAggregationService]);
+
+  // Load per-salon loyalty points + upcoming booking count for the salon switcher.
+  // Fires whenever memberships change. Does NOT change global loyalty state.
+  useEffect(() => {
+    if (!userId || availableMemberships.length === 0) return;
+    let cancelled = false;
+
+    async function loadPerSalonSwitcherData() {
+      const map = new Map<string, { points: number; tier: string; upcomingCount: number }>();
+      await Promise.all(
+        availableMemberships.map(async (m) => {
+          let pts = 0;
+          let upcomingCount = 0;
+          try {
+            const loyaltyDoc = await getDoc(doc(db, `user_brand_loyalty/${userId}_${m.tenantId}`));
+            pts = loyaltyDoc.exists() ? ((loyaltyDoc.data()["points"] as number) ?? 0) : 0;
+          } catch { /* loyalty state not accessible — leave pts = 0 */ }
+          try {
+            const UPCOMING_STATUSES = ["confirmed", "reschedule_pending", "rescheduled"];
+            const bookingsSnap = await getDocs(
+              query(
+                collection(db, `tenants/${m.tenantId}/bookings`),
+                where("customerUserId", "==", userId),
+              ),
+            );
+            upcomingCount = bookingsSnap.docs.filter((d) => {
+              const b = d.data() as { status: string; date: string; startTime: string };
+              return UPCOMING_STATUSES.includes(b.status) && `${b.date}T${b.startTime}:00` > new Date().toISOString();
+            }).length;
+          } catch { /* bookings not accessible — leave upcomingCount = 0 */ }
+          map.set(m.tenantId, { points: pts, tier: deriveTier(pts), upcomingCount });
+        }),
+      );
+      if (!cancelled) setPerSalonSwitcherData(map);
+    }
+
+    void loadPerSalonSwitcherData();
+    return () => { cancelled = true; };
+  }, [userId, availableMemberships]);
+
+  // Direct booking query: load the next upcoming confirmed booking on sign-in.
+  // This is a reliable fallback for when the Cloud Function hasn't yet written
+  // nextAppointmentAt on the userTenantAccess document (e.g. seeded dev data).
+  useEffect(() => {
+    if (!userId) {
+      setHomeRawNextBooking(null);
+      return;
+    }
+    let cancelled = false;
+
+    async function loadUpcomingBooking() {
+      try {
+        const membershipsSnap = await getDocs(
+          query(collection(db, "tenantUsers"), where("userId", "==", userId)),
+        );
+        const tenantIds = membershipsSnap.docs
+          .map((d) => d.data()["tenantId"] as string)
+          .filter(Boolean);
+        if (tenantIds.length === 0) {
+          if (!cancelled) setHomeRawNextBooking(null);
+          return;
+        }
+
+        const now = new Date();
+        const todayStr = now.toISOString().slice(0, 10);
+        const UPCOMING_STATUSES = ["confirmed", "reschedule_pending", "rescheduled"];
+        let earliest: { booking: Booking; tenantId: string } | null = null;
+
+        for (const tid of tenantIds) {
+          const snap = await getDocs(
+            query(
+              collection(db, `tenants/${tid}/bookings`),
+              where("customerUserId", "==", userId),
+            ),
+          );
+          for (const docSnap of snap.docs) {
+            const b = docSnap.data() as Booking;
+            if (!UPCOMING_STATUSES.includes(b.status)) continue;
+            const apptDate = new Date(`${b.date}T${b.startTime}:00`);
+            if (apptDate <= now) continue;
+            if (
+              !earliest ||
+              apptDate < new Date(`${earliest.booking.date}T${earliest.booking.startTime}:00`)
+            ) {
+              earliest = { booking: b, tenantId: tid };
+            }
+          }
+        }
+
+        if (cancelled) return;
+        if (!earliest) {
+          setHomeRawNextBooking(null);
+          return;
+        }
+
+        const apptDate = new Date(`${earliest.booking.date}T${earliest.booking.startTime}:00`);
+        const hoursUntil = (apptDate.getTime() - now.getTime()) / (1000 * 60 * 60);
+        const dateTimeLabel =
+          apptDate.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" }) +
+          " · " +
+          apptDate.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
+        setHomeRawNextBooking({
+          tenantId: earliest.tenantId,
+          serviceId: earliest.booking.serviceId,
+          dateTimeLabel,
+          hoursUntil,
+        });
+      } catch {
+        // Non-fatal — Home tab falls back to empty state
+      }
+    }
+
+    void loadUpcomingBooking();
+    return () => { cancelled = true; };
+  }, [userId]);
+
   // ---------------------------------------------------------------------------
-  // W37-B: Subscribe to messaging threads (real-time)
+  // Home Quick Rebook: load up to 3 unique services from the user's completed
+  // bookings at the active tenant. Enriches with current service price for
+  // change detection. Resets when userId or tenantId changes.
   // ---------------------------------------------------------------------------
+  useEffect(() => {
+    if (!userId) {
+      setHomeRebookItems(null);
+      return;
+    }
+    let cancelled = false;
+    setHomeRebookItems(null);
+
+    async function loadRebookItems() {
+      try {
+        // Resolve which tenant to query. If tenantId is already set (active salon
+        // context) use it directly; otherwise discover from tenantUsers — same
+        // pattern as loadUpcomingBooking so this works for plain consumers too.
+        let activeTenantId = tenantId;
+        if (!activeTenantId) {
+          const membershipsSnap = await getDocs(
+            query(collection(db, "tenantUsers"), where("userId", "==", userId)),
+          );
+          const ids = membershipsSnap.docs
+            .map((d) => d.data()["tenantId"] as string)
+            .filter(Boolean);
+          if (ids.length === 0) {
+            if (!cancelled) setHomeRebookItems([]);
+            return;
+          }
+          activeTenantId = ids[0];
+        }
+        if (cancelled) return;
+
+        // 1. Query completed bookings — orderBy omitted to avoid composite index.
+        //    Sort in memory instead (same pattern as loadUpcomingBooking).
+        const bookingsSnap = await getDocs(
+          query(
+            collection(db, `tenants/${activeTenantId}/bookings`),
+            where("customerUserId", "==", userId),
+            where("status", "==", "completed"),
+            limit(50),
+          ),
+        );
+        if (cancelled) return;
+
+        // 2. Sort in memory by date desc, then deduplicate by serviceId
+        const sortedDocs = [...bookingsSnap.docs].sort((a, b) => {
+          const aDate = (a.data() as Booking).date ?? "";
+          const bDate = (b.data() as Booking).date ?? "";
+          return bDate.localeCompare(aDate);
+        });
+        const seen = new Set<string>();
+        const rawItems: Array<{ serviceId: string; staffId: string; locationId: string }> = [];
+        for (const d of sortedDocs) {
+          const b = d.data() as Booking;
+          if (!b.serviceId || seen.has(b.serviceId)) continue;
+          seen.add(b.serviceId);
+          rawItems.push({ serviceId: b.serviceId, staffId: b.staffId, locationId: b.locationId });
+          if (rawItems.length === 3) break;
+        }
+
+        if (rawItems.length === 0) {
+          if (!cancelled) setHomeRebookItems([]);
+          return;
+        }
+
+        // 3. Load current services to get up-to-date name / price / availability
+        let currentServices: Service[] = [];
+        if (clientBookingFlow && rawItems[0]) {
+          const svcResult = await clientBookingFlow.loadServices(activeTenantId, rawItems[0].locationId);
+          if (!cancelled && svcResult.ok) {
+            currentServices = svcResult.services;
+          }
+        }
+
+        // 4. Build rebook items with price-change detection
+        const items: HomeRebookItem[] = rawItems.map(({ serviceId, staffId, locationId }) => {
+          const current = currentServices.find((s) => s.serviceId === serviceId);
+          const currentPriceMinor = current ? current.basePrice : 0;
+          return {
+            serviceId,
+            serviceName: current?.name ?? serviceId,
+            staffId,
+            staffName: staffId,         // P2: no staff name lookup yet
+            locationId,
+            priceLastPaidMinor: currentPriceMinor, // best estimate; no receipt price stored on Booking
+            currentPriceMinor,
+            currency: current?.baseCurrency ?? "EUR",
+            durationMinutes: current?.baseDurationMinutes ?? 60,
+            available: current ? current.active : false,
+          };
+        });
+
+        if (!cancelled) setHomeRebookItems(items);
+      } catch {
+        // Non-fatal: show empty state
+        if (!cancelled) setHomeRebookItems([]);
+      }
+    }
+
+    void loadRebookItems();
+    return () => { cancelled = true; };
+  }, [userId, tenantId, clientBookingFlow]);
+
+
   useEffect(() => {
     if (!userId || !consumerMessagingService) return;
     const unsub = consumerMessagingService.subscribeToThreads(userId, setThreads);
@@ -2613,7 +3459,7 @@ export function AppNavigatorShell({
   // W38-DEBT-2: Load full salon profile + gallery when SalonProfile opens.
   // ---------------------------------------------------------------------------
   useEffect(() => {
-    if (activeRoute.name !== "SalonProfile" || !selectedSalonTenantId) return;
+    if (activeRoute.name !== "SalonProfile" && activeRoute.name !== "TenantPublicProfile" || !selectedSalonTenantId) return;
     let cancelled = false;
     async function load() {
       setSalonProfileLoading(true);
@@ -2623,7 +3469,7 @@ export function AppNavigatorShell({
       setSalonProfileGalleryUrls([]);
       try {
         // Load structured profile data (salon, services, staff, reviews)
-        const result = await salonProfileService.getSalonProfile(selectedSalonTenantId);
+        const result = await salonProfileService.getSalonProfile(selectedSalonTenantId!);
         if (cancelled) return;
         if (result.type === "ok") {
           setSalonProfileData(result.data);
@@ -2632,23 +3478,28 @@ export function AppNavigatorShell({
         } else {
           setSalonProfileError(result.message);
         }
-        // Load media gallery (non-fatal)
-        const colRef = collection(db, `tenants/${selectedSalonTenantId}/media`);
-        const q = query(colRef, orderBy("sortOrder", "asc"));
-        const snap = await getDocs(q);
-        if (cancelled) return;
-        let hero: string | undefined;
-        const gallery: string[] = [];
-        for (const d of snap.docs) {
-          const data = d.data() as { url: string; type: string };
-          if (data.type === "hero" && !hero) {
-            hero = data.url;
-          } else if (data.url) {
-            gallery.push(data.url);
+        // Load media gallery (isolated — failure must not override profile data/error)
+        try {
+          const colRef = collection(db, `tenants/${selectedSalonTenantId}/media`);
+          const q = query(colRef, orderBy("sortOrder", "asc"));
+          const snap = await getDocs(q);
+          if (!cancelled) {
+            let hero: string | undefined;
+            const gallery: string[] = [];
+            for (const d of snap.docs) {
+              const data = d.data() as { url: string; type: string };
+              if (data.type === "hero" && !hero) {
+                hero = data.url;
+              } else if (data.url) {
+                gallery.push(data.url);
+              }
+            }
+            setSalonProfileHeroUrl(hero);
+            setSalonProfileGalleryUrls(gallery);
           }
+        } catch {
+          // Non-fatal: profile still shows without media gallery
         }
-        setSalonProfileHeroUrl(hero);
-        setSalonProfileGalleryUrls(gallery);
       } catch (e) {
         if (!cancelled) {
           setSalonProfileError(e instanceof Error ? e.message : "Could not load salon.");
@@ -2679,6 +3530,14 @@ export function AppNavigatorShell({
     return () => { cancelled = true; };
   }, [tenantId, wizardService]);
 
+  // When a consumer (no tenant context) taps the Bookings tab, show their booking history.
+  useEffect(() => {
+    if (activeTab !== "Bookings" || !userId || !!tenantId) return;
+    navigate("BookingHistory");
+  // navigate is stable (defined below, hoisted); userId/tenantId/activeTab are the real deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab, userId, tenantId]);
+
   function navigate(routeName: string) {
     const candidate = appRoutes.find((route) => route.name === routeName);
     if (!candidate) {
@@ -2692,6 +3551,14 @@ export function AppNavigatorShell({
       return;
     }
 
+    // Root routes clear history; all others push the current route so
+    // the Android hardware back button can retrace the navigation path.
+    if (ROOT_ROUTES.has(routeName)) {
+      navHistoryRef.current = [];
+    } else {
+      navHistoryRef.current = [...navHistoryRef.current, activeRouteName];
+    }
+
     setActiveRouteName(candidate.name);
   }
 
@@ -2701,10 +3568,76 @@ export function AppNavigatorShell({
 
   function openTenantPublicProfile(tenantProfileId: string) {
     setSelectedDiscoverTenantId(tenantProfileId);
+    setSelectedSalonTenantId(tenantProfileId);
     navigate("TenantPublicProfile");
   }
 
   const preferredFirstName = firstName ?? formatPreferredFirstName(email, userId);
+
+  // Derive next upcoming appointment.
+  // Prefers the direct booking query (reliable even without Cloud Function denorm),
+  // falls back to salonSummaries nextAppointmentAt if the direct query found nothing.
+  const nextAppointment = useMemo(() => {
+    // Primary: direct booking query result
+    if (homeRawNextBooking) {
+      const salonName =
+        salonSummaries.find((s) => s.tenantId === homeRawNextBooking.tenantId)?.tenantName ??
+        homeRawNextBooking.tenantId;
+      return {
+        salonName,
+        serviceName: homeRawNextBooking.serviceId,
+        dateTimeLabel: homeRawNextBooking.dateTimeLabel,
+        hoursUntil: homeRawNextBooking.hoursUntil,
+        tenantId: homeRawNextBooking.tenantId,
+      };
+    }
+    // Fallback: Cloud Function–denormalised field on userTenantAccess
+    const now = Date.now();
+    let earliest: (typeof salonSummaries)[0] | null = null;
+    for (const summary of salonSummaries) {
+      if (!summary.nextAppointmentAt) continue;
+      const ts = summary.nextAppointmentAt.toMillis();
+      if (!earliest || ts < earliest.nextAppointmentAt!.toMillis()) {
+        earliest = summary;
+      }
+    }
+    if (!earliest || !earliest.nextAppointmentAt) return null;
+    const apptMs = earliest.nextAppointmentAt.toMillis();
+    const hoursUntil = (apptMs - now) / (1000 * 60 * 60);
+    const d = new Date(apptMs);
+    const dateTimeLabel =
+      d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" }) +
+      " · " +
+      d.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
+    return {
+      salonName: earliest.tenantName,
+      serviceName: earliest.nextAppointmentServiceName ?? "Appointment",
+      dateTimeLabel,
+      hoursUntil,
+      tenantId: earliest.tenantId,
+    };
+  }, [homeRawNextBooking, salonSummaries]);
+
+  // Derive loyalty summary for the Home tab banner from already-loaded loyalty state.
+  const homeLoyaltySummary = useMemo(() => {
+    if (!userId || loyaltyPoints === null) return null;
+    const sortedRewards = [...loyaltyRewards].sort((a, b) => a.points - b.points);
+    const first = sortedRewards[0];
+    return {
+      points: loyaltyPoints,
+      tier: loyaltyTier,
+      nextMilestonePts: pointsToNextTier(loyaltyPoints),
+      firstReward: first ? { name: first.title, pointsRequired: first.points } : null,
+    };
+  }, [userId, loyaltyPoints, loyaltyTier, loyaltyRewards]);
+
+  // Active brand name for the Quick Rebook section header chip.
+  const activeBrandName = useMemo(() => {
+    if (!tenantId) return null;
+    // Do NOT fall back to tenantId — raw Firestore IDs must never reach the UI.
+    // If salonSummaries hasn't loaded yet, return null (chip hidden until loaded).
+    return salonSummaries.find((s) => s.tenantId === tenantId)?.tenantName ?? null;
+  }, [tenantId, salonSummaries]);
 
   function completeDevSignIn() {
     setAuthErrorMessage(null);
@@ -2731,11 +3664,13 @@ export function AppNavigatorShell({
 
     try {
       const [nextHomeFeed, nextExploreFeed] = await Promise.all([
-        activeDiscoveryService.getHomeFeed(),
-        activeDiscoveryService.getExploreFeed(),
+        activeDiscoveryService.getHomeFeed(userId),
+        activeDiscoveryService.getExploreFeed(userId),
       ]);
       setHomeFeed(nextHomeFeed);
       setExploreFeed(nextExploreFeed);
+      setExploreNextCursor(null);
+      setExploreHasMore(false);
     } catch {
       setFeedErrorMessage("Unable to load discovery content.");
     } finally {
@@ -2996,6 +3931,8 @@ export function AppNavigatorShell({
       role: staffRoleInput.trim() as import("../../domains/staff/model").StaffRole,
       status: "active",
       locationIds,
+      photoUrl: null,
+      specialtyTags: [],
       serviceIds: [],
       skills: [],
       constraints: [],
@@ -3045,13 +3982,17 @@ export function AppNavigatorShell({
 
     const result = await serviceAdminService.createServiceForTenant(serviceId, {
       tenantId,
-      locationIds: [],
+      locationId: "",
       name: serviceNameInput.trim(),
-      category: serviceCategoryInput.trim(),
-      durationMinutes: durationNum,
-      bufferMinutes: 0,
-      price: priceNum,
-      currency: serviceCurrencyInput.trim() || "EUR",
+      categoryId: serviceCategoryInput.trim(),
+      baseDurationMinutes: durationNum,
+      baseBufferMinutes: 0,
+      basePrice: priceNum,
+      baseCurrency: serviceCurrencyInput.trim() || "EUR",
+      description: "",
+      tags: [],
+      technicianIds: [],
+      photoUrl: null,
       active: true,
       sortOrder: 0,
     });
@@ -3108,6 +4049,7 @@ export function AppNavigatorShell({
     const payload: CreateLocationInput = {
       tenantId,
       name: locationNameInput.trim(),
+      displayName: locationNameInput.trim(),
       code: locationCodeInput.trim().toUpperCase(),
       status: "active",
       timezone: locationTimezoneInput.trim(),
@@ -3731,25 +4673,6 @@ export function AppNavigatorShell({
     activeLocationId,
   ]);
 
-        setAntiTheftKpi(kpi);
-        setAntiTheftSignals(signals);
-        setAntiTheftLoading(false);
-      }).catch(() => {
-        setAntiTheftLoading(false);
-        setAntiTheftError("Failed to load anti-theft data.");
-      });
-    }
-  }, [
-    activeRoute.name,
-    loadTenantLocations, loadTenantProfile, loadStaffList, loadServicesList,
-    loadQueue, loadDashboard, loadOwnerKpi,
-    loadBillingSubscription, loadBillingInvoices, loadBillingMethods,
-    loadBillingPayouts, loadBillingConnect, loadBillingRefunds,
-    loadLocationList, loadLocationDashboard, loadLocationSettings,
-    loadLocationOverrides, loadLocationResources, loadWalkInQueue, loadDailyClose,
-    activeLocationId,
-  ]);
-
   // ---------------------------------------------------------------------------
   // W49 — Platform Super-Admin route activators
   // ---------------------------------------------------------------------------
@@ -3780,7 +4703,7 @@ export function AppNavigatorShell({
     if (activeRoute.name === "Impersonation") {
       setImpersonationLoading(true);
       setImpersonationError(null);
-      void impersonationSvc.getActiveImpersonationSession(adminRole).then((session) => {
+      void impersonationSvc.getActiveImpersonationSession(adminRole, userId ?? "").then((session) => {
         setActiveImpersonationSession(session);
         setImpersonationLoading(false);
       }).catch(() => { setImpersonationLoading(false); setImpersonationError("Failed to load session."); });
@@ -3818,7 +4741,7 @@ export function AppNavigatorShell({
       setFeatureFlagsError(null);
       void Promise.all([
         featureFlagSvc.listPlatformFlags(adminRole),
-        featureFlagSvc.listTenantFlags(adminRole, undefined),
+        featureFlagSvc.listTenantFlags(adminRole, ""),
       ]).then(([pFlags, tFlags]) => {
         setPlatformFlags(pFlags);
         setTenantFlags(tFlags);
@@ -3829,9 +4752,9 @@ export function AppNavigatorShell({
     if (activeRoute.name === "PlatformAuditLog") {
       setPlatformAuditLoading(true);
       setPlatformAuditError(null);
-      void platformAdminSvc.listPlatformAuditLog(adminRole, platformAuditFilter).then(({ entries, total }) => {
+      void platformAdminSvc.listPlatformAuditLog(adminRole, platformAuditFilter).then((entries) => {
         setPlatformAuditEntries(entries);
-        setPlatformAuditTotal(total);
+        setPlatformAuditTotal(entries.length);
         setPlatformAuditLoading(false);
       }).catch(() => { setPlatformAuditLoading(false); setPlatformAuditError("Failed to load audit log."); });
     }
@@ -3909,7 +4832,8 @@ export function AppNavigatorShell({
     }
   }, [activeRoute.name]);
 
-
+  function getOnboardingGuardMessage(): string {
+    if (membershipsLoading) {
       return t("membership.loading");
     }
 
@@ -3921,8 +4845,47 @@ export function AppNavigatorShell({
   }
 
   function selectTenantContext(nextTenantId: string) {
+    hasRefinedSalonSelection.current = true; // user chose — don't auto-override
     setTenantId(nextTenantId);
     setOnboardingGuardMessage(null);
+  }
+
+  // NEW-DEBT-H: Home → Quick Rebook → "Rebook" pre-fills service + last staff
+  // and jumps to Step 3 (Date/time) per zarkili_booking_flow_spec_v2.md §1.
+  // The Home rebook strip is brand-scoped, so the active tenant context is
+  // assumed to be correct; we pre-load location + services + technicians here
+  // so the existing BookingDate slot-loading effect has everything it needs.
+  async function handleQuickRebook(item: HomeRebookItem) {
+    const bookingTenantId = selectedSalonTenantId ?? tenantId;
+    if (!clientBookingFlow || !bookingTenantId) {
+      navigate("BookingHistory");
+      return;
+    }
+
+    // Reset booking-flow state and pre-fill from the rebook item.
+    setConsumerSelectedServiceIds([item.serviceId]);
+    setConsumerSelectedAddOnIds([]);
+    setConsumerSelectedVariantId(null);
+    setConsumerSelectedStaffId(item.staffId);
+    setBatchCLocationId(item.locationId);
+
+    // Pre-load batch C data in parallel so BookingDate is ready immediately.
+    const [locResult, svcResult, techResult] = await Promise.all([
+      clientBookingFlow.loadLocations(bookingTenantId),
+      clientBookingFlow.loadServices(bookingTenantId, item.locationId),
+      clientBookingFlow.loadTechnicians(bookingTenantId, item.locationId, item.serviceId),
+    ]);
+    if (locResult.ok) {
+      const loc =
+        locResult.locations.find((l) => l.locationId === item.locationId) ??
+        locResult.locations[0] ??
+        null;
+      if (loc) setBatchCLocation(loc);
+    }
+    if (svcResult.ok) setBatchCServices(svcResult.services);
+    if (techResult.ok) setBatchCTechnicians(techResult.technicians);
+
+    navigate("BookingDate");
   }
 
   async function navigateToOnboardingFlow(flow: OnboardingFlow) {
@@ -4061,6 +5024,11 @@ export function AppNavigatorShell({
     setBookingSlotsError(null);
     setBookingSubmitting(false);
     setBookingResult(null);
+    setBookingPaymentClientSecret(null);
+    setBookingPaymentEphKey(null);
+    setBookingPaymentCustomerId(null);
+    setBookingPaymentMode(null);
+    setBookingPaymentError(null);
   }
 
   async function startBookingFlow() {
@@ -4167,11 +5135,86 @@ export function AppNavigatorShell({
       date: bookingSelectedDate,
       slot: bookingSelectedSlot,
       customerUserId: userId,
+      variantId: "",
+      addonIds: [],
+      serviceNameSnapshot: bookingSelectedService.name,
+      locationNameSnapshot: bookingSelectedLocation.displayName ?? bookingSelectedLocation.name,
+      technicianNameSnapshot: bookingSelectedTechnician.displayName,
       notes: null,
     });
     setBookingResult(result);
+
+    if (!result.ok || !paymentsRepository) {
+      setBookingSubmitting(false);
+      setBookingFlowStep("result");
+      return;
+    }
+
+    // Initiate payment intent on the server
+    const bookingId = result.booking.bookingId;
+    const totalAmountMinor = Math.round(bookingSelectedService.basePrice * 100);
+    const currency = bookingSelectedService.baseCurrency;
+
+    try {
+      const paymentResult = await paymentsRepository.createBookingPaymentIntent({
+        tenantId,
+        bookingId,
+        totalAmountMinor,
+        currency,
+      });
+
+      if (paymentResult.type === "no_payment_required") {
+        setBookingSubmitting(false);
+        setBookingFlowStep("result");
+        return;
+      }
+
+      // Initialize Stripe PaymentSheet
+      const isSetupIntent = paymentResult.type === "setup_intent";
+      const { error: initError } = await initPaymentSheet({
+        merchantDisplayName: "Zarkili",
+        customerId: paymentResult.customerId,
+        customerEphemeralKeySecret: paymentResult.ephemeralKeySecret,
+        ...(isSetupIntent
+          ? { setupIntentClientSecret: paymentResult.clientSecret }
+          : { paymentIntentClientSecret: paymentResult.clientSecret }),
+        allowsDelayedPaymentMethods: false,
+        returnURL: "zarkili://booking-payment-return",
+      });
+
+      if (initError) {
+        setBookingPaymentError(initError.message ?? "Payment setup failed.");
+        setBookingSubmitting(false);
+        setBookingFlowStep("result");
+        return;
+      }
+
+      setBookingPaymentClientSecret(paymentResult.clientSecret);
+      setBookingPaymentEphKey(paymentResult.ephemeralKeySecret);
+      setBookingPaymentCustomerId(paymentResult.customerId);
+      setBookingPaymentMode(isSetupIntent ? "setup" : (paymentResult as { paymentMode: "deposit" | "full" }).paymentMode);
+    } catch (err) {
+      setBookingPaymentError(err instanceof Error ? err.message : "Payment initialisation failed.");
+      setBookingSubmitting(false);
+      setBookingFlowStep("result");
+      return;
+    }
+
     setBookingSubmitting(false);
-    setBookingFlowStep("result");
+    setBookingFlowStep("payment");
+  }
+
+  async function handlePresentPaymentSheet() {
+    setBookingSubmitting(true);
+    setBookingPaymentError(null);
+    const { error } = await presentPaymentSheet();
+    if (error) {
+      setBookingPaymentError(error.message ?? "Payment failed.");
+      setBookingSubmitting(false);
+    } else {
+      setBookingSubmitting(false);
+      setBookingFlowStep("result");
+    }
   }
 
   // ---------------------------------------------------------------------------
@@ -4227,9 +5270,10 @@ export function AppNavigatorShell({
    * AppShell.  Called both from the dashboard card tap and from quick-action
    * deep-links that pre-select a tenant.
    */
-  function selectSalonContext(tenantId: string) {
-    setTenantId(tenantId);
-    navigate("OwnerHome");
+  function selectSalonContext(newTenantId: string) {
+    hasRefinedSalonSelection.current = true; // preserve user choice
+    setTenantId(newTenantId);
+    setSalonContextPendingNav(newTenantId);
   }
 
   /**
@@ -4342,14 +5386,67 @@ export function AppNavigatorShell({
             date: bookingSelectedDate,
             startTime: bookingSelectedSlot.startTime,
             endTime: bookingSelectedSlot.endTime,
-            durationMinutes: bookingSelectedService.durationMinutes,
-            price: bookingSelectedService.price,
-            currency: bookingSelectedService.currency,
+            durationMinutes: bookingSelectedService.baseDurationMinutes,
+            price: bookingSelectedService.basePrice,
+            currency: bookingSelectedService.baseCurrency,
           }}
           isSubmitting={bookingSubmitting}
           onConfirm={() => void handleConfirmBooking()}
           onBack={() => setBookingFlowStep("slot")}
         />
+      );
+    }
+
+    if (bookingFlowStep === "payment" && bookingPaymentClientSecret) {
+      return (
+        <View style={{ flex: 1, justifyContent: "center", alignItems: "center", padding: 24 }}>
+          <Text style={{ fontSize: 18, fontWeight: "600", marginBottom: 8 }}>
+            {bookingPaymentMode === "setup" ? "Save a card" : "Pay to confirm"}
+          </Text>
+          <Text style={{ color: "#666", marginBottom: 24, textAlign: "center" }}>
+            {bookingPaymentMode === "deposit"
+              ? "A deposit will be held on your card."
+              : bookingPaymentMode === "full"
+                ? "The full amount will be held on your card."
+                : "Save a payment method for post-service charging."}
+          </Text>
+          {bookingPaymentError ? (
+            <Text style={{ color: "red", marginBottom: 12 }}>{bookingPaymentError}</Text>
+          ) : null}
+          {bookingSubmitting ? (
+            <ActivityIndicator />
+          ) : Platform.OS === "web" && stripePublishableKey && bookingPaymentClientSecret ? (
+            <WebStripePaymentForm
+              publishableKey={stripePublishableKey}
+              clientSecret={bookingPaymentClientSecret}
+              isSetupIntent={bookingPaymentMode === "setup"}
+              onSuccess={() => {
+                setBookingSubmitting(false);
+                setBookingFlowStep("result");
+              }}
+              onError={(msg: string) => {
+                setBookingPaymentError(msg);
+                setBookingSubmitting(false);
+              }}
+            />
+          ) : (
+            <TouchableOpacity
+              onPress={() => void handlePresentPaymentSheet()}
+              style={{ backgroundColor: "#000", paddingHorizontal: 32, paddingVertical: 14, borderRadius: 8 }}
+            >
+              <Text style={{ color: "#fff", fontWeight: "600", fontSize: 16 }}>
+                {bookingPaymentMode === "setup" ? "Save card" : "Pay now"}
+              </Text>
+            </TouchableOpacity>
+          )}
+          <TouchableOpacity
+            onPress={() => setBookingFlowStep("confirm")}
+            style={{ marginTop: 16 }}
+            disabled={bookingSubmitting}
+          >
+            <Text style={{ color: "#666" }}>Back</Text>
+          </TouchableOpacity>
+        </View>
       );
     }
 
@@ -4376,6 +5473,17 @@ export function AppNavigatorShell({
         );
       }
 
+      if (bookingPaymentError) {
+        return (
+          <BookingResultScreen
+            outcome="error"
+            message={bookingPaymentError}
+            onRetry={() => setBookingFlowStep("payment")}
+            onBack={() => setBookingFlowStep("confirm")}
+          />
+        );
+      }
+
       if (!bookingResult.ok) {
         return (
           <BookingResultScreen
@@ -4396,15 +5504,96 @@ export function AppNavigatorShell({
     if (activeTab === "Explore") {
       return (
         <ExploreRouteScreen
+          availableMemberships={availableMemberships}
           exploreFeed={exploreFeed}
           feedError={feedErrorMessage}
           isLoadingFeed={feedLoading}
           marketplaceEnabled={featureFlags.marketplaceEnabled}
           onBookEnabled={(salon) => openTenantPublicProfile(salon.tenantId)}
-          onBookUnavailable={() => undefined}
-          onOpenDiscovery={() => navigate("DiscoverHome")}
+          onBookUnavailable={(service) => setBookingComingSoonMessage(`Booking is coming soon for ${service.serviceName}.`)}
           onBack={() => setActiveTab("Home")}
           onRetryFeed={() => void retryDiscoveryFeeds()}
+          selectedCategory={selectedExploreCategory}
+          onCategoryChange={setSelectedExploreCategory}
+          userId={userId}
+          hasMore={exploreHasMore}
+          onLoadMore={() => {
+            if (exploreLoadingMore || !exploreHasMore) return;
+            setExploreLoadingMore(true);
+            void activeDiscoveryService
+              .getExploreFeedPage({ cursor: exploreNextCursor, pageSize: 20, userId })
+              .then((page) => {
+                setExploreFeed((prev) =>
+                  prev
+                    ? { ...prev, salons: [...prev.salons, ...page.services] }
+                    : { categories: [], salons: page.services }
+                );
+                setExploreNextCursor(page.nextCursor);
+                setExploreHasMore(page.nextCursor !== null);
+              })
+              .catch(() => undefined)
+              .finally(() => setExploreLoadingMore(false));
+          }}
+          suggestions={exploreSuggestions}
+          onSearchQueryChange={(q) => {
+            const lower = q.toLowerCase();
+            const salons = exploreFeed?.salons ?? [];
+            const seen = new Set<string>();
+            const results = salons
+              .filter((s) =>
+                s.serviceName.toLowerCase().includes(lower) ||
+                s.locationDisplayName.toLowerCase().includes(lower) ||
+                s.categoryName.toLowerCase().includes(lower)
+              )
+              .slice(0, 6)
+              .map((s) => {
+                const key = s.serviceName.toLowerCase();
+                if (seen.has(key)) return null;
+                seen.add(key);
+                return {
+                  type: "service" as const,
+                  id: s.id,
+                  label: s.serviceName,
+                  sublabel: s.locationDisplayName || undefined,
+                };
+              })
+              .filter((x): x is NonNullable<typeof x> => x !== null);
+            setExploreSuggestions(results);
+          }}
+          onToggleSave={(serviceId, saved) => {
+            if (!userId) return;
+            setExploreFeed((prev) =>
+              prev
+                ? { ...prev, salons: prev.salons.map((s) => s.id === serviceId ? { ...s, isSaved: saved } : s) }
+                : prev
+            );
+            void activeDiscoveryService
+              .toggleSavedService(userId, serviceId, saved)
+              .catch(() => undefined);
+          }}
+          onViewDetail={(serviceId) => {
+            setSelectedServiceId(serviceId);
+            setExploreDetailLoading(true);
+            setExploreDetailData(null);
+            setExploreDetailError(null);
+            navigate("ExploreServiceDetail");
+            void activeDiscoveryService
+              .getServiceDetail(serviceId)
+              .then((detail) => {
+                console.log("[getServiceDetail] result:", JSON.stringify(detail));
+                setExploreDetailData(detail);
+              })
+              .catch((err) => {
+                console.error("[getServiceDetail] ERROR", err?.code, err?.message, err);
+                setExploreDetailError("Unable to load service details.");
+              })
+              .finally(() => setExploreDetailLoading(false));
+          }}
+          locationLabel={exploreLocationLabel}
+          onLocationChange={(result) => {
+            if (result.type === "manual" && result.query) setExploreLocationLabel(`near ${result.query}`);
+            else if (result.type === "gps") setExploreLocationLabel("near you");
+          }}
         />
       );
     }
@@ -4412,11 +5601,7 @@ export function AppNavigatorShell({
     if (activeTab === "Bookings") {
       if (!userId) {
         return (
-          <WelcomeRouteScreen
-            onGetStarted={() => navigate("SignUp")}
-            onSignIn={() => navigate("SignIn")}
-            onBrowseAsGuest={() => setActiveTab("Explore")}
-          />
+          <GuestBookingsEmptyScreen onSignUp={() => navigate("SignUp")} />
         );
       }
       return renderBookingFlow();
@@ -4425,10 +5610,9 @@ export function AppNavigatorShell({
     if (activeTab === "Rewards") {
       if (!userId) {
         return (
-          <WelcomeRouteScreen
-            onGetStarted={() => navigate("SignUp")}
+          <GuestRewardsEmptyScreen
+            onSignUp={() => navigate("SignUp")}
             onSignIn={() => navigate("SignIn")}
-            onBrowseAsGuest={() => setActiveTab("Explore")}
           />
         );
       }
@@ -4437,12 +5621,24 @@ export function AppNavigatorShell({
           points={loyaltyPoints ?? 0}
           historyEntries={loyaltyHistory}
           earnActions={DEFAULT_EARN_ACTIONS}
+          activeSalonName={activeBrandName}
+          isMultiSalon={availableMemberships.length > 1}
+          salonSwitcherItems={availableMemberships.map((m) => ({
+            tenantId: m.tenantId,
+            name: salonSummaries.find((s) => s.tenantId === m.tenantId)?.tenantName ?? "(loading…)",
+            upcomingCount: perSalonSwitcherData.get(m.tenantId)?.upcomingCount ?? 0,
+            points: perSalonSwitcherData.get(m.tenantId)?.points ?? 0,
+            tier: perSalonSwitcherData.get(m.tenantId)?.tier ?? "Bronze",
+          }))}
+          activeTenantId={tenantId}
+          onSelectSalon={selectTenantContext}
           onPressBrowseRewards={() => navigate("RewardCatalog")}
           onPressEarnAction={(action) => {
             if (action.id === "refer") navigate("Referral");
             else if (action.id === "review") navigate("ReviewPrompt");
             else navigate("BookingService");
           }}
+          onPressSeeFullHistory={() => navigate("Activities")}
         />
       );
     }
@@ -4462,29 +5658,33 @@ export function AppNavigatorShell({
           firstName={firstName}
           lastName={lastName}
           email={email}
-          bookingCount={4}
-          loyaltyPoints={450}
+          bookingCount={profileBookingCount ?? 0}
+          loyaltyPoints={profileLoyaltyPoints ?? 0}
+          tenantId={tenantId}
+          membershipsLoading={membershipsLoading}
+          availableMemberships={availableMemberships}
+          onboardingGuardMessage={onboardingGuardMessage}
+          onSelectTenant={selectTenantContext}
+          onStartSalonOnboarding={() => void navigateToOnboardingFlow("salon")}
+          onStartClientOnboarding={() => void navigateToOnboardingFlow("client")}
           onEditProfile={() => navigate("EditProfile")}
           onOpenSettings={() => navigate("SettingsShell")}
         />
       );
     }
 
-    // Home (default)
     return (
       <HomeRouteScreen
+        userId={userId}
         feedError={feedErrorMessage}
         firstName={preferredFirstName}
         homeFeed={homeFeed}
         tenantId={tenantId}
         isLoadingFeed={feedLoading}
-        membershipsLoading={membershipsLoading}
         availableMemberships={availableMemberships}
-        onboardingGuardMessage={onboardingGuardMessage}
         isPlatformAdmin={isPlatformAdmin}
-        onSelectTenant={selectTenantContext}
-        onStartSalonOnboarding={() => void navigateToOnboardingFlow("salon")}
-        onStartClientOnboarding={() => void navigateToOnboardingFlow("client")}
+        nextAppointment={nextAppointment}
+        loyaltySummary={homeLoyaltySummary}
         onOpenTenantProfile={() => navigate("TenantProfile")}
         onOpenTenantLocations={() => navigate("TenantLocations")}
         onOpenCreateLocation={() => navigate("CreateLocation")}
@@ -4497,8 +5697,28 @@ export function AppNavigatorShell({
         onOpenDashboard={() => navigate("SalonDashboard")}
         onBackToDashboard={() => navigate("SalonDashboard")}
         onRetryFeed={() => void retryDiscoveryFeeds()}
+        onOpenSalon={(salon) => openTenantPublicProfile(salon.tenantId)}
         onSignOut={() => void handleSignOut()}
         onOpenInbox={() => navigate("Inbox")}
+        unreadInboxCount={unreadInboxCount}
+        onOpenBookingDetail={() => navigate("BookingHistory")}
+        onNavigateToRewards={() => { setActiveTab("Rewards"); navigate("AppShell"); }}
+        onSignUp={() => navigate("SignUp")}
+        onSignIn={() => navigate("SignIn")}
+        rebookItems={homeRebookItems}
+        activeBrandName={activeBrandName}
+        isMultiBrandUser={availableMemberships.length > 1}
+        brandSwitcherItems={availableMemberships.map((m) => ({
+          tenantId: m.tenantId,
+          name: salonSummaries.find((s) => s.tenantId === m.tenantId)?.tenantName ?? m.tenantId,
+          upcomingCount: perSalonSwitcherData.get(m.tenantId)?.upcomingCount ?? 0,
+          points: perSalonSwitcherData.get(m.tenantId)?.points ?? 0,
+          tier: perSalonSwitcherData.get(m.tenantId)?.tier ?? "Bronze",
+        }))}
+        onRebook={(item) => void handleQuickRebook(item)}
+        onSelectActiveBrand={selectTenantContext}
+        onExploreServices={() => navigate("BookingService")}
+        onBrowseCategory={(catId) => { setSelectedExploreCategory(catId); setActiveTab("Explore"); navigate("AppShell"); }}
       />
     );
   }
@@ -4548,12 +5768,19 @@ export function AppNavigatorShell({
     if (activeRoute.name === "SignIn") {
       return (
         <SignInScreen
-          onSignedIn={() => { setActiveRouteName("AppShell"); setActiveTab("Home"); }}
+          onSignedIn={() => {
+            if (postAuthRoute) {
+              setBookingPaymentPendingAuth(true);
+            } else {
+              setActiveRouteName("AppShell");
+              setActiveTab("Home");
+            }
+          }}
           onForgotPassword={() => navigate("ForgotPassword")}
           onCreateAccount={() => navigate("SignUp")}
           onSocialSignIn={() => navigate("SocialSignIn")}
           onDevAction={completeDevSignIn}
-          onBack={() => navigate("AppShell")}
+          onBack={() => postAuthRoute ? navigate("GuestBookingGate") : navigate("AppShell")}
         />
       );
     }
@@ -4614,7 +5841,14 @@ export function AppNavigatorShell({
             }
           }}
           onChangeEmail={() => navigate("SignUp")}
-          onContinue={() => { setActiveRouteName("AppShell"); setActiveTab("Home"); }}
+          onContinue={() => {
+            if (postAuthRoute) {
+              setBookingPaymentPendingAuth(true);
+            } else {
+              setActiveRouteName("AppShell");
+              setActiveTab("Home");
+            }
+          }}
         />
       );
     }
@@ -4676,6 +5910,15 @@ export function AppNavigatorShell({
           }
           onPressContinue={() => navigate("BookingStaff")}
           onPressBack={() => navigate("AppShell")}
+          progressIndicator={bookingFlowProgressIndicator}
+          stepHeaderTitle={
+            consumerSelectedStaffId && consumerSelectedStaffId !== ANY_STAFF_ID
+              ? `What would you like ${
+                  batchCTechnicians.find((t) => t.staffId === consumerSelectedStaffId)
+                    ?.displayName ?? "them"
+                } to do?`
+              : undefined
+          }
         />
       );
     }
@@ -4683,13 +5926,25 @@ export function AppNavigatorShell({
     if (activeRoute.name === "BookingStaff") {
       return (
         <StaffSelectionScreen
-          staffOptions={batchCTechnicians.map((t) => ({ id: t.staffId, name: t.displayName }))}
+          staffOptions={[...batchCTechnicians]
+            .sort((a, b) => (b.averageRating ?? 0) - (a.averageRating ?? 0))
+            .map((t) => ({
+            id: t.staffId,
+            name: t.displayName,
+            photoUrl: t.photoUrl ?? undefined,
+            rating: t.averageRating ?? undefined,
+            reviewCount: t.reviewCount > 0 ? t.reviewCount : undefined,
+            specialties: t.specialtyTags.length > 0 ? t.specialtyTags : undefined,
+          }))}
           selectedStaffId={consumerSelectedStaffId}
           loading={batchCTechniciansLoading}
           errorMessage={batchCTechniciansError ?? undefined}
+          allUnavailable={!batchCTechniciansLoading && batchCTechnicians.length === 0 && batchCTechniciansError === null}
           onSelectStaff={(id) => setConsumerSelectedStaffId(id)}
           onPressContinue={() => navigate("BookingDate")}
           onPressBack={() => navigate("BookingService")}
+          onPressTryDifferentDate={() => navigate("BookingService")}
+          progressIndicator={bookingFlowProgressIndicator}
         />
       );
     }
@@ -4710,14 +5965,25 @@ export function AppNavigatorShell({
             setConsumerBookingMonth((m) => {
               const next = new Date(m);
               next.setMonth(m.getMonth() + delta);
-              return next;
+              // Never navigate before the current month
+              const now = new Date();
+              const currentMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+              return next < currentMonth ? m : next;
             })
           }
           availableSlots={batchCSlots}
           availabilityMap={batchCAvailabilityMap}
           selectedSlot={consumerBookingSlot}
           segment={consumerBookingSegment}
-          timezone="UTC"
+          timezone={batchCLocation?.timezone ?? "UTC"}
+          staff={
+            consumerSelectedStaffId && consumerSelectedStaffId !== ANY_STAFF_ID
+              ? (() => {
+                  const t = batchCTechnicians.find((t) => t.staffId === consumerSelectedStaffId);
+                  return t ? { id: t.staffId, name: t.displayName } : null;
+                })()
+              : null
+          }
           slotsLoading={batchCSlotsLoading}
           slotsErrorMessage={batchCSlotsError ?? undefined}
           onChangeSegment={(s) => setConsumerBookingSegment(s)}
@@ -4726,8 +5992,32 @@ export function AppNavigatorShell({
             const idx = batchCSlots.indexOf(s);
             setBatchCSelectedSlotRaw(idx >= 0 ? (batchCRawSlots[idx] ?? null) : null);
           }}
+          onPressQuickPick={(which) => {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            let target: Date;
+            if (which === "today") {
+              target = today;
+            } else if (which === "tomorrow") {
+              target = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
+            } else {
+              // "this-weekend" → next Saturday
+              const sat = new Date(today);
+              sat.setDate(today.getDate() + ((6 - today.getDay() + 7) % 7 || 7));
+              target = sat;
+            }
+            setConsumerBookingDate(target);
+            setConsumerBookingSlot(null);
+            setBatchCSelectedSlotRaw(null);
+          }}
+          onPressTryAnotherDay={() => {
+            setConsumerBookingDate(null);
+            setConsumerBookingSlot(null);
+            setBatchCSelectedSlotRaw(null);
+          }}
           onPressContinue={async () => {
-            if (consumerRescheduleMode && batchCCreatedBookingId && tenantId && consumerBookingDate && batchCSelectedSlotRaw) {
+            const bookingTenantId = selectedSalonTenantId ?? tenantId;
+            if (consumerRescheduleMode && batchCCreatedBookingId && bookingTenantId && consumerBookingDate && batchCSelectedSlotRaw) {
               setConsumerRescheduleLoading(true);
               setConsumerRescheduleError(null);
               try {
@@ -4735,7 +6025,7 @@ export function AppNavigatorShell({
                 const endMinutes = batchCSelectedSlotRaw.endMinutes;
                 await appBookingsRepository.rescheduleBookingAtomically(
                   batchCCreatedBookingId,
-                  tenantId,
+                  bookingTenantId,
                   dateStr,
                   batchCSelectedSlotRaw.startMinutes,
                   endMinutes,
@@ -4761,6 +6051,7 @@ export function AppNavigatorShell({
               navigate("BookingStaff");
             }
           }}
+          progressIndicator={bookingFlowProgressIndicator}
         />
       );
     }
@@ -4769,17 +6060,34 @@ export function AppNavigatorShell({
       const selectedServices = batchCServices.filter((s) =>
         consumerSelectedServiceIds.includes(s.serviceId),
       );
-      const totalDurationMinutes = selectedServices.reduce((sum, s) => sum + s.durationMinutes, 0);
-      const reviewSubtotal = selectedServices.reduce((sum, s) => sum + s.price, 0);
+      const totalDurationMinutes = selectedServices.reduce((sum, s) => sum + s.baseDurationMinutes, 0);
+      const reviewSubtotal = selectedServices.reduce((sum, s) => sum + s.basePrice, 0);
       const reviewTax = Math.round(reviewSubtotal * 0.08 * 100) / 100;
       const reviewPricing = { subtotal: reviewSubtotal, taxRate: 0.08, tax: reviewTax, tip: 0, total: Math.round((reviewSubtotal + reviewTax) * 100) / 100 };
       const selectedTech = batchCTechnicians.find((t) => t.staffId === consumerSelectedStaffId) ?? null;
       const reviewStaff = selectedTech ? { id: selectedTech.staffId, name: selectedTech.displayName } : null;
-      const reviewServices = selectedServices.map((s) => ({ id: s.serviceId, name: s.name, durationMinutes: s.durationMinutes, priceUsd: s.price }));
+      const reviewServices = selectedServices.map((s) => ({ id: s.serviceId, name: s.name, durationMinutes: s.baseDurationMinutes, priceUsd: s.basePrice }));
       return (
         <BookingReviewScreen
-          salon={{ id: tenantId ?? "salon-1", name: tenantProfile?.name ?? "—" }}
+          salon={{
+            id: selectedSalonTenantId ?? tenantId ?? "salon-1",
+            name: salonProfileData?.salon.name ?? tenantProfile?.name ?? "—",
+            address: batchCLocation
+              ? `${batchCLocation.address.line1}, ${batchCLocation.address.city}`
+              : undefined,
+          }}
           services={reviewServices}
+          addOns={
+            consumerSelectedAddOnIds.length > 0
+              ? consumerSelectedAddOnIds.flatMap((id) => {
+                  for (const addOns of Object.values(batchCAddOnCatalog)) {
+                    const found = addOns.find((a) => a.id === id);
+                    if (found) return [found];
+                  }
+                  return [];
+                })
+              : undefined
+          }
           staff={reviewStaff}
           staffAnyAvailable={consumerSelectedStaffId === "any"}
           date={consumerBookingDate ?? new Date()}
@@ -4787,38 +6095,194 @@ export function AppNavigatorShell({
           totalDurationMinutes={totalDurationMinutes}
           pricing={reviewPricing}
           notes={consumerBookingNotes}
+          freeCancellationLabel={
+            consumerBookingDate
+              ? (() => {
+                  const cutoff = new Date(consumerBookingDate);
+                  cutoff.setHours(cutoff.getHours() - 24);
+                  const h = cutoff.getHours();
+                  const m = String(cutoff.getMinutes()).padStart(2, "0");
+                  const ampm = h >= 12 ? "PM" : "AM";
+                  const h12 = h % 12 || 12;
+                  return `Free cancellation until ${formatLongDateLabel(cutoff)} at ${h12}:${m} ${ampm}`;
+                })()
+              : undefined
+          }
+          loyaltyEarnPreviewText={
+            reviewSubtotal > 0
+              ? `You'll earn ${Math.round(reviewSubtotal)} pts at ${tenantProfile?.name ?? "this salon"} for this booking`
+              : undefined
+          }
+          policySummary={
+            consumerPoliciesAlreadyAcked
+              ? "By continuing you agree to the salon's cancellation and no-show policies (already acknowledged)."
+              : undefined
+          }
           onChangeNotes={(n) => setConsumerBookingNotes(n)}
-          onEditServices={() => navigate("BookingService")}
-          onEditStaff={() => navigate("BookingStaff")}
+          onEditServices={() => {
+            // Spec §7: changing service resets staff + date/time (W50-DEBT-7)
+            setConsumerSelectedStaffId(null);
+            setConsumerBookingDate(null);
+            setConsumerBookingSlot(null);
+            setBatchCSelectedSlotRaw(null);
+            navigate("BookingService");
+          }}
+          onEditStaff={() => {
+            // Spec §7: changing staff resets date/time only (W50-DEBT-7)
+            setConsumerBookingDate(null);
+            setConsumerBookingSlot(null);
+            setBatchCSelectedSlotRaw(null);
+            navigate("BookingStaff");
+          }}
           onEditDateTime={() => navigate("BookingDate")}
-          onPressContinue={() => navigate("BookingPolicies")}
+          onPressContinue={async () => {
+            // W50-DEBT-13: skip policies if user already acknowledged current version
+            if (userId && batchCLocationId) {
+              try {
+                const [ackSnap, locDocSnap] = await Promise.all([
+                  getDoc(doc(db, "user_policy_acknowledgements", `${userId}_${batchCLocationId}`)),
+                  getDoc(doc(db, "locations", batchCLocationId)),
+                ]);
+                const currentPolicyVersion = locDocSnap.data()?.policyVersion as string | undefined;
+                if (
+                  ackSnap.exists() &&
+                  currentPolicyVersion &&
+                  (ackSnap.data()?.policyVersion as string | undefined) === currentPolicyVersion
+                ) {
+                  setConsumerPoliciesAlreadyAcked(true);
+                  navigate("BookingPayment");
+                  return;
+                }
+              } catch { /* fall through to policies */ }
+            }
+            navigate("BookingPolicies");
+          }}
           onPressBack={() => navigate("BookingDate")}
+          progressIndicator={bookingFlowProgressIndicator}
         />
       );
     }
 
     if (activeRoute.name === "BookingPolicies") {
+      // GAP-4 + GAP-8: render tenant-configurable policy copy when fields are
+      // available; otherwise fall back to platform-default language.
+      const cancelH = batchCLocationPolicy?.cancellationWindowH ?? 24;
+      const lateFee = batchCLocationPolicy?.lateFeePct ?? 50;
+      const noShowFee = batchCLocationPolicy?.noShowFeePct ?? 100;
       return (
         <BookingPoliciesScreen
           visible
           sections={[
-            { id: "cancellation", title: "Cancellation", body: "Free cancellation up to 24 hours before your appointment. After that, a 50% fee applies." },
-            { id: "no-show", title: "No-show", body: "If you miss your appointment without notice, the full amount may be charged." },
-            { id: "late-arrival", title: "Late arrival", body: "Please arrive 5 minutes early. Arrivals more than 15 minutes late may be rescheduled." },
+            {
+              id: "cancellation",
+              title: "Cancellation",
+              body: `Free cancellation up to ${cancelH} hours before your appointment. After that, a ${lateFee}% fee applies.`,
+            },
+            {
+              id: "no-show",
+              title: "No-show",
+              body:
+                noShowFee >= 100
+                  ? "If you miss your appointment without notice, the full amount may be charged."
+                  : `If you miss your appointment without notice, a ${noShowFee}% fee may be charged.`,
+            },
+            {
+              id: "late-arrival",
+              title: "Late arrival",
+              body: "Please arrive 5 minutes early. Arrivals more than 15 minutes late may be rescheduled.",
+            },
           ]}
           acknowledged={consumerPoliciesAck}
           onChangeAcknowledged={(next) => setConsumerPoliciesAck(next)}
-          onPressAgreeAndContinue={() => navigate("BookingPayment")}
+          onPressAgreeAndContinue={async () => {
+            // Guest gate: require an account before showing the payment screen.
+            if (!userId) {
+              setPostAuthRoute("BookingPayment");
+              navigate("GuestBookingGate");
+              return;
+            }
+            // Fetch loyalty balance before showing the payment screen.
+            const loyaltyTenantId = selectedSalonTenantId ?? tenantId;
+            setConsumerLoyaltyApplied(false);
+            if (loyaltyTenantId) {
+              try {
+                const loyaltySnap = await getDoc(
+                  doc(db, `user_brand_loyalty/${userId}_${loyaltyTenantId}`),
+                );
+                setConsumerLoyaltyPoints(
+                  loyaltySnap.exists()
+                    ? ((loyaltySnap.data()?.points as number | undefined) ?? 0)
+                    : 0,
+                );
+              } catch {
+                setConsumerLoyaltyPoints(0);
+              }
+            }
+            // W50-DEBT-13: write policy acknowledgement (best-effort, non-fatal)
+            if (userId && batchCLocationId) {
+              try {
+                const locDocSnap = await getDoc(doc(db, "locations", batchCLocationId));
+                const policyVersion = locDocSnap.data()?.policyVersion as string | undefined;
+                await setDoc(
+                  doc(db, "user_policy_acknowledgements", `${userId}_${batchCLocationId}`),
+                  {
+                    userId,
+                    locationId: batchCLocationId,
+                    policyVersion: policyVersion ?? null,
+                    acknowledgedAt: new Date().toISOString(),
+                  },
+                  { merge: true },
+                );
+              } catch { /* non-fatal */ }
+            }
+            navigate("BookingPayment");
+          }}
           onPressClose={() => navigate("BookingReview")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "GuestBookingGate") {
+      const gateFirstServiceId = consumerSelectedServiceIds[0];
+      const gateService = batchCServices.find((s) => s.serviceId === gateFirstServiceId);
+      const gateServiceName = gateService?.name ?? "your service";
+      const gateLocationName = batchCLocation?.displayName ?? batchCLocation?.name ?? "this location";
+      return (
+        <GuestBookingGateScreen
+          serviceName={gateServiceName}
+          locationName={gateLocationName}
+          onSocialProvider={async (provider) => {
+            await signInWithSocialProvider(provider);
+            // userId updates asynchronously via AuthProvider — the useEffect fires
+            // once it becomes available and navigates to postAuthRoute.
+            setBookingPaymentPendingAuth(true);
+          }}
+          onUseEmail={() => navigate("SignUp")}
+          onSignIn={() => navigate("SignIn")}
+          onBack={() => navigate("BookingPolicies")}
         />
       );
     }
 
     if (activeRoute.name === "BookingPayment") {
       const paySelectedSvcs = batchCServices.filter((s) => consumerSelectedServiceIds.includes(s.serviceId));
-      const paySubtotal = paySelectedSvcs.reduce((sum, s) => sum + s.price, 0);
+      const paySubtotal = paySelectedSvcs.reduce((sum, s) => sum + s.basePrice, 0);
       const payTax = Math.round(paySubtotal * 0.08 * 100) / 100;
-      const payPricing = { subtotal: paySubtotal, taxRate: 0.08, tax: payTax, tip: 0, total: Math.round((paySubtotal + payTax) * 100) / 100 };
+      // Cap redeemable points to the pre-discount total (in minor units = cents, 1 pt = 1 cent).
+      const preDiscountTotalMinor = Math.round((paySubtotal + payTax) * 100);
+      const loyaltyPointsToDebit =
+        consumerLoyaltyApplied && consumerLoyaltyPoints != null && consumerLoyaltyPoints > 0
+          ? Math.min(consumerLoyaltyPoints, preDiscountTotalMinor)
+          : 0;
+      const loyaltyDiscountUsd = loyaltyPointsToDebit / 100;
+      const payPricing = {
+        subtotal: paySubtotal,
+        taxRate: 0.08,
+        tax: payTax,
+        tip: 0,
+        loyaltyDiscount: loyaltyDiscountUsd,
+        total: Math.max(0, Math.round((paySubtotal + payTax - loyaltyDiscountUsd) * 100) / 100),
+      };
       return (
         <BookingPaymentScreen
           pricing={payPricing}
@@ -4827,12 +6291,14 @@ export function AppNavigatorShell({
           applePayAvailable={false}
           loading={batchCConfirmLoading}
           errorMessage={batchCConfirmError ?? undefined}
+          loyaltyPointsBalance={consumerLoyaltyPoints}
+          onPressApplyLoyalty={() => setConsumerLoyaltyApplied(true)}
+          onPressRemoveLoyalty={() => setConsumerLoyaltyApplied(false)}
           onSelectCard={(id) => setConsumerSelectedCardId(id)}
-          onPressAddCard={() => {
-            // P2: Stripe Add Card wired W38+.
-          }}
+          onPressAddCard={() => navigate("AddPaymentMethod")}
           onPressConfirm={async () => {
             // W36-R1: create real booking on pay confirm.
+            const bookingTenantId = selectedSalonTenantId ?? tenantId;
             const firstServiceId = consumerSelectedServiceIds[0];
             const firstService = batchCServices.find((s) => s.serviceId === firstServiceId);
             const resolvedTech =
@@ -4841,7 +6307,7 @@ export function AppNavigatorShell({
               null;
             if (
               clientBookingFlow &&
-              tenantId &&
+              bookingTenantId &&
               batchCLocation &&
               firstService &&
               resolvedTech &&
@@ -4851,63 +6317,209 @@ export function AppNavigatorShell({
             ) {
               setBatchCConfirmLoading(true);
               setBatchCConfirmError(null);
+              setConsumerLoyaltyDebitError(null);
               const dateStr = consumerBookingDate.toISOString().slice(0, 10);
+
+              // Step 1: Reserve the slot (creates the booking document).
               const result = await clientBookingFlow.reserveSlot({
-                tenantId,
+                tenantId: bookingTenantId,
                 customerUserId: userId,
                 location: batchCLocation,
                 service: firstService,
                 technician: resolvedTech,
                 date: dateStr,
                 slot: batchCSelectedSlotRaw,
+                variantId: consumerSelectedVariantId ?? "",
+                addonIds: [...consumerSelectedAddOnIds],
+                serviceNameSnapshot: firstService.name,
+                locationNameSnapshot: batchCLocation.displayName ?? batchCLocation.name,
+                technicianNameSnapshot: resolvedTech.displayName,
                 notes: consumerBookingNotes || null,
               });
-              setBatchCConfirmLoading(false);
-              if (result.ok) {
-                setBatchCCreatedBookingId(result.booking.bookingId);
-                navigate("BookingConfirmation");
-              } else {
+              if (!result.ok) {
+                setBatchCConfirmLoading(false);
                 setBatchCConfirmError(result.message);
+                return;
               }
+              const newBookingId = result.booking.bookingId;
+
+              // Step 2: Create a Stripe PaymentIntent / SetupIntent and present
+              // Stripe's native PaymentSheet for card confirmation. Skip when
+              // the tenant has payments disabled or paymentsRepository is absent
+              // (dev / test mode without Firebase).
+              const stripeAmountMinor = Math.max(0, Math.round(payPricing.total * 100));
+              if (stripeAmountMinor > 0 && paymentsRepository) {
+                try {
+                  const payResult = await paymentsRepository.createBookingPaymentIntent({
+                    tenantId: bookingTenantId,
+                    bookingId: newBookingId,
+                    totalAmountMinor: stripeAmountMinor,
+                    currency: "usd",
+                  });
+
+                  if (payResult.type !== "no_payment_required") {
+                    const isSetupIntent = payResult.type === "setup_intent";
+                    const { error: initError } = await initPaymentSheet({
+                      merchantDisplayName: tenantProfile?.name ?? "Zarkili",
+                      customerId: payResult.customerId,
+                      customerEphemeralKeySecret: payResult.ephemeralKeySecret,
+                      ...(isSetupIntent
+                        ? { setupIntentClientSecret: payResult.clientSecret }
+                        : { paymentIntentClientSecret: payResult.clientSecret }),
+                      allowsDelayedPaymentMethods: false,
+                      returnURL: "zarkili://booking-payment-return",
+                    });
+                    if (initError) {
+                      setBatchCConfirmLoading(false);
+                      setBatchCConfirmError(initError.message ?? "Payment setup failed.");
+                      return;
+                    }
+                    const { error: presentError } = await presentPaymentSheet();
+                    if (presentError) {
+                      setBatchCConfirmLoading(false);
+                      // presentError.code === "Canceled" means the user closed the sheet —
+                      // don't treat it as a hard error shown in the same way.
+                      setBatchCConfirmError(presentError.message ?? "Payment was not completed.");
+                      return;
+                    }
+                  }
+                } catch (err) {
+                  setBatchCConfirmLoading(false);
+                  setBatchCConfirmError(
+                    err instanceof Error ? err.message : "Payment initialisation failed.",
+                  );
+                  return;
+                }
+              }
+
+              // Step 3: Apply loyalty discount server-side (best-effort — booking and
+              // payment are already confirmed at this point).
+              if (loyaltyPointsToDebit > 0 && paymentsRepository && userId && bookingTenantId) {
+                try {
+                  await paymentsRepository.applyLoyaltyDiscount({
+                    tenantId: bookingTenantId,
+                    userId,
+                    bookingId: newBookingId,
+                    pointsToDebit: loyaltyPointsToDebit,
+                    idempotencyKey: `booking_${newBookingId}_loyalty_v1`,
+                  });
+                } catch {
+                  // Payment confirmed — show a non-blocking note on the confirmation screen.
+                  setConsumerLoyaltyDebitError(
+                    "Your loyalty points could not be applied this time. Your booking is confirmed — points will be returned within 24 hours.",
+                  );
+                }
+              }
+
+              // W50-DEBT-10: capture assigned staff when "any available" was selected
+              if (consumerSelectedStaffId === ANY_STAFF_ID && result.booking.staffId) {
+                setConsumerAssignedStaffId(result.booking.staffId);
+              }
+              setBatchCConfirmLoading(false);
+              setBatchCCreatedBookingId(newBookingId);
+              navigate("BookingConfirmation");
             } else {
-              // Fallback: navigate without real booking (missing prerequisites)
+              // Fallback: navigate without real booking (missing prerequisites).
               navigate("BookingConfirmation");
             }
           }}
+          depositEnabled={batchCBrandDeposit?.enabled}
+          depositAmountUsd={batchCBrandDeposit ? batchCBrandDeposit.amountCents / 100 : undefined}
           onPressBack={() => navigate("BookingPolicies")}
+          progressIndicator={bookingFlowProgressIndicator}
         />
       );
     }
 
     if (activeRoute.name === "BookingConfirmation") {
       const confServices = batchCServices.filter((s) => consumerSelectedServiceIds.includes(s.serviceId));
-      const confSubtotal = confServices.reduce((sum, s) => sum + s.price, 0);
+      const confSubtotal = confServices.reduce((sum, s) => sum + s.basePrice, 0);
       const confTax = Math.round(confSubtotal * 0.08 * 100) / 100;
-      const confPricing = { subtotal: confSubtotal, taxRate: 0.08, tax: confTax, tip: 0, total: Math.round((confSubtotal + confTax) * 100) / 100 };
-      const confTech = batchCTechnicians.find((t) => t.staffId === consumerSelectedStaffId) ?? null;
+      // W50-DEBT-4: mirror loyalty discount from payment step so the total is correct.
+      const confLoyaltyDiscount =
+        consumerLoyaltyApplied && consumerLoyaltyPoints != null && consumerLoyaltyPoints > 0
+          ? Math.min(consumerLoyaltyPoints, Math.round((confSubtotal + confTax) * 100)) / 100
+          : 0;
+      const confPricing = { subtotal: confSubtotal, taxRate: 0.08, tax: confTax, tip: 0, loyaltyDiscount: confLoyaltyDiscount, total: Math.max(0, Math.round((confSubtotal + confTax - confLoyaltyDiscount) * 100) / 100) };
+      // GAP-6: when "any available" was chosen, resolve the assigned tech from
+      // the post-reserve booking result; otherwise use the explicitly chosen one.
+      const confResolvedStaffId = consumerSelectedStaffId === "any"
+        ? consumerAssignedStaffId
+        : consumerSelectedStaffId;
+      const confTech = batchCTechnicians.find((t) => t.staffId === confResolvedStaffId) ?? null;
+      // NEW-DEBT-D guard: v1 supports a single service. Warn if multiple
+      // selected; reserveSlot only used the first one.
+      if (consumerSelectedServiceIds.length > 1 && __DEV__) {
+        // eslint-disable-next-line no-console
+        console.warn(
+          `[booking] Multi-service booking attempted (${consumerSelectedServiceIds.length} services); only the first was reserved. See NEW-DEBT-D.`,
+        );
+      }
+      // W50-DEBT-15: salonAddress wired from batchCLocation
+      const confSalonAddress = batchCLocation
+        ? `${batchCLocation.address.line1}, ${batchCLocation.address.city}`
+        : "";
+      const confAssignedNote =
+        consumerSelectedStaffId === "any" && confTech
+          ? `Booked with ${confTech.displayName}. To book with a different stylist, cancel this booking and start again.`
+          : null;
+      const confNote = consumerLoyaltyDebitError ?? confAssignedNote ?? undefined;
       return (
         <BookingConfirmationScreen
           bookingId={batchCCreatedBookingId ?? "—"}
           salonName={tenantProfile?.name ?? "—"}
-          salonAddress=""
+          salonAddress={confSalonAddress}
           servicesSummary={confServices.map((s) => s.name).join(", ") || "—"}
           staffName={confTech?.displayName ?? "Any available"}
           date={consumerBookingDate ?? new Date()}
           timeSlot={consumerBookingSlot ?? ""}
           pricing={confPricing}
+          note={confNote}
+          // W50-DEBT-15: action buttons — calendar via mailto fallback,
+          // directions via maps deep link, message handled by Linking SMS.
+          onPressAddToCalendar={consumerBookingDate ? () => {
+            const start = new Date(consumerBookingDate);
+            const end = new Date(start.getTime() + 60 * 60 * 1000);
+            const fmt = (d: Date) =>
+              d.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+            const title = encodeURIComponent(`${tenantProfile?.name ?? "Salon"} booking`);
+            const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${fmt(start)}/${fmt(end)}`;
+            void Linking.openURL(url).catch(() => undefined);
+          } : undefined}
+          onPressDirections={confSalonAddress ? () => {
+            const q = encodeURIComponent(confSalonAddress);
+            const url = Platform.OS === "ios"
+              ? `https://maps.apple.com/?q=${q}`
+              : `https://maps.google.com/?q=${q}`;
+            void Linking.openURL(url).catch(() => undefined);
+          } : undefined}
+          onPressMessageSalon={batchCLocation?.phone ? () => {
+            void Linking.openURL(`sms:${batchCLocation!.phone}`).catch(() => undefined);
+          } : undefined}
           onPressManage={() => navigate("ManageBooking")}
           onPressDone={() => {
             // Reset flow on completion.
             setConsumerSelectedServiceIds([]);
             setConsumerSelectedAddOnIds([]);
+            setConsumerSelectedVariantId(null);
             setConsumerSelectedStaffId(null);
             setConsumerBookingDate(null);
             setConsumerBookingSlot(null);
             setConsumerBookingNotes("");
             setConsumerPoliciesAck(false);
+            setConsumerLoyaltyPoints(null);
+            setConsumerLoyaltyApplied(false);
+            setConsumerLoyaltyDebitError(null);
             setBatchCCreatedBookingId(null);
             setBatchCSelectedSlotRaw(null);
             setBatchCConfirmError(null);
+            // W50-DEBT-10/13/14: reset Phase 3 state
+            setConsumerAssignedStaffId(null);
+            setConsumerPoliciesAlreadyAcked(false);
+            setBatchCBrandDeposit(null);
+            setBatchCAddOnCatalog({});
+            // GAP-4/8: reset location policy snapshot
+            setBatchCLocationPolicy(null);
             navigate("AppShell");
           }}
         />
@@ -4928,7 +6540,7 @@ export function AppNavigatorShell({
 
     if (activeRoute.name === "ManageBooking") {
       const manageServices = batchCServices.filter((s) => consumerSelectedServiceIds.includes(s.serviceId));
-      const manageSubtotal = manageServices.reduce((sum, s) => sum + s.price, 0);
+      const manageSubtotal = manageServices.reduce((sum, s) => sum + s.basePrice, 0);
       const manageTax = Math.round(manageSubtotal * 0.08 * 100) / 100;
       const managePricing = { subtotal: manageSubtotal, taxRate: 0.08, tax: manageTax, tip: 0, total: Math.round((manageSubtotal + manageTax) * 100) / 100 };
       const manageTech = batchCTechnicians.find((t) => t.staffId === consumerSelectedStaffId) ?? null;
@@ -5020,15 +6632,15 @@ export function AppNavigatorShell({
         <AddPaymentMethodScreen
           state={addCardFormState}
           onChange={(next) => setAddCardFormState(next)}
-          onSubmit={() => navigate("SavedPaymentMethods")}
-          onPressBack={() => navigate("SavedPaymentMethods")}
+          onSubmit={() => navigate(addCardReturnRoute as Parameters<typeof navigate>[0])}
+          onPressBack={() => navigate(addCardReturnRoute as Parameters<typeof navigate>[0])}
         />
       );
     }
 
     if (activeRoute.name === "Tipping") {
       const tipServices = batchCServices.filter((s) => consumerSelectedServiceIds.includes(s.serviceId));
-      const tipSubtotal = tipServices.reduce((sum, s) => sum + s.price, 0);
+      const tipSubtotal = tipServices.reduce((sum, s) => sum + s.basePrice, 0);
       return (
         <TippingScreen
           subtotal={tipSubtotal}
@@ -5192,7 +6804,7 @@ export function AppNavigatorShell({
     if (activeRoute.name === "LoyaltyLanding") {
       return (
         <LoyaltyLandingScreen
-          points={loyaltyPoints ?? 0}
+          points={profileLoyaltyPoints ?? loyaltyPoints ?? 0}
           historyEntries={loyaltyHistory}
           earnActions={DEFAULT_EARN_ACTIONS}
           onPressBrowseRewards={() => navigate("RewardCatalog")}
@@ -5201,6 +6813,7 @@ export function AppNavigatorShell({
             else if (action.id === "review") navigate("ReviewPrompt");
             else navigate("BookingService");
           }}
+          onPressSeeFullHistory={() => navigate("Activities")}
         />
       );
     }
@@ -5629,7 +7242,7 @@ export function AppNavigatorShell({
           featuredSalons={(homeFeed?.featuredSalons ?? []).map(toFeaturedSalon)}
           categories={(homeFeed?.categories ?? []).map(toAppCategory)}
           onSelectSalon={(tid) => { setSelectedSalonTenantId(tid); navigate("SalonProfile"); }}
-          onSelectCategory={() => navigate("ExploreResults")}}
+          onSelectCategory={() => navigate("ExploreResults")}
         />
       );
     }
@@ -5654,7 +7267,7 @@ export function AppNavigatorShell({
           filters={discoveryFilters}
           onSelectSalon={(tid) => { setSelectedSalonTenantId(tid); navigate("SalonProfile"); }}
           onChangeFilters={() => navigate("DiscoverFilters")}
-          onOpenMap={() => navigate("ExploreMap")}}
+          onOpenMap={() => navigate("ExploreMap")}
         />
       );
     }
@@ -5695,7 +7308,6 @@ export function AppNavigatorShell({
             galleryUrls={[]}
             onSelectService={() => undefined}
             onSelectStaff={() => undefined}
-            onBook={() => undefined}
             onBack={() => navigate("DiscoverHome")}
           />
         );
@@ -5709,7 +7321,6 @@ export function AppNavigatorShell({
             reviews={[]}
             onSelectService={() => undefined}
             onSelectStaff={() => undefined}
-            onBook={() => undefined}
             onBack={() => navigate("DiscoverHome")}
           />
         );
@@ -5722,10 +7333,49 @@ export function AppNavigatorShell({
           reviews={salonProfileData.reviews}
           heroImageUrl={salonProfileHeroUrl}
           galleryUrls={salonProfileGalleryUrls}
-          onSelectService={(serviceId) => { setSelectedServiceId(serviceId); navigate("ServiceDetail"); }}
+          onSelectService={(serviceId) => {
+            // Spec §2: service row tap starts booking at Step 2 (Staff) with service pre-filled.
+            // W50-DEBT-1 fix.
+            setConsumerSelectedServiceIds([serviceId]);
+            setConsumerSelectedVariantId(null);
+            setConsumerSelectedAddOnIds([]);
+            setConsumerSelectedStaffId(null);
+            setConsumerBookingDate(null);
+            setConsumerBookingSlot(null);
+            navigate("BookingStaff");
+          }}
           onSelectStaff={(staffId) => { setSelectedStaffId(staffId); navigate("StaffDetail"); }}
-          onBook={() => navigate("BookingService")}
           onBack={() => navigate("DiscoverHome")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "ExploreServiceDetail") {
+      if (exploreDetailLoading || (!exploreDetailData && !exploreDetailError)) {
+        return (
+          <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+            <ActivityIndicator size="large" />
+          </View>
+        );
+      }
+      if (!exploreDetailData) {
+        return (
+          <View style={{ flex: 1, padding: 24 }}>
+            <Text>{exploreDetailError ?? "Service not found."}</Text>
+          </View>
+        );
+      }
+      return (
+        <ExploreServiceDetailScreen
+          service={exploreDetailData}
+          isLoggedIn={!!userId}
+          onBack={() => navigate("AppShell")}
+          onToggleSave={userId ? (serviceId, next) => {
+            void activeDiscoveryService
+              .toggleSavedService(userId, serviceId, next)
+              .catch(() => undefined);
+          } : undefined}
+          onContinueToTimeSlots={() => navigate("BookingService")}
         />
       );
     }
@@ -5747,7 +7397,29 @@ export function AppNavigatorShell({
         <ServiceDetailScreen
           service={service}
           salon={{ id: salonProfileData.salon.id, name: salonProfileData.salon.name, city: salonProfileData.salon.city }}
-          onBook={() => navigate("BookingService")}
+          // W50-DEBT-17: only show staff who can perform this service type
+          teamStaff={salonProfileData.staff.filter((p) => {
+            const ids = (p as { serviceTypeIds?: string[] }).serviceTypeIds;
+            // When the staff doc has no serviceTypeIds (legacy data), fall back
+            // to showing everyone rather than producing an empty list.
+            return !ids || ids.length === 0 || ids.includes(service.id);
+          })}
+          reviews={salonProfileData.reviews}
+          onBook={(variantId, addonIds) => {
+            // W50-DEBT-2: capture variant + add-on selections; navigate to Step 2 (Staff)
+            setConsumerSelectedServiceIds([service.id]);
+            setConsumerSelectedVariantId(variantId);
+            setConsumerSelectedAddOnIds(addonIds);
+            navigate("BookingStaff");
+          }}
+          onBookWithStaff={(staffId, variantId, addonIds) => {
+            // W50-DEBT-2: capture all selections; navigate to Step 3 (Date/time)
+            setConsumerSelectedServiceIds([service.id]);
+            setConsumerSelectedVariantId(variantId);
+            setConsumerSelectedAddOnIds(addonIds);
+            setConsumerSelectedStaffId(staffId);
+            navigate("BookingDate");
+          }}
           onBack={() => navigate("SalonProfile")}
         />
       );
@@ -5770,9 +7442,27 @@ export function AppNavigatorShell({
       return (
         <StaffDetailScreen
           staff={{ ...staffMember, salonName: salonProfileData.salon.name }}
-          services={salonProfileData.services}
+          // W50-DEBT-18: when the staff member has a serviceTypeIds whitelist,
+          // show only the services they can perform. Empty/undefined = all.
+          services={(() => {
+            const ids = (staffMember as { serviceTypeIds?: string[] }).serviceTypeIds;
+            if (!ids || ids.length === 0) return salonProfileData.services;
+            return salonProfileData.services.filter((s) => ids.includes(s.id));
+          })()}
           onSelectService={(serviceId) => { setSelectedServiceId(serviceId); navigate("ServiceDetail"); }}
-          onBook={() => navigate("BookingService")}
+          onBook={() => {
+            // Pre-fill staff; navigate to Step 1 (Service selection)
+            setConsumerSelectedStaffId(staffMember.id);
+            navigate("BookingService");
+          }}
+          onBookServiceWithStaff={(serviceId, variantId, addonIds) => {
+            // W50-DEBT-2: capture all selections; navigate to Step 3 (Date/time)
+            setConsumerSelectedServiceIds([serviceId]);
+            setConsumerSelectedVariantId(variantId);
+            setConsumerSelectedAddOnIds([...addonIds]);
+            setConsumerSelectedStaffId(staffMember.id);
+            navigate("BookingDate");
+          }}
           onBack={() => navigate("SalonProfile")}
         />
       );
@@ -5792,32 +7482,149 @@ export function AppNavigatorShell({
     if (activeRoute.name === "DiscoverBusinesses") {
       return (
         <ExploreRouteScreen
+          availableMemberships={availableMemberships}
           exploreFeed={exploreFeed}
           feedError={feedErrorMessage}
           isLoadingFeed={feedLoading}
           marketplaceEnabled={featureFlags.marketplaceEnabled}
           onBookEnabled={(salon) => openTenantPublicProfile(salon.tenantId)}
           onBack={() => navigate("AppShell")}
-          onBookUnavailable={() => undefined}
-          onOpenDiscovery={() => navigate("DiscoverHome")}
+          onBookUnavailable={(service) => setBookingComingSoonMessage(`Booking is coming soon for ${service.serviceName}.`)}
           onRetryFeed={() => void retryDiscoveryFeeds()}
+          userId={userId}
+          hasMore={exploreHasMore}
+          onLoadMore={() => {
+            if (exploreLoadingMore || !exploreHasMore) return;
+            setExploreLoadingMore(true);
+            void activeDiscoveryService
+              .getExploreFeedPage({ cursor: exploreNextCursor, pageSize: 20, userId })
+              .then((page) => {
+                setExploreFeed((prev) =>
+                  prev
+                    ? { ...prev, salons: [...prev.salons, ...page.services] }
+                    : { categories: [], salons: page.services }
+                );
+                setExploreNextCursor(page.nextCursor);
+                setExploreHasMore(page.nextCursor !== null);
+              })
+              .catch(() => undefined)
+              .finally(() => setExploreLoadingMore(false));
+          }}
+          suggestions={exploreSuggestions}
+          onSearchQueryChange={(q) => {
+            const lower = q.toLowerCase();
+            const salons = exploreFeed?.salons ?? [];
+            const seen = new Set<string>();
+            const results = salons
+              .filter((s) =>
+                s.serviceName.toLowerCase().includes(lower) ||
+                s.locationDisplayName.toLowerCase().includes(lower) ||
+                s.categoryName.toLowerCase().includes(lower)
+              )
+              .slice(0, 6)
+              .map((s) => {
+                const key = s.serviceName.toLowerCase();
+                if (seen.has(key)) return null;
+                seen.add(key);
+                return {
+                  type: "service" as const,
+                  id: s.id,
+                  label: s.serviceName,
+                  sublabel: s.locationDisplayName || undefined,
+                };
+              })
+              .filter((x): x is NonNullable<typeof x> => x !== null);
+            setExploreSuggestions(results);
+          }}
+          onToggleSave={(serviceId, saved) => {
+            if (!userId) return;
+            setExploreFeed((prev) =>
+              prev
+                ? { ...prev, salons: prev.salons.map((s) => s.id === serviceId ? { ...s, isSaved: saved } : s) }
+                : prev
+            );
+            void activeDiscoveryService
+              .toggleSavedService(userId, serviceId, saved)
+              .catch(() => undefined);
+          }}
+          onViewDetail={(serviceId) => {
+            setSelectedServiceId(serviceId);
+            setExploreDetailLoading(true);
+            setExploreDetailData(null);
+            setExploreDetailError(null);
+            navigate("ExploreServiceDetail");
+            void activeDiscoveryService
+              .getServiceDetail(serviceId)
+              .then((detail) => {
+                console.log("[getServiceDetail] result:", JSON.stringify(detail));
+                setExploreDetailData(detail);
+              })
+              .catch((err) => {
+                console.error("[getServiceDetail] ERROR", err?.code, err?.message, err);
+                setExploreDetailError("Unable to load service details.");
+              })
+              .finally(() => setExploreDetailLoading(false));
+          }}
+          locationLabel={exploreLocationLabel}
+          onLocationChange={(result) => {
+            if (result.type === "manual" && result.query) setExploreLocationLabel(`near ${result.query}`);
+            else if (result.type === "gps") setExploreLocationLabel("near you");
+          }}
         />
       );
     }
 
     if (activeRoute.name === "TenantPublicProfile") {
+      if (salonProfileLoading || (!salonProfileData && !salonProfileError)) {
+        return (
+          <SalonProfileScreen
+            salon={{ id: "", name: "Loading…", city: "", addressLine: "", rating: 0, reviewCount: 0, description: "" }}
+            services={[]}
+            staff={[]}
+            reviews={[]}
+            heroImageUrl={undefined}
+            galleryUrls={[]}
+            onSelectService={() => undefined}
+            onSelectStaff={() => undefined}
+            onBack={() => navigate("DiscoverBusinesses")}
+          />
+        );
+      }
+      if (salonProfileError || !salonProfileData) {
+        return (
+          <SalonProfileScreen
+            salon={{ id: "", name: salonProfileError ?? "Salon unavailable", city: "", addressLine: "", rating: 0, reviewCount: 0, description: "" }}
+            services={[]}
+            staff={[]}
+            reviews={[]}
+            onSelectService={() => undefined}
+            onSelectStaff={() => undefined}
+            onBack={() => navigate("DiscoverBusinesses")}
+          />
+        );
+      }
       return (
-        <>
-          <Text style={styles.screenTitle}>Tenant public profile placeholder</Text>
-          <Text style={styles.screenBody}>
-            {selectedDiscoverTenantId
-              ? `Selected tenant: ${selectedDiscoverTenantId}`
-              : "No tenant selected from discover yet."}
-          </Text>
-          <TouchableOpacity accessibilityRole="button" onPress={() => navigate("DiscoverBusinesses")} style={styles.buttonSecondary}>
-            <Text style={styles.buttonText}>Back to discover</Text>
-          </TouchableOpacity>
-        </>
+        <SalonProfileScreen
+          salon={salonProfileData.salon}
+          services={salonProfileData.services}
+          staff={salonProfileData.staff}
+          reviews={salonProfileData.reviews}
+          heroImageUrl={salonProfileHeroUrl}
+          galleryUrls={salonProfileGalleryUrls}
+          onSelectService={(serviceId) => {
+            // Spec §2: service row tap starts booking at Step 2 (Staff) with service pre-filled.
+            // W50-DEBT-1 fix.
+            setConsumerSelectedServiceIds([serviceId]);
+            setConsumerSelectedVariantId(null);
+            setConsumerSelectedAddOnIds([]);
+            setConsumerSelectedStaffId(null);
+            setConsumerBookingDate(null);
+            setConsumerBookingSlot(null);
+            navigate("BookingStaff");
+          }}
+          onSelectStaff={(staffId) => { setSelectedStaffId(staffId); navigate("StaffDetail"); }}
+          onBack={() => navigate("DiscoverBusinesses")}
+        />
       );
     }
 
@@ -6463,6 +8270,8 @@ export function AppNavigatorShell({
             setAddonSubmitting(true);
             const result = await serviceCatalogService.createAddon({
               tenantId: tenantId ?? "",
+              serviceId: selectedService?.serviceId ?? "",
+              locationId: selectedService?.locationId ?? "",
               name: newAddonName.trim(),
               price: parseFloat(newAddonPrice) || 0,
               currency: "USD",
@@ -6705,16 +8514,16 @@ export function AppNavigatorShell({
           onSelectService={(svc) => {
             setSelectedService(svc);
             setServiceEditName(svc.name);
-            setServiceEditCategory(svc.category);
-            setServiceEditDuration(String(svc.durationMinutes));
-            setServiceEditPrice(String(svc.price));
+            setServiceEditCategory(svc.categoryId);
+            setServiceEditDuration(String(svc.baseDurationMinutes));
+            setServiceEditPrice(String(svc.basePrice));
             navigate("ServiceEdit");
           }}
           onImportCsv={() => { setCsvText(""); setParsedRows([]); setParseErrors([]); navigate("ServiceBulkImport"); }}
           onExportCsv={async () => {
             const header = "name,category,durationMinutes,price,currency";
             const rows = servicesList.map(
-              (s) => `${s.name},${s.category},${s.durationMinutes},${s.price},${s.currency}`,
+              (s) => `${s.name},${s.categoryId},${s.baseDurationMinutes},${s.basePrice},${s.baseCurrency}`,
             );
             const csvText = [header, ...rows].join("\n");
             try {
@@ -6883,6 +8692,29 @@ export function AppNavigatorShell({
           onReschedule={() => navigate("RescheduleAdmin")}
           onMarkNoShow={() => navigate("NoShowMark")}
           onForceBook={() => navigate("ForceBook")}
+          onFinalizePayment={() => {
+            const booking = adminBookingDetail?.booking;
+            if (!booking || !tenantId) return;
+            const bookingId = booking.bookingId;
+            const serviceTotal = booking.priceSnapshot ?? 0;
+            setFinalizePaymentBookingId(bookingId);
+            setFinalizePaymentServiceTotal(serviceTotal);
+            setFinalizePaymentDepositPaid(0);
+            setFinalizePaymentMode(null);
+            navigate("FinalizePaymentAdmin");
+            // Load real deposit/mode via callable for server-side auth enforcement
+            const summaryFn = httpsCallable<
+              { tenantId: string; bookingId: string },
+              { authorizedAmountMinor: number; paymentMode: "deposit" | "full" | "card_on_file" | null }
+            >(functions, "getPaymentSummary");
+            void summaryFn({ tenantId, bookingId }).then((result) => {
+              const d = result.data;
+              setFinalizePaymentDepositPaid((d.authorizedAmountMinor ?? 0) / 100);
+              setFinalizePaymentMode(d.paymentMode ?? null);
+            }).catch(() => {
+              // Non-fatal — screen will show $0; admin can still proceed
+            });
+          }}
           onRetry={() => {
             const id = adminBookingDetail?.booking.bookingId ?? "";
             if (!id) return;
@@ -7221,6 +9053,22 @@ export function AppNavigatorShell({
           }}
           onBack={() => navigate("BookingDetailAdmin")}
           testID="reschedule-admin-screen"
+        />
+      );
+    }
+
+    if (activeRoute.name === "FinalizePaymentAdmin") {
+      return (
+        <FinalizePaymentAdminScreen
+          tenantId={tenantId ?? ""}
+          bookingId={finalizePaymentBookingId}
+          serviceTotal={finalizePaymentServiceTotal}
+          currency={tenantProfile?.defaultCurrency ?? "usd"}
+          depositPaid={finalizePaymentDepositPaid}
+          paymentMode={finalizePaymentMode}
+          functions={functions}
+          onDone={() => navigate("BookingDetailAdmin")}
+          onBack={() => navigate("BookingDetailAdmin")}
         />
       );
     }
@@ -9079,7 +10927,7 @@ export function AppNavigatorShell({
           }}
           onExport={() => {
             if (!tenantId || !customReportResult) return;
-            void exportService.exportBookings(tenantId, analyticsDateRange, "tenant_owner").then((r) => {
+            void exportService.exportBookings({ actorRole: "tenant_owner", filter: { tenantId, dateRange: analyticsDateRange }, format: "csv" }).then((r) => {
               if (!r.ok) alert(r.message);
             });
           }}
@@ -9098,7 +10946,7 @@ export function AppNavigatorShell({
           onCreateReport={async (config) => {
             if (!tenantId) return;
             setScheduledReportsSaving(true);
-            await scheduledReportRepo.createScheduledReport({ ...config, tenantId });
+            await scheduledReportRepo.createScheduledReport({ ...config, tenantId, active: true, createdBy: userId ?? "" });
             const rows = await scheduledReportRepo.listScheduledReports(tenantId);
             setScheduledReports(rows);
             setScheduledReportsSaving(false);
@@ -9160,7 +11008,7 @@ export function AppNavigatorShell({
           loading={aiTogglesLoading}
           saving={aiTogglesSaving}
           toggles={aiToggles}
-          pendingChanges={aiTogglesPending}
+          pendingChanges={aiTogglesPending.length > 0}
           onToggle={(featureKey, enabled) => {
             setAiTogglesPending((prev) => {
               const existing = prev.findIndex((t) => t.featureKey === featureKey);
@@ -9168,7 +11016,7 @@ export function AppNavigatorShell({
               if (existing >= 0) {
                 next[existing] = { ...next[existing], enabled };
               } else {
-                next.push({ featureKey, enabled });
+                next.push({ featureKey: featureKey as AiFeatureKey, enabled, planRequired: null });
               }
               return next;
             });
@@ -9204,13 +11052,18 @@ export function AppNavigatorShell({
           budgetConfig={aiBudgetConfig}
           usageByFeature={aiBudgetUsage}
           onUpdateGlobalCap={(cap) => {
-            setAiBudgetConfig((prev) => prev ? { ...prev, globalMonthlyBudgetUsd: cap } : null);
+            setAiBudgetConfig((prev) => prev ? { ...prev, globalMonthlyCapUsd: cap } : null);
           }}
           onUpdateFeatureCap={(featureKey, cap) => {
             setAiBudgetConfig((prev) => {
               if (!prev) return prev;
-              const features = { ...prev.featureBudgets, [featureKey]: { ...(prev.featureBudgets?.[featureKey] ?? {}), monthlyBudgetUsd: cap } };
-              return { ...prev, featureBudgets: features };
+              return {
+                ...prev,
+                featureCaps: {
+                  ...prev.featureCaps,
+                  [featureKey]: { monthlyCapUsd: cap },
+                } as Record<AiFeatureKey, AiFeatureBudgetConfig>,
+              };
             });
           }}
           onSave={() => {
@@ -9611,8 +11464,8 @@ export function AppNavigatorShell({
               setTenantDirLoading(false);
             }).catch(() => { setTenantDirLoading(false); setTenantDirError("Failed to filter tenants."); });
           }}
-          onSelectTenant={(t) => {
-            setSelectedTenant(t);
+          onSelectTenant={(tenantId) => {
+            setSelectedTenant(tenants.find((t) => t.tenantId === tenantId) ?? null);
             navigate("TenantDetail");
           }}
           onRetry={() => {
@@ -9631,6 +11484,7 @@ export function AppNavigatorShell({
       return (
         <TenantDetailScreen
           loading={tenantDetailLoading}
+          saving={false}
           error={tenantDetailError}
           tenant={selectedTenant}
           onSaveSupportNotes={(notes) => {
@@ -9640,16 +11494,17 @@ export function AppNavigatorShell({
           }}
           onSuspend={() => {
             setSuspendTenantId(selectedTenant.tenantId);
-            setSuspendTenantName(selectedTenant.name);
+            setSuspendTenantName(selectedTenant.displayName);
             navigate("SuspendTenant");
           }}
           onReactivate={() => {
-            void platformAdminSvc.reactivateTenant("platform_admin", selectedTenant.tenantId).then(() => {
+            void platformAdminSvc.reactivateTenant("platform_admin", selectedTenant.tenantId, userId ?? "").then(() => {
               setSelectedTenant({ ...selectedTenant, status: "active" });
             });
           }}
           onImpersonate={() => navigate("Impersonation")}
           onViewAuditLog={() => navigate("PlatformAuditLog")}
+          onRetry={() => { setTenantDetailLoading(true); setTenantDetailLoading(false); }}
           onBack={() => navigate("TenantDirectory")}
           testID="tenant-detail-screen"
         />
@@ -9659,14 +11514,14 @@ export function AppNavigatorShell({
     if (activeRoute.name === "SuspendTenant" && suspendTenantId) {
       return (
         <SuspendTenantScreen
-          loading={suspendTenantLoading}
+          submitting={suspendTenantLoading}
           error={suspendTenantError}
           tenantId={suspendTenantId}
           tenantName={suspendTenantName}
           onConfirmSuspend={(reason) => {
             setSuspendTenantLoading(true);
             setSuspendTenantError(null);
-            void platformAdminSvc.suspendTenant("platform_admin", suspendTenantId, reason).then(() => {
+            void platformAdminSvc.suspendTenant("platform_admin", suspendTenantId, reason, userId ?? "").then(() => {
               setSuspendTenantLoading(false);
               if (selectedTenant) setSelectedTenant({ ...selectedTenant, status: "suspended" });
               navigate("TenantDetail");
@@ -9678,16 +11533,18 @@ export function AppNavigatorShell({
       );
     }
 
-    if (activeRoute.name === "Impersonation") {
+    if (activeRoute.name === "Impersonation" && selectedTenant) {
       return (
         <ImpersonationScreen
-          loading={impersonationLoading}
+          targetTenantId={selectedTenant.tenantId}
+          targetTenantName={selectedTenant.displayName}
+          submitting={impersonationLoading}
           error={impersonationError}
           activeSession={activeImpersonationSession}
-          onStartImpersonation={(targetTenantId, targetUserId) => {
+          onStartImpersonation={(targetUserId, targetUserEmail, reason) => {
             setImpersonationLoading(true);
             setImpersonationError(null);
-            void impersonationSvc.startImpersonation("platform_admin", userId ?? "", targetTenantId, targetUserId).then((session) => {
+            void impersonationSvc.startImpersonation("platform_admin", userId ?? "", selectedTenant.tenantId, targetUserId, targetUserEmail, reason).then((session) => {
               setActiveImpersonationSession(session);
               setImpersonationLoading(false);
             }).catch(() => { setImpersonationLoading(false); setImpersonationError("Failed to start impersonation."); });
@@ -9695,18 +11552,12 @@ export function AppNavigatorShell({
           onEndImpersonation={() => {
             if (!activeImpersonationSession) return;
             setImpersonationLoading(true);
-            void impersonationSvc.endImpersonation("platform_admin", activeImpersonationSession.sessionId).then(() => {
+            void impersonationSvc.endImpersonation("platform_admin", activeImpersonationSession.sessionId, userId ?? "").then(() => {
               setActiveImpersonationSession(null);
               setImpersonationLoading(false);
             }).catch(() => setImpersonationLoading(false));
           }}
-          onRetry={() => {
-            setImpersonationLoading(true);
-            void impersonationSvc.getActiveImpersonationSession("platform_admin").then((s) => {
-              setActiveImpersonationSession(s); setImpersonationLoading(false);
-            }).catch(() => setImpersonationLoading(false));
-          }}
-          onBack={() => navigate("TenantDetail")}
+          onCancel={() => navigate("TenantDetail")}
           testID="impersonation-screen"
         />
       );
@@ -9752,12 +11603,11 @@ export function AppNavigatorShell({
       return (
         <PricingPlanManagementScreen
           loading={pricingPlansLoading}
+          saving={false}
           error={pricingPlansError}
           plans={pricingPlans}
-          onEditPlan={(planId, updates) => {
-            void platformAdminSvc.updatePricingPlan("platform_admin", planId, updates).then(() => {
-              setPricingPlans((prev) => prev.map((p) => p.planId === planId ? { ...p, ...updates } : p));
-            });
+          onEditPlan={(planId) => {
+            void platformAdminSvc.updatePricingPlan("platform_admin", planId, {});
           }}
           onTogglePlanActive={(planId, active) => {
             void platformAdminSvc.updatePricingPlan("platform_admin", planId, { isActive: active }).then(() => {
@@ -9780,9 +11630,12 @@ export function AppNavigatorShell({
       return (
         <FeatureFlagConsoleScreen
           loading={featureFlagsLoading}
+          saving={false}
           error={featureFlagsError}
           platformFlags={platformFlags}
           tenantFlags={tenantFlags}
+          selectedTenantId={selectedTenant?.tenantId ?? ""}
+          selectedTenantName={selectedTenant?.displayName ?? ""}
           onTogglePlatformFlag={(flagKey, enabled) => {
             setPlatformFlags((prev) => prev.map((f) => f.flagKey === flagKey ? { ...f, enabled } : f));
           }}
@@ -9791,15 +11644,15 @@ export function AppNavigatorShell({
           }}
           onSaveAll={() => {
             void Promise.all([
-              ...platformFlags.map((f) => featureFlagSvc.setPlatformFlag("platform_admin", f.flagKey, f.enabled)),
-              ...tenantFlags.map((f) => f.tenantId ? featureFlagSvc.setTenantFlag("platform_admin", f.tenantId, f.flagKey, f.enabled) : Promise.resolve()),
+              ...platformFlags.map((f) => featureFlagSvc.setPlatformFlag("platform_admin", f.flagKey, f.enabled, userId ?? "")),
+              ...tenantFlags.map((f) => f.tenantId ? featureFlagSvc.setTenantFlag("platform_admin", f.flagKey, f.tenantId, f.enabled, userId ?? "") : Promise.resolve()),
             ]);
           }}
           onRetry={() => {
             setFeatureFlagsLoading(true);
             void Promise.all([
               featureFlagSvc.listPlatformFlags("platform_admin"),
-              featureFlagSvc.listTenantFlags("platform_admin", undefined),
+              featureFlagSvc.listTenantFlags("platform_admin", selectedTenant?.tenantId ?? ""),
             ]).then(([pf, tf]) => { setPlatformFlags(pf); setTenantFlags(tf); setFeatureFlagsLoading(false); })
               .catch(() => setFeatureFlagsLoading(false));
           }}
@@ -9820,14 +11673,14 @@ export function AppNavigatorShell({
           onChangeFilter={(f) => {
             setPlatformAuditFilter(f);
             setPlatformAuditLoading(true);
-            void platformAdminSvc.listPlatformAuditLog("platform_admin", f).then(({ entries, total }) => {
-              setPlatformAuditEntries(entries); setPlatformAuditTotal(total); setPlatformAuditLoading(false);
+            void platformAdminSvc.listPlatformAuditLog("platform_admin", f).then((entries) => {
+              setPlatformAuditEntries(entries); setPlatformAuditTotal(entries.length); setPlatformAuditLoading(false);
             }).catch(() => setPlatformAuditLoading(false));
           }}
           onRetry={() => {
             setPlatformAuditLoading(true);
-            void platformAdminSvc.listPlatformAuditLog("platform_admin", platformAuditFilter).then(({ entries, total }) => {
-              setPlatformAuditEntries(entries); setPlatformAuditTotal(total); setPlatformAuditLoading(false);
+            void platformAdminSvc.listPlatformAuditLog("platform_admin", platformAuditFilter).then((entries) => {
+              setPlatformAuditEntries(entries); setPlatformAuditTotal(entries.length); setPlatformAuditLoading(false);
             }).catch(() => setPlatformAuditLoading(false));
           }}
           onBack={() => navigate("AppShell")}
@@ -9844,19 +11697,19 @@ export function AppNavigatorShell({
           items={moderationItems}
           statusFilter={moderationStatusFilter}
           onChangeStatusFilter={(s) => {
-            setModerationStatusFilter(s);
+            setModerationStatusFilter(s ?? "pending");
             setModerationQueueLoading(true);
             void platformAdminSvc.listModerationQueue("platform_admin", s).then((items) => {
               setModerationItems(items); setModerationQueueLoading(false);
             }).catch(() => setModerationQueueLoading(false));
           }}
-          onFlagItem={(itemId, reason) => {
-            void platformAdminSvc.flagModerationItem("platform_admin", itemId, reason).then(() => {
+          onFlagItem={(itemId) => {
+            void platformAdminSvc.flagModerationItem("platform_admin", itemId, "Flagged via admin console", userId ?? "").then(() => {
               setModerationItems((prev) => prev.map((i) => i.itemId === itemId ? { ...i, status: "flagged" as ModerationItemStatus } : i));
             });
           }}
           onClearItem={(itemId) => {
-            void platformAdminSvc.clearModerationItem("platform_admin", itemId).then(() => {
+            void platformAdminSvc.clearModerationItem("platform_admin", itemId, userId ?? "").then(() => {
               setModerationItems((prev) => prev.map((i) => i.itemId === itemId ? { ...i, status: "cleared" as ModerationItemStatus } : i));
             });
           }}
@@ -9876,13 +11729,14 @@ export function AppNavigatorShell({
       return (
         <CrossTenantAiBudgetScreen
           loading={platformAiBudgetLoading}
+          saving={false}
           error={platformAiBudgetError}
           overrides={platformAiBudgetOverrides}
-          onSetOverride={(tenantId: string, monthlyTokenCap, enabled) => {
-            void platformAdminSvc.setTenantAiBudgetOverride("platform_admin", tenantId, { monthlyTokenCap, enabled }).then((updated) => {
-              setPlatformAiBudgetOverrides((prev) => prev.some((o) => o.tenantId === tenantId)
-                ? prev.map((o) => o.tenantId === tenantId ? updated : o)
-                : [...prev, updated]);
+          onSetOverride={(tenantId, capUsd) => {
+            void platformAdminSvc.setTenantAiBudgetOverride("platform_admin", tenantId, capUsd, userId ?? "").then(() => {
+              setPlatformAiBudgetOverrides((prev) =>
+                prev.map((o) => o.tenantId === tenantId ? { ...o, platformCapUsd: capUsd } : o)
+              );
             });
           }}
           onRetry={() => {
@@ -9901,11 +11755,12 @@ export function AppNavigatorShell({
       return (
         <MigrationRunnerScreen
           loading={migrationJobsLoading}
+          triggering={false}
           error={migrationJobsError}
           jobs={migrationJobs}
           onTriggerJob={(jobId) => {
-            void platformAdminSvc.triggerMigrationJob("platform_admin", jobId).then((updated) => {
-              setMigrationJobs((prev) => prev.map((j) => j.jobId === jobId ? updated : j));
+            void platformAdminSvc.triggerMigrationJob("platform_admin", jobId, userId ?? "").then(() => {
+              setMigrationJobs((prev) => prev.map((j) => j.jobId === jobId ? { ...j, status: "running" as MigrationJobStatus } : j));
             });
           }}
           onRetry={() => {
@@ -9941,7 +11796,10 @@ export function AppNavigatorShell({
     if (activeRoute.name === "SupportInbox") {
       return (
         <SupportInboxScreen
+          loading={false}
+          error={null}
           vendorEmbedUrl="https://support.example.com/embed"
+          onRetry={() => {}}
           onBack={() => navigate("AppShell")}
           testID="support-inbox-screen"
         />
@@ -9985,9 +11843,9 @@ export function AppNavigatorShell({
           loading={dataExportLoading}
           error={dataExportError}
           requests={dataExportRequests}
-          onProcessRequest={(requestId, action) => {
-            void platformAdminSvc.processDataExportRequest("platform_admin", requestId, action).then((updated) => {
-              setDataExportRequests((prev) => prev.map((r) => r.requestId === requestId ? updated : r));
+          onProcessRequest={(requestId) => {
+            void platformAdminSvc.processDataExportRequest("platform_admin", requestId).then(() => {
+              setDataExportRequests((prev) => prev.map((r) => r.requestId === requestId ? { ...r, status: "processing" as DataExportRequest["status"] } : r));
             });
           }}
           onRetry={() => {
@@ -10008,7 +11866,7 @@ export function AppNavigatorShell({
           loading={consentPolicyLoading}
           error={consentPolicyError}
           entries={consentPolicyEntries}
-          tenantFilter={consentTenantFilter}
+          tenantFilter={consentTenantFilter ?? ""}
           onChangeTenantFilter={(tid) => {
             setConsentTenantFilter(tid);
             setConsentPolicyLoading(true);
@@ -10032,11 +11890,12 @@ export function AppNavigatorShell({
       return (
         <IncidentResponseScreen
           loading={incidentsLoading}
+          saving={false}
           error={incidentsError}
           incidents={incidents}
           onUpdateStatus={(id, status, notes) => {
-            void platformAdminSvc.updateIncidentStatus("platform_admin", id, status, notes).then((updated) => {
-              setIncidents((prev) => prev.map((i) => i.incidentId === id ? updated : i));
+            void platformAdminSvc.updateIncidentStatus("platform_admin", id, status, notes).then(() => {
+              setIncidents((prev) => prev.map((i) => i.incidentId === id ? { ...i, status, mitigationNotes: notes ?? i.mitigationNotes } : i));
             });
           }}
           onRetry={() => {
@@ -10054,11 +11913,12 @@ export function AppNavigatorShell({
     if (activeRoute.name === "AdminSignIn") {
       return (
         <AdminSignInScreen
+          loading={false}
+          error={null}
           onSignIn={(email, password) => {
             // Platform sign-in delegates to Firebase Auth — handled by host layer
             void Promise.resolve({ email, password });
           }}
-          onBack={() => navigate("AppShell")}
           testID="admin-sign-in-screen"
         />
       );
@@ -10068,7 +11928,7 @@ export function AppNavigatorShell({
       return (
         <RoleDeniedScreen
           requiredRole="platform_admin"
-          currentRole={role ?? "none"}
+          currentRole={"platform_admin"}
           screenName={activeRoute.name}
           onGoBack={() => navigate("AppShell")}
           onGoHome={() => navigate("AppShell")}
@@ -10154,7 +12014,7 @@ export function AppNavigatorShell({
           void goToNextOnboardingStep();
         };
 
-        if (onboardingRoute.step === "account") {
+        if (onboardingRoute.step === "account" && salonWizardState.stepStatuses["ACCOUNT"] !== "completed") {
           return (
             <SalonOnboardingAccountScreen
               totalSteps={totalSalonSteps}
@@ -10483,6 +12343,8 @@ export function AppNavigatorShell({
         "connect-health": "ConnectHealth",
         payouts: "PayoutHistory",
         "refunds-disputes": "RefundDisputeAdmin",
+        // Payment settings
+        "payment-settings": "PaymentSettings",
         // W40 location sections
         locations: "LocationOverview",
         "location-settings": "LocationSettings",
@@ -10564,6 +12426,22 @@ export function AppNavigatorShell({
         <OwnerNotificationPreferencesScreen
           tenantId={tenantId ?? ""}
           onBack={() => navigate("TenantSettingsShell")}
+        />
+      );
+    }
+
+    if (activeRoute.name === "PaymentSettings") {
+      return (
+        <PaymentSettingsScreen
+          tenantId={tenantId ?? ""}
+          functions={functions}
+          connectAccount={billingConnectAccount}
+          userRole="owner"
+          onBack={() => navigate("TenantSettingsShell")}
+          onLaunchConnectOnboarding={(url) => {
+            // Open Stripe hosted onboarding URL in OS browser
+            void url;
+          }}
         />
       );
     }
@@ -10941,18 +12819,16 @@ export function AppNavigatorShell({
 
     return (
       <HomeRouteScreen
+        userId={userId}
         feedError={feedErrorMessage}
         firstName={preferredFirstName}
         homeFeed={homeFeed}
         tenantId={tenantId}
         isLoadingFeed={feedLoading}
-        membershipsLoading={membershipsLoading}
         availableMemberships={availableMemberships}
-        onboardingGuardMessage={onboardingGuardMessage}
         isPlatformAdmin={isPlatformAdmin}
-        onSelectTenant={selectTenantContext}
-        onStartSalonOnboarding={() => void navigateToOnboardingFlow("salon")}
-        onStartClientOnboarding={() => void navigateToOnboardingFlow("client")}
+        nextAppointment={nextAppointment}
+        loyaltySummary={homeLoyaltySummary}
         onOpenTenantProfile={() => navigate("TenantProfile")}
         onOpenTenantLocations={() => navigate("TenantLocations")}
         onOpenCreateLocation={() => navigate("CreateLocation")}
@@ -10965,8 +12841,28 @@ export function AppNavigatorShell({
         onOpenDashboard={() => navigate("SalonDashboard")}
         onBackToDashboard={() => navigate("SalonDashboard")}
         onRetryFeed={() => void retryDiscoveryFeeds()}
+        onOpenSalon={(salon) => openTenantPublicProfile(salon.tenantId)}
         onSignOut={signOut}
         onOpenInbox={() => navigate("Inbox")}
+        unreadInboxCount={unreadInboxCount}
+        onOpenBookingDetail={() => navigate("BookingHistory")}
+        onNavigateToRewards={() => { setActiveTab("Rewards"); navigate("AppShell"); }}
+        onSignUp={() => navigate("SignUp")}
+        onSignIn={() => navigate("SignIn")}
+        rebookItems={homeRebookItems}
+        activeBrandName={activeBrandName}
+        isMultiBrandUser={availableMemberships.length > 1}
+        brandSwitcherItems={availableMemberships.map((m) => ({
+          tenantId: m.tenantId,
+          name: salonSummaries.find((s) => s.tenantId === m.tenantId)?.tenantName ?? m.tenantId,
+          upcomingCount: perSalonSwitcherData.get(m.tenantId)?.upcomingCount ?? 0,
+          points: perSalonSwitcherData.get(m.tenantId)?.points ?? 0,
+          tier: perSalonSwitcherData.get(m.tenantId)?.tier ?? "Bronze",
+        }))}
+        onRebook={(item) => void handleQuickRebook(item)}
+        onSelectActiveBrand={selectTenantContext}
+        onExploreServices={() => navigate("BookingService")}
+        onBrowseCategory={(catId) => { setSelectedExploreCategory(catId); setActiveTab("Explore"); navigate("AppShell"); }}
       />
     );
   }
@@ -10978,6 +12874,32 @@ export function AppNavigatorShell({
         <Text>{t("app.title")}</Text>
         <Text>{t("app.currentRoute", { route: activeRoute.name })}</Text>
         <Text>{t("app.accessibleRoutes", { routes: accessibleRoutes.map((route) => route.name).join(", ") })}</Text>
+        {tenantId ? <Text>{t("appShell.tenantContext", { tenantId })}</Text> : null}
+        {userId ? <Text>{t("appShell.protectedPlaceholder")}</Text> : null}
+        {onboardingGuardMessage ? <Text>{onboardingGuardMessage}</Text> : null}
+        {selectedSalonTenantId ? <Text>{`Selected tenant: ${selectedSalonTenantId}`}</Text> : null}
+        {bookingComingSoonMessage ? <Text>{bookingComingSoonMessage}</Text> : null}
+        {/* Functional bridge — onboarding + membership access regardless of active tab */}
+        {userId && !membershipsLoading && availableMemberships.length === 0 ? (
+          <Text>{t("membership.none")}</Text>
+        ) : null}
+        {userId && !membershipsLoading && availableMemberships.length > 1
+          ? availableMemberships.map((m) => (
+              <TouchableOpacity key={m.membershipId} onPress={() => selectTenantContext(m.tenantId)}>
+                <Text>{t("membership.selectTenant", { tenantId: m.tenantId })}</Text>
+              </TouchableOpacity>
+            ))
+          : null}
+        {userId ? (
+          <>
+            <TouchableOpacity onPress={() => void navigateToOnboardingFlow("salon")}>
+              <Text>{t("onboarding.startSalon")}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => void navigateToOnboardingFlow("client")}>
+              <Text>{t("onboarding.startClient")}</Text>
+            </TouchableOpacity>
+          </>
+        ) : null}
       </View>
       <View style={styles.contentArea}>
         <View style={styles.container}>

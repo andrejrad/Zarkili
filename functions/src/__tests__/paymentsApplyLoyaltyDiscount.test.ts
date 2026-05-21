@@ -140,14 +140,27 @@ function seedState(
   points: number,
   lifetimePoints = 500,
 ) {
-  db.__setDoc(`tenants/${TENANT}/loyaltyStates/${USER}`, {
+  db.__setDoc(`user_brand_loyalty/${USER}_${TENANT}`, {
     userId: USER,
     tenantId: TENANT,
+    brandId: TENANT,
     points,
+    pointsBalance: points,
     lifetimePoints,
     currentTierId: "bronze",
     enrolledAt: { seconds: 0, nanoseconds: 0 },
     updatedAt: { seconds: 0, nanoseconds: 0 },
+  });
+}
+
+function seedBooking(
+  db: ReturnType<typeof makeFirestoreMock>,
+  userId = USER,
+) {
+  db.__setDoc(`tenants/${TENANT}/appointmentPayments/${BOOKING}`, {
+    userId,
+    tenantId: TENANT,
+    bookingId: BOOKING,
   });
 }
 
@@ -197,6 +210,7 @@ describe("handleApplyLoyaltyDiscount", () => {
 
   it("throws resource-exhausted when user has too few points", async () => {
     seedConfig(db);
+    seedBooking(db);
     seedState(db, 50); // only 50 points; requesting 100
     await expect(
       handleApplyLoyaltyDiscount(db as never, USER, makeInput()),
@@ -205,6 +219,7 @@ describe("handleApplyLoyaltyDiscount", () => {
 
   it("throws resource-exhausted when user has no loyalty state document", async () => {
     seedConfig(db);
+    seedBooking(db);
     // no seedState — user has 0 balance
     await expect(
       handleApplyLoyaltyDiscount(db as never, USER, makeInput()),
@@ -215,6 +230,7 @@ describe("handleApplyLoyaltyDiscount", () => {
 
   it("debits points and returns discountMinor = pointsToDebit (1 pt = 1 minor unit)", async () => {
     seedConfig(db);
+    seedBooking(db);
     seedState(db, 200);
 
     const result = await handleApplyLoyaltyDiscount(db as never, USER, makeInput());
@@ -226,16 +242,18 @@ describe("handleApplyLoyaltyDiscount", () => {
 
   it("decrements the loyalty state balance correctly", async () => {
     seedConfig(db);
+    seedBooking(db);
     seedState(db, 200);
 
     await handleApplyLoyaltyDiscount(db as never, USER, makeInput());
 
-    const stateDoc = db.__docs.get(`tenants/${TENANT}/loyaltyStates/${USER}`);
+    const stateDoc = db.__docs.get(`user_brand_loyalty/${USER}_${TENANT}`);
     expect(stateDoc?.points).toBe(100); // 200 - 100 = 100
   });
 
   it("writes a loyalty transaction doc of type debit", async () => {
     seedConfig(db);
+    seedBooking(db);
     seedState(db, 500);
 
     const result = await handleApplyLoyaltyDiscount(db as never, USER, makeInput());
@@ -251,6 +269,7 @@ describe("handleApplyLoyaltyDiscount", () => {
 
   it("writes the idempotency marker with txId and discountMinor", async () => {
     seedConfig(db);
+    seedBooking(db);
     seedState(db, 500);
 
     const result = await handleApplyLoyaltyDiscount(db as never, USER, makeInput());
@@ -266,13 +285,14 @@ describe("handleApplyLoyaltyDiscount", () => {
 
   it("returns cached result without debiting again on duplicate call", async () => {
     seedConfig(db);
+    seedBooking(db);
     seedState(db, 500);
 
     // First call
     const first = await handleApplyLoyaltyDiscount(db as never, USER, makeInput());
 
     // Capture state after first call
-    const stateAfterFirst = db.__docs.get(`tenants/${TENANT}/loyaltyStates/${USER}`);
+    const stateAfterFirst = db.__docs.get(`user_brand_loyalty/${USER}_${TENANT}`);
     const balanceAfterFirst = stateAfterFirst?.points as number;
 
     // Second call with same idempotency key
@@ -284,7 +304,7 @@ describe("handleApplyLoyaltyDiscount", () => {
     expect(second.pointsDebited).toBe(first.pointsDebited);
 
     // Balance must not have changed after second call
-    const stateAfterSecond = db.__docs.get(`tenants/${TENANT}/loyaltyStates/${USER}`);
+    const stateAfterSecond = db.__docs.get(`user_brand_loyalty/${USER}_${TENANT}`);
     expect(stateAfterSecond?.points).toBe(balanceAfterFirst);
   });
 
@@ -292,6 +312,7 @@ describe("handleApplyLoyaltyDiscount", () => {
 
   it("succeeds when user has exactly enough points", async () => {
     seedConfig(db);
+    seedBooking(db);
     seedState(db, 100); // exactly 100
 
     const result = await handleApplyLoyaltyDiscount(
@@ -301,7 +322,27 @@ describe("handleApplyLoyaltyDiscount", () => {
     );
 
     expect(result.pointsDebited).toBe(100);
-    const stateDoc = db.__docs.get(`tenants/${TENANT}/loyaltyStates/${USER}`);
+    const stateDoc = db.__docs.get(`user_brand_loyalty/${USER}_${TENANT}`);
     expect(stateDoc?.points).toBe(0);
+  });
+
+  // ── Booking ownership (BUG-07 fix) ───────────────────────────────────────
+
+  it("throws not-found when booking does not exist", async () => {
+    seedConfig(db);
+    seedState(db, 200);
+    // intentionally no seedBooking
+    await expect(
+      handleApplyLoyaltyDiscount(db as never, USER, makeInput()),
+    ).rejects.toThrow("Booking not found");
+  });
+
+  it("throws permission-denied when booking belongs to a different user", async () => {
+    seedConfig(db);
+    seedBooking(db, "other-user"); // booking owned by someone else
+    seedState(db, 200);
+    await expect(
+      handleApplyLoyaltyDiscount(db as never, USER, makeInput()),
+    ).rejects.toThrow("Booking does not belong to this user");
   });
 });

@@ -31,6 +31,8 @@ export type TenantSettingsSection =
   | "connect-health"
   | "payouts"
   | "refunds-disputes"
+  // Payment settings (Stripe per-tenant)
+  | "payment-settings"
   // W40 locations
   | "locations"
   | "location-settings"
@@ -96,6 +98,11 @@ export function TenantSettingsShellScreen({
           label="Currency settings"
           sublabel="Default currency, FX disclosure preferences"
           onPress={() => onNavigateTo("currency")}
+        />
+        <AdminSectionRow
+          label="Payment settings"
+          sublabel="Enable payments, deposit %, Stripe Connect"
+          onPress={() => onNavigateTo("payment-settings")}
         />
       </View>
 

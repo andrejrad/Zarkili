@@ -32,7 +32,7 @@ export function AiTogglesScreen({
   if (loading) {
     return (
       <View style={styles.center} testID={testID}>
-        <ActivityIndicator testID="loading-indicator" />
+        <ActivityIndicator testID="loading-spinner" />
       </View>
     );
   }

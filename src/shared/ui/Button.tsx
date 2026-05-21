@@ -17,6 +17,7 @@ export type ButtonVariant =
   | "secondary"
   | "tertiary"
   | "destructive"
+  | "ghost"
   | "iconOnly";
 
 export type ButtonSize = "large" | "medium" | "small";
@@ -143,6 +144,11 @@ const VARIANT_STYLES: Record<ButtonVariant, {
     container: { backgroundColor: "transparent", minWidth: 44, minHeight: 44 },
     label: { color: colors.foreground },
     pressed: { backgroundColor: colors.hover },
+  },
+  ghost: {
+    container: { backgroundColor: "transparent" },
+    label: { color: colors.primary },
+    pressed: { backgroundColor: colors.primary10 },
   },
 };
 

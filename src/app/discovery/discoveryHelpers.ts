@@ -82,6 +82,31 @@ export type SalonServiceSummary = {
   name: string;
   durationMinutes: number;
   priceCents: number;
+  description?: string;
+  /** Staff first-names who can perform this service (max 3 shown + "and X more"). */
+  staffNames?: string[];
+  /** Human-readable next available slot, e.g. "Today 4:30 PM". */
+  nextAvailableLabel?: string;
+  variantCount?: number;
+};
+
+/** A single pricing/duration variant for a service (e.g. "Partial" vs "Full head"). */
+export type ServiceVariantSummary = {
+  id: string;
+  name: string;
+  durationMinutes: number;
+  /** Pence / cents. */
+  price: number;
+  isDefault: boolean;
+};
+
+/** An optional add-on that can be bolted onto a service booking. */
+export type ServiceAddonSummary = {
+  id: string;
+  name: string;
+  durationMinutes: number;
+  /** Incremental pence / cents. */
+  price: number;
 };
 
 export type SalonStaffSummary = {
@@ -89,9 +114,32 @@ export type SalonStaffSummary = {
   name: string;
   role: string;
   rating?: number;
+  reviewCount?: number;
+  specialties?: string[];
   imageUrl?: string;
+  /** IDs of service types this staff member can perform. */
+  serviceTypeIds?: string[];
+  /** Full bio for the detail screen. */
+  bio?: string;
+  /** First sentence of bio — used in mini-sheet. */
+  bioSummary?: string;
+  /** Human-readable next available slot for a specific service, e.g. "Today 2:00 PM". */
+  nextAvailableLabel?: string;
 };
 
-export function formatPrice(cents: number): string {
-  return `$${(cents / 100).toFixed(2)}`;
+import { formatMoney } from "../../shared/ui/money";
+
+/**
+ * Format a price stored in minor currency units (pence/cents) for display.
+ *
+ * NEW-DEBT-A: currency is multi-tenant — pass an explicit `currencyCode`
+ * (ISO-4217, e.g. "GBP", "USD", "EUR") when known. Falls back to GBP when
+ * the caller has not yet been plumbed through with currency context.
+ *
+ * Note: the legacy implementation rendered the input as `$amount.toFixed(2)`,
+ * which mis-displayed minor-unit amounts (e.g. 8500 → "$8500.00"). Callers
+ * already pass minor units (`priceCents`, `v.price`, `a.price`).
+ */
+export function formatPrice(minorUnits: number, currencyCode?: string): string {
+  return formatMoney(minorUnits, currencyCode);
 }

@@ -25,6 +25,7 @@ import { ModalSheet } from "../../shared/ui/ModalSheet";
 import { ReceiptLineItem } from "../../shared/ui/ReceiptLineItem";
 import { SummaryRow } from "../../shared/ui/SummaryRow";
 import { WalkInForm, type WalkInService } from "../../shared/ui/WalkInForm";
+import { formatMoney } from "../../shared/ui/money";
 import { colors, radius, spacing } from "../../shared/ui/tokens";
 
 // ---------------------------------------------------------------------------
@@ -100,6 +101,8 @@ export type PayoutEarningsScreenProps = {
   lineItems: EarningsLineItem[];
   payoutHistory: PayoutHistory[];
   onRequestPayout: () => void;
+  /** ISO-4217 currency code for the location/tenant. Defaults to "GBP". */
+  currency?: string;
   testID?: string;
 };
 
@@ -114,6 +117,8 @@ export type DailyCloseReportScreenProps = {
   summary: DailyCloseSummary;
   date: string;
   onExport: () => void;
+  /** ISO-4217 currency code for the location/tenant. Defaults to "GBP". */
+  currency?: string;
   testID?: string;
 };
 
@@ -424,6 +429,7 @@ export function PayoutEarningsScreen({
   lineItems,
   payoutHistory,
   onRequestPayout,
+  currency = "GBP",
   testID,
 }: PayoutEarningsScreenProps) {
   return (
@@ -433,7 +439,7 @@ export function PayoutEarningsScreen({
         <View style={styles.earningsCard} testID={testID ? `${testID}-card` : undefined}>
           <Text style={styles.earningsPeriod}>{periodLabel}</Text>
           <Text style={styles.earningsAmount} testID={testID ? `${testID}-amount` : undefined}>
-            ${(currentEarnings / 100).toFixed(2)}
+            {formatMoney(currentEarnings, currency)}
           </Text>
           <Pressable
             onPress={onRequestPayout}
@@ -452,7 +458,7 @@ export function PayoutEarningsScreen({
             <ReceiptLineItem
               key={item.id}
               description={item.label}
-              amountLabel={`${item.type === "debit" ? "−" : "+"}$${(item.amount / 100).toFixed(2)}`}
+              amountLabel={`${item.type === "debit" ? "−" : "+"}${formatMoney(item.amount, currency)}`}
               testID={testID ? `${testID}-line-${item.id}` : undefined}
             />
           ))}
@@ -467,7 +473,7 @@ export function PayoutEarningsScreen({
                 <SummaryRow
                   key={p.id}
                   label={p.date}
-                  value={`$${(p.amount / 100).toFixed(2)}`}
+                  value={formatMoney(p.amount, currency)}
                   testID={testID ? `${testID}-payout-${p.id}` : undefined}
                 />
               ))}
@@ -487,12 +493,13 @@ export function DailyCloseReportScreen({
   summary,
   date,
   onExport,
+  currency = "GBP",
   testID,
 }: DailyCloseReportScreenProps) {
   const tiles = [
     { id: "bookings", label: "Bookings", value: String(summary.bookingsCount), icon: "📅" },
-    { id: "revenue", label: "Revenue", value: `$${(summary.revenue / 100).toFixed(2)}`, icon: "💵" },
-    { id: "tips", label: "Tips", value: `$${(summary.tips / 100).toFixed(2)}`, icon: "🙏" },
+    { id: "revenue", label: "Revenue", value: formatMoney(summary.revenue, currency), icon: "💵" },
+    { id: "tips", label: "Tips", value: formatMoney(summary.tips, currency), icon: "🙏" },
     { id: "no-shows", label: "No-shows", value: String(summary.noShows), icon: "❌" },
   ];
 

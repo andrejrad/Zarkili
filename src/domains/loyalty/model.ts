@@ -59,6 +59,8 @@ export type CustomerLoyaltyState = {
   currentTierId: string | null;
   enrolledAt: Timestamp;
   updatedAt: Timestamp;
+  /** Per-location spend breakdown: locationId → totalPoints */
+  locationBreakdown: Record<string, number>;
 };
 
 // ---------------------------------------------------------------------------
@@ -75,6 +77,8 @@ export type LoyaltyTransaction = {
   /** Always a positive number; `type` indicates the direction */
   points: number;
   reason: string;
+  /** Optional structured data for the event, used to render human-readable history labels. */
+  eventData?: Record<string, string>;
   referenceId: string;
   idempotencyKey: string;
   createdAt: Timestamp;

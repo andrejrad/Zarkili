@@ -1,7 +1,11 @@
 /**
  * formatters.ts — US-locale formatting helpers for W21 auth surfaces.
  *
- * Defaults: en-US, USD, MM/DD/YYYY, 12-hour, (XXX) XXX-XXXX phone, 5-digit ZIP.
+ * Scope: US phone, ZIP, email, password policy helpers only. Currency
+ * formatting lives in `./money.ts` (multi-currency, locale-aware) per
+ * NEW-DEBT-A — never assume USD at the display layer.
+ *
+ * Defaults: en-US, MM/DD/YYYY, 12-hour, (XXX) XXX-XXXX phone, 5-digit ZIP.
  */
 
 /** Strips non-digits then formats progressively as `(XXX) XXX-XXXX`. */

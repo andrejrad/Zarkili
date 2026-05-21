@@ -9,6 +9,11 @@
 import React from "react";
 import { fireEvent, render } from "@testing-library/react-native";
 
+jest.mock("expo-location", () => ({
+  getForegroundPermissionsAsync: jest.fn().mockResolvedValue({ status: "denied" }),
+  requestForegroundPermissionsAsync: jest.fn().mockResolvedValue({ status: "denied" }),
+}));
+
 import { DiscoverHomeScreen } from "../DiscoverHomeScreen";
 import { DiscoverFeedScreen } from "../DiscoverFeedScreen";
 import { ExploreResultsScreen } from "../ExploreResultsScreen";
@@ -318,7 +323,6 @@ describe("SalonProfileScreen", () => {
   function renderProfile() {
     const onSelectService = jest.fn();
     const onSelectStaff = jest.fn();
-    const onBook = jest.fn();
     const onBack = jest.fn();
     const utils = render(
       <SalonProfileScreen
@@ -328,11 +332,10 @@ describe("SalonProfileScreen", () => {
         reviews={REVIEWS}
         onSelectService={onSelectService}
         onSelectStaff={onSelectStaff}
-        onBook={onBook}
         onBack={onBack}
       />,
     );
-    return { ...utils, onSelectService, onSelectStaff, onBook, onBack };
+    return { ...utils, onSelectService, onSelectStaff, onBack };
   }
 
   it("renders salon name, services, staff and reviews", () => {
@@ -344,11 +347,9 @@ describe("SalonProfileScreen", () => {
     expect(getByText(/Loved it/)).toBeTruthy();
   });
 
-  it("invokes onBook and onBack handlers", () => {
-    const { getByTestId, onBook, onBack } = renderProfile();
-    fireEvent.press(getByTestId("salon-profile-book"));
+  it("invokes onBack handler", () => {
+    const { getByTestId, onBack } = renderProfile();
     fireEvent.press(getByTestId("salon-profile-back"));
-    expect(onBook).toHaveBeenCalled();
     expect(onBack).toHaveBeenCalled();
   });
 

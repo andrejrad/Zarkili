@@ -32,9 +32,9 @@ function makeFirestoreMock() {
     return resolved;
   }
 
-  function doc(_db: unknown, collectionPath: string, id: string) {
-    const key = `${collectionPath}/${id}`;
-    return { key, id, path: key };
+  function doc(_db: unknown, ...segments: string[]) {
+    const key = segments.join("/");
+    return { key, id: segments[segments.length - 1], path: key };
   }
 
   async function getDoc(ref: { key: string; id: string }) {
@@ -207,6 +207,8 @@ function makeInput(startMinutes: number): CreateBookingInput {
     locationId: "locA",
     staffId: "staffA",
     serviceId: "svcA",
+    variantId: "var-svcA-standard",
+    addonIds: [],
     customerUserId: "custA",
     date: TEST_DATE,
     startMinutes,
@@ -215,6 +217,9 @@ function makeInput(startMinutes: number): CreateBookingInput {
     endTime: `${Math.floor((startMinutes + DURATION) / 60).toString().padStart(2, "0")}:${((startMinutes + DURATION) % 60).toString().padStart(2, "0")}`,
     durationMinutes: DURATION,
     bufferMinutes: BUFFER,
+    serviceNameSnapshot: "Service",
+    locationNameSnapshot: "Location",
+    technicianNameSnapshot: "Technician",
     notes: null,
   };
 }
@@ -226,6 +231,12 @@ function makeInput(startMinutes: number): CreateBookingInput {
 describe("Booking domain — end-to-end flow", () => {
   beforeEach(() => {
     mockFirestore = makeFirestoreMock();
+    // Seed the service variant required by createBookingAtomically
+    mockFirestore.store["brands/tenantA/locations/locA/service_types/svcA/variants/var-svcA-standard"] = {
+      name: "Standard",
+      price: 5000,
+      durationMinutes: 60,
+    };
   });
 
   it("full flow: generate slots → reserve one → reserved slot disappears from next generation", async () => {

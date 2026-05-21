@@ -11,6 +11,7 @@ import {
   orderBy,
   limit,
   type Firestore,
+  type QueryConstraint,
 } from "firebase/firestore";
 import type { AiFeatureKey } from "../../shared/ai";
 import type {
@@ -101,7 +102,7 @@ export function createAiAdminService(db: Firestore) {
     assertAllowed(actorRole);
 
     const colRef = collection(db, "tenants", tenantId, "aiSuggestions");
-    const constraints = [orderBy("generatedAt", "desc"), limit(200)];
+    const constraints: QueryConstraint[] = [orderBy("generatedAt", "desc"), limit(200)];
     if (filter.kind) {
       constraints.unshift(where("kind", "==", filter.kind));
     }
@@ -239,7 +240,7 @@ export function createAiAdminService(db: Firestore) {
     assertAllowed(actorRole);
 
     const colRef = collection(db, "tenants", tenantId, "aiAuditLog");
-    const constraints = [orderBy("createdAt", "desc"), limit(200)];
+    const constraints: QueryConstraint[] = [orderBy("createdAt", "desc"), limit(200)];
     if (filter.featureKey) {
       constraints.unshift(where("featureKey", "==", filter.featureKey));
     }

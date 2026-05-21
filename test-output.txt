@@ -1,0 +1,324 @@
+﻿  console.warn
+    expo-notifications: Android Push notifications (remote notifications) functionality provided by expo-notifications was removed from Expo Go with the release of SDK 53. Use a development build instead of Expo Go. Read more at https://docs.expo.dev/develop/development-builds/introduction/.
+
+    [0m [90m 14 |[39m
+     [90m 15 |[39m [36mimport[39m [33m*[39m [36mas[39m [33mDevice[39m [36mfrom[39m [32m"expo-device"[39m[33m;[39m
+    [31m[1m>[22m[39m[90m 16 |[39m [36mimport[39m [33m*[39m [36mas[39m [33mNotifications[39m [36mfrom[39m [32m"expo-notifications"[39m[33m;[39m
+     [90m    |[39m [31m[1m^[22m[39m
+     [90m 17 |[39m [36mimport[39m { [33mPlatform[39m } [36mfrom[39m [32m"react-native"[39m[33m;[39m
+     [90m 18 |[39m
+     [90m 19 |[39m [36mexport[39m type [33mPushTokenRecord[39m [33m=[39m {[0m
+
+      at warn (node_modules/expo-notifications/src/warnOfExpoGoPushUsage.ts:14:15)
+      at addPushTokenListener (node_modules/expo-notifications/src/TokenEmitter.ts:44:24)
+      at Object.<anonymous> (node_modules/expo-notifications/src/DevicePushTokenAutoRegistration.fx.ts:104:23)
+      at Object.require (node_modules/expo-notifications/src/getExpoPushTokenAsync.ts:5:1)
+      at Object.require (node_modules/expo-notifications/src/index.ts:16:1)
+      at Object.require (src/app/notifications/registerFcmToken.ts:16:1)
+      at Object.require (src/app/navigation/AppNavigatorShell.tsx:518:1)
+      at Object.require (src/app/navigation/__tests__/AppNavigatorShell.test.tsx:4:1)
+
+  console.log
+    [ProfileStats] loyalty points total: 0 across 0 tenants
+
+      at log (src/app/navigation/AppNavigatorShell.tsx:2976:17)
+
+  console.log
+    [ProfileStats] loyalty points total: 0 across 0 tenants
+
+      at log (src/app/navigation/AppNavigatorShell.tsx:2976:17)
+
+node.exe : FAIL src/app/navigation/__tests__/AppNavigatorShell.test.tsx 
+(129.639 s)
+At C:\nvm4w\nodejs\npx.ps1:29 char:3
++   & $NODE_EXE $NPX_CLI_JS $args
++   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (FAIL src/app/na...tsx (129.639 s) 
+   :String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  AppNavigatorShell
+    ΓêÜ shows coming soon on discover when marketplace flag is disabled (683 
+ms)
+    ΓêÜ moves to app shell after dev sign-in (370 ms)
+    ΓêÜ submits login through the injected auth repository and enters the app 
+shell (281 ms)
+    ΓêÜ submits registration, completes profile, and enters the app shell (325 
+ms)
+    ΓêÜ navigates to EditProfile and saves display name changes (290 ms)
+    ΓêÜ shows user identity on the profile overview after sign-in (305 ms)
+    ΓêÜ shows repository auth errors on the login screen (150 ms)
+    ΓêÜ clears auth errors after navigating away from and back to login (215 
+ms)
+    ΓêÜ resumes saved onboarding step on flow entry (317 ms)
+    ΓêÜ saves onboarding draft when moving to next step (388 ms)
+    ΓêÜ blocks onboarding start without tenant context (208 ms)
+    ΓêÜ allows selecting tenant from multiple memberships (338 ms)
+    ΓêÜ shows owner AI budget settings only for platform admin user (274 ms)
+    ΓêÜ navigates to tenant profile placeholder when booking is enabled (198 
+ms)
+    ΓêÜ shows coming-soon notice when booking is disabled for a salon (191 ms)
+    ΓêÜ filters discover results by search and shows empty state when nothing 
+matches (206 ms)
+    ΓêÜ shows discover error state when feed loading fails (142 ms)
+    ΓêÜ renders tenant profile screen from app shell route entry (335 ms)
+    ΓêÜ submits create location with tenant-scoped payload (403 ms)
+    ΓêÜ renders staff list screen from app shell route entry (329 ms)
+    ΓêÜ submits create service with tenant-scoped payload (360 ms)
+    ├ù context switch: selecting a salon from the dashboard scopes subsequent 
+operations to that tenant (224 ms)
+
+  ΓùÅ AppNavigatorShell ΓÇ║ context switch: selecting a salon from the 
+dashboard scopes subsequent operations to that tenant
+
+    Unable to find an element with testID: salon-card-tenantA
+
+    [36m<View>[39m
+      [36m<View>[39m
+        [36m<Text>[39m
+          [0mZarkili[0m
+        [36m</Text>[39m
+        [36m<Text>[39m
+          [0mCurrent route: SalonDashboard[0m
+        [36m</Text>[39m
+        [36m<Text>[39m
+          [0mAccessible routes: Landing, Login, Register, SignIn, SignUp, 
+SocialSignIn, ForgotPassword, ResetPassword, EmailVerification, 
+OtpVerification, AccountMerge, GuestBookingGate, DiscoverBusinesses, 
+TenantPublicProfile, DiscoverHome, DiscoverFeed, ExploreResults, 
+ExploreServiceDetail, ExploreMap, DiscoverFilters, SalonProfile, 
+ServiceDetail, StaffDetail, BookingService, BookingStaff, BookingDate, 
+BookingReview, BookingPolicies, BookingPayment, BookingConfirmation, 
+ManageBooking, GuestContact, PostBookingUpgrade, SavedPaymentMethods, 
+AddPaymentMethod, Tipping, Receipt, BookingHistory, RefundStatus, 
+LoyaltyLanding, RewardCatalog, RewardRedemption, Activities, ActivityDetail, 
+ClaimActivityReward, ReviewPrompt, ReviewDetail, Referral, Inbox, Thread, 
+Compose, NotificationCenter, NotificationPreferences, EditProfile, 
+SettingsShell, LegalPage, Waitlist, WaitlistJoin, WaitlistPosition, AppShell, 
+CompleteProfile, TenantProfile, TenantLocations, CreateLocation, StaffList, 
+StaffCreate, StaffEdit, ServiceList, ServiceCreate, ServiceEdit, 
+AdminBookingQueue, SalonDashboard, OwnerHome, TenantSettingsShell, 
+BusinessProfile, BrandSettings, TaxSettings, CurrencySettings, LegalDocuments, 
+DomainSettings, OwnerNotificationPreferences, PaymentSettings, BillingHub, 
+SubscriptionPlan, InvoiceHistory, AdminPaymentMethod, CancelSubscription, 
+StripeConnectOnboarding, ConnectHealth, PayoutHistory, RefundDisputeAdmin, 
+PrintPdfLayout, LocationOverview, LocationDashboard, LocationSettings, 
+LocationServiceOverrides, ResourceManagement, AdminWalkInQueue, DailyClose, 
+StaffSchedule, StaffPerformance, StaffCommission, StaffInvite, StaffRole, 
+StaffServiceMapping, ServiceCategories, ServiceBulkImport, ServicePricing, 
+ServiceAddOns, ServiceSeasonalRules, ServicePhotos, ServiceBookingRules, 
+ServiceVisibility, BookingCalendar, BookingDetailAdmin, ManualBooking, 
+BlockTime, ForceBook, NoShowMark, CancellationAdmin, RescheduleAdmin, 
+FinalizePaymentAdmin, ClientListAdmin, ClientDetailAdmin, MergeClients, 
+BlockClient, GdprExport, DeleteClient, SegmentBuilder, TargetedMessage, 
+LoyaltyConfig, AdminRewardCatalog, PointAdjustment, LoyaltyDashboard, 
+TierMigration, ActivityCatalog, ActivityAnalytics, CampaignList, 
+CampaignBuilder, CampaignPerformance, TransactionalTemplates, PromotionAdmin, 
+ReviewQueue, ReviewReply, ReviewFlag, ReviewAutomation, ReputationDashboard, 
+InboxTriage, ThreadAssign, CannedReplies, AutoReplyConfig, MessageArchive, 
+WaitlistAdminList, WaitlistConvert, WaitlistPolicies, RevenueDashboard, 
+BookingFunnel, StaffProductivity, ServicePerformance, ClientRetention, 
+MarketplaceAttribution, CustomReportBuilder, ScheduledReports, 
+OperatorAuditLog, AiToggles, AiBudgetConfig, AiSuggestionQueue, 
+AiUsageAnalytics, AiAuditLog, MarketplacePostComposer, PerPostPerformance, 
+AntiTheftCompliance, OnboardingAdmin, SalonOnboardingAccount, 
+SalonOnboardingBusinessProfile, SalonOnboardingPaymentSetup, 
+SalonOnboardingServices, SalonOnboardingStaff, SalonOnboardingPolicies, 
+SalonOnboardingAvailability, SalonOnboardingMarketplace, 
+SalonOnboardingVerification, ClientOnboardingAccountGuest, 
+ClientOnboardingPhoneVerify, ClientOnboardingProfile, 
+ClientOnboardingPaymentMethod, ClientOnboardingPreferences, 
+ClientOnboardingNotifications, ClientOnboardingLoyalty, AdminSignIn, 
+RoleDenied[0m
+        [36m</Text>[39m
+        [36m<Text>[39m
+          [0mTenant context: tenantA[0m
+        [36m</Text>[39m
+        [36m<Text>[39m
+          [0mProtected area placeholder for authenticated users.[0m
+        [36m</Text>[39m
+        [36m<View[39m
+          [33maccessible[39m=[32m{true}[39m
+        [36m>[39m
+          [36m<Text>[39m
+            [0mSelect tenant tenantA[0m
+          [36m</Text>[39m
+        [36m</View>[39m
+        [36m<View[39m
+          [33maccessible[39m=[32m{true}[39m
+        [36m>[39m
+          [36m<Text>[39m
+            [0mSelect tenant tenantB[0m
+          [36m</Text>[39m
+        [36m</View>[39m
+        [36m<View[39m
+          [33maccessible[39m=[32m{true}[39m
+        [36m>[39m
+          [36m<Text>[39m
+            [0mStart salon onboarding[0m
+          [36m</Text>[39m
+        [36m</View>[39m
+        [36m<View[39m
+          [33maccessible[39m=[32m{true}[39m
+        [36m>[39m
+          [36m<Text>[39m
+            [0mStart client onboarding[0m
+          [36m</Text>[39m
+        [36m</View>[39m
+      [36m</View>[39m
+      [36m<View>[39m
+        [36m<View>[39m
+          [36m<View[39m
+            [33mtestID[39m=[32m"multi-salon-dashboard"[39m
+          [36m>[39m
+            [36m<View>[39m
+              [36m<Text>[39m
+                [0mYour salons[0m
+              [36m</Text>[39m
+            [36m</View>[39m
+            [36m<RCTScrollView[39m
+              [33mtestID[39m=[32m"dashboard-scroll"[39m
+            [36m>[39m
+              [36m<View>[39m
+                [36m<View[39m
+                  [33mtestID[39m=[32m"dashboard-loading"[39m
+                [36m>[39m
+                  [36m<ActivityIndicator />[39m
+                  [36m<Text>[39m
+                    [0mLoading your salonsΓÇª[0m
+                  [36m</Text>[39m
+                [36m</View>[39m
+              [36m</View>[39m
+            [36m</RCTScrollView>[39m
+          [36m</View>[39m
+        [36m</View>[39m
+      [36m</View>[39m
+      [36m<View>[39m
+        [36m<View[39m
+          [33maccessibilityLabel[39m=[32m"Home"[39m
+          [33maccessibilityRole[39m=[32m"tab"[39m
+          [33maccessibilityState[39m=[32m{
+            {
+              "selected": true,
+            }
+          }[39m
+          [33maccessible[39m=[32m{true}[39m
+        [36m>[39m
+          [36m<View />[39m
+          [36m<RNSVGSvgView>[39m
+            [36m<RNSVGGroup>[39m
+              [36m<RNSVGPath />[39m
+            [36m</RNSVGGroup>[39m
+          [36m</RNSVGSvgView>[39m
+          [36m<Text>[39m
+            [0mHome[0m
+          [36m</Text>[39m
+        [36m</View>[39m
+        [36m<View[39m
+          [33maccessibilityLabel[39m=[32m"Explore"[39m
+          [33maccessibilityRole[39m=[32m"tab"[39m
+          [33maccessibilityState[39m=[32m{
+            {
+              "selected": false,
+            }
+          }[39m
+          [33maccessible[39m=[32m{true}[39m
+        [36m>[39m
+          [36m<RNSVGSvgView>[39m
+            [36m<RNSVGGroup>[39m
+              [36m<RNSVGCircle />[39m
+              [36m<RNSVGPath />[39m
+            [36m</RNSVGGroup>[39m
+          [36m</RNSVGSvgView>[39m
+          [36m<Text>[39m
+            [0mExplore[0m
+          [36m</Text>[39m
+        [36m</View>[39m
+        [36m<View[39m
+          [33maccessibilityLabel[39m=[32m"Bookings"[39m
+          [33maccessibilityRole[39m=[32m"tab"[39m
+          [33maccessibilityState[39m=[32m{
+            {
+              "selected": false,
+            }
+          }[39m
+          [33maccessible[39m=[32m{true}[39m
+        [36m>[39m
+          [36m<RNSVGSvgView>[39m
+            [36m<RNSVGGroup>[39m
+              [36m<RNSVGRect />[39m
+              [36m<RNSVGPath />[39m
+              [36m<RNSVGPath />[39m
+              [36m<RNSVGPath />[39m
+            [36m</RNSVGGroup>[39m
+          [36m</RNSVGSvgView>[39m
+          [36m<Text>[39m
+            [0mBookings[0m
+          [36m</Text>[39m
+        [36m</View>[39m
+        [36m<View[39m
+          [33maccessibilityLabel[39m=[32m"Rewards"[39m
+          [33maccessibilityRole[39m=[32m"tab"[39m
+          [33maccessibilityState[39m=[32m{
+            {
+              "selected": false,
+            }
+          }[39m
+          [33maccessible[39m=[32m{true}[39m
+        [36m>[39m
+          [36m<RNSVGSvgView>[39m
+            [36m<RNSVGGroup>[39m
+              [36m<RNSVGPath />[39m
+            [36m</RNSVGGroup>[39m
+          [36m</RNSVGSvgView>[39m
+          [36m<Text>[39m
+            [0mRewards[0m
+          [36m</Text>[39m
+        [36m</View>[39m
+        [36m<View[39m
+          [33maccessibilityLabel[39m=[32m"Profile"[39m
+          [33maccessibilityRole[39m=[32m"tab"[39m
+          [33maccessibilityState[39m=[32m{
+            {
+              "selected": false,
+            }
+          }[39m
+          [33maccessible[39m=[32m{true}[39m
+        [36m>[39m
+          [36m<RNSVGSvgView>[39m
+            [36m<RNSVGGroup>[39m
+              [36m<RNSVGCircle />[39m
+              [36m<RNSVGPath />[39m
+            [36m</RNSVGGroup>[39m
+          [36m</RNSVGSvgView>[39m
+          [36m<Text>[39m
+            [0mProfile[0m
+          [36m</Text>[39m
+        [36m</View>[39m
+      [36m</View>[39m
+    [36m</View>[39m
+
+    [0m [90m 1280 |[39m     [90m// Dashboard renders with both salon 
+cards[39m
+     [90m 1281 |[39m     [36mawait[39m 
+screen[33m.[39mfindByTestId([32m"multi-salon-dashboard"[39m)[33m;[39m
+    [31m[1m>[22m[39m[90m 1282 |[39m     expect(screen[33m.[39mgetByTest
+Id([32m"salon-card-tenantA"[39m))[33m.[39mtoBeTruthy()[33m;[39m
+     [90m      |[39m                   [31m[1m^[22m[39m
+     [90m 1283 |[39m     expect(screen[33m.[39mgetByTestId([32m"salon-card
+-tenantB"[39m))[33m.[39mtoBeTruthy()[33m;[39m
+     [90m 1284 |[39m
+     [90m 1285 |[39m     [90m// Select tenantB ΓÇö context switches away 
+from tenantA[39m[0m
+
+      at Object.getByTestId 
+(src/app/navigation/__tests__/AppNavigatorShell.test.tsx:1282:19)
+      at asyncGeneratorStep 
+(node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 21 passed, 22 total
+Snapshots:   0 total
+Time:        129.907 s
+Ran all test suites matching /AppNavigatorShell.test/i.

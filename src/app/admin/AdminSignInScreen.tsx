@@ -47,7 +47,7 @@ export function AdminSignInScreen({
           keyboardType="email-address"
           autoCapitalize="none"
           autoComplete="email"
-          testID="email-input"
+          testID={`${testID}-email`}
         />
 
         <TextInput
@@ -57,7 +57,7 @@ export function AdminSignInScreen({
           placeholder="Password"
           secureTextEntry
           autoComplete="password"
-          testID="password-input"
+          testID={`${testID}-password`}
         />
 
         {error && (
@@ -68,7 +68,7 @@ export function AdminSignInScreen({
           style={[styles.signInBtn, (!isValid || loading) && styles.btnDisabled]}
           onPress={() => isValid && onSignIn(email.trim(), password)}
           disabled={!isValid || loading}
-          testID="sign-in-btn"
+          testID={`${testID}-submit`}
         >
           {loading ? (
             <ActivityIndicator color="#ffffff" />

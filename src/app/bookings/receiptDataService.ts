@@ -24,6 +24,8 @@ import {
   type Firestore,
 } from "firebase/firestore";
 
+import { serviceTypeDocSegments } from "../../domains/services/paths";
+
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -154,8 +156,10 @@ export function createReceiptDataService(db: Firestore) {
 
       // 3. Get the service name.
       let serviceName = "Service";
-      if (booking.serviceId) {
-        const serviceSnap = await getDoc(doc(db, "services", booking.serviceId));
+      if (booking.serviceId && booking.locationId) {
+        const serviceSnap = await getDoc(
+          doc(db, ...serviceTypeDocSegments(tenantId, booking.locationId, booking.serviceId)),
+        );
         if (serviceSnap.exists()) {
           serviceName = (serviceSnap.data() as ServiceDoc).name ?? "Service";
         }

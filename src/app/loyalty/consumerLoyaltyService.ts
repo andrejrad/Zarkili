@@ -6,6 +6,7 @@
  */
 
 import type { LoyaltyRepository } from "../../domains/loyalty/repository";
+import type { LoyaltyTransaction } from "../../domains/loyalty/model";
 import type { ActivityRepository } from "../../domains/activities/repository";
 import type {
   Activity as UiActivity,
@@ -82,10 +83,13 @@ export function createConsumerLoyaltyService(
   activityRepo: ActivityRepository,
 ): ConsumerLoyaltyService {
   async function getLoyaltyData(userId: string, tenantId: string): Promise<ConsumerLoyaltyData> {
+    // Run the three reads independently so a failure in transactions or config
+    // does not prevent points + tier from being returned (the banner requires
+    // only the loyaltyState doc, which is the lightest read).
     const [state, transactions, config] = await Promise.all([
       loyaltyRepo.getCustomerLoyaltyState(userId, tenantId),
-      loyaltyRepo.listTransactions(userId, tenantId, 50),
-      loyaltyRepo.getLoyaltyConfig(tenantId),
+      loyaltyRepo.listTransactions(userId, tenantId, 50).catch(() => [] as LoyaltyTransaction[]),
+      loyaltyRepo.getLoyaltyConfig(tenantId).catch(() => null),
     ]);
 
     const points = state?.points ?? 0;
@@ -104,6 +108,9 @@ export function createConsumerLoyaltyService(
           ? (tx.createdAt as { toDate: () => Date }).toDate().toISOString()
           : new Date().toISOString(),
       description: tx.reason,
+      // Surface reason as eventType + any structured eventData so getEventTypeLabel renders human copy
+      eventType: tx.reason || undefined,
+      eventData: tx.eventData,
       delta: tx.type === "credit" ? tx.points : -tx.points,
     }));
 

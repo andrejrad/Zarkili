@@ -4,6 +4,7 @@ import {
   Text,
   ScrollView,
   TouchableOpacity,
+  Switch,
   TextInput,
   StyleSheet,
   ActivityIndicator,
@@ -12,14 +13,14 @@ import type { FeatureFlag } from "./platformAdminTypes";
 
 export type FeatureFlagConsoleScreenProps = {
   loading: boolean;
-  saving: boolean;
+  saving?: boolean;
   error: string | null;
   /** Platform-wide flags */
   platformFlags: FeatureFlag[];
   /** Tenant-scoped flags for the currently selected tenant */
   tenantFlags: FeatureFlag[];
-  selectedTenantId: string;
-  selectedTenantName: string;
+  selectedTenantId?: string;
+  selectedTenantName?: string;
   onTogglePlatformFlag: (flagKey: string, enabled: boolean) => void;
   onToggleTenantFlag: (flagKey: string, tenantId: string, enabled: boolean) => void;
   onSaveAll: () => void;
@@ -47,8 +48,8 @@ export function FeatureFlagConsoleScreen({
 
   if (loading) {
     return (
-      <View style={styles.center} testID={testID}>
-        <ActivityIndicator testID="loading-indicator" />
+      <View style={styles.center} testID={`${testID}-loading`}>
+        <ActivityIndicator />
       </View>
     );
   }
@@ -103,15 +104,13 @@ export function FeatureFlagConsoleScreen({
               <Text style={styles.flagKey}>{flag.flagKey}</Text>
               <Text style={styles.flagLabel}>{flag.label}</Text>
               {flag.description ? <Text style={styles.flagDesc}>{flag.description}</Text> : null}
-              <Text style={styles.flagMeta}>Updated {flag.updatedAt.slice(0, 10)} by {flag.updatedBy}</Text>
+              {flag.updatedAt ? <Text style={styles.flagMeta}>Updated {flag.updatedAt.slice(0, 10)} by {flag.updatedBy}</Text> : null}
             </View>
-            <TouchableOpacity
-              style={[styles.toggle, flag.enabled ? styles.toggleOn : styles.toggleOff]}
-              onPress={() => onTogglePlatformFlag(flag.flagKey, !flag.enabled)}
-              testID={`toggle-platform-${flag.flagKey}`}
-            >
-              <Text style={styles.toggleText}>{flag.enabled ? "ON" : "OFF"}</Text>
-            </TouchableOpacity>
+            <Switch
+              value={flag.enabled}
+              onValueChange={(newVal) => onTogglePlatformFlag(flag.flagKey, newVal)}
+              testID={`flag-toggle-${flag.flagKey}`}
+            />
           </View>
         ))}
 
@@ -129,12 +128,12 @@ export function FeatureFlagConsoleScreen({
                 <View style={styles.flagInfo}>
                   <Text style={styles.flagKey}>{flag.flagKey}</Text>
                   <Text style={styles.flagLabel}>{flag.label}</Text>
-                  <Text style={styles.flagMeta}>Updated {flag.updatedAt.slice(0, 10)} by {flag.updatedBy}</Text>
+              {flag.updatedAt ? <Text style={styles.flagMeta}>Updated {flag.updatedAt.slice(0, 10)} by {flag.updatedBy}</Text> : null}
                 </View>
                 <TouchableOpacity
                   style={[styles.toggle, flag.enabled ? styles.toggleOn : styles.toggleOff]}
                   onPress={() => onToggleTenantFlag(flag.flagKey, selectedTenantId, !flag.enabled)}
-                  testID={`toggle-tenant-${flag.flagKey}`}
+                  testID={`flag-toggle-tenant-${flag.flagKey}`}
                 >
                   <Text style={styles.toggleText}>{flag.enabled ? "ON" : "OFF"}</Text>
                 </TouchableOpacity>
@@ -149,7 +148,7 @@ export function FeatureFlagConsoleScreen({
           style={[styles.saveBtn, saving && styles.btnDisabled]}
           onPress={onSaveAll}
           disabled={saving}
-          testID="save-all-btn"
+          testID={`${testID}-save`}
         >
           <Text style={styles.saveBtnText}>{saving ? "Saving…" : "Save All Changes"}</Text>
         </TouchableOpacity>

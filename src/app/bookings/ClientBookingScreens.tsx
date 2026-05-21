@@ -232,7 +232,7 @@ export function ServicePickerScreen({
         <SelectionCard
           key={svc.serviceId}
           label={svc.name}
-          sublabel={`${svc.durationMinutes} min · ${formatPrice(svc.price, svc.currency)}`}
+          sublabel={`${svc.baseDurationMinutes} min · ${formatPrice(svc.basePrice, svc.baseCurrency)}`}
           onPress={() => onSelect(svc)}
           testID={`service-card-${svc.serviceId}`}
         />

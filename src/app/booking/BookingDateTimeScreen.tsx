@@ -63,6 +63,8 @@ export type BookingDateTimeScreenProps = {
   onPressContinue: () => void;
   onPressBack?: () => void;
   onPressRetry?: () => void;
+  /** BookingProgressIndicator slot — replaces the plain "3–4/5" step badge when provided. W50-DEBT-6 */
+  progressIndicator?: React.ReactNode;
   testID?: string;
 };
 
@@ -92,6 +94,7 @@ export function BookingDateTimeScreen({
   onPressContinue,
   onPressBack,
   onPressRetry,
+  progressIndicator,
   testID,
 }: BookingDateTimeScreenProps) {
   const monthLabel = `${MONTH_NAMES[month.getMonth()]} ${month.getFullYear()}`;
@@ -134,8 +137,9 @@ export function BookingDateTimeScreen({
           </Pressable>
         ) : null}
         <Text style={styles.title}>Pick date &amp; time</Text>
-        <Text style={styles.step}>3–4/5</Text>
+        {progressIndicator ? null : <Text style={styles.step}>3–4/5</Text>}
       </View>
+      {progressIndicator}
 
       <ScrollView contentContainerStyle={styles.body}>
         {/* Quick-picks */}
@@ -199,6 +203,7 @@ export function BookingDateTimeScreen({
           <CalendarGrid
             month={month}
             selectedDate={selectedDate}
+            minDate={new Date()}
             disabledDates={disabledDates}
             holidays={holidays}
             availabilityMap={availabilityMap}

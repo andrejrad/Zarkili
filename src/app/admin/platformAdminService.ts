@@ -190,7 +190,7 @@ export function createPlatformAdminService(db: Firestore) {
   async function listPricingPlans(actorRole: string): Promise<PricingPlan[]> {
     assertPlatformAdmin(actorRole);
     const snap = await getDocs(collection(db, "pricingPlans"));
-    return snap.docs.map((d) => ({ planId: d.id, ...(d.data() as Omit<PricingPlan, "planId">) }));
+    return snap.docs.map((d) => ({ planId: d.id, ...(d.data() as Omit<PricingPlan, "planId">) })) as PricingPlan[];
   }
 
   async function updatePricingPlan(

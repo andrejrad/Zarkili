@@ -34,6 +34,9 @@ function makeFirestoreMock() {
         docs.set(path, { ...existing, ...data });
         updatedDocs.push({ path, data });
       }),
+      collection: (subName: string) => ({
+        doc: (subId: string) => docRef(`${path}/${subName}/${subId}`),
+      }),
     };
   }
 
@@ -129,7 +132,7 @@ function makeBooking(overrides: Partial<TriggerBooking> = {}): TriggerBooking {
 
 function setupDb(db: ReturnType<typeof makeFirestoreMock>) {
   // Pre-create the service document
-  db.__setDoc("services/svc-haircut", { name: "Haircut", tenantId: "tenant-1" });
+  db.__setDoc("brands/tenant-1/locations/loc-1/service_types/svc-haircut", { name: "Haircut", tenantId: "tenant-1" });
   // Pre-create the userTenantAccess document
   db.__setDoc("userTenantAccess/user-42_tenant-1", {
     userId: "user-42",
@@ -253,7 +256,7 @@ describe("handleBookingWrite", () => {
   });
 
   it("sets nextAppointmentAt to next booking when cancelled but another exists", async () => {
-    db.__setDoc("services/svc-manicure", { name: "Manicure", tenantId: "tenant-1" });
+    db.__setDoc("brands/tenant-1/locations/loc-1/service_types/svc-manicure", { name: "Manicure", tenantId: "tenant-1" });
     db.__setQueryResults("bookings", [
       makeBooking({
         bookingId: "booking-next",

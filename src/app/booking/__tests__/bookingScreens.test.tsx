@@ -277,6 +277,49 @@ describe("BookingPaymentScreen", () => {
     fireEvent.press(getByTestId("pay-confirm"));
     expect(onConfirm).toHaveBeenCalledTimes(1);
   });
+
+  it("shows loyalty section and fires onPressApplyLoyalty", () => {
+    const onApply = jest.fn();
+    const { getByTestId } = render(
+      <BookingPaymentScreen
+        pricing={SAMPLE_PRICING}
+        savedCards={[]}
+        selectedCardId={null}
+        onSelectCard={jest.fn()}
+        onPressAddCard={jest.fn()}
+        onPressConfirm={jest.fn()}
+        loyaltyPointsBalance={500}
+        onPressApplyLoyalty={onApply}
+        onPressRemoveLoyalty={jest.fn()}
+        testID="pay"
+      />,
+    );
+    expect(getByTestId("pay-loyalty-section")).toBeTruthy();
+    fireEvent.press(getByTestId("pay-loyalty-apply"));
+    expect(onApply).toHaveBeenCalledTimes(1);
+  });
+
+  it("shows Remove button and fires onPressRemoveLoyalty when discount applied", () => {
+    const onRemove = jest.fn();
+    const { getByTestId, queryByTestId } = render(
+      <BookingPaymentScreen
+        pricing={{ ...SAMPLE_PRICING, loyaltyDiscount: 5, total: 112.45 }}
+        savedCards={[]}
+        selectedCardId={null}
+        onSelectCard={jest.fn()}
+        onPressAddCard={jest.fn()}
+        onPressConfirm={jest.fn()}
+        loyaltyPointsBalance={500}
+        onPressApplyLoyalty={jest.fn()}
+        onPressRemoveLoyalty={onRemove}
+        testID="pay"
+      />,
+    );
+    expect(getByTestId("pay-loyalty-remove")).toBeTruthy();
+    expect(queryByTestId("pay-loyalty-apply")).toBeNull();
+    fireEvent.press(getByTestId("pay-loyalty-remove"));
+    expect(onRemove).toHaveBeenCalledTimes(1);
+  });
 });
 
 describe("BookingConfirmationScreen", () => {

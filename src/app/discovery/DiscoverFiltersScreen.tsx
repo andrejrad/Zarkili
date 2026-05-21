@@ -4,7 +4,9 @@
  * Filter editor: rating, price, categories, distance, open-now toggle.
  */
 
-import { Pressable, ScrollView, StyleSheet, Switch, Text, View } from "react-native";
+import { useEffect, useState } from "react";
+import { Platform, Pressable, ScrollView, StyleSheet, Switch, Text, View } from "react-native";
+import * as Location from "expo-location";
 
 import { Button, colors, radius, spacing } from "../../shared/ui";
 
@@ -27,6 +29,8 @@ const PRICE_LEVELS: Array<{ value: 1 | 2 | 3; label: string }> = [
 
 const RATING_OPTIONS = [0, 3, 4, 4.5];
 
+const DISTANCE_OPTIONS = [2, 5, 10, 25] as const;
+
 export function DiscoverFiltersScreen({
   filters,
   categories,
@@ -35,6 +39,20 @@ export function DiscoverFiltersScreen({
   onReset,
   testID,
 }: DiscoverFiltersScreenProps) {
+  const [gpsGranted, setGpsGranted] = useState(false);
+  useEffect(() => {
+    if (Platform.OS === "web") return;
+    void Location.getForegroundPermissionsAsync().then(({ status }) => {
+      if (status === "granted") {
+        setGpsGranted(true);
+      } else {
+        void Location.requestForegroundPermissionsAsync().then((r) => {
+          if (r.status === "granted") setGpsGranted(true);
+        });
+      }
+    });
+  }, []);
+
   function togglePrice(level: 1 | 2 | 3) {
     const next = filters.priceLevels.includes(level)
       ? filters.priceLevels.filter((p) => p !== level)
@@ -123,6 +141,32 @@ export function DiscoverFiltersScreen({
         })}
       </View>
 
+      <Text style={styles.sectionLabel}>Distance</Text>
+      {gpsGranted ? (
+        <View style={styles.row}>
+          {DISTANCE_OPTIONS.map((km) => {
+            const selected = filters.maxDistanceMiles === km;
+            return (
+              <Pressable
+                key={km}
+                onPress={() => onChange({ ...filters, maxDistanceMiles: km })}
+                style={[styles.chip, selected && styles.chipSelected]}
+                accessibilityRole="radio"
+                accessibilityState={{ selected }}
+                accessibilityLabel={`Within ${km} miles`}
+                testID={`discover-filters-distance-${km}`}
+              >
+                <Text style={[styles.chipText, selected && styles.chipTextSelected]}>
+                  {km} mi
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
+      ) : (
+        <Text style={styles.gpsHint}>Enable location access to filter by distance.</Text>
+      )}
+
       <View style={styles.toggleRow}>
         <Text style={styles.sectionLabel}>Open now</Text>
         <Switch
@@ -173,4 +217,5 @@ const styles = StyleSheet.create({
   },
   footerRow: { flexDirection: "row", gap: spacing.s2, marginTop: spacing.s4 },
   applyWrap: { flex: 1 },
+  gpsHint: { fontSize: 13, color: colors.textMuted ?? "#9CA3AF", fontStyle: "italic" },
 });

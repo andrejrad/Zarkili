@@ -1,17 +1,18 @@
 /**
- * FilterSheetScreen.tsx — B.4 Filter Sheet.
+ * FilterSheetScreen.tsx — Phase 5.5 Filter Sheet (full spec).
  *
- * Modal-style filter sheet composing FilterSheet + RangeSlider +
- * RatingStars + category/availability pills + member-only toggle.
- * Live result count in the apply button uses `applyDiscoveryFilters`.
+ * Filters: Price range (dual-handle), Availability (Today/This week/Any time),
+ * Minimum rating (star icons), Distance (1-25 km, GPS-gated).
+ *
+ * Filters apply live via onChangeFilters.
+ * The sheet dismisses on swipe-down or tap-outside (no confirm button).
  */
 
-import { useEffect, useState } from "react";
-import { Pressable, StyleSheet, Switch, Text, View } from "react-native";
+import { useEffect, useRef, useState } from "react";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import type {
-  DiscoveryCategoryId,
-  DiscoverySalonCard,
+  ServiceTypeCard,
 } from "../../domains/discovery";
 import {
   FilterSheet,
@@ -27,144 +28,109 @@ import {
   applyDiscoveryFilters,
   type AvailabilityWindow,
   type DiscoveryFilters,
-  type DiscoverySortKey,
 } from "./discoveryFilters";
 
 export type FilterSheetScreenProps = {
   visible: boolean;
   initialFilters: DiscoveryFilters;
-  salons: DiscoverySalonCard[];
+  services: ServiceTypeCard[];
   onClose: () => void;
-  onApply: (filters: DiscoveryFilters) => void;
+  /** Called on every filter change so results update live behind the sheet. */
+  onChangeFilters?: (filters: DiscoveryFilters) => void;
+  /** p95 local price (pence) — upper bound of price slider. Defaults to 50000 (£500). */
+  p95Price?: number;
+  /** Whether GPS is granted — enables distance dimension. */
+  gpsGranted?: boolean;
+  /** Controlled live service count to show below price slider. null = hide. */
+  serviceCount?: number | null;
   testID?: string;
 };
-
-const CATEGORIES: { id: DiscoveryCategoryId; label: string }[] = [
-  { id: "all", label: "All" },
-  { id: "nails", label: "Nails" },
-  { id: "hair", label: "Hair" },
-  { id: "skin", label: "Skin" },
-  { id: "lashes", label: "Lashes" },
-  { id: "brows", label: "Brows" },
-  { id: "massage", label: "Massage" },
-  { id: "makeup", label: "Makeup" },
-  { id: "barber", label: "Barber" },
-  { id: "waxing", label: "Waxing" },
-  { id: "spa", label: "Spa" },
-  { id: "injectables", label: "Injectables" },
-  { id: "wellness", label: "Wellness" },
-];
 
 const AVAILABILITY: { id: AvailabilityWindow; label: string }[] = [
   { id: "any", label: "Any time" },
   { id: "today", label: "Today" },
-  { id: "tomorrow", label: "Tomorrow" },
   { id: "this-week", label: "This week" },
 ];
 
-const SORTS: { id: DiscoverySortKey; label: string }[] = [
-  { id: "recommended", label: "Recommended" },
-  { id: "rating-desc", label: "Top rated" },
-  { id: "price-asc", label: "Price: low to high" },
-  { id: "price-desc", label: "Price: high to low" },
-];
+const RATING_STEPS = [1, 2, 3, 4, 5] as const;
 
-const RATING_OPTIONS: number[] = [0, 3, 4, 4.5];
+const MIN_DISTANCE_KM = 1;
+const MAX_DISTANCE_KM = 25;
+const DEFAULT_DISTANCE_KM = DEFAULT_FILTERS.distanceKm;
 
 export function FilterSheetScreen({
   visible,
   initialFilters,
-  salons,
+  services,
   onClose,
-  onApply,
+  onChangeFilters,
+  p95Price = 50000,
+  gpsGranted = false,
+  serviceCount,
   testID,
 }: FilterSheetScreenProps) {
   const [draft, setDraft] = useState<DiscoveryFilters>(initialFilters);
 
+  // Only reset draft when the sheet opens (visible transitions to true).
+  // Do NOT include initialFilters in deps: during a drag, onChangeFilters
+  // updates the parent on every frame → parent re-renders → new initialFilters
+  // reference → useEffect fires → setDraft → re-render → loop at 60fps.
+  // The sheet's own draft is the single source of truth while it is visible.
+  const prevVisible = useRef(false);
   useEffect(() => {
-    if (visible) setDraft(initialFilters);
-  }, [visible, initialFilters]);
+    if (visible && !prevVisible.current) {
+      setDraft(initialFilters);
+    }
+    prevVisible.current = visible;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visible]);
 
-  const previewCount = applyDiscoveryFilters(salons, draft).length;
-  const applyLabel =
-    previewCount === 1 ? "Show 1 result" : `Show ${previewCount} results`;
+  function updateDraft(next: DiscoveryFilters) {
+    setDraft(next);
+    onChangeFilters?.(next);
+  }
+
+  // Legacy: live count from services prop if serviceCount not provided
+  const liveCount =
+    serviceCount != null
+      ? serviceCount
+      : applyDiscoveryFilters(services, draft).length;
+
+  const countLabel =
+    liveCount === 1 ? "1 service in this range" : `${liveCount} services in this range`;
 
   return (
     <FilterSheet
       visible={visible}
       onClose={onClose}
-      onReset={() => setDraft(DEFAULT_FILTERS)}
-      applyLabel={applyLabel}
-      onApply={() => onApply(draft)}
+      onReset={() => updateDraft({ ...DEFAULT_FILTERS })}
+      title="Filters"
       testID={testID}
     >
-      <Section title="Category">
-        <View style={styles.pillRow}>
-          {CATEGORIES.map((c) => {
-            const selected = draft.category === c.id;
-            return (
-              <Pressable
-                key={c.id}
-                onPress={() => setDraft({ ...draft, category: c.id })}
-                style={[styles.pill, selected && styles.pillActive]}
-                accessibilityRole="button"
-                accessibilityLabel={`${c.label} category`}
-                accessibilityState={{ selected }}
-                testID={testID ? `${testID}-cat-${c.id}` : undefined}
-              >
-                <Text style={[styles.pillText, selected && styles.pillTextActive]}>
-                  {c.label}
-                </Text>
-              </Pressable>
-            );
-          })}
-        </View>
-      </Section>
-
-      <Section title="Price (USD, starts from)">
+      {/* Price range */}
+      <Section title="Price">
         <RangeSlider
           range={draft.priceRange}
           minValue={0}
-          maxValue={500}
-          step={10}
-          onChange={(next: [number, number]) => setDraft({ ...draft, priceRange: next })}
-          formatValue={(v) => `$${v}`}
+          maxValue={p95Price}
+          step={100}
+          onChange={(next: [number, number]) =>
+            updateDraft({ ...draft, priceRange: next })
+          }
+          formatValue={(v) => `£${(v / 100).toFixed(0)}`}
           testID={testID ? `${testID}-price` : undefined}
         />
+        {liveCount >= 0 ? (
+          <Text
+            style={styles.countLabel}
+            testID={testID ? `${testID}-count` : undefined}
+          >
+            {countLabel}
+          </Text>
+        ) : null}
       </Section>
 
-      <Section title="Minimum rating">
-        <View style={styles.pillRow}>
-          {RATING_OPTIONS.map((r) => {
-            const selected = draft.minRating === r;
-            return (
-              <Pressable
-                key={r}
-                onPress={() => setDraft({ ...draft, minRating: r })}
-                style={[styles.pill, selected && styles.pillActive]}
-                accessibilityRole="button"
-                accessibilityLabel={r === 0 ? "Any rating" : `${r} stars and up`}
-                accessibilityState={{ selected }}
-                testID={testID ? `${testID}-rating-${r}` : undefined}
-              >
-                {r === 0 ? (
-                  <Text style={[styles.pillText, selected && styles.pillTextActive]}>
-                    Any
-                  </Text>
-                ) : (
-                  <View style={styles.ratingPillBody}>
-                    <RatingStars value={r} size={16} />
-                    <Text style={[styles.pillText, selected && styles.pillTextActive]}>
-                      {r}+
-                    </Text>
-                  </View>
-                )}
-              </Pressable>
-            );
-          })}
-        </View>
-      </Section>
-
+      {/* Availability */}
       <Section title="Availability">
         <View style={styles.pillRow}>
           {AVAILABILITY.map((a) => {
@@ -172,14 +138,17 @@ export function FilterSheetScreen({
             return (
               <Pressable
                 key={a.id}
-                onPress={() => setDraft({ ...draft, availability: a.id })}
+                onPress={() => updateDraft({ ...draft, availability: a.id })}
                 style={[styles.pill, selected && styles.pillActive]}
                 accessibilityRole="button"
                 accessibilityState={{ selected }}
                 accessibilityLabel={a.label}
                 testID={testID ? `${testID}-avail-${a.id}` : undefined}
               >
-                <Text style={[styles.pillText, selected && styles.pillTextActive]}>
+                <Text
+                  style={[styles.pillText, selected && styles.pillTextActive]}
+                  numberOfLines={1}
+                >
                   {a.label}
                 </Text>
               </Pressable>
@@ -188,43 +157,82 @@ export function FilterSheetScreen({
         </View>
       </Section>
 
-      <Section title="Sort">
-        <View style={styles.pillRow}>
-          {SORTS.map((s) => {
-            const selected = draft.sort === s.id;
+      {/* Minimum rating */}
+      <Section title="Minimum rating">
+        <View
+          style={styles.starsRow}
+          accessibilityRole="radiogroup"
+          testID={testID ? `${testID}-rating` : undefined}
+        >
+          <Pressable
+            onPress={() => updateDraft({ ...draft, minRating: 0 })}
+            style={[styles.pill, draft.minRating === 0 && styles.pillActive]}
+            accessibilityRole="radio"
+            accessibilityState={{ selected: draft.minRating === 0 }}
+            accessibilityLabel="Any rating"
+            testID={testID ? `${testID}-rating-any` : undefined}
+          >
+            <Text
+              style={[
+                styles.pillText,
+                draft.minRating === 0 && styles.pillTextActive,
+              ]}
+            >
+              Any
+            </Text>
+          </Pressable>
+          {RATING_STEPS.map((r) => {
+            const selected = draft.minRating === r;
             return (
               <Pressable
-                key={s.id}
-                onPress={() => setDraft({ ...draft, sort: s.id })}
-                style={[styles.pill, selected && styles.pillActive]}
-                accessibilityRole="button"
+                key={r}
+                onPress={() => updateDraft({ ...draft, minRating: r })}
+                style={[styles.starBtn, selected && styles.starBtnActive]}
+                accessibilityRole="radio"
                 accessibilityState={{ selected }}
-                accessibilityLabel={s.label}
-                testID={testID ? `${testID}-sort-${s.id}` : undefined}
+                accessibilityLabel={`${r} star minimum`}
+                testID={testID ? `${testID}-rating-${r}` : undefined}
               >
-                <Text style={[styles.pillText, selected && styles.pillTextActive]}>
-                  {s.label}
-                </Text>
+                <RatingStars value={r} size={20} />
               </Pressable>
             );
           })}
         </View>
       </Section>
 
-      <View style={styles.toggleRow}>
-        <Text style={styles.toggleLabel}>Members only</Text>
-        <Switch
-          value={draft.memberOnly}
-          onValueChange={(v) => setDraft({ ...draft, memberOnly: v })}
-          accessibilityLabel="Members only"
-          testID={testID ? `${testID}-member-toggle` : undefined}
-        />
-      </View>
+      {/* Distance — GPS-gated */}
+      {gpsGranted ? (
+        <Section title="Distance">
+          <RangeSlider
+            value={draft.distanceKm}
+            minValue={MIN_DISTANCE_KM}
+            maxValue={MAX_DISTANCE_KM}
+            step={1}
+            onChange={(v: number) =>
+              updateDraft({ ...draft, distanceKm: v })
+            }
+            formatValue={(v) => `${v} km`}
+            testID={testID ? `${testID}-distance` : undefined}
+          />
+        </Section>
+      ) : (
+        <Section title="Distance">
+          <Text style={styles.gpsHint}>
+            Enable location access to filter by distance.
+          </Text>
+        </Section>
+      )}
     </FilterSheet>
   );
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function Section({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
   return (
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>{title}</Text>
@@ -237,6 +245,7 @@ const styles = StyleSheet.create({
   section: { gap: spacing.s2 },
   sectionTitle: { ...textStyles.heading4, color: colors.foreground },
   pillRow: { flexDirection: "row", flexWrap: "wrap", gap: spacing.s2 },
+  starsRow: { flexDirection: "row", flexWrap: "wrap", gap: spacing.s2, alignItems: "center" },
   pill: {
     paddingVertical: spacing.s2,
     paddingHorizontal: spacing.s4,
@@ -246,19 +255,41 @@ const styles = StyleSheet.create({
     minHeight: spacing.touchTarget,
     justifyContent: "center",
     backgroundColor: colors.surface,
+    flexShrink: 0,
   },
   pillActive: {
     backgroundColor: colors.coralBlossom,
     borderColor: colors.coralBlossom,
   },
-  pillText: { ...textStyles.label, color: colors.foreground },
+  pillText: { ...textStyles.label, color: colors.foreground, flexShrink: 0 },
   pillTextActive: { color: colors.white },
-  ratingPillBody: { flexDirection: "row", alignItems: "center", gap: spacing.s1 },
-  toggleRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+  starBtn: {
     paddingVertical: spacing.s2,
+    paddingHorizontal: spacing.s3,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
+    minHeight: spacing.touchTarget,
+    justifyContent: "center",
   },
-  toggleLabel: { ...textStyles.bodyLarge, color: colors.foreground },
+  starBtnActive: {
+    backgroundColor: colors.primary10,
+    borderColor: colors.primary,
+  },
+  countLabel: {
+    ...textStyles.bodySmall,
+    color: colors.textMuted,
+    marginTop: spacing.s1,
+  },
+  gpsHint: {
+    ...textStyles.body,
+    color: colors.textMuted,
+  },
+  distanceDefault: {
+    ...textStyles.bodySmall,
+    color: colors.textMuted,
+    marginTop: spacing.s1,
+  },
 });
+

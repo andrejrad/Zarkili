@@ -203,15 +203,19 @@ export const receiptsGeneratePdf = onCall(async (request) => {
 
   // 2. Booking doc for serviceId / locationId.
   const bookingSnap = await db.doc(`bookings/${bookingId}`).get();
-  const booking: BookingDoc = bookingSnap.exists()
+  const booking: BookingDoc = bookingSnap.exists
     ? (bookingSnap.data() as BookingDoc)
     : { serviceId: "", locationId: "", date: "", startTime: "" };
 
   // 3. Service name.
   let serviceName = "Service";
-  if (booking.serviceId) {
-    const serviceSnap = await db.doc(`services/${booking.serviceId}`).get();
-    if (serviceSnap.exists()) {
+  if (booking.serviceId && booking.locationId) {
+    const serviceSnap = await db
+      .collection("brands").doc(tenantId)
+      .collection("locations").doc(booking.locationId)
+      .collection("service_types").doc(booking.serviceId)
+      .get();
+    if (serviceSnap.exists) {
       serviceName = (serviceSnap.data() as ServiceDoc).name ?? "Service";
     }
   }
@@ -221,7 +225,7 @@ export const receiptsGeneratePdf = onCall(async (request) => {
   let salonAddress = "";
   if (booking.locationId) {
     const locationSnap = await db.doc(`locations/${booking.locationId}`).get();
-    if (locationSnap.exists()) {
+    if (locationSnap.exists) {
       const loc = locationSnap.data() as LocationDoc;
       salonName = loc.name ?? "Salon";
       if (loc.address) {
@@ -235,7 +239,7 @@ export const receiptsGeneratePdf = onCall(async (request) => {
   let paymentMethodLabel = "Card on file";
   if (paymentMethodId) {
     const pmSnap = await db.doc(`clients/${userId}/paymentMethods/${paymentMethodId}`).get();
-    if (pmSnap.exists()) {
+    if (pmSnap.exists) {
       const pm = pmSnap.data() as PaymentMethodDoc;
       const brand = pm.brand
         ? pm.brand.charAt(0).toUpperCase() + pm.brand.slice(1)

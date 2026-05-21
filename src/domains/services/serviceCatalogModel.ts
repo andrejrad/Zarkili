@@ -11,7 +11,7 @@ import type { Timestamp } from "firebase/firestore";
 // ServiceCategory
 // ---------------------------------------------------------------------------
 
-export type ServiceCategory = {
+export type TenantServiceCategory = {
   categoryId: string;
   tenantId: string;
   name: string;
@@ -21,21 +21,24 @@ export type ServiceCategory = {
   updatedAt: Timestamp;
 };
 
-export type CreateServiceCategoryInput = Pick<
-  ServiceCategory,
+export type CreateTenantServiceCategoryInput = Pick<
+  TenantServiceCategory,
   "tenantId" | "name" | "sortOrder"
 > & { color?: string };
 
-export type UpdateServiceCategoryInput = Partial<
-  Pick<ServiceCategory, "name" | "sortOrder" | "color">
+export type UpdateTenantServiceCategoryInput = Partial<
+  Pick<TenantServiceCategory, "name" | "sortOrder" | "color">
 >;
 
 // ---------------------------------------------------------------------------
 // ServiceAddon
 // ---------------------------------------------------------------------------
 
+// Path: services/{serviceId}/addons/{addonId}
 export type ServiceAddon = {
   addonId: string;
+  serviceId: string;
+  locationId: string;
   tenantId: string;
   name: string;
   price: number;

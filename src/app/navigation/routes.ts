@@ -8,7 +8,8 @@ export type AppRouteGroup =
   | "protected"
   | "owner"
   | "salonOnboarding"
-  | "clientOnboarding";
+  | "clientOnboarding"
+  | "platform_admin";
 
 export type AppRouteGuard = "none" | "authenticated" | "platform-admin";
 
@@ -66,6 +67,7 @@ export const appRoutes: AppRouteDefinition[] = [
   { name: "EmailVerification", group: "public", path: "/auth/verify-email", guard: "none" },
   { name: "OtpVerification", group: "public", path: "/auth/verify-phone", guard: "none" },
   { name: "AccountMerge", group: "public", path: "/auth/account-merge", guard: "none" },
+  { name: "GuestBookingGate", group: "public", path: "/auth/booking-gate", guard: "none" },
   {
     name: "DiscoverBusinesses",
     group: "public",
@@ -82,6 +84,7 @@ export const appRoutes: AppRouteDefinition[] = [
   { name: "DiscoverHome", group: "public", path: "/discover/home", guard: "none" },
   { name: "DiscoverFeed", group: "public", path: "/discover/feed", guard: "none" },
   { name: "ExploreResults", group: "public", path: "/discover/explore", guard: "none" },
+  { name: "ExploreServiceDetail", group: "public", path: "/discover/explore/service", guard: "none" },
   { name: "ExploreMap", group: "public", path: "/discover/explore/map", guard: "none" },
   { name: "DiscoverFilters", group: "public", path: "/discover/filters", guard: "none" },
   { name: "SalonProfile", group: "public", path: "/discover/salon", guard: "none" },
@@ -215,6 +218,7 @@ export const appRoutes: AppRouteDefinition[] = [
   { name: "LegalDocuments", group: "owner", path: "/owner/settings/legal-docs", guard: "authenticated" },
   { name: "DomainSettings", group: "owner", path: "/owner/settings/domain", guard: "authenticated" },
   { name: "OwnerNotificationPreferences", group: "owner", path: "/owner/settings/notifications", guard: "authenticated" },
+  { name: "PaymentSettings", group: "owner", path: "/owner/settings/payments", guard: "authenticated" },
   {
     name: "OwnerAiBudgetSettings",
     group: "owner",
@@ -266,6 +270,7 @@ export const appRoutes: AppRouteDefinition[] = [
   { name: "NoShowMark", group: "owner", path: "/owner/bookings/no-show", guard: "authenticated" },
   { name: "CancellationAdmin", group: "owner", path: "/owner/bookings/cancel", guard: "authenticated" },
   { name: "RescheduleAdmin", group: "owner", path: "/owner/bookings/reschedule", guard: "authenticated" },
+  { name: "FinalizePaymentAdmin", group: "owner", path: "/owner/bookings/finalize-payment", guard: "authenticated" },
   // W44 — Client / CRM
   { name: "ClientListAdmin", group: "owner", path: "/owner/clients", guard: "authenticated" },
   { name: "ClientDetailAdmin", group: "owner", path: "/owner/clients/detail", guard: "authenticated" },

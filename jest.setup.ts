@@ -16,6 +16,7 @@ jest.mock("firebase/auth", () => ({
   sendEmailVerification: jest.fn(async () => undefined),
   createUserWithEmailAndPassword: jest.fn(async () => ({ user: { uid: "uid" } })),
   signInWithEmailAndPassword: jest.fn(async () => ({ user: { uid: "uid" } })),
+  signInAnonymously: jest.fn(async () => ({ user: { uid: "anon-uid" } })),
   signOut: jest.fn(async () => undefined),
   sendPasswordResetEmail: jest.fn(async () => undefined),
   updateEmail: jest.fn(async () => undefined),

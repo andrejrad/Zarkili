@@ -1,0 +1,75 @@
+﻿  console.warn
+    expo-notifications: Android Push notifications (remote notifications) functionality provided by expo-notifications was removed from Expo Go with the release of SDK 53. Use a development build instead of Expo Go. Read more at https://docs.expo.dev/develop/development-builds/introduction/.
+
+    [0m [90m 14 |[39m
+     [90m 15 |[39m [36mimport[39m [33m*[39m [36mas[39m [33mDevice[39m [36mfrom[39m [32m"expo-device"[39m[33m;[39m
+    [31m[1m>[22m[39m[90m 16 |[39m [36mimport[39m [33m*[39m [36mas[39m [33mNotifications[39m [36mfrom[39m [32m"expo-notifications"[39m[33m;[39m
+     [90m    |[39m [31m[1m^[22m[39m
+     [90m 17 |[39m [36mimport[39m { [33mPlatform[39m } [36mfrom[39m [32m"react-native"[39m[33m;[39m
+     [90m 18 |[39m
+     [90m 19 |[39m [36mexport[39m type [33mPushTokenRecord[39m [33m=[39m {[0m
+
+      at warn (node_modules/expo-notifications/src/warnOfExpoGoPushUsage.ts:14:15)
+      at addPushTokenListener (node_modules/expo-notifications/src/TokenEmitter.ts:44:24)
+      at Object.<anonymous> (node_modules/expo-notifications/src/DevicePushTokenAutoRegistration.fx.ts:104:23)
+      at Object.require (node_modules/expo-notifications/src/getExpoPushTokenAsync.ts:5:1)
+      at Object.require (node_modules/expo-notifications/src/index.ts:16:1)
+      at Object.require (src/app/notifications/registerFcmToken.ts:16:1)
+      at Object.require (src/app/navigation/AppNavigatorShell.tsx:518:1)
+      at Object.require (src/app/navigation/__tests__/AppNavigatorShell.test.tsx:4:1)
+
+  console.log
+    [ProfileStats] loyalty points total: 0 across 0 tenants
+
+      at log (src/app/navigation/AppNavigatorShell.tsx:2976:17)
+
+  console.log
+    [ProfileStats] loyalty points total: 0 across 0 tenants
+
+      at log (src/app/navigation/AppNavigatorShell.tsx:2976:17)
+
+node.exe : PASS src/app/navigation/__tests__/AppNavigatorShell.test.tsx (8.475 
+s)
+At C:\nvm4w\nodejs\npx.ps1:29 char:3
++   & $NODE_EXE $NPX_CLI_JS $args
++   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (PASS src/app/na...t.tsx (8.475 s) 
+   :String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  AppNavigatorShell
+    ΓêÜ shows coming soon on discover when marketplace flag is disabled (323 
+ms)
+    ΓêÜ moves to app shell after dev sign-in (352 ms)
+    ΓêÜ submits login through the injected auth repository and enters the app 
+shell (283 ms)
+    ΓêÜ submits registration, completes profile, and enters the app shell (274 
+ms)
+    ΓêÜ navigates to EditProfile and saves display name changes (300 ms)
+    ΓêÜ shows user identity on the profile overview after sign-in (265 ms)
+    ΓêÜ shows repository auth errors on the login screen (166 ms)
+    ΓêÜ clears auth errors after navigating away from and back to login (197 
+ms)
+    ΓêÜ resumes saved onboarding step on flow entry (286 ms)
+    ΓêÜ saves onboarding draft when moving to next step (404 ms)
+    ΓêÜ blocks onboarding start without tenant context (237 ms)
+    ΓêÜ allows selecting tenant from multiple memberships (324 ms)
+    ΓêÜ shows owner AI budget settings only for platform admin user (293 ms)
+    ΓêÜ navigates to tenant profile placeholder when booking is enabled (174 
+ms)
+    ΓêÜ shows coming-soon notice when booking is disabled for a salon (156 ms)
+    ΓêÜ filters discover results by search and shows empty state when nothing 
+matches (169 ms)
+    ΓêÜ shows discover error state when feed loading fails (141 ms)
+    ΓêÜ renders tenant profile screen from app shell route entry (266 ms)
+    ΓêÜ submits create location with tenant-scoped payload (425 ms)
+    ΓêÜ renders staff list screen from app shell route entry (340 ms)
+    ΓêÜ submits create service with tenant-scoped payload (402 ms)
+    ΓêÜ context switch: selecting a salon from the dashboard scopes subsequent 
+operations to that tenant (313 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       22 passed, 22 total
+Snapshots:   0 total
+Time:        8.606 s
+Ran all test suites matching /AppNavigatorShell.test/i.

@@ -97,9 +97,15 @@ function bookingDateToTimestamp(date: string, startMinutes: number): Timestamp {
 
 async function lookupServiceName(
   serviceId: string,
+  tenantId: string,
+  locationId: string,
   db: FirebaseFirestore.Firestore,
 ): Promise<string> {
-  const snap = await db.collection("services").doc(serviceId).get();
+  const snap = await db
+    .collection("brands").doc(tenantId)
+    .collection("locations").doc(locationId)
+    .collection("service_types").doc(serviceId)
+    .get();
   if (!snap.exists) return serviceId;
   const data = snap.data() as { name?: string };
   return data?.name ?? serviceId;
@@ -116,7 +122,7 @@ async function findNextConfirmedBooking(
   tenantId: string,
   customerUserId: string,
   db: FirebaseFirestore.Firestore,
-): Promise<{ date: string; startMinutes: number; serviceId: string } | null> {
+): Promise<{ date: string; startMinutes: number; serviceId: string; locationId: string } | null> {
   const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
 
   const snap = await db
@@ -132,7 +138,7 @@ async function findNextConfirmedBooking(
 
   if (snap.empty) return null;
   const d = snap.docs[0].data() as TriggerBooking;
-  return { date: d.date, startMinutes: d.startMinutes, serviceId: d.serviceId };
+  return { date: d.date, startMinutes: d.startMinutes, serviceId: d.serviceId, locationId: d.locationId };
 }
 
 // ---------------------------------------------------------------------------
@@ -193,7 +199,7 @@ async function handleUpcomingTransition(
   eventId: string,
   db: FirebaseFirestore.Firestore,
 ): Promise<void> {
-  const serviceName = await lookupServiceName(after.serviceId, db);
+  const serviceName = await lookupServiceName(after.serviceId, after.tenantId, after.locationId, db);
   const appointmentAt = bookingDateToTimestamp(after.date, after.startMinutes);
   const eventType = STATUS_TO_EVENT_TYPE[afterStatus] ?? afterStatus;
 
@@ -253,7 +259,7 @@ async function handleTerminalTransition(
   let nextAppointmentServiceName: string | null = null;
 
   if (next) {
-    const serviceName = await lookupServiceName(next.serviceId, db);
+    const serviceName = await lookupServiceName(next.serviceId, after.tenantId, next.locationId, db);
     nextAppointmentAt = bookingDateToTimestamp(next.date, next.startMinutes);
     nextAppointmentServiceName = serviceName;
   }

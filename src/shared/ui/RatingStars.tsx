@@ -40,36 +40,16 @@ export function RatingStars({
   const isInteractive = typeof onChange === "function";
   const label = accessibilityLabel ?? `${v} of 5 stars`;
 
-  return (
-    <View
-      style={styles.row}
-      accessibilityRole={isInteractive ? "adjustable" : "image"}
-      accessibilityLabel={label}
-      accessibilityValue={isInteractive ? { min: 0, max: 5, now: v } : undefined}
-      testID={testID}
-    >
-      {[1, 2, 3, 4, 5].map((i) => {
-        const filled = v >= i;
-        const half = !filled && v >= i - 0.5;
-        const star = filled ? "★" : half ? "☆" : "☆";
-        const color = filled || half ? colors.coralBlossom : colors.disabled;
-        const child = (
-          <Text
-            key={i}
-            style={[
-              styles.star,
-              {
-                fontSize: size,
-                color,
-                marginRight: i < 5 ? spacing.s1 : 0,
-              },
-            ]}
-          >
-            {star}
-          </Text>
-        );
-        if (!isInteractive) return child;
-        return (
+  if (isInteractive) {
+    return (
+      <View
+        style={styles.row}
+        accessibilityRole="adjustable"
+        accessibilityLabel={label}
+        accessibilityValue={{ min: 0, max: 5, now: v }}
+        testID={testID}
+      >
+        {[1, 2, 3, 4, 5].map((i) => (
           <Pressable
             key={i}
             onPress={() => onChange?.(i)}
@@ -78,18 +58,72 @@ export function RatingStars({
             hitSlop={8}
             testID={`${testID ?? "rating"}-star-${i}`}
           >
-            {child}
+            <Text
+              style={[
+                styles.star,
+                {
+                  fontSize: size,
+                  color: v >= i ? colors.coralBlossom : colors.disabled,
+                  marginRight: i < 5 ? spacing.s1 : 0,
+                },
+              ]}
+            >
+              ★
+            </Text>
           </Pressable>
-        );
-      })}
+        ))}
+      </View>
+    );
+  }
+
+  // Read-only: smooth partial fill via overlay clip so e.g. 4.9 shows a
+  // nearly-full 5th star rather than an empty/hollow character.
+  const fillPct = `${((v / 5) * 100).toFixed(2)}%` as `${number}%`;
+  const starStyle = (i: number) =>
+    [styles.star, { fontSize: size, marginRight: i < 5 ? spacing.s1 : 0 }] as const;
+
+  return (
+    <View
+      style={styles.starsContainer}
+      accessibilityRole="image"
+      accessibilityLabel={label}
+      testID={testID}
+    >
+      {/* Base layer: 5 gray stars */}
+      <View style={styles.row}>
+        {[1, 2, 3, 4, 5].map((i) => (
+          <Text key={i} style={[...starStyle(i), { color: colors.disabled }]}>
+            ★
+          </Text>
+        ))}
+      </View>
+      {/* Overlay: colored stars clipped to fill percentage */}
+      <View style={[styles.fillOverlay, { width: fillPct }]}>
+        <View style={styles.row}>
+          {[1, 2, 3, 4, 5].map((i) => (
+            <Text key={i} style={[...starStyle(i), { color: colors.coralBlossom }]}>
+              ★
+            </Text>
+          ))}
+        </View>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  starsContainer: {
+    position: "relative",
+  },
   row: {
     flexDirection: "row",
     alignItems: "center",
+  },
+  fillOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    overflow: "hidden",
   },
   star: {
     includeFontPadding: false,

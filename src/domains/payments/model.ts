@@ -158,6 +158,7 @@ export type PaymentsErrorCode =
   | "INVALID_AMOUNT"
   | "IDEMPOTENCY_CONFLICT"
   | "STRIPE_ERROR"
+  | "PAYMENT_NOT_REQUIRED"
   | "NOT_IMPLEMENTED";
 
 export class PaymentsError extends Error {
@@ -169,3 +170,76 @@ export class PaymentsError extends Error {
     this.name = "PaymentsError";
   }
 }
+
+// ---------------------------------------------------------------------------
+// Booking-level payments (Connect flow)
+// ---------------------------------------------------------------------------
+
+export type PaymentMode = "deposit" | "full" | "card_on_file";
+
+export type AppointmentPaymentStatus =
+  | "pending"
+  | "authorized"
+  | "captured"
+  | "cancelled"
+  | "refunded"
+  | "paid_in_person"
+  | "failed";
+
+export type PaymentSettings = {
+  paymentsEnabled: boolean;
+  paymentMode: PaymentMode;
+  depositPercentage: number;
+  currency: string;
+  platformFeePercent: number;
+};
+
+export type AppointmentPayment = {
+  bookingId: string;
+  tenantId: string;
+  userId: string;
+  paymentMode: PaymentMode;
+  currency: string;
+  totalAmountMinor: number;
+  authorizedAmountMinor: number;
+  capturedAmountMinor: number;
+  tipAmountMinor: number;
+  stripePaymentIntentId: string | null;
+  stripeSetupIntentId: string | null;
+  status: AppointmentPaymentStatus;
+  stripeStatus: string | null;
+  notes: string | null;
+};
+
+export type CreateBookingPaymentIntentInput = {
+  tenantId: string;
+  bookingId: string;
+  /** Service total in minor units (cents) */
+  totalAmountMinor: number;
+  currency?: string;
+};
+
+export type CreateBookingPaymentIntentResult =
+  | { type: "no_payment_required" }
+  | {
+      type: "payment_intent";
+      clientSecret: string;
+      ephemeralKeySecret: string;
+      customerId: string;
+      paymentMode: "deposit" | "full";
+      authorizedAmountMinor: number;
+    }
+  | { type: "setup_intent"; clientSecret: string; ephemeralKeySecret: string; customerId: string };
+
+export type CaptureBookingPaymentInput = {
+  tenantId: string;
+  bookingId: string;
+  finalAmountMinor: number;
+  tipAmountMinor?: number;
+  paidInPerson?: boolean;
+};
+
+export type CancelBookingPaymentInput = {
+  tenantId: string;
+  bookingId: string;
+};

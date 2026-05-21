@@ -27,6 +27,8 @@ export type CalendarGridProps = {
   month: Date;
   /** Currently selected date or null. */
   selectedDate?: Date | null;
+  /** Earliest selectable date. Any date before this is disabled. Defaults to today. */
+  minDate?: Date;
   /** Dates that are fully booked or otherwise non-selectable. */
   disabledDates?: Date[];
   /** Dates flagged as holidays (renders mint dot). */
@@ -74,6 +76,7 @@ function buildMonthCells(month: Date): Array<Date | null> {
 export function CalendarGrid({
   month,
   selectedDate,
+  minDate,
   disabledDates = [],
   holidays = [],
   availabilityMap = {},
@@ -81,6 +84,10 @@ export function CalendarGrid({
   testID,
 }: CalendarGridProps) {
   const today = new Date();
+  // Normalise minDate to start-of-day so same-day comparisons work correctly.
+  const minDay = minDate
+    ? new Date(minDate.getFullYear(), minDate.getMonth(), minDate.getDate())
+    : new Date(today.getFullYear(), today.getMonth(), today.getDate());
   const cells = buildMonthCells(month);
   const monthLabel = `${MONTH_NAMES[month.getMonth()]} ${month.getFullYear()}`;
 
@@ -104,14 +111,17 @@ export function CalendarGrid({
           const iso = toIsoDate(date);
           const isToday = isSameDay(date, today);
           const isSelected = selectedDate ? isSameDay(date, selectedDate) : false;
-          const isDisabled = disabledDates.some((d) => isSameDay(d, date));
+          const isPast = date < minDay;
+          const isDisabled = isPast || disabledDates.some((d) => isSameDay(d, date));
           const isHoliday = holidays.some((d) => isSameDay(d, date));
           const availability = availabilityMap[iso];
           const slotCount = availability?.slotCount ?? 0;
 
-          const a11yLabel = isDisabled
-            ? `${WEEKDAY_LABELS[date.getDay()]} ${MONTH_NAMES[date.getMonth()]} ${date.getDate()}, fully booked`
-            : `${WEEKDAY_LABELS[date.getDay()]} ${MONTH_NAMES[date.getMonth()]} ${date.getDate()}, ${slotCount} slots available`;
+          const a11yLabel = isPast
+            ? `${WEEKDAY_LABELS[date.getDay()]} ${MONTH_NAMES[date.getMonth()]} ${date.getDate()}, not available`
+            : isDisabled
+              ? `${WEEKDAY_LABELS[date.getDay()]} ${MONTH_NAMES[date.getMonth()]} ${date.getDate()}, fully booked`
+              : `${WEEKDAY_LABELS[date.getDay()]} ${MONTH_NAMES[date.getMonth()]} ${date.getDate()}, ${slotCount} slots available`;
 
           return (
             <Pressable

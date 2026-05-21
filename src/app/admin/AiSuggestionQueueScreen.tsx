@@ -179,14 +179,14 @@ export function AiSuggestionQueueScreen({
               {s.status === "pending" && (
                 <View style={styles.actionRow}>
                   <TouchableOpacity
-                    onPress={() => onApprove(s.suggestionId)}
+                    onPress={() => onApprove(s.suggestionId, undefined)}
                     style={styles.approveBtn}
                     testID={`approve-${s.suggestionId}`}
                   >
                     <Text style={styles.approveBtnText}>Approve</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
-                    onPress={() => onReject(s.suggestionId)}
+                    onPress={() => onReject(s.suggestionId, undefined)}
                     style={styles.rejectBtn}
                     testID={`reject-${s.suggestionId}`}
                   >

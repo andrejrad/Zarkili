@@ -28,11 +28,13 @@ describe("navigation route guards", () => {
       "EmailVerification",
       "OtpVerification",
       "AccountMerge",
+      "GuestBookingGate",
       "DiscoverBusinesses",
       "TenantPublicProfile",
       "DiscoverHome",
       "DiscoverFeed",
       "ExploreResults",
+      "ExploreServiceDetail",
       "ExploreMap",
       "DiscoverFilters",
       "SalonProfile",
@@ -75,6 +77,8 @@ describe("navigation route guards", () => {
       "WaitlistJoin",
       "WaitlistPosition",
       "AppShell",
+      "AdminSignIn",
+      "RoleDenied",
     ]);
   });
 

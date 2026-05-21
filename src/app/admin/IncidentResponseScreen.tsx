@@ -12,7 +12,7 @@ import type { IncidentRecord, IncidentSeverity, IncidentStatus } from "./platfor
 
 export type IncidentResponseScreenProps = {
   loading: boolean;
-  saving: boolean;
+  saving?: boolean;
   error: string | null;
   incidents: IncidentRecord[];
   onUpdateStatus: (incidentId: string, status: IncidentStatus, notes?: string) => void;
@@ -21,11 +21,15 @@ export type IncidentResponseScreenProps = {
   testID?: string;
 };
 
-const SEVERITY_COLORS: Record<IncidentSeverity, string> = {
+const SEVERITY_COLORS: Partial<Record<string, string>> = {
   P1: "#ef4444",
   P2: "#f97316",
   P3: "#f59e0b",
   P4: "#6b7280",
+  critical: "#ef4444",
+  high: "#f97316",
+  medium: "#f59e0b",
+  low: "#6b7280",
 };
 
 const STATUS_COLORS: Record<IncidentStatus, string> = {
@@ -50,8 +54,8 @@ export function IncidentResponseScreen({
 
   if (loading) {
     return (
-      <View style={styles.center} testID={testID}>
-        <ActivityIndicator testID="loading-indicator" />
+      <View style={styles.center} testID={`${testID}-loading`}>
+        <ActivityIndicator />
       </View>
     );
   }
@@ -94,7 +98,7 @@ export function IncidentResponseScreen({
               onPress={() => setExpandedId(expandedId === incident.incidentId ? null : incident.incidentId)}
             >
               <View style={styles.incidentHeader}>
-                <View style={[styles.severityBadge, { backgroundColor: SEVERITY_COLORS[incident.severity] }]}>
+                <View style={[styles.severityBadge, { backgroundColor: SEVERITY_COLORS[incident.severity] ?? "#6b7280" }]}>
                   <Text style={styles.severityText}>{incident.severity}</Text>
                 </View>
                 <Text style={styles.incidentTitle}>{incident.title}</Text>
@@ -103,9 +107,19 @@ export function IncidentResponseScreen({
                 </View>
               </View>
               <Text style={styles.incidentDate}>
-                {incident.createdAt.slice(0, 10)} · {incident.affectedServices.join(", ")}
+                {incident.createdAt.slice(0, 10)}{(incident.affectedServices?.length ?? 0) > 0 ? ` · ${incident.affectedServices!.join(", ")}` : ""}
               </Text>
             </TouchableOpacity>
+
+            {incident.status !== "resolved" && (
+              <TouchableOpacity
+                style={styles.resolveBtn}
+                onPress={() => onUpdateStatus(incident.incidentId, "resolved", undefined)}
+                testID={`incident-resolve-${incident.incidentId}`}
+              >
+                <Text style={styles.resolveBtnText}>Resolve</Text>
+              </TouchableOpacity>
+            )}
 
             {expandedId === incident.incidentId && (
               <View style={styles.expanded} testID={`expanded-${incident.incidentId}`}>
@@ -182,6 +196,8 @@ const styles = StyleSheet.create({
   statusButtons: { flexDirection: "row", gap: 8, flexWrap: "wrap" },
   statusBtn: { paddingHorizontal: 12, paddingVertical: 8, borderRadius: 6 },
   statusBtnText: { color: "#ffffff", fontWeight: "700", fontSize: 12 },
+  resolveBtn: { margin: 8, backgroundColor: "#10b981", paddingHorizontal: 14, paddingVertical: 8, borderRadius: 6, alignSelf: "flex-start" },
+  resolveBtnText: { color: "#ffffff", fontWeight: "700", fontSize: 12 },
   emptyText: { textAlign: "center", color: "#9ca3af", marginTop: 32 },
   errorText: { color: "#ef4444", marginBottom: 12 },
   retryBtn: { backgroundColor: "#3b82f6", padding: 10, borderRadius: 8 },

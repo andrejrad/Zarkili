@@ -1,5 +1,5 @@
 export const featureFlags = {
-  marketplaceEnabled: false,
+  marketplaceEnabled: true,
 } as const;
 
 export type FeatureFlags = typeof featureFlags;

@@ -57,7 +57,7 @@ import { GoogleAuthProvider, OAuthProvider } from "firebase/auth";
 const mockAuthRequestCtor = ExpoAuthSession.AuthRequest as jest.Mock;
 const mockExchangeCodeAsync = ExpoAuthSession.exchangeCodeAsync as jest.Mock;
 const mockAppleSignInAsync = ExpoApple.signInAsync as jest.Mock;
-const MockOAuthProvider = OAuthProvider as jest.Mock;
+const MockOAuthProvider = OAuthProvider as unknown as jest.Mock;
 
 // ---------------------------------------------------------------------------
 // Module under test

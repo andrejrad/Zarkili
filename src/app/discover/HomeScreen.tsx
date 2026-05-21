@@ -11,7 +11,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import type {
   DiscoveryCategoryId,
   DiscoveryHomeFeed,
-  DiscoverySalonCard,
+  ServiceTypeCard,
 } from "../../domains/discovery";
 import { RatingStars, colors, radius, spacing, textStyles } from "../../shared/ui";
 
@@ -20,7 +20,7 @@ export type HomeScreenProps = {
   greetingName?: string;
   onPressSearch?: () => void;
   onPressCategory?: (id: DiscoveryCategoryId) => void;
-  onPressSalon?: (salon: DiscoverySalonCard) => void;
+  onPressSalon?: (service: ServiceTypeCard) => void;
   onPressRecentBooking?: (id: string) => void;
   onPressDiscoverTab?: () => void;
   testID?: string;
@@ -108,21 +108,21 @@ export function HomeScreen({
             onPress={() => onPressSalon?.(s)}
             style={styles.salonCard}
             accessibilityRole="button"
-            accessibilityLabel={`${s.name} in ${s.city}`}
+            accessibilityLabel={`${s.serviceName} at ${s.locationDisplayName}`}
             testID={testID ? `${testID}-salon-${s.id}` : undefined}
           >
             <View style={styles.salonImage} />
             <Text style={styles.salonName} numberOfLines={1}>
-              {s.name}
+              {s.serviceName}
             </Text>
             <Text style={styles.salonCity} numberOfLines={1}>
-              {s.city}
+              {s.locationDisplayName}
             </Text>
             <View style={styles.ratingRow}>
-              <RatingStars value={s.rating} size={16} />
-              <Text style={styles.salonMeta}>({s.reviewCount})</Text>
+              <RatingStars value={s.serviceAverageRating ?? s.locationAverageRating ?? 0} size={16} />
+              <Text style={styles.salonMeta}>({s.serviceReviewCount})</Text>
             </View>
-            <Text style={styles.salonMeta}>From ${s.priceFrom} · {s.nextAvailableLabel}</Text>
+            <Text style={styles.salonMeta}>From £{s.priceFrom.toFixed(0)}</Text>
           </Pressable>
         ))}
       </ScrollView>

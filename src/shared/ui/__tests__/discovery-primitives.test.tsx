@@ -32,7 +32,7 @@ describe("RatingStars", () => {
 });
 
 describe("RangeSlider single", () => {
-  it("calls onChange with stepped value", () => {
+  it("renders the track and handle with correct accessibility value", () => {
     const onChange = jest.fn();
     const { getByTestId } = render(
       <RangeSlider
@@ -44,15 +44,13 @@ describe("RangeSlider single", () => {
         testID="r"
       />,
     );
-    fireEvent.press(getByTestId("r-inc"));
-    expect(onChange).toHaveBeenCalledWith(15);
-    fireEvent.press(getByTestId("r-dec"));
-    expect(onChange).toHaveBeenCalledWith(5);
+    const thumb = getByTestId("r-thumb");
+    expect(thumb.props.accessibilityValue).toEqual({ min: 0, max: 50, now: 10 });
   });
 });
 
 describe("RangeSlider dual", () => {
-  it("constrains min thumb below max thumb minus step", () => {
+  it("renders both handles with correct accessibility values", () => {
     const onChange = jest.fn();
     const { getByTestId } = render(
       <RangeSlider
@@ -64,8 +62,10 @@ describe("RangeSlider dual", () => {
         testID="r2"
       />,
     );
-    fireEvent.press(getByTestId("r2-lo-inc"));
-    expect(onChange).toHaveBeenCalledWith([110, 200]);
+    expect(getByTestId("r2-lo").props.accessibilityValue.now).toBe(100);
+    expect(getByTestId("r2-hi").props.accessibilityValue.now).toBe(200);
+    expect(getByTestId("r2-lo-label").props.children).toBe("100");
+    expect(getByTestId("r2-hi-label").props.children).toBe("200");
   });
 });
 

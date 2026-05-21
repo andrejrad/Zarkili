@@ -26,23 +26,41 @@ export type LocationAddress = {
   lng?: number;
 };
 
+export type ServiceAggregate = {
+  averageRating: number | null;
+  reviewCount: number;
+  ratingSum: number;
+  popularityScore: number;
+  nextAvailableAt: Timestamp | null;
+  isFullyBooked: boolean;
+};
+
 export type Location = {
   locationId: string;
   tenantId: string;
   name: string;
+  displayName: string;
   code: string;
   status: LocationStatus;
   timezone: string;
   phone: string | null;
   email: string | null;
   address: LocationAddress;
+  geohash: string;
   operatingHours: OperatingHours;
+  // Derived aggregate written by Cloud Functions
+  averageRating: number | null;
+  reviewCount: number;
+  ratingSum: number;
   createdAt: Timestamp;
   updatedAt: Timestamp;
 };
 
-export type CreateLocationInput = Omit<Location, "locationId" | "createdAt" | "updatedAt">;
+export type CreateLocationInput = Omit<
+  Location,
+  "locationId" | "createdAt" | "updatedAt" | "geohash" | "averageRating" | "reviewCount" | "ratingSum"
+>;
 
 export type UpdateLocationInput = Partial<
-  Pick<Location, "name" | "code" | "status" | "timezone" | "phone" | "email" | "address" | "operatingHours">
+  Pick<Location, "name" | "displayName" | "code" | "status" | "timezone" | "phone" | "email" | "address" | "geohash" | "operatingHours">
 >;

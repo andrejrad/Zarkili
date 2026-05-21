@@ -109,16 +109,65 @@ export type HistoryEntry = {
   description: string;
   /** Positive = earned, negative = redeemed / spent. */
   delta: number;
+  /** Raw Firestore event type key (e.g. "booking_completed"). Used by getEventTypeLabel. */
+  eventType?: string;
+  /** Optional event context data (serviceName, locationName, rewardName, note, etc.). */
+  eventData?: Record<string, string>;
 };
 
-/** Format ISO date to "MM/DD/YYYY". */
+// ---------------------------------------------------------------------------
+// Activity date formatting (spec §3.6.3)
+// ---------------------------------------------------------------------------
+
+/**
+ * Format ISO date to a human-readable relative or short date.
+ *   Today / Yesterday / N days ago / "14 May" / "14 May 2025"
+ * Never MM/DD/YYYY. Never wraps across lines.
+ */
+export function formatActivityDate(iso: string): string {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return iso;
+  const now = new Date();
+  const diffDays = Math.floor((now.getTime() - date.getTime()) / 86_400_000);
+  if (diffDays === 0) return "Today";
+  if (diffDays === 1) return "Yesterday";
+  if (diffDays < 7) return `${diffDays} days ago`;
+  return date.toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+}
+
+/** @deprecated Use formatActivityDate instead. */
 export function formatHistoryDate(iso: string): string {
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return iso;
-  const mm = String(d.getMonth() + 1).padStart(2, "0");
-  const dd = String(d.getDate()).padStart(2, "0");
-  const yyyy = d.getFullYear();
-  return `${mm}/${dd}/${yyyy}`;
+  return formatActivityDate(iso);
+}
+
+// ---------------------------------------------------------------------------
+// Event type label map (spec §3.6.2)
+// ---------------------------------------------------------------------------
+
+export const EVENT_TYPE_LABELS: Record<
+  string,
+  (data: Record<string, string>) => string
+> = {
+  booking_completed:  (d) => `${d.serviceName ?? "Service"} — ${d.locationName ?? "location"}`,
+  reward_redemption:  (d) => `${d.rewardName ?? "Reward"} redeemed`,
+  referral_bonus:     ()  => "Friend referral bonus",
+  review_bonus:       ()  => "Review bonus",
+  review_photo_bonus: ()  => "Photo review bonus",
+  welcome_bonus:      ()  => "Welcome bonus",
+  manual_adjustment:  (d) => d.note ?? "Points adjustment",
+};
+
+/** Map a raw eventType + optional eventData to a human-readable label. */
+export function getEventTypeLabel(
+  eventType: string,
+  eventData?: Record<string, string>,
+): string {
+  const fn = EVENT_TYPE_LABELS[eventType];
+  return fn ? fn(eventData ?? {}) : "Points update";
 }
 
 // ---------------------------------------------------------------------------
@@ -147,6 +196,24 @@ export type Reward = {
   expiresAt?: string;
   redeemed?: boolean;
   locked?: boolean;
+};
+
+/**
+ * Inline reward item shown in the Redeem section on the Rewards tab.
+ * Client-computed from the full RewardObject returned by the catalogue API.
+ */
+export type InlineReward = {
+  id: string;
+  name: string;
+  pointsRequired: number;
+  /** URL or null for placeholder. */
+  photoUrl: string | null;
+  /** ISO 8601 expiry, or null for no expiry. */
+  expiresAt: string | null;
+  /** true when userPoints >= pointsRequired */
+  isRedeemable: boolean;
+  /** max(0, pointsRequired - userPoints) */
+  pointsNeeded: number;
 };
 
 export function filterRewards(

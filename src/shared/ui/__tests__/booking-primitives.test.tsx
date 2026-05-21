@@ -26,7 +26,10 @@ describe("CalendarGrid", () => {
   it("invokes onSelectDate when a non-disabled cell is pressed", () => {
     const onSelectDate = jest.fn();
     const { getByTestId } = render(
-      <CalendarGrid month={march2026} testID="cal" onSelectDate={onSelectDate} />,
+      // minDate in Jan 2026 ensures March cells are never treated as "past"
+      // regardless of when the test runs. Without this the calendar defaults
+      // minDate to today, which breaks the test once today passes March 12.
+      <CalendarGrid month={march2026} testID="cal" onSelectDate={onSelectDate} minDate={new Date(2026, 0, 1)} />,
     );
     fireEvent.press(getByTestId(`cal-cell-${toIsoDate(new Date(2026, 2, 12))}`));
     expect(onSelectDate).toHaveBeenCalledTimes(1);

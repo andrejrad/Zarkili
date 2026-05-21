@@ -9,8 +9,6 @@ describe("FilterSheet", () => {
       <FilterSheet
         visible={false}
         onClose={jest.fn()}
-        applyLabel="Apply"
-        onApply={jest.fn()}
       >
         <></>
       </FilterSheet>,
@@ -18,8 +16,7 @@ describe("FilterSheet", () => {
     expect(queryByText("Filters")).toBeNull();
   });
 
-  it("invokes apply / reset / close handlers", () => {
-    const onApply = jest.fn();
+  it("invokes reset and close handlers", () => {
     const onReset = jest.fn();
     const onClose = jest.fn();
     const { getByTestId } = render(
@@ -27,8 +24,6 @@ describe("FilterSheet", () => {
         visible
         onClose={onClose}
         onReset={onReset}
-        applyLabel="Apply filters (3 results)"
-        onApply={onApply}
         testID="fs"
       >
         <></>
@@ -36,8 +31,6 @@ describe("FilterSheet", () => {
     );
     fireEvent.press(getByTestId("fs-reset"));
     expect(onReset).toHaveBeenCalled();
-    fireEvent.press(getByTestId("fs-apply"));
-    expect(onApply).toHaveBeenCalled();
     fireEvent.press(getByTestId("fs-scrim"));
     expect(onClose).toHaveBeenCalled();
   });

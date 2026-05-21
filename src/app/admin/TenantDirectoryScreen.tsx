@@ -16,7 +16,7 @@ export type TenantDirectoryScreenProps = {
   tenants: TenantRecord[];
   filter: TenantFilter;
   onChangeFilter: (f: TenantFilter) => void;
-  onSelectTenant: (tenantId: string) => void;
+  onSelectTenant: (t: TenantRecord) => void;
   onRetry: () => void;
   onBack: () => void;
   testID?: string;
@@ -44,8 +44,8 @@ export function TenantDirectoryScreen({
 
   if (loading) {
     return (
-      <View style={styles.center} testID={testID}>
-        <ActivityIndicator testID="loading-indicator" />
+      <View style={styles.center} testID={`${testID}-loading`}>
+        <ActivityIndicator />
       </View>
     );
   }
@@ -106,11 +106,11 @@ export function TenantDirectoryScreen({
           <TouchableOpacity
             key={t.tenantId}
             style={styles.tenantRow}
-            onPress={() => onSelectTenant(t.tenantId)}
+            onPress={() => onSelectTenant(t)}
             testID={`tenant-row-${t.tenantId}`}
           >
             <View style={styles.tenantMain}>
-              <Text style={styles.tenantName}>{t.displayName}</Text>
+              <Text style={styles.tenantName}>{t.name ?? t.displayName}</Text>
               <Text style={styles.tenantEmail}>{t.ownerEmail}</Text>
             </View>
             <View style={styles.tenantMeta}>

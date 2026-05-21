@@ -50,7 +50,7 @@ export function SalonOnboardingAccountScreen({
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <Stepper totalSteps={totalSteps} currentStep={currentStep} testID="salon-account-stepper" />
       <Text style={styles.heading} accessibilityRole="header">Account Setup</Text>
-      <Text style={styles.body}>Confirm the owner email and contact phone for your salon account.</Text>
+      <Text style={styles.body}>Confirm the contact details for your salon account.</Text>
 
       {error ? (
         <View style={styles.bannerWrap}>
@@ -60,7 +60,7 @@ export function SalonOnboardingAccountScreen({
 
       <View style={styles.form}>
         <InputField
-          label="Owner email"
+          accessibilityLabel="Owner email"
           value={ownerEmail}
           onChangeText={setOwnerEmail}
           placeholder="owner@example.com"

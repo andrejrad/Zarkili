@@ -40,6 +40,10 @@ export const colors = {
   disabled: "#B0B0B0",
   disabledBg: "#F5F5F5",
   white: "#FFFFFF",
+  // Surface variants
+  surfaceMuted: "#F7F5F0",
+  successSurface: "#E8F5E9",
+  successText: "#2E7D32",
 } as const;
 
 export type ColorToken = keyof typeof colors;

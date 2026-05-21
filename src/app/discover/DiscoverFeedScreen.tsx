@@ -8,17 +8,17 @@
 
 import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 
-import type { DiscoverySalonCard } from "../../domains/discovery";
+import type { ServiceTypeCard } from "../../domains/discovery";
 import { RatingStars, colors, radius, spacing, textStyles } from "../../shared/ui";
 
 export type DiscoverFeedItem =
-  | { kind: "salon"; salon: DiscoverySalonCard }
-  | { kind: "sponsored"; salon: DiscoverySalonCard; sponsorName: string }
+  | { kind: "salon"; salon: ServiceTypeCard }
+  | { kind: "sponsored"; salon: ServiceTypeCard; sponsorName: string }
   | { kind: "editorial"; id: string; title: string; subtitle: string; ctaLabel: string };
 
 export type DiscoverFeedScreenProps = {
   items: DiscoverFeedItem[];
-  onPressSalon?: (salon: DiscoverySalonCard) => void;
+  onPressSalon?: (salon: ServiceTypeCard) => void;
   onPressEditorial?: (id: string) => void;
   onPressFilters?: () => void;
   testID?: string;
@@ -73,7 +73,7 @@ export function DiscoverFeedScreen({
               onPress={() => onPressSalon?.(item.salon)}
               style={styles.salonCard}
               accessibilityRole="button"
-              accessibilityLabel={`${item.salon.name} in ${item.salon.city}${isSponsored ? ", sponsored" : ""}`}
+              accessibilityLabel={`${item.salon.serviceName} at ${item.salon.locationDisplayName}${isSponsored ? ", sponsored" : ""}`}
               testID={testID ? `${testID}-salon-${item.salon.id}` : undefined}
             >
               {isSponsored ? (
@@ -86,17 +86,17 @@ export function DiscoverFeedScreen({
               ) : null}
               <View style={styles.salonImage} />
               <Text style={styles.salonName} numberOfLines={1}>
-                {item.salon.name}
+                {item.salon.serviceName}
               </Text>
               <Text style={styles.salonCity} numberOfLines={1}>
-                {item.salon.city}
+                {item.salon.locationDisplayName}
               </Text>
               <View style={styles.ratingRow}>
-                <RatingStars value={item.salon.rating} size={16} />
-                <Text style={styles.salonMeta}>({item.salon.reviewCount})</Text>
+                <RatingStars value={item.salon.serviceAverageRating ?? item.salon.locationAverageRating ?? 0} size={16} />
+                <Text style={styles.salonMeta}>({item.salon.serviceReviewCount})</Text>
               </View>
               <Text style={styles.salonMeta}>
-                From ${item.salon.priceFrom} · {item.salon.nextAvailableLabel}
+                From £{item.salon.priceFrom.toFixed(0)}
               </Text>
             </Pressable>
           );

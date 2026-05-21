@@ -68,7 +68,7 @@ export function SalonOnboardingPoliciesScreen({
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <Stepper totalSteps={totalSteps} currentStep={currentStep} testID="salon-policies-stepper" />
-      <Text style={styles.heading} accessibilityRole="header">Cancellation policy</Text>
+      <Text style={styles.heading} accessibilityRole="header">Booking policy</Text>
       <Text style={styles.body}>
         Choose how far in advance clients must cancel to avoid a charge.
       </Text>

@@ -49,6 +49,7 @@ const EMPTY_HOME_FEED: DiscoveryHomeFeed = {
   categories: [],
   featuredSalons: [],
   recentBookings: [],
+  recommendedSalons: [],
 };
 
 // ---------------------------------------------------------------------------
@@ -60,7 +61,9 @@ function makeBaseRepo(): DiscoveryRepository {
     listCategories: async () => [],
     listFeaturedSalons: async () => [],
     listRecentBookings: async () => [],
+    listRecommendedSalons: async () => [],
     searchSalons: async () => [],
+    getServiceCards: async () => ({ services: [], nextCursor: null, total: 0, locationLabel: "" }),
   };
 }
 

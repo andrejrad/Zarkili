@@ -1,5 +1,5 @@
 import { createDiscoveryService } from "../service";
-import { discoveryCategories, featuredDiscoverySalons } from "../mockData";
+import { discoveryCategories, featuredDiscoverySalons, recommendedDiscoverySalons } from "../mockData";
 import type { DiscoveryRepository } from "../repository";
 
 function makeRepo(overrides: Partial<DiscoveryRepository> = {}): DiscoveryRepository {
@@ -7,12 +7,14 @@ function makeRepo(overrides: Partial<DiscoveryRepository> = {}): DiscoveryReposi
     listCategories: jest.fn().mockResolvedValue(discoveryCategories),
     listFeaturedSalons: jest.fn().mockResolvedValue(featuredDiscoverySalons),
     listRecentBookings: jest.fn().mockResolvedValue([]),
+    listRecommendedSalons: jest.fn().mockResolvedValue(recommendedDiscoverySalons),
+    getServiceCards: jest.fn().mockResolvedValue({ services: featuredDiscoverySalons, nextCursor: null, total: featuredDiscoverySalons.length, locationLabel: "" }),
     ...overrides,
   };
 }
 
 describe("DiscoveryService.getHomeFeed", () => {
-  it("returns categories, featuredSalons, and recentBookings from the repository", async () => {
+  it("returns categories, featuredSalons, recentBookings, and recommendedSalons from the repository", async () => {
     const repo = makeRepo();
     const service = createDiscoveryService(repo);
 
@@ -21,6 +23,7 @@ describe("DiscoveryService.getHomeFeed", () => {
     expect(feed.categories).toEqual(discoveryCategories);
     expect(feed.featuredSalons).toEqual(featuredDiscoverySalons);
     expect(feed.recentBookings).toEqual([]);
+    expect(feed.recommendedSalons).toEqual(recommendedDiscoverySalons);
   });
 
   it("includes all 13 expected categories", async () => {
@@ -53,17 +56,19 @@ describe("DiscoveryService.getHomeFeed", () => {
     expect(feed.recentBookings).toEqual(recentBookings);
   });
 
-  it("calls repository methods concurrently (all three awaited)", async () => {
+  it("calls repository methods concurrently (all four awaited)", async () => {
     const listCategories = jest.fn().mockResolvedValue(discoveryCategories);
     const listFeaturedSalons = jest.fn().mockResolvedValue(featuredDiscoverySalons);
     const listRecentBookings = jest.fn().mockResolvedValue([]);
+    const listRecommendedSalons = jest.fn().mockResolvedValue([]);
 
-    const service = createDiscoveryService({ listCategories, listFeaturedSalons, listRecentBookings });
+    const service = createDiscoveryService({ listCategories, listFeaturedSalons, listRecentBookings, listRecommendedSalons, getServiceCards: jest.fn().mockResolvedValue({ services: [], nextCursor: null, total: 0, locationLabel: "" }) });
     await service.getHomeFeed();
 
     expect(listCategories).toHaveBeenCalledTimes(1);
     expect(listFeaturedSalons).toHaveBeenCalledTimes(1);
     expect(listRecentBookings).toHaveBeenCalledTimes(1);
+    expect(listRecommendedSalons).toHaveBeenCalledTimes(1);
   });
 });
 
@@ -77,7 +82,7 @@ describe("DiscoveryService.getExploreFeed", () => {
   });
 
   it("returns empty salons list when repository has none", async () => {
-    const service = createDiscoveryService(makeRepo({ listFeaturedSalons: jest.fn().mockResolvedValue([]) }));
+    const service = createDiscoveryService(makeRepo({ getServiceCards: jest.fn().mockResolvedValue({ services: [], nextCursor: null, total: 0, locationLabel: "" }) }));
     const feed = await service.getExploreFeed();
 
     expect(feed.salons).toEqual([]);
@@ -88,6 +93,8 @@ describe("DiscoveryService.getExploreFeed", () => {
       listCategories: jest.fn().mockRejectedValue(new Error("Firestore unavailable")),
       listFeaturedSalons: jest.fn().mockResolvedValue([]),
       listRecentBookings: jest.fn().mockResolvedValue([]),
+      listRecommendedSalons: jest.fn().mockResolvedValue([]),
+      getServiceCards: jest.fn().mockResolvedValue({ services: [], nextCursor: null, total: 0, locationLabel: "" }),
     });
 
     await expect(service.getExploreFeed()).rejects.toThrow("Firestore unavailable");
@@ -100,22 +107,24 @@ describe("mockData contract", () => {
     expect(discoveryCategories).toHaveLength(13);
   });
 
-  it("featuredDiscoverySalons have all required DiscoverySalonCard fields", () => {
+  it("featuredDiscoverySalons have all required ServiceTypeCard fields", () => {
     for (const salon of featuredDiscoverySalons) {
       expect(typeof salon.id).toBe("string");
       expect(typeof salon.tenantId).toBe("string");
-      expect(typeof salon.name).toBe("string");
-      expect(typeof salon.rating).toBe("number");
-      expect(typeof salon.bookingEnabled).toBe("boolean");
-      expect(Array.isArray(salon.categories)).toBe(true);
+      expect(typeof salon.serviceName).toBe("string");
+      expect(
+        salon.serviceAverageRating === null || typeof salon.serviceAverageRating === "number"
+      ).toBe(true);
+      expect(typeof salon.isBookableOnline).toBe("boolean");
+      expect(typeof salon.categoryId).toBe("string");
     }
   });
 
   it("featuredDiscoverySalons includes at least one bookingEnabled salon", () => {
-    expect(featuredDiscoverySalons.some((s) => s.bookingEnabled)).toBe(true);
+    expect(featuredDiscoverySalons.some((s) => s.isBookableOnline)).toBe(true);
   });
 
   it("featuredDiscoverySalons includes at least one salon with bookingEnabled false", () => {
-    expect(featuredDiscoverySalons.some((s) => !s.bookingEnabled)).toBe(true);
+    expect(featuredDiscoverySalons.some((s) => !s.isBookableOnline)).toBe(true);
   });
 });

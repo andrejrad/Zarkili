@@ -17,6 +17,8 @@ import type { ParsedPaymentEvent } from "./parseEvent.js";
 
 export type AdminPaymentsRepository = {
   hasProcessedEvent(scopeId: string, eventId: string): Promise<boolean>;
+  markPaymentMethodEventProcessed(userId: string, eventId: string): Promise<void>;
+  hasProcessedTenantEvent(tenantId: string, eventId: string): Promise<boolean>;
   upsertPaymentMethod(
     userId: string,
     methodId: string,
@@ -36,6 +38,21 @@ export type AdminPaymentsRepository = {
     stripeRefundId: string,
     status: "issued" | "denied",
     failureCode: string | null,
+    eventId: string,
+  ): Promise<void>;
+  updateAppointmentPaymentByIntentId(
+    tenantId: string,
+    stripePaymentIntentId: string,
+    status: "authorized" | "cancelled",
+    paymentMethodId: string | undefined,
+    eventId: string,
+  ): Promise<void>;
+  handleSetupIntentSucceeded(
+    tenantId: string,
+    bookingId: string,
+    userId: string,
+    paymentMethodId: string,
+    eventId: string,
   ): Promise<void>;
 };
 
@@ -43,6 +60,18 @@ export function createAdminPaymentsRepository(db: Firestore): AdminPaymentsRepos
   return {
     async hasProcessedEvent(scopeId, eventId) {
       const ref = db.doc(`clients/${scopeId}/paymentsWebhookIdempotency/${eventId}`);
+      return (await ref.get()).exists;
+    },
+
+    async markPaymentMethodEventProcessed(userId, eventId) {
+      await db.doc(`clients/${userId}/paymentsWebhookIdempotency/${eventId}`).set({
+        eventId,
+        appliedAt: FieldValue.serverTimestamp(),
+      });
+    },
+
+    async hasProcessedTenantEvent(tenantId, eventId) {
+      const ref = db.doc(`tenants/${tenantId}/paymentsWebhookIdempotency/${eventId}`);
       return (await ref.get()).exists;
     },
 
@@ -62,7 +91,18 @@ export function createAdminPaymentsRepository(db: Firestore): AdminPaymentsRepos
         .where("stripePaymentIntentId", "==", stripePaymentIntentId)
         .limit(1)
         .get();
-      if (snap.empty) return; // Charge not yet written or wrong tenant; skip silently
+      if (snap.empty) {
+        // The PI may belong to an appointment payment (deposit/full mode) rather than
+        // a standard platform charge. In that case the status is already managed by
+        // the captureBookingPayment callable directly. Write the idempotency record
+        // so duplicate events are deduplicated and return cleanly — do NOT throw,
+        // which would cause Stripe to retry the webhook indefinitely.
+        await db.doc(`tenants/${tenantId}/paymentsWebhookIdempotency/${eventId}`).set({
+          eventId,
+          appliedAt: FieldValue.serverTimestamp(),
+        });
+        return;
+      }
 
       const chargeRef = snap.docs[0].ref;
       const batch = db.batch();
@@ -80,8 +120,10 @@ export function createAdminPaymentsRepository(db: Firestore): AdminPaymentsRepos
       await batch.commit();
     },
 
-    async writeRefund(tenantId, stripeRefundId, status, failureCode) {
-      await db.doc(`tenants/${tenantId}/refunds/${stripeRefundId}`).set(
+    async writeRefund(tenantId, stripeRefundId, status, failureCode, eventId) {
+      const batch = db.batch();
+      batch.set(
+        db.doc(`tenants/${tenantId}/refunds/${stripeRefundId}`),
         {
           status,
           failureCode: failureCode ?? null,
@@ -90,6 +132,61 @@ export function createAdminPaymentsRepository(db: Firestore): AdminPaymentsRepos
         },
         { merge: true },
       );
+      batch.set(db.doc(`tenants/${tenantId}/paymentsWebhookIdempotency/${eventId}`), {
+        eventId,
+        appliedAt: FieldValue.serverTimestamp(),
+      });
+      await batch.commit();
+    },
+
+    async updateAppointmentPaymentByIntentId(tenantId, stripePaymentIntentId, status, paymentMethodId, eventId) {
+      const snap = await db
+        .collection(`tenants/${tenantId}/appointmentPayments`)
+        .where("stripePaymentIntentId", "==", stripePaymentIntentId)
+        .limit(1)
+        .get();
+      if (snap.empty) return;
+      const batch = db.batch();
+      batch.update(snap.docs[0].ref, {
+        status,
+        ...(status === "authorized" && {
+          authorizedAt: FieldValue.serverTimestamp(),
+          ...(paymentMethodId ? { stripePaymentMethodId: paymentMethodId } : {}),
+        }),
+        updatedAt: FieldValue.serverTimestamp(),
+      });
+      batch.set(db.doc(`tenants/${tenantId}/paymentsWebhookIdempotency/${eventId}`), {
+        eventId,
+        appliedAt: FieldValue.serverTimestamp(),
+      });
+      await batch.commit();
+    },
+
+    async handleSetupIntentSucceeded(tenantId, bookingId, userId, paymentMethodId, eventId) {
+      const batch = db.batch();
+      // Save default payment method on the tenant customer profile
+      batch.set(
+        db.doc(`clients/${userId}/tenantPaymentProfiles/${tenantId}`),
+        { defaultPaymentMethodId: paymentMethodId, updatedAt: FieldValue.serverTimestamp() },
+        { merge: true },
+      );
+      // Update appointment payment status to authorized
+      batch.update(
+        db.doc(`tenants/${tenantId}/appointmentPayments/${bookingId}`),
+        {
+          status: "authorized",
+          stripeStatus: "succeeded",
+          authorizedAt: FieldValue.serverTimestamp(),
+          stripePaymentMethodId: paymentMethodId,
+          updatedAt: FieldValue.serverTimestamp(),
+        },
+      );
+      // Idempotency record
+      batch.set(db.doc(`tenants/${tenantId}/paymentsWebhookIdempotency/${eventId}`), {
+        eventId,
+        appliedAt: FieldValue.serverTimestamp(),
+      });
+      await batch.commit();
     },
   };
 }
@@ -110,6 +207,7 @@ export async function applyPaymentEvent(
         return { outcome: "duplicate" };
       }
       await deps.payments.upsertPaymentMethod(d.userId, d.methodId, d.methodData);
+      await deps.payments.markPaymentMethodEventProcessed(d.userId, event.id);
       return { outcome: "applied" };
     }
 
@@ -120,12 +218,16 @@ export async function applyPaymentEvent(
         return { outcome: "duplicate" };
       }
       await deps.payments.deletePaymentMethod(d.userId, d.methodId);
+      await deps.payments.markPaymentMethodEventProcessed(d.userId, event.id);
       return { outcome: "applied" };
     }
 
     case "payment_intent.succeeded": {
       const d = event.paymentIntent;
       if (!d || !d.tenantId) return { outcome: "ignored" };
+      if (await deps.payments.hasProcessedTenantEvent(d.tenantId, event.id)) {
+        return { outcome: "duplicate" };
+      }
       await deps.payments.updateChargeByIntentId(
         d.tenantId,
         d.stripePaymentIntentId,
@@ -140,6 +242,9 @@ export async function applyPaymentEvent(
     case "payment_intent.payment_failed": {
       const d = event.paymentIntent;
       if (!d || !d.tenantId) return { outcome: "ignored" };
+      if (await deps.payments.hasProcessedTenantEvent(d.tenantId, event.id)) {
+        return { outcome: "duplicate" };
+      }
       await deps.payments.updateChargeByIntentId(
         d.tenantId,
         d.stripePaymentIntentId,
@@ -154,7 +259,67 @@ export async function applyPaymentEvent(
     case "charge.refunded": {
       const d = event.chargeRefunded;
       if (!d || !d.tenantId || !d.stripeRefundId) return { outcome: "ignored" };
-      await deps.payments.writeRefund(d.tenantId, d.stripeRefundId, "issued", null);
+      if (await deps.payments.hasProcessedTenantEvent(d.tenantId, event.id)) {
+        return { outcome: "duplicate" };
+      }
+      await deps.payments.writeRefund(d.tenantId, d.stripeRefundId, "issued", null, event.id);
+      return { outcome: "applied" };
+    }
+
+    case "charge.refund.updated": {
+      const d = event.chargeRefundDenied;
+      if (!d || !d.tenantId || !d.stripeRefundId) return { outcome: "ignored" };
+      if (await deps.payments.hasProcessedTenantEvent(d.tenantId, event.id)) {
+        return { outcome: "duplicate" };
+      }
+      await deps.payments.writeRefund(d.tenantId, d.stripeRefundId, "denied", d.failureCode, event.id);
+      return { outcome: "applied" };
+    }
+
+    case "payment_intent.amount_capturable_updated": {
+      const d = event.paymentIntent;
+      if (!d || !d.tenantId) return { outcome: "ignored" };
+      if (await deps.payments.hasProcessedTenantEvent(d.tenantId, event.id)) {
+        return { outcome: "duplicate" };
+      }
+      await deps.payments.updateAppointmentPaymentByIntentId(
+        d.tenantId,
+        d.stripePaymentIntentId,
+        "authorized",
+        d.paymentMethodId,
+        event.id,
+      );
+      return { outcome: "applied" };
+    }
+
+    case "payment_intent.canceled": {
+      const d = event.paymentIntent;
+      if (!d || !d.tenantId) return { outcome: "ignored" };
+      await deps.payments.updateAppointmentPaymentByIntentId(
+        d.tenantId,
+        d.stripePaymentIntentId,
+        "cancelled",
+        undefined,
+        event.id,
+      );
+      return { outcome: "applied" };
+    }
+
+    case "setup_intent.succeeded": {
+      const d = event.setupIntentSucceeded;
+      if (!d || !d.tenantId || !d.bookingId || !d.userId || !d.paymentMethodId) {
+        return { outcome: "ignored" };
+      }
+      if (await deps.payments.hasProcessedTenantEvent(d.tenantId, event.id)) {
+        return { outcome: "duplicate" };
+      }
+      await deps.payments.handleSetupIntentSucceeded(
+        d.tenantId,
+        d.bookingId,
+        d.userId,
+        d.paymentMethodId,
+        event.id,
+      );
       return { outcome: "applied" };
     }
 

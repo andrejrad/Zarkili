@@ -26,13 +26,15 @@ import {
 import {
   DEFAULT_DISCOVERY_FILTERS,
   type DiscoveryCategory,
-  type DiscoveryFeedPost,
   type FeaturedSalon,
-  type SalonProfile,
-  type SalonReviewSnippet,
-  type SalonServiceSummary,
-  type SalonStaffSummary,
 } from "../discovery/discoveryHelpers";
+import type { DiscoveryFeedPost } from "../../domains/discovery";
+import type {
+  SalonProfile,
+  SalonReviewSnippet,
+  SalonServiceSummary,
+  SalonStaffSummary,
+} from "../../domains/discovery/salonProfileService";
 import type { BookingServiceCategoryGroup } from "../booking/ServiceSelectionScreen";
 import type { BookingPolicySection } from "../booking/BookingPoliciesScreen";
 import type { SavedCard } from "../booking/BookingPaymentScreen";

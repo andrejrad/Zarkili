@@ -196,10 +196,14 @@ export function createMarketplaceAdminService(db: Firestore) {
     return snap.docs.map((d) => {
       const data = d.data();
       return {
+        bookingId: d.id,
         date: data.startTime as string,
+        serviceDate: data.startTime as string,
         clientName: data.clientName as string ?? "",
         serviceName: data.serviceName as string ?? "",
         amountUsd: (data.priceUsd as number) ?? 0,
+        revenueUsd: (data.priceUsd as number) ?? 0,
+        rating: (data.rating as number | null) ?? null,
       };
     });
   }

@@ -156,7 +156,7 @@ function seedHappyPath() {
     startTime: "14:30",
   });
 
-  mock.seed(`services/${SERVICE_ID}`, {
+  mock.seed(`brands/${TENANT_ID}/locations/${LOCATION_ID}/service_types/${SERVICE_ID}`, {
     name: "Haircut",
     price: 65,
   });

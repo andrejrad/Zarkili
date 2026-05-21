@@ -62,7 +62,9 @@ service cloud.firestore {
     }
 
     match /tenants/{tenantId} {
-      allow read: if isPlatformAdmin() || isTenantMember(tenantId);
+      // Public consumer discovery — any user (including unauthenticated) may read
+      // tenant profiles for the marketplace / booking flow.
+      allow read: if true;
       allow create: if isPlatformAdmin();
       allow update, delete: if isPlatformAdmin() || hasTenantRole(tenantId, ['tenant_owner']);
     }
@@ -131,25 +133,51 @@ service cloud.firestore {
     }
 
     match /locations/{locationId} {
-      allow read: if tenantScopedReadFromResource();
+      // Active locations are public consumer info (salon address, booking flow).
+      // Tenant members can also read inactive locations for admin purposes.
+      allow read: if resource.data.status == 'active' || tenantScopedReadFromResource();
       allow create: if tenantScopedCreateWrite() && isTenantAdmin(request.resource.data.tenantId);
       allow update, delete: if tenantScopedUpdateWrite() && isTenantAdmin(resource.data.tenantId);
     }
 
     match /staff/{staffId} {
-      allow read: if tenantScopedReadFromResource();
+      // Active staff profiles are public marketplace info (display name, specialties, rating).
+      // Tenant members can also read inactive/archived staff for admin purposes.
+      allow read: if resource.data.status == 'active' || tenantScopedReadFromResource();
       allow create: if tenantScopedCreateWrite() && isTenantAdmin(request.resource.data.tenantId);
       allow update, delete: if tenantScopedUpdateWrite() && isTenantAdmin(resource.data.tenantId);
     }
 
     match /services/{serviceId} {
-      allow read: if tenantScopedReadFromResource();
-      allow create: if tenantScopedCreateWrite() && isTenantAdmin(request.resource.data.tenantId);
-      allow update, delete: if tenantScopedUpdateWrite() && isTenantAdmin(resource.data.tenantId);
+      // MIGRATED (NEW-DEBT-B B2e): canonical path is now
+      //   brands/{brandId}/locations/{locationId}/service_types/{serviceTypeId}.
+      // Legacy path is retained read-only during the migration window so
+      // any un-migrated clients continue to receive data.
+      // Writes are locked to platform admin only — no tenant can write here.
+      allow read: if true;
+      allow write: if isPlatformAdmin();
+
+      match /variants/{variantId} {
+        allow read: if true;
+        allow write: if false;
+      }
+
+      match /addons/{addonId} {
+        allow read: if true;
+        allow write: if false;
+      }
+
+      match /photos/{photoId} {
+        allow read: if true;
+        allow write: if false;
+      }
     }
 
     match /bookings/{bookingId} {
-      allow read: if tenantScopedReadFromResource();
+      // Public read for slot availability — the booking flow is public (guard:none)
+      // so unauthenticated users need to see which time blocks are already taken.
+      // Write paths still enforce tenant membership and customer ownership.
+      allow read: if true;
 
       allow create: if tenantScopedCreateWrite() && (
         isTenantAdmin(request.resource.data.tenantId)
@@ -192,11 +220,9 @@ service cloud.firestore {
     }
 
     match /staffSchedules/{scheduleId} {
-      // scheduleId = tenantId_staffId_locationId
-      // Tenant members can read their own schedule templates.
-      // Only tenant admins (owner, admin, location_manager) can write.
-      allow read: if isPlatformAdmin()
-        || (isSignedIn() && resource.data.tenantId is string && isTenantMember(resource.data.tenantId));
+      // Business-hours config only — no PII. Fully public so unauthenticated
+      // consumers can browse slot availability before signing in.
+      allow read: if true;
 
       allow create: if isPlatformAdmin()
         || (
@@ -268,7 +294,131 @@ service cloud.firestore {
         || (isSignedIn() && resource.data.tenantId is string && isTenantMember(resource.data.tenantId));
     }
 
-    match /discoveryFeaturedSalons/{salonId} {
+    // -------------------------------------------------------------------------
+    // Brand hierarchy (NEW-DEBT-B v3 path)
+    //   brands/{brandId}                              — brand profile (brandId == tenantId)
+    //   brands/{brandId}/locations/{locationId}       — location profile
+    //   .../service_types/{serviceTypeId}             — one Explore card
+    //   .../service_types/{serviceTypeId}/variants    — variant picker
+    //   .../service_types/{serviceTypeId}/addons      — add-on chips
+    //   .../service_types/{serviceTypeId}/photos      — gallery
+    // -------------------------------------------------------------------------
+    match /brands/{brandId} {
+      allow read: if true;
+      allow create: if isPlatformAdmin() || isTenantAdmin(brandId);
+      allow update, delete: if isPlatformAdmin() || isTenantAdmin(brandId);
+
+      match /locations/{locationId} {
+        allow read: if true;
+        allow create: if isPlatformAdmin() || isTenantAdmin(brandId);
+        allow update, delete: if isPlatformAdmin() || isTenantAdmin(brandId);
+
+        match /service_types/{serviceTypeId} {
+          // Public consumer discovery — any user (including unauthenticated) may read
+          // active service cards for the marketplace / booking flow.
+          allow read: if true;
+          allow create: if isPlatformAdmin()
+            || (isTenantAdmin(brandId)
+                && request.resource.data.brandId == brandId
+                && request.resource.data.locationId == locationId);
+          allow update, delete: if isPlatformAdmin() || isTenantAdmin(brandId);
+
+          match /variants/{variantId} {
+            allow read: if true;
+            allow write: if isPlatformAdmin() || isTenantAdmin(brandId);
+          }
+
+          match /addons/{addonId} {
+            allow read: if true;
+            allow write: if isPlatformAdmin() || isTenantAdmin(brandId);
+          }
+
+          match /photos/{photoId} {
+            allow read: if true;
+            allow write: if isPlatformAdmin() || isTenantAdmin(brandId);
+          }
+        }
+
+        match /technicians/{technicianId} {
+          allow read: if true;
+          allow write: if isPlatformAdmin() || isTenantAdmin(brandId);
+        }
+      }
+    }
+
+    // -------------------------------------------------------------------------
+    // Brand hierarchy (NEW-DEBT-B B2e — v3 canonical path)
+    //   brands/{brandId}                              — brand profile (brandId == tenantId)
+    //   brands/{brandId}/locations/{locationId}       — location profile
+    //   .../service_types/{serviceTypeId}             — one Explore card
+    //   .../service_types/{serviceTypeId}/variants    — variant picker
+    //   .../service_types/{serviceTypeId}/addons      — add-on chips
+    //   .../service_types/{serviceTypeId}/photos      — gallery
+    //   .../technicians/{technicianId}                — "Our team" section
+    // brandId === tenantId invariant: use brandId wildcard directly for role checks.
+    // -------------------------------------------------------------------------
+    match /brands/{brandId} {
+      allow read: if true;
+      allow create: if isPlatformAdmin() || isTenantAdmin(brandId);
+      allow update, delete: if isPlatformAdmin() || isTenantAdmin(brandId);
+
+      match /locations/{locationId} {
+        allow read: if true;
+        allow create: if isPlatformAdmin() || isTenantAdmin(brandId);
+        allow update, delete: if isPlatformAdmin() || isTenantAdmin(brandId);
+
+        match /service_types/{serviceTypeId} {
+          // Public consumer discovery — any user (including unauthenticated) may read
+          // active service cards for the marketplace / booking flow.
+          allow read: if true;
+          allow create: if isPlatformAdmin()
+            || (isTenantAdmin(brandId)
+                && request.resource.data.brandId == brandId
+                && request.resource.data.locationId == locationId);
+          allow update, delete: if isPlatformAdmin() || isTenantAdmin(brandId);
+
+          match /variants/{variantId} {
+            allow read: if true;
+            allow write: if isPlatformAdmin() || isTenantAdmin(brandId);
+          }
+
+          match /addons/{addonId} {
+            allow read: if true;
+            allow write: if isPlatformAdmin() || isTenantAdmin(brandId);
+          }
+
+          match /photos/{photoId} {
+            allow read: if true;
+            allow write: if isPlatformAdmin() || isTenantAdmin(brandId);
+          }
+        }
+
+        match /technicians/{technicianId} {
+          allow read: if true;
+          allow write: if isPlatformAdmin() || isTenantAdmin(brandId);
+        }
+      }
+    }
+
+    // -------------------------------------------------------------------------
+    // Platform-managed service taxonomy (globally visible, admin-managed)
+    // -------------------------------------------------------------------------
+    match /service_categories/{categoryId} {
+      allow read: if true;
+      allow write: if isPlatformAdmin();
+    }
+
+    // -------------------------------------------------------------------------
+    // W22-DEBT-3 — Editorial cards + sponsored listings (platform-managed)
+    // Both collections are globally managed marketing content; all users may read.
+    // Writes are platform admin only (no tenant-scoped access needed).
+    // -------------------------------------------------------------------------
+    match /platformEditorial/{cardId} {
+      allow read: if true;
+      allow write: if isPlatformAdmin();
+    }
+
+    match /sponsoredListings/{listingId} {
       allow read: if true;
       allow write: if isPlatformAdmin();
     }
@@ -331,14 +481,44 @@ service cloud.firestore {
     }
 
     // -------------------------------------------------------------------------
+    // Public discovery subcollections (tenants/{tenantId}/services, /staff, /media)
+    // Publicly readable — no auth required for consumer marketplace flow.
+    // -------------------------------------------------------------------------
+    match /tenants/{tenantId}/services/{serviceId} {
+      allow read: if true;
+      allow write: if isPlatformAdmin() || isTenantAdmin(tenantId);
+    }
+
+    match /tenants/{tenantId}/staff/{staffId} {
+      allow read: if true;
+      allow write: if isPlatformAdmin() || isTenantAdmin(tenantId);
+    }
+
+    match /tenants/{tenantId}/media/{mediaId} {
+      allow read: if true;
+      allow write: if isPlatformAdmin() || isTenantAdmin(tenantId);
+    }
+
+    // -------------------------------------------------------------------------
+    // Reviews — top-level collection used by consumer discovery / service detail
+    // -------------------------------------------------------------------------
+    match /reviews/{reviewId} {
+      // Public consumer discovery — anyone may read reviews.
+      allow read: if true;
+      allow create: if isSignedIn();
+      allow update, delete: if isPlatformAdmin();
+    }
+
     // Reviews (subcollection: tenants/{tenantId}/reviews/{reviewId})
     // -------------------------------------------------------------------------
     match /tenants/{tenantId}/reviews/{reviewId} {
       // Tenant admins can read all statuses (moderation queue access).
       // Regular members only see published reviews.
+      // Anyone (including unauthenticated) may read published reviews for consumer discovery.
       allow read: if isPlatformAdmin()
         || (isTenantAdmin(tenantId))
-        || (isTenantMember(tenantId) && resource.data.status == 'published');
+        || (isTenantMember(tenantId) && resource.data.status == 'published')
+        || (resource.data.status == 'published');
 
       // Any authenticated tenant client may submit their own review.
       // Guards: correct tenant, customer owns the review, valid rating, starts as pending.
@@ -360,6 +540,25 @@ service cloud.firestore {
 
       // Reviews are never hard-deleted — status transitions to hidden/rejected instead.
       allow delete: if isPlatformAdmin();
+    }
+
+    // -------------------------------------------------------------------------
+    // Bookings subcollection (tenants/{tenantId}/bookings/{bookingId})
+    // Seeded data lives here; new bookings are written to the top-level
+    // /bookings collection by the app. Both paths are queried via
+    // collectionGroup("bookings") from the consumer-facing booking history.
+    //
+    // NOTE: isTenantMember() is intentionally excluded here — it calls exists()
+    // which causes collection group queries to fail (same pattern as loyaltyStates).
+    // Tenant staff/admin access to subcollection bookings goes via the top-level
+    // /bookings/{bookingId} rule using tenantId filters, not this path.
+    // -------------------------------------------------------------------------
+    match /tenants/{tenantId}/bookings/{bookingId} {
+      allow read: if isPlatformAdmin()
+        || (isSignedIn() && resource.data.customerUserId == request.auth.uid);
+
+      // Writes by tenant admins or platform admins only (seed/admin tooling).
+      allow write: if isPlatformAdmin() || isTenantAdmin(tenantId);
     }
 
     // -------------------------------------------------------------------------
@@ -386,17 +585,13 @@ service cloud.firestore {
     }
 
     // -------------------------------------------------------------------------
-    // Loyalty states (tenants/{tenantId}/loyaltyStates/{userId})
+    // Loyalty states — MIGRATED (NEW-DEBT-B):
+    // Active rule now lives at /user_brand_loyalty/{userId}_{brandId} below.
+    // The legacy nested path is retained read-only to surface any stragglers.
     // -------------------------------------------------------------------------
     match /tenants/{tenantId}/loyaltyStates/{userId} {
-      // A client may read their own state; admins may read all states.
-      allow read: if isPlatformAdmin()
-        || isTenantAdmin(tenantId)
-        || (isTenantMember(tenantId) && request.auth.uid == userId);
-
-      // Client state is updated by backend/Cloud Functions only.
-      // Direct client writes are prohibited; platform admin and tenant admins may write.
-      allow write: if isPlatformAdmin() || isTenantAdmin(tenantId);
+      allow read: if isPlatformAdmin();
+      allow write: if false;
     }
 
     // -------------------------------------------------------------------------
@@ -404,9 +599,14 @@ service cloud.firestore {
     // -------------------------------------------------------------------------
     match /tenants/{tenantId}/loyaltyTransactions/{txId} {
       // A client may read their own transactions; admins may read all.
+      // isSignedIn() is used (not isTenantMember) for the self-read branch so
+      // the rule contains no exists() call — exists() in query-evaluated rules
+      // can cause "Missing or insufficient permissions" for per-tenant queries.
+      // The data-field check resource.data.userId == request.auth.uid ensures
+      // a user can only ever read their own transactions.
       allow read: if isPlatformAdmin()
         || isTenantAdmin(tenantId)
-        || (isTenantMember(tenantId) && resource.data.userId == request.auth.uid);
+        || (isSignedIn() && resource.data.userId == request.auth.uid);
 
       // Transactions are immutable server-side records — no client writes.
       allow write: if isPlatformAdmin() || isTenantAdmin(tenantId);
@@ -581,6 +781,17 @@ service cloud.firestore {
       allow write: if isPlatformAdmin();
     }
 
+    // tenants/{tenantId}/refunds/{refundId} — refund records written by
+    //   paymentsRefundBooking callable and updated by charge.refunded /
+    //   charge.refund.updated webhooks. The booking's owner and tenant admins
+    //   may read (RefundStatusScreen). Writes are server-only.
+    match /tenants/{tenantId}/refunds/{refundId} {
+      allow read: if isPlatformAdmin()
+        || isTenantAdmin(tenantId)
+        || (isSignedIn() && resource.data.userId == request.auth.uid);
+      allow write: if isPlatformAdmin();
+    }
+
     // tenants/{tenantId}/paymentsIdempotency/{key} — charge idempotency records.
     //   Server-only; no client access required.
     match /tenants/{tenantId}/paymentsIdempotency/{key} {
@@ -591,6 +802,46 @@ service cloud.firestore {
     //   store for payment_intent events. Server-only.
     match /tenants/{tenantId}/paymentsWebhookIdempotency/{eventId} {
       allow read, write: if isPlatformAdmin();
+    }
+
+    // -------------------------------------------------------------------------
+    // Stripe Connect — per-tenant connected account record
+    // -------------------------------------------------------------------------
+    // tenants/{tenantId}/connect/account — stripeAccountId, onboarding status.
+    //   Tenant owner/admin may read. Writes are server-only (stripeConnectOnboard
+    //   callable + account.updated webhook).
+    match /tenants/{tenantId}/connect/{docId} {
+      allow read: if isPlatformAdmin() || isTenantOwnerOrAdmin(tenantId);
+      allow write: if isPlatformAdmin();
+    }
+
+    // -------------------------------------------------------------------------
+    // Stripe Payments (Booking-level) — new Connect payment flow
+    // -------------------------------------------------------------------------
+    // tenants/{tenantId}/paymentSettings/config — payment mode, deposit %,
+    //   cancellation policy. Tenant owner/admin may read + write (update via
+    //   updatePaymentSettings callable). Customers have no access.
+    match /tenants/{tenantId}/paymentSettings/{docId} {
+      allow read: if isPlatformAdmin() || isTenantOwnerOrAdmin(tenantId);
+      allow write: if isPlatformAdmin();
+    }
+
+    // tenants/{tenantId}/appointmentPayments/{bookingId} — per-booking payment
+    //   record holding PI id, status, amounts. The booking's owner and tenant
+    //   admins may read. Writes are server-only (callable + webhook).
+    match /tenants/{tenantId}/appointmentPayments/{bookingId} {
+      allow read: if isPlatformAdmin()
+        || isTenantAdmin(tenantId)
+        || (isSignedIn() && resource.data.userId == request.auth.uid);
+      allow write: if isPlatformAdmin();
+    }
+
+    // clients/{userId}/tenantPaymentProfiles/{tenantId} — per-tenant Stripe
+    //   customer id + default payment method. Owner may read. Writes are
+    //   server-only (createBookingPaymentIntent callable).
+    match /clients/{userId}/tenantPaymentProfiles/{tenantId} {
+      allow read: if isPlatformAdmin() || (isSignedIn() && request.auth.uid == userId);
+      allow write: if isPlatformAdmin();
     }
 
     // -------------------------------------------------------------------------
@@ -644,7 +895,7 @@ service cloud.firestore {
       allow read: if isSignedIn() && (
         isPlatformAdmin() ||
         resource.data.clientId == request.auth.uid ||
-        resource.data.salonId == tenantId
+        (resource.data.salonId is string && isTenantAdmin(resource.data.salonId))
       );
       allow create: if isSignedIn();
       allow update: if isSignedIn() && (
@@ -671,6 +922,39 @@ service cloud.firestore {
     }
 
     match /clients/{userId}/notificationPrefs/{docId} {
+      allow read: if isPlatformAdmin() || (isSignedIn() && request.auth.uid == userId);
+      allow write: if isPlatformAdmin() || (isSignedIn() && request.auth.uid == userId);
+    }
+
+    // -------------------------------------------------------------------------
+    // Brand-level loyalty balances (user_brand_loyalty/{userId}_{brandId})
+    // Used by consumer discovery to show "Member · N pts" badge on service cards.
+    // After NEW-DEBT-B this is the canonical home for customer loyalty state
+    // (replaces tenants/{tenantId}/loyaltyStates/{userId}). Stored field name
+    // is `pointsBalance` per spec; `points` retained as a bridge alias.
+    // -------------------------------------------------------------------------
+    match /user_brand_loyalty/{docId} {
+      // A user may read their own loyalty docs (docId = {userId}_{brandId}).
+      // Platform admin may read all for support/tooling.
+      // Tenant admins may read state for their brand (resource.data.brandId).
+      allow read: if isPlatformAdmin()
+        || (resource != null && isTenantAdmin(resource.data.brandId))
+        || (isSignedIn() && docId.matches(request.auth.uid + '_.*'));
+      // Tenant admins may write state for their brand; Cloud Functions bypass
+      // rules via admin SDK. Direct client writes (other than via CFs) are
+      // gated to admins so the consumer can’t self-credit points.
+      allow create: if isPlatformAdmin()
+        || isTenantAdmin(request.resource.data.brandId);
+      allow update: if isPlatformAdmin()
+        || isTenantAdmin(resource.data.brandId);
+      allow delete: if isPlatformAdmin();
+    }
+
+    // -------------------------------------------------------------------------
+    // User saved services (users/{userId}/savedServices/{serviceId})
+    // Allows logged-in users to save/unsave service cards in the discovery feed.
+    // -------------------------------------------------------------------------
+    match /users/{userId}/savedServices/{serviceId} {
       allow read: if isPlatformAdmin() || (isSignedIn() && request.auth.uid == userId);
       allow write: if isPlatformAdmin() || (isSignedIn() && request.auth.uid == userId);
     }

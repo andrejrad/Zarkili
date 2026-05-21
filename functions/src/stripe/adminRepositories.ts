@@ -139,3 +139,172 @@ export function createAdminConnectRepository(db: Firestore): AdminConnectReposit
 
 // Re-export for convenience.
 export type { Transaction };
+
+// ---------------------------------------------------------------------------
+// Payment Settings
+// ---------------------------------------------------------------------------
+
+export type PaymentMode = "deposit" | "full" | "card_on_file";
+
+export type TenantPaymentSettings = {
+  tenantId: string;
+  paymentsEnabled: boolean;
+  paymentMode: PaymentMode;
+  depositPercentage: number;   // 1–100; relevant when paymentMode=deposit
+  currency: string;            // e.g. "usd"
+  platformFeePercent: number;  // e.g. 0.02
+  cancellationPolicy: boolean;
+  cancellationHours: number;
+  cancellationCharge: "deposit" | "custom";
+  cancellationAmountMinor: number; // cents; relevant when cancellationCharge=custom
+};
+
+export type AdminPaymentSettingsRepository = {
+  getPaymentSettings(tenantId: string): Promise<TenantPaymentSettings | null>;
+  savePaymentSettings(settings: TenantPaymentSettings): Promise<void>;
+};
+
+export function createAdminPaymentSettingsRepository(db: Firestore): AdminPaymentSettingsRepository {
+  const settingsDoc = (tid: string) => db.doc(`tenants/${tid}/paymentSettings/config`);
+
+  return {
+    async getPaymentSettings(tenantId) {
+      const snap = await settingsDoc(tenantId).get();
+      return snap.exists ? (snap.data() as TenantPaymentSettings) : null;
+    },
+    async savePaymentSettings(settings) {
+      await settingsDoc(settings.tenantId).set(
+        { ...settings, updatedAt: FieldValue.serverTimestamp() },
+        { merge: true },
+      );
+    },
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Appointment Payments
+// ---------------------------------------------------------------------------
+
+export type AppointmentPaymentStatus =
+  | "pending"
+  | "authorized"
+  | "capture_in_progress"
+  | "captured"
+  | "cancelled"
+  | "refunded"
+  | "paid_in_person"
+  | "failed";
+
+export type AppointmentPayment = {
+  bookingId: string;
+  tenantId: string;
+  userId: string;
+  paymentMode: PaymentMode;
+  currency: string;
+  totalAmountMinor: number;
+  authorizedAmountMinor: number;
+  capturedAmountMinor: number;
+  tipAmountMinor: number;
+  stripePaymentIntentId: string | null;
+  stripeSetupIntentId: string | null;
+  /** Payment method used to authorize the hold (saved for re-authorization). */
+  stripePaymentMethodId: string | null;
+  status: AppointmentPaymentStatus;
+  stripeStatus: string | null;
+  notes: string | null;
+  /** Server timestamp set when status transitions to "authorized". Used to detect 7-day expiry. */
+  authorizedAt: ReturnType<typeof FieldValue.serverTimestamp> | null;
+};
+
+export type AdminAppointmentPaymentsRepository = {
+  getAppointmentPayment(tenantId: string, bookingId: string): Promise<AppointmentPayment | null>;
+  createAppointmentPayment(payment: AppointmentPayment): Promise<void>;
+  updateAppointmentPayment(
+    tenantId: string,
+    bookingId: string,
+    update: Partial<AppointmentPayment>,
+  ): Promise<void>;
+  updateByPaymentIntentId(
+    tenantId: string,
+    stripePaymentIntentId: string,
+    update: Partial<AppointmentPayment>,
+  ): Promise<void>;
+};
+
+export function createAdminAppointmentPaymentsRepository(db: Firestore): AdminAppointmentPaymentsRepository {
+  const paymentDoc = (tid: string, bookingId: string) =>
+    db.doc(`tenants/${tid}/appointmentPayments/${bookingId}`);
+
+  return {
+    async getAppointmentPayment(tenantId, bookingId) {
+      const snap = await paymentDoc(tenantId, bookingId).get();
+      return snap.exists ? (snap.data() as AppointmentPayment) : null;
+    },
+    async createAppointmentPayment(payment) {
+      await paymentDoc(payment.tenantId, payment.bookingId).set({
+        ...payment,
+        createdAt: FieldValue.serverTimestamp(),
+        updatedAt: FieldValue.serverTimestamp(),
+      });
+    },
+    async updateAppointmentPayment(tenantId, bookingId, update) {
+      await paymentDoc(tenantId, bookingId).update({
+        ...update,
+        updatedAt: FieldValue.serverTimestamp(),
+      });
+    },
+    async updateByPaymentIntentId(tenantId, stripePaymentIntentId, update) {
+      const snap = await db
+        .collection(`tenants/${tenantId}/appointmentPayments`)
+        .where("stripePaymentIntentId", "==", stripePaymentIntentId)
+        .limit(1)
+        .get();
+      if (snap.empty) return;
+      await snap.docs[0].ref.update({
+        ...update,
+        updatedAt: FieldValue.serverTimestamp(),
+      });
+    },
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Per-tenant Stripe customer profiles
+// ---------------------------------------------------------------------------
+
+export type TenantCustomerProfile = {
+  tenantId: string;
+  userId: string;
+  stripeCustomerId: string;
+  defaultPaymentMethodId: string | null;
+};
+
+export type AdminTenantCustomerRepository = {
+  getTenantCustomerProfile(userId: string, tenantId: string): Promise<TenantCustomerProfile | null>;
+  saveTenantCustomerProfile(profile: TenantCustomerProfile): Promise<void>;
+  updateDefaultPaymentMethod(userId: string, tenantId: string, methodId: string): Promise<void>;
+};
+
+export function createAdminTenantCustomerRepository(db: Firestore): AdminTenantCustomerRepository {
+  const profileDoc = (uid: string, tid: string) =>
+    db.doc(`clients/${uid}/tenantPaymentProfiles/${tid}`);
+
+  return {
+    async getTenantCustomerProfile(userId, tenantId) {
+      const snap = await profileDoc(userId, tenantId).get();
+      return snap.exists ? (snap.data() as TenantCustomerProfile) : null;
+    },
+    async saveTenantCustomerProfile(profile) {
+      await profileDoc(profile.userId, profile.tenantId).set(
+        { ...profile, updatedAt: FieldValue.serverTimestamp() },
+        { merge: true },
+      );
+    },
+    async updateDefaultPaymentMethod(userId, tenantId, methodId) {
+      await profileDoc(userId, tenantId).update({
+        defaultPaymentMethodId: methodId,
+        updatedAt: FieldValue.serverTimestamp(),
+      });
+    },
+  };
+}

@@ -21,7 +21,7 @@ function createAuthRepositoryStub(overrides: Partial<AuthRepository> = {}): Auth
     signOutCurrentUser: async () => undefined,
     listUserTenantMemberships: async () => [],
     ...overrides,
-  };
+  } as AuthRepository;
 }
 
 function Wrapper({ children, authRepository }: PropsWithChildren<{ authRepository?: AuthRepository | null }>) {

@@ -27,14 +27,22 @@ export type Review = {
   locationId: string;
   /** Staff member who performed the service */
   staffId: string;
+  /** Service for which this review was submitted */
+  serviceId: string | null;
   /** The booking this review is for — used for eligibility check */
   bookingId: string;
   /** Customer who submitted the review */
   customerId: string;
-  /** Integer 1–5 */
+  /** Integer 1–5 — overall service/location rating */
   rating: number;
+  /** Alias for `rating` — canonical name going forward (Phase 8 delta). */
+  overallRating: number;
   /** Optional free-text comment */
   comment: string | null;
+  /** Integer 1–5 rating specifically for the technician (optional) */
+  technicianRating: number | null;
+  /** Optional technician-specific comment */
+  technicianComment: string | null;
   status: ReviewStatus;
   createdAt: Timestamp;
   updatedAt: Timestamp;
@@ -52,10 +60,35 @@ export type CreateReviewInput = {
   tenantId: string;
   locationId: string;
   staffId: string;
+  serviceId?: string;
   bookingId: string;
   customerId: string;
   rating: number;
   comment?: string;
+  technicianRating?: number;
+  technicianComment?: string;
+};
+
+// ---------------------------------------------------------------------------
+// Service-scoped review types (Phase 8.2)
+// ---------------------------------------------------------------------------
+
+/** Lightweight display object for a single published service review. */
+export type ServiceReviewItem = {
+  reviewId: string;
+  reviewerName: string;
+  overallRating: number;
+  /** Equivalent to `overallRating` — kept for consistency with ReviewObject in discovery. */
+  rating: number;
+  body: string;
+  technicianComment: string | null;
+  createdAt: string; // ISO-8601
+};
+
+export type ServiceReviewBreakdown = {
+  average: number | null;
+  count: number;
+  breakdown: { 5: number; 4: number; 3: number; 2: number; 1: number };
 };
 
 export type ModerateReviewInput = {
@@ -74,6 +107,13 @@ export type ModerateReviewInput = {
 export type RatingAggregate = {
   averageRating: number;
   reviewCount: number;
+};
+
+/** Aggregate totals stored on service, staff, and location documents */
+export type DerivedRatingAggregate = {
+  averageRating: number | null;
+  reviewCount: number;
+  ratingSum: number;
 };
 
 // ---------------------------------------------------------------------------

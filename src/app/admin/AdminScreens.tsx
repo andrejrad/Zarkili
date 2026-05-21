@@ -14,6 +14,7 @@ import {
   type AdminDataTableColumn,
 } from "./AdminPatterns";
 import { brandTypography } from "../../shared/ui/brandTypography";
+import { formatMoneyMajor } from "../../shared/ui/money";
 
 function PrimaryButton({ label, onPress, disabled = false, testID }: { label: string; onPress: () => void; disabled?: boolean; testID?: string }) {
   return (
@@ -476,8 +477,8 @@ export function ServiceListScreen({
 
   const columns: AdminDataTableColumn<Service>[] = [
     { header: "Name", flex: 2, render: (s) => s.name },
-    { header: "Category", flex: 1, render: (s) => s.category },
-    { header: "Price", flex: 1, render: (s) => `${s.price} ${s.currency}` },
+    { header: "Category", flex: 1, render: (s) => s.categoryId },
+    { header: "Price", flex: 1, render: (s) => formatMoneyMajor(s.basePrice, s.baseCurrency) },
     { header: "Status", flex: 1, render: (s) => (s.active ? "Active" : "Inactive") },
   ];
 

@@ -1,6 +1,11 @@
 /**
  * MultiServiceBookingScreen.tsx — J.2 Multi / Recurring / On-Behalf (W30 Batch J).
  *
+ * NEW-DEBT-F: This screen is NOT wired into AppNavigatorShell in v1. The v1
+ * booking flow scope is single-service only (spec §1 / §5.2). Tests in
+ * __tests__/bookingEdgeScreens.test.tsx keep the component compiling. Reactivate
+ * once the v2 multi-service / cart spec is published.
+ *
  * Covers three booking-customisation surfaces:
  *   J.2.1  MultiServiceBookingScreen  — multi-select variant of C.1 ServiceSelectionScreen
  *                                       (same groups prop) with a sticky "Xh Xm total" banner.

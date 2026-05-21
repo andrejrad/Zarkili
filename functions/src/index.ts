@@ -31,6 +31,7 @@ export {
   paymentsChargeBooking,
   paymentsApplyLoyaltyDiscount,
   paymentsRefundBooking,
+  updateLoyaltyOnBookingComplete,
 } from "./payments";
 
 export { receiptsGeneratePdf } from "./receipts";
@@ -38,6 +39,37 @@ export { receiptsGeneratePdf } from "./receipts";
 export { check1099KThreshold } from "./tax1099K";
 
 export { computePopularityIndex } from "./popularityIndex";
+
+// ---------------------------------------------------------------------------
+// Stripe Connect — tenant onboarding
+// ---------------------------------------------------------------------------
+export { stripeConnectOnboard, stripeConnectDashboardLink } from "./stripeConnectCallable";
+
+// ---------------------------------------------------------------------------
+// Payment settings — tenant admin CRUD
+// ---------------------------------------------------------------------------
+export { getPaymentSettings, updatePaymentSettings, getPaymentSummary } from "./paymentSettingsCallable";
+
+// ---------------------------------------------------------------------------
+// Booking-level payments — intent, capture, cancel
+// ---------------------------------------------------------------------------
+export {
+  createBookingPaymentIntent,
+  captureBookingPayment,
+  cancelBookingPayment,
+} from "./appointmentPaymentsCallable";
+
+// ---------------------------------------------------------------------------
+// Stripe payment hold re-authorization (7-day expiry)
+// ---------------------------------------------------------------------------
+export { reauthorizeExpiredHolds } from "./reauthorizeExpiredHolds";
+
+// ---------------------------------------------------------------------------
+// Explore tab — service data model v3 (Phase 2)
+// ---------------------------------------------------------------------------
+export { updateServiceDerivedFields } from "./updateServiceDerivedFields";
+export { syncLocationGeohash } from "./geohashTrigger";
+export { updateServiceAvailability } from "./serviceAvailabilityTrigger";
 
 setGlobalOptions({ maxInstances: 10 });
 
@@ -49,3 +81,4 @@ export const health = onRequest((req, res) => {
     timestamp: new Date().toISOString()
   });
 });
+

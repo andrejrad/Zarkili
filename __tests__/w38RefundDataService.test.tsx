@@ -1,7 +1,7 @@
-/**
+﻿/**
  * w38RefundDataService.test.tsx
  *
- * W38-DEBT-4 — client-side refund data service tests.
+ * W38-DEBT-4 â€” client-side refund data service tests.
  *
  * Covers:
  *   createRefundDataService / getRefundByBookingId  (9 tests)
@@ -24,49 +24,50 @@ interface MockDb {
 }
 
 // Intercept calls that the service makes:
-//   getDocs(query(collection(db, ...)))   → __queryResults
-//   getDoc(doc(db, ...))                  → __docs
+//   getDocs(query(collection(db, ...)))   â†’ mockQueryResults
+//   getDoc(doc(db, ...))                  â†’ mockDocs
 
-let __docs: Map<string, DocData>;
-let __queryResults: Map<string, DocData[]>;
+let mockDocs: Map<string, DocData>;
+let mockQueryResults: Map<string, DocData[]>;
 
 function resetMocks() {
-  __docs = new Map();
-  __queryResults = new Map();
+  mockDocs = new Map();
+  mockQueryResults = new Map();
 }
 
 // Reference objects (just carry a path)
-function makeDocRef(path: string) {
+// Must be prefixed with 'mock' so Jest allows them inside the jest.mock() factory.
+function mockMakeDocRef(path: string) {
   return { path };
 }
 
-function makeCollectionRef(path: string) {
+function mockMakeCollectionRef(path: string) {
   return { path };
 }
 
 // query() builds a query object that carries the collection path so we can
-// look it up in __queryResults when getDocs is called.
+// look it up in mockQueryResults when getDocs is called.
 let lastQueryPath = "";
 jest.mock("firebase/firestore", () => ({
   collection: (_db: unknown, ...segments: string[]) => {
     const path = segments.join("/");
     lastQueryPath = path;
-    return makeCollectionRef(path);
+    return mockMakeCollectionRef(path);
   },
-  doc: (_db: unknown, ...segments: string[]) => makeDocRef(segments.join("/")),
+  doc: (_db: unknown, ...segments: string[]) => mockMakeDocRef(segments.join("/")),
   query: (colRef: { path: string }, ..._constraints: unknown[]) => {
     return { __colPath: colRef.path };
   },
   where: () => ({}),
   getDocs: async (q: { __colPath: string }) => {
-    const results = __queryResults.get(q.__colPath) ?? [];
+    const results = mockQueryResults.get(q.__colPath) ?? [];
     return {
       empty: results.length === 0,
       docs: results.map((data) => ({ data: () => data })),
     };
   },
   getDoc: async (ref: { path: string }) => {
-    const data = __docs.get(ref.path);
+    const data = mockDocs.get(ref.path);
     return {
       exists: () => data !== undefined,
       data: () => data,
@@ -81,10 +82,10 @@ jest.mock("firebase/firestore", () => ({
 function makeFakeDb(): MockDb {
   return {
     __setDoc(path, data) {
-      __docs.set(path, data);
+      mockDocs.set(path, data);
     },
     __setQueryResults(colPath, docs) {
-      __queryResults.set(colPath, docs);
+      mockQueryResults.set(colPath, docs);
     },
   };
 }
@@ -120,7 +121,7 @@ function seedHappyPath(db: MockDb) {
     date: "2025-06-10",
     startTime: "14:00",
   });
-  db.__setDoc(`services/${SERVICE_ID}`, { name: "Haircut" });
+  db.__setDoc(`brands/${TENANT}/locations/${LOCATION_ID}/service_types/${SERVICE_ID}`, { name: "Haircut" });
   db.__setDoc(`locations/${LOCATION_ID}`, { name: "Downtown Salon" });
 }
 
@@ -155,7 +156,7 @@ describe("createRefundDataService / getRefundByBookingId", () => {
 
   it("returns NOT_FOUND when no refund exists for the booking", async () => {
     const db = makeFakeDb();
-    // No query results seeded — refunds collection returns empty
+    // No query results seeded â€” refunds collection returns empty
     db.__setQueryResults(`tenants/${TENANT}/refunds`, []);
     const svc = createRefundDataService(db as unknown as Parameters<typeof createRefundDataService>[0]);
     const result = await svc.getRefundByBookingId(TENANT, BOOKING, USER);
@@ -180,7 +181,7 @@ describe("createRefundDataService / getRefundByBookingId", () => {
         failureCode: null,
       } as Record<string, unknown>,
     ]);
-    // Do NOT seed the booking doc → service falls back
+    // Do NOT seed the booking doc â†’ service falls back
     const svc = createRefundDataService(db as unknown as Parameters<typeof createRefundDataService>[0]);
     const result = await svc.getRefundByBookingId(TENANT, BOOKING, USER);
 
@@ -265,7 +266,7 @@ describe("createRefundDataService / getRefundByBookingId", () => {
   it("returns ERROR when Firestore throws", async () => {
     const db = makeFakeDb();
     // Seed query results with a getter that throws
-    __queryResults.set(`tenants/${TENANT}/refunds`, (() => {
+    mockQueryResults.set(`tenants/${TENANT}/refunds`, (() => {
       throw new Error("network error");
     }) as unknown as DocData[]);
 
@@ -304,3 +305,4 @@ describe("createRefundDataService / getRefundByBookingId", () => {
     expect(result.data.requestedAtIso).toBe(new Date(epochSeconds * 1000).toISOString());
   });
 });
+

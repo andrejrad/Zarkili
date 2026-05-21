@@ -41,8 +41,8 @@ export function SecurityEventsDashboardScreen({
 }: SecurityEventsDashboardScreenProps) {
   if (loading) {
     return (
-      <View style={styles.center} testID={testID}>
-        <ActivityIndicator testID="loading-indicator" />
+      <View style={styles.center} testID={`${testID}-loading`}>
+        <ActivityIndicator />
       </View>
     );
   }
@@ -106,7 +106,7 @@ export function SecurityEventsDashboardScreen({
                 <View style={[styles.severityDot, { backgroundColor: SEVERITY_COLORS[e.severity] }]} />
                 <Text style={styles.eventKind}>{e.kind.replace(/_/g, " ")}</Text>
               </View>
-              <Text style={styles.eventDetail}>{e.detail}</Text>
+              <Text style={styles.eventDetail}>{e.description ?? e.detail}</Text>
               {e.actorEmail && <Text style={styles.eventMeta}>{e.actorEmail}</Text>}
               <Text style={styles.eventDate}>{e.occurredAt?.slice?.(0, 16).replace("T", " ")}</Text>
             </View>
@@ -117,7 +117,7 @@ export function SecurityEventsDashboardScreen({
                 <TouchableOpacity
                   style={styles.resolveBtn}
                   onPress={() => onResolveEvent(e.eventId)}
-                  testID={`resolve-btn-${e.eventId}`}
+                  testID={`resolve-event-${e.eventId}`}
                 >
                   <Text style={styles.resolveBtnText}>Resolve</Text>
                 </TouchableOpacity>

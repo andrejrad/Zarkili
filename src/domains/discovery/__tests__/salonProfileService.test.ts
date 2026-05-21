@@ -92,23 +92,19 @@ function makeDb(options: {
 // we must use jest.mock to intercept them.
 // ---------------------------------------------------------------------------
 
-jest.mock("firebase/firestore", () => {
-  const actual = jest.requireActual<typeof import("firebase/firestore")>("firebase/firestore");
-  return {
-    ...actual,
-    getDoc: jest.fn(),
-    getDocs: jest.fn(),
-    doc: jest.fn((_db, col, id) => ({ _path: `${col}/${id}` })),
-    collection: jest.fn((_db, path) => {
-      const buildable = { _path: path } as Record<string, unknown>;
-      return buildable;
-    }),
-    query: jest.fn((col) => col),
-    where: jest.fn((col) => col),
-    orderBy: jest.fn((col) => col),
-    limit: jest.fn((col) => col),
-  };
-});
+jest.mock("firebase/firestore", () => ({
+  getDoc: jest.fn(),
+  getDocs: jest.fn(),
+  doc: jest.fn((_db: unknown, col: string, id: string) => ({ _path: `${col}/${id}` })),
+  collection: jest.fn((_db: unknown, path: string) => ({
+    _path: path,
+  })),
+  collectionGroup: jest.fn((_db: unknown, id: string) => ({ _collectionId: id })),
+  query: jest.fn((col: unknown) => col),
+  where: jest.fn((col: unknown) => col),
+  orderBy: jest.fn((col: unknown) => col),
+  limit: jest.fn((col: unknown) => col),
+}));
 
 import { getDoc, getDocs } from "firebase/firestore";
 const mockGetDoc = getDoc as jest.MockedFunction<typeof getDoc>;
@@ -129,8 +125,8 @@ const TENANT_DOC = {
 };
 
 const SERVICES = [
-  { id: "svc-1", data: { name: "Balayage", durationMinutes: 150, priceCents: 25000, active: true, sortOrder: 1 } },
-  { id: "svc-2", data: { name: "Gloss", durationMinutes: 45, priceCents: 7500, active: true, sortOrder: 2 } },
+  { id: "svc-1", data: { name: "Balayage", durationMinutes: 150, price: 25000, active: true, sortOrder: 1 } },
+  { id: "svc-2", data: { name: "Gloss", durationMinutes: 45, price: 7500, active: true, sortOrder: 2 } },
 ];
 
 const STAFF = [
@@ -171,7 +167,8 @@ describe("getSalonProfile — success path", () => {
   it("maps services sub-collection to SalonServiceSummary[]", async () => {
     mockGetDoc.mockResolvedValueOnce(makeDocSnap(true, TENANT_DOC) as never);
     mockGetDocs
-      .mockResolvedValueOnce(makeQuerySnap(SERVICES) as never) // services
+      .mockResolvedValueOnce(makeQuerySnap([]) as never)       // locations
+      .mockResolvedValueOnce(makeQuerySnap(SERVICES) as never) // service_types (collectionGroup)
       .mockResolvedValueOnce(makeQuerySnap([]) as never)       // staff
       .mockResolvedValueOnce(makeQuerySnap([]) as never);      // reviews
 
@@ -187,7 +184,8 @@ describe("getSalonProfile — success path", () => {
   it("maps staff sub-collection to SalonStaffSummary[]", async () => {
     mockGetDoc.mockResolvedValueOnce(makeDocSnap(true, TENANT_DOC) as never);
     mockGetDocs
-      .mockResolvedValueOnce(makeQuerySnap([]) as never)       // services
+      .mockResolvedValueOnce(makeQuerySnap([]) as never)       // locations
+      .mockResolvedValueOnce(makeQuerySnap([]) as never)       // service_types
       .mockResolvedValueOnce(makeQuerySnap(STAFF) as never)    // staff
       .mockResolvedValueOnce(makeQuerySnap([]) as never);      // reviews
 
@@ -203,9 +201,10 @@ describe("getSalonProfile — success path", () => {
   it("maps reviews sub-collection including Timestamp createdAt", async () => {
     mockGetDoc.mockResolvedValueOnce(makeDocSnap(true, TENANT_DOC) as never);
     mockGetDocs
-      .mockResolvedValueOnce(makeQuerySnap([]) as never)
-      .mockResolvedValueOnce(makeQuerySnap([]) as never)
-      .mockResolvedValueOnce(makeQuerySnap(REVIEWS) as never);
+      .mockResolvedValueOnce(makeQuerySnap([]) as never)       // locations
+      .mockResolvedValueOnce(makeQuerySnap([]) as never)       // service_types
+      .mockResolvedValueOnce(makeQuerySnap([]) as never)       // staff
+      .mockResolvedValueOnce(makeQuerySnap(REVIEWS) as never); // reviews
 
     const service = createSalonProfileService(FAKE_DB);
     const result = await service.getSalonProfile("tenant-abc");
@@ -279,9 +278,10 @@ describe("getSalonProfile — fallback field names", () => {
       { id: "s1", data: { displayName: "Cara Bloom", role: "Colorist", status: "active" } },
     ];
     mockGetDocs
-      .mockResolvedValueOnce(makeQuerySnap([]) as never)
-      .mockResolvedValueOnce(makeQuerySnap(staffWithDisplayName) as never)
-      .mockResolvedValueOnce(makeQuerySnap([]) as never);
+      .mockResolvedValueOnce(makeQuerySnap([]) as never)               // locations
+      .mockResolvedValueOnce(makeQuerySnap([]) as never)               // service_types
+      .mockResolvedValueOnce(makeQuerySnap(staffWithDisplayName) as never) // staff
+      .mockResolvedValueOnce(makeQuerySnap([]) as never);              // reviews
 
     const service = createSalonProfileService(FAKE_DB);
     const result = await service.getSalonProfile("t2");

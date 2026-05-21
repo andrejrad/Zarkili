@@ -15,6 +15,7 @@ function makeSummary(overrides: Partial<SalonSummary> = {}): SalonSummary {
     unreadMessageCount: 0,
     subscriptionStatus: "active",
     accessLevel: "owner",
+    subscribedAt: {} as import("firebase/firestore").Timestamp,
     nextAppointmentAt: null,
     nextAppointmentServiceName: null,
     ...overrides,

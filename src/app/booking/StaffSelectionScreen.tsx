@@ -5,7 +5,7 @@
  * a card surfaces preview slots inline. Caller owns selection + slot fetch.
  */
 
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import {
   RatingStars,
@@ -31,6 +31,8 @@ export type StaffSelectionScreenProps = {
   onPressContinue: () => void;
   onPressBack?: () => void;
   onPressTryDifferentDate?: () => void;
+  /** BookingProgressIndicator slot — replaces the plain "2/5" step badge when provided. W50-DEBT-6 */
+  progressIndicator?: React.ReactNode;
   testID?: string;
 };
 
@@ -44,6 +46,7 @@ export function StaffSelectionScreen({
   onPressContinue,
   onPressBack,
   onPressTryDifferentDate,
+  progressIndicator,
   testID,
 }: StaffSelectionScreenProps) {
   return (
@@ -61,8 +64,9 @@ export function StaffSelectionScreen({
           </Pressable>
         ) : null}
         <Text style={styles.title}>Choose staff</Text>
-        <Text style={styles.step}>2/5</Text>
+        {progressIndicator ? null : <Text style={styles.step}>2/5</Text>}
       </View>
+      {progressIndicator}
       <ScrollView contentContainerStyle={styles.body}>
         {allUnavailable ? (
           <View style={styles.banner} testID={testID ? `${testID}-unavailable` : undefined}>
@@ -116,13 +120,27 @@ export function StaffSelectionScreen({
               style={[styles.card, sel ? styles.cardSelected : null]}
             >
               <View style={styles.staffRow}>
-                <View style={styles.avatar}>
-                  <Text style={styles.avatarText}>{s.name.charAt(0)}</Text>
-                </View>
+                {s.photoUrl ? (
+                  <Image
+                    source={{ uri: s.photoUrl }}
+                    style={styles.avatar}
+                    accessibilityElementsHidden
+                  />
+                ) : (
+                  <View style={styles.avatar}>
+                    <Text style={styles.avatarText}>{s.name.charAt(0)}</Text>
+                  </View>
+                )}
                 <View style={styles.staffText}>
                   <Text style={styles.staffName}>{s.name}</Text>
                   {s.rating !== undefined ? (
-                    <RatingStars value={s.rating} size={16} />
+                    <View style={styles.ratingRow}>
+                      <RatingStars value={s.rating} size={16} />
+                      <Text style={styles.ratingLabel}>
+                        {s.rating.toFixed(1)}
+                        {s.reviewCount !== undefined ? ` (${s.reviewCount})` : ""}
+                      </Text>
+                    </View>
                   ) : null}
                   {s.specialties && s.specialties.length > 0 ? (
                     <Text style={styles.specialties}>{s.specialties.join(" · ")}</Text>
@@ -211,6 +229,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: radius.full,
+    overflow: "hidden",
     backgroundColor: colors.primary10,
     alignItems: "center",
     justifyContent: "center",
@@ -218,6 +237,8 @@ const styles = StyleSheet.create({
   avatarText: { fontSize: 20, fontWeight: "600", color: colors.primary },
   staffText: { flex: 1 },
   staffName: { fontSize: 16, fontWeight: "600", color: colors.foreground },
+  ratingRow: { flexDirection: "row", alignItems: "center", gap: spacing.s1, marginTop: 2 },
+  ratingLabel: { fontSize: 12, color: colors.textMuted },
   specialties: { fontSize: 12, color: colors.textMuted, marginTop: spacing.s1 },
   nextAvailable: { fontSize: 12, color: colors.foreground, marginTop: spacing.s1 },
   leaveBadge: {

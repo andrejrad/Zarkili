@@ -17,11 +17,17 @@ import {
   assertValidStatusTransition,
   BookingError,
   type Booking,
+  type BookingAddonSnapshot,
   type BookingActorRole,
   type BookingStatus,
   type CreateBookingInput,
   type UpdateBookingStatusInput,
 } from "./model";
+import type { ServiceAddon, ServiceVariant } from "../services/model";
+import {
+  serviceAddonsCollectionSegments,
+  serviceVariantsCollectionSegments,
+} from "../services/paths";
 
 const COLLECTION = "bookings";
 const SLOT_TOKENS_COLLECTION = "bookingSlotTokens";
@@ -63,6 +69,50 @@ export function createBookingsRepository(db: Firestore) {
     assertNonEmpty(input.serviceId, "serviceId");
     assertNonEmpty(input.customerUserId, "customerUserId");
     assertNonEmpty(input.date, "date");
+    assertNonEmpty(input.variantId, "variantId");
+
+    // ── Fetch variant + addons to compute immutable snapshots ─────────────
+    const variantRef = doc(
+      db,
+      ...serviceVariantsCollectionSegments(input.tenantId, input.locationId, input.serviceId),
+      input.variantId,
+    );
+    const variantSnap = await getDoc(variantRef);
+    if (!variantSnap.exists()) {
+      throw new BookingError(
+        "SLOT_UNAVAILABLE",
+        `Variant ${input.variantId} not found for service ${input.serviceId}`,
+      );
+    }
+    const variant = variantSnap.data() as ServiceVariant;
+
+    const addonSnapshots: BookingAddonSnapshot[] = [];
+    let addonPriceTotal = 0;
+    let addonDurationTotal = 0;
+    for (const addonId of input.addonIds) {
+      const addonRef = doc(
+        db,
+        ...serviceAddonsCollectionSegments(input.tenantId, input.locationId, input.serviceId),
+        addonId,
+      );
+      const addonSnap = await getDoc(addonRef);
+      if (addonSnap.exists()) {
+        const addon = addonSnap.data() as ServiceAddon;
+        addonSnapshots.push({
+          name: addon.name,
+          price: addon.price,
+          durationMinutes: addon.durationMinutes,
+        });
+        addonPriceTotal += addon.price;
+        addonDurationTotal += addon.durationMinutes;
+      }
+    }
+
+    const priceSnapshot = variant.price + addonPriceTotal;
+    const durationSnapshot = variant.durationMinutes + addonDurationTotal;
+    const variantNameSnapshot = variant.name;
+    const addonsSnapshot = addonSnapshots;
+    // ── End snapshot computation ────────────────────────────────────────────
 
     const bookingId = `${input.tenantId}_${input.customerUserId}_${Date.now()}`;
     const slotTokenId = buildSlotTokenId(
@@ -95,6 +145,10 @@ export function createBookingsRepository(db: Firestore) {
       tx.set(bookingRef, {
         bookingId,
         ...input,
+        priceSnapshot,
+        durationSnapshot,
+        variantNameSnapshot,
+        addonsSnapshot,
         status: "pending" as BookingStatus,
         version: 0,
         lifecycleEvents: [],
@@ -179,6 +233,20 @@ export function createBookingsRepository(db: Firestore) {
       where("tenantId", "==", tenantId),
       where("customerUserId", "==", customerUserId),
     );
+    const snap = await getDocs(q);
+    return snap.docs.map((d) => d.data() as Booking);
+  }
+
+  async function listBookingsByCustomerAllTenants(
+    customerUserId: string,
+  ): Promise<Booking[]> {
+    assertNonEmpty(customerUserId, "customerUserId");
+    // NOTE: collectionGroup is avoided here because the /bookings rule includes
+    // isTenantMember() (exists()) which breaks collection-group query evaluation.
+    // Callers that need cross-tenant consumer history should query tenantUsers
+    // first and then issue per-tenant subcollection queries (see AppNavigatorShell).
+    const col = collection(db, COLLECTION);
+    const q = query(col, where("customerUserId", "==", customerUserId));
     const snap = await getDocs(q);
     return snap.docs.map((d) => d.data() as Booking);
   }
@@ -460,6 +528,7 @@ export function createBookingsRepository(db: Firestore) {
     listBookingsByStaffAndDate,
     listBookingsByLocationAndDate,
     listBookingsByCustomer,
+    listBookingsByCustomerAllTenants,
     listBookingsByStatus,
     updateBookingStatus,
     confirmBooking,

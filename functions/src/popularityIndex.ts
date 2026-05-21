@@ -76,13 +76,18 @@ export function normalizeScores(
 }
 
 /**
- * Fetches recent completed bookings for one tenant and writes the
- * popularity index docs.  No-ops when there are no qualifying bookings.
+ * Fetches recent completed bookings for one tenant, writes the per-tenant
+ * popularity index docs, and also writes `popularityScore` to the
+ * `brands/{tenantId}/locations/{locationId}/service_types/{serviceId}` document
+ * using the full 3-factor formula:
+ *   bookingCount_normalised × 0.6 + normalised_rating × 0.3 + recency_factor × 0.1
+ * No-ops when there are no qualifying bookings.
  */
 export async function computeTenantPopularity(
   db: FirebaseFirestore.Firestore,
   tenantId: string,
   windowStart: Date,
+  now: Date = new Date(),
 ): Promise<void> {
   const snap = await db
     .collection("tenants")
@@ -92,16 +97,72 @@ export async function computeTenantPopularity(
     .where("createdAt", ">=", windowStart.toISOString())
     .get();
 
-  const bookings = snap.docs.map((d) => d.data() as { serviceId?: string });
+  const bookings = snap.docs.map((d) => d.data() as { serviceId?: string; date?: string; locationId?: string });
   const counts = countBookingsByService(bookings);
 
   if (Object.keys(counts).length === 0) return;
 
   const scores = normalizeScores(counts);
 
+  // Track last booking date and locationId per service for the recency factor
+  // and v3 hierarchical path resolution.
+  const lastBookingDate: Record<string, string> = {};
+  const serviceLocationMap: Record<string, string> = {};
+  for (const b of bookings) {
+    if (typeof b.serviceId === "string") {
+      if (typeof b.date === "string" && b.date > (lastBookingDate[b.serviceId] ?? "")) {
+        lastBookingDate[b.serviceId] = b.date;
+      }
+      if (typeof b.locationId === "string" && b.locationId.length > 0 && !serviceLocationMap[b.serviceId]) {
+        serviceLocationMap[b.serviceId] = b.locationId;
+      }
+    }
+  }
+
+  const MS_PER_DAY = 24 * 60 * 60 * 1000;
+  const todayStr = now.toISOString().slice(0, 10);
+  const todayMs = new Date(todayStr).getTime();
+
   await Promise.all(
-    Object.entries(counts).map(([serviceId, bookedCount]) =>
-      db
+    Object.entries(counts).map(async ([serviceId, bookedCount]) => {
+      const normalizedBooking = scores[serviceId] ?? 0;
+      const locationId = serviceLocationMap[serviceId];
+
+      // Fetch service doc for rating component (v3 hierarchical path).
+      const svcRef = locationId
+        ? db
+            .collection("brands").doc(tenantId)
+            .collection("locations").doc(locationId)
+            .collection("service_types").doc(serviceId)
+        : undefined;
+      const svcSnap = svcRef ? await svcRef.get() : undefined;
+      const svcData = svcSnap?.exists
+        ? (svcSnap.data() as Record<string, unknown>)
+        : undefined;
+      const svcRating =
+        (svcData?.serviceAverageRating as number | null | undefined) ??
+        (svcData?.locationAverageRating as number | null | undefined) ??
+        null;
+      const normalizedRating = svcRating !== null ? svcRating / 5 : 0;
+
+      // Recency factor: 1.0 = booked today, 0.0 = last booking ≥ 30 days ago.
+      const lastDate = lastBookingDate[serviceId];
+      let recencyFactor = 0;
+      if (lastDate) {
+        const daysSince = Math.min(
+          30,
+          Math.max(0, (todayMs - new Date(lastDate).getTime()) / MS_PER_DAY),
+        );
+        recencyFactor = 1 - daysSince / 30;
+      }
+
+      const popularityScore = Math.min(
+        1,
+        normalizedBooking * 0.6 + normalizedRating * 0.3 + recencyFactor * 0.1,
+      );
+
+      // Write per-tenant index (existing behaviour — score is booking-normalised only).
+      await db
         .collection("tenants")
         .doc(tenantId)
         .collection("popularityIndex")
@@ -110,12 +171,28 @@ export async function computeTenantPopularity(
           {
             serviceId,
             bookedCount,
-            score: scores[serviceId] ?? 0,
+            score: normalizedBooking,
             updatedAt: FieldValue.serverTimestamp(),
           },
           { merge: true },
-        ),
-    ),
+        );
+
+      // Write full popularity score to the service_types doc.
+      if (svcRef) {
+        await svcRef
+          .update({
+            popularityScore,
+            updatedAt: FieldValue.serverTimestamp(),
+          })
+          .catch((err: unknown) => {
+            // Non-fatal: service doc may have been deleted since the booking was created.
+            logger.warn("computeTenantPopularity: skipping missing service doc", {
+              serviceId,
+              err,
+            });
+          });
+      }
+    }),
   );
 }
 
@@ -133,7 +210,7 @@ export async function runPopularityIndexJob(
 
   await Promise.all(
     tenantsSnap.docs.map((tenantDoc) =>
-      computeTenantPopularity(db, tenantDoc.id, windowStart),
+      computeTenantPopularity(db, tenantDoc.id, windowStart, now),
     ),
   );
 

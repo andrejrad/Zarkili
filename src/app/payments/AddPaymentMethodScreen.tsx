@@ -10,7 +10,7 @@
  */
 
 import { Pressable, ScrollView, StyleSheet, Switch, Text, View } from "react-native";
-import { CardField } from "@stripe/stripe-react-native";
+import { CardField, type CardFieldInput } from "@stripe/stripe-react-native";
 
 import {
   Button,
@@ -95,11 +95,15 @@ export function AddPaymentMethodScreen({
         <View style={styles.cardFieldWrap} testID={testID ? `${testID}-card` : undefined}>
           <CardField
             postalCodeEnabled={false}
-            placeholders={{ number: "Card number" }}
-            onCardChange={(details) =>
-              onChange({ ...state, cardComplete: Boolean(details?.complete) })
+            placeholder={{ number: "Card number" }}
+            onCardChange={(details: CardFieldInput.Details) =>
+              onChange({ ...state, cardComplete: details.complete })
             }
-            cardStyle={cardFieldStyle}
+            cardStyle={{
+              backgroundColor: colors.surface,
+              textColor: colors.foreground,
+              placeholderColor: colors.textMuted,
+            }}
             style={styles.cardField}
           />
         </View>
@@ -158,18 +162,6 @@ export function AddPaymentMethodScreen({
 }
 
 // Stripe CardField visual styling lives in a plain object (not StyleSheet).
-const cardFieldStyle = {
-  backgroundColor: "#FFFFFF",
-  textColor: "#1A1A1A",
-  borderRadius: 12,
-  fontSize: 16,
-  placeholderColor: "#6B6B6B",
-};
-
-// Re-use Button to satisfy "tertiary" reachability under D.1's empty state if needed.
-// (Not used directly here, but exported to keep barrel intact across primitives.)
-void Button;
-
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.background },
   header: {
@@ -198,7 +190,10 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
     paddingHorizontal: spacing.s3,
   },
-  cardField: { height: 56 },
+  cardField: {
+    height: 56,
+    width: "100%",
+  },
   helper: { fontSize: 12, lineHeight: 16, color: colors.textMuted, marginTop: spacing.s1 },
   gap: { height: spacing.s4 },
   toggleRow: { flexDirection: "row", alignItems: "center", gap: spacing.s3 },

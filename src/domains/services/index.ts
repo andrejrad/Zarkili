@@ -1,9 +1,19 @@
-export type { Service, CreateServiceInput, UpdateServiceInput } from "./model";
+export type {
+  Service,
+  CreateServiceInput,
+  UpdateServiceInput,
+  ServiceCategory,
+  ServiceVariant,
+  CreateServiceVariantInput,
+  UpdateServiceVariantInput,
+  ServicePhoto,
+  CreateServicePhotoInput,
+} from "./model";
 export { createServiceRepository } from "./repository";
 export type {
-  ServiceCategory,
-  CreateServiceCategoryInput,
-  UpdateServiceCategoryInput,
+  TenantServiceCategory,
+  CreateTenantServiceCategoryInput,
+  UpdateTenantServiceCategoryInput,
   ServiceAddon,
   CreateServiceAddonInput,
   UpdateServiceAddonInput,

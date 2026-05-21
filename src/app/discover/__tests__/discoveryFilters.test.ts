@@ -6,104 +6,124 @@ import {
   hasActiveFilters,
   sortDiscoveryResults,
 } from "../discoveryFilters";
-import type { DiscoverySalonCard } from "../../../domains/discovery";
+import type { ServiceTypeCard } from "../../../domains/discovery";
 
-function salon(p: Partial<DiscoverySalonCard> & { id: string }): DiscoverySalonCard {
+// ISO date helpers for availability filter tests — computed once per test run.
+const NOW = new Date();
+const todayISO = new Date(NOW.getFullYear(), NOW.getMonth(), NOW.getDate(), 10, 0).toISOString();
+const tomorrowISO = new Date(NOW.getFullYear(), NOW.getMonth(), NOW.getDate() + 1, 10, 0).toISOString();
+const dayInWeekISO = new Date(NOW.getFullYear(), NOW.getMonth(), NOW.getDate() + 3, 10, 0).toISOString();
+
+function service(p: Partial<ServiceTypeCard> & { id: string }): ServiceTypeCard {
+  const { id, ...rest } = p;
   return {
-    id: p.id,
-    tenantId: p.tenantId ?? `t-${p.id}`,
-    name: p.name ?? `Salon ${p.id}`,
-    city: p.city ?? "Beverly Hills",
-    categories: p.categories ?? ["hair"],
-    rating: p.rating ?? 4.5,
-    reviewCount: p.reviewCount ?? 100,
-    priceFrom: p.priceFrom ?? 50,
-    currency: p.currency ?? "USD",
-    nextAvailableLabel: p.nextAvailableLabel ?? "Today",
-    featuredService: p.featuredService ?? "Cut & blow-dry",
-    member: p.member ?? false,
-    bookingEnabled: p.bookingEnabled ?? true,
-    messageEnabled: p.messageEnabled ?? true,
+    id,
+    tenantId: `t-${id}`,
+    locationId: `loc-${id}`,
+    categoryId: "hair",
+    categoryName: "Hair",
+    serviceName: `Service ${id}`,
+    locationDisplayName: "Studio · Beverly Hills",
+    locationCity: "Beverly Hills",
+    variantCount: 1,
+    durationFrom: 45,
+    serviceAverageRating: 4.5,
+    serviceReviewCount: 100,
+    locationAverageRating: 4.5,
+    locationReviewCount: 200,
+    nextAvailableAt: todayISO,
+    isFullyBooked: false,
+    priceFrom: 5000,
+    primaryPhotoUrl: null,
+    primaryPhotoSource: null,
+    isBookableOnline: true,
+    locationLat: 34.0,
+    locationLng: -118.5,
+    distanceMetres: 500,
+    isSaved: null,
+    memberPoints: null,
+    popularityScore: 0,
+    ...rest,
   };
 }
 
 describe("applyDiscoveryFilters", () => {
-  const salons = [
-    salon({ id: "1", name: "Bloom Studio", categories: ["hair"], priceFrom: 40, rating: 4.8, member: true }),
-    salon({ id: "2", name: "Nail Bar", categories: ["nails"], priceFrom: 30, rating: 4.2, nextAvailableLabel: "Tomorrow" }),
-    salon({ id: "3", name: "Glow Spa", categories: ["skin", "spa"], priceFrom: 120, rating: 4.6, nextAvailableLabel: "Sat Nov 8" }),
-    salon({ id: "4", name: "Cheap Cuts", categories: ["hair"], priceFrom: 20, rating: 3.5, nextAvailableLabel: "Today" }),
+  const services = [
+    service({ id: "1", serviceName: "Bloom Studio", categoryId: "hair", priceFrom: 40, serviceAverageRating: 4.8, memberPoints: 100, nextAvailableAt: todayISO }),
+    service({ id: "2", serviceName: "Nail Bar", categoryId: "nails", priceFrom: 30, serviceAverageRating: 4.2, nextAvailableAt: tomorrowISO }),
+    service({ id: "3", serviceName: "Glow Spa", categoryId: "skin", priceFrom: 120, serviceAverageRating: 4.6, nextAvailableAt: dayInWeekISO }),
+    service({ id: "4", serviceName: "Cheap Cuts", categoryId: "hair", priceFrom: 20, serviceAverageRating: 3.5, nextAvailableAt: todayISO }),
   ];
 
   it("returns all when filters are default", () => {
-    expect(applyDiscoveryFilters(salons, DEFAULT_FILTERS)).toHaveLength(4);
+    expect(applyDiscoveryFilters(services, DEFAULT_FILTERS)).toHaveLength(4);
   });
 
-  it("filters by query (case-insensitive substring across name/city/featuredService)", () => {
-    const out = applyDiscoveryFilters(salons, { ...DEFAULT_FILTERS, query: "bloom" });
+  it("filters by query (case-insensitive substring across serviceName/locationDisplayName)", () => {
+    const out = applyDiscoveryFilters(services, { ...DEFAULT_FILTERS, query: "bloom" });
     expect(out.map((s) => s.id)).toEqual(["1"]);
   });
 
   it("filters by category", () => {
-    const out = applyDiscoveryFilters(salons, { ...DEFAULT_FILTERS, category: "nails" });
+    const out = applyDiscoveryFilters(services, { ...DEFAULT_FILTERS, category: "nails" });
     expect(out.map((s) => s.id)).toEqual(["2"]);
   });
 
   it("filters by price range", () => {
-    const out = applyDiscoveryFilters(salons, { ...DEFAULT_FILTERS, priceRange: [25, 50] });
+    const out = applyDiscoveryFilters(services, { ...DEFAULT_FILTERS, priceRange: [25, 50] });
     expect(out.map((s) => s.id).sort()).toEqual(["1", "2"]);
   });
 
   it("filters by minimum rating", () => {
-    const out = applyDiscoveryFilters(salons, { ...DEFAULT_FILTERS, minRating: 4.5 });
+    const out = applyDiscoveryFilters(services, { ...DEFAULT_FILTERS, minRating: 4.5 });
     expect(out.map((s) => s.id).sort()).toEqual(["1", "3"]);
   });
 
   it("filters by availability today", () => {
-    const out = applyDiscoveryFilters(salons, { ...DEFAULT_FILTERS, availability: "today" });
+    const out = applyDiscoveryFilters(services, { ...DEFAULT_FILTERS, availability: "today" });
     expect(out.map((s) => s.id).sort()).toEqual(["1", "4"]);
   });
 
   it("filters by availability tomorrow", () => {
-    const out = applyDiscoveryFilters(salons, { ...DEFAULT_FILTERS, availability: "tomorrow" });
+    const out = applyDiscoveryFilters(services, { ...DEFAULT_FILTERS, availability: "tomorrow" });
     expect(out.map((s) => s.id)).toEqual(["2"]);
   });
 
-  it("filters this-week (today + tomorrow + weekday labels)", () => {
-    const out = applyDiscoveryFilters(salons, { ...DEFAULT_FILTERS, availability: "this-week" });
+  it("filters this-week (today + tomorrow + within-7-days)", () => {
+    const out = applyDiscoveryFilters(services, { ...DEFAULT_FILTERS, availability: "this-week" });
     expect(out.map((s) => s.id).sort()).toEqual(["1", "2", "3", "4"]);
   });
 
   it("filters memberOnly", () => {
-    const out = applyDiscoveryFilters(salons, { ...DEFAULT_FILTERS, memberOnly: true });
+    const out = applyDiscoveryFilters(services, { ...DEFAULT_FILTERS, memberOnly: true });
     expect(out.map((s) => s.id)).toEqual(["1"]);
   });
 });
 
 describe("sortDiscoveryResults", () => {
-  const salons = [
-    salon({ id: "a", rating: 4.0, reviewCount: 10, priceFrom: 100, member: false }),
-    salon({ id: "b", rating: 4.8, reviewCount: 50, priceFrom: 80, member: true }),
-    salon({ id: "c", rating: 4.8, reviewCount: 200, priceFrom: 60, member: false }),
+  const services = [
+    service({ id: "a", serviceAverageRating: 4.0, serviceReviewCount: 10, priceFrom: 100, memberPoints: null }),
+    service({ id: "b", serviceAverageRating: 4.8, serviceReviewCount: 50, priceFrom: 80, memberPoints: 100 }),
+    service({ id: "c", serviceAverageRating: 4.8, serviceReviewCount: 200, priceFrom: 60, memberPoints: null }),
   ];
 
-  it("recommended sort: members first, then rating desc, then review count", () => {
-    const out = sortDiscoveryResults(salons, "recommended");
+  it("recommended sort: member-points first, then rating desc, then review count", () => {
+    const out = sortDiscoveryResults(services, "recommended");
     expect(out.map((s) => s.id)).toEqual(["b", "c", "a"]);
   });
 
   it("rating-desc sort breaks ties by review count", () => {
-    const out = sortDiscoveryResults(salons, "rating-desc");
+    const out = sortDiscoveryResults(services, "rating-desc");
     expect(out.map((s) => s.id)).toEqual(["c", "b", "a"]);
   });
 
   it("price-asc sort", () => {
-    const out = sortDiscoveryResults(salons, "price-asc");
+    const out = sortDiscoveryResults(services, "price-asc");
     expect(out.map((s) => s.id)).toEqual(["c", "b", "a"]);
   });
 
   it("price-desc sort", () => {
-    const out = sortDiscoveryResults(salons, "price-desc");
+    const out = sortDiscoveryResults(services, "price-desc");
     expect(out.map((s) => s.id)).toEqual(["a", "b", "c"]);
   });
 });
@@ -131,12 +151,12 @@ describe("hasActiveFilters / countActiveFilterDimensions", () => {
 
 describe("applyDiscoveryFiltersAndSort", () => {
   it("filters then sorts", () => {
-    const salons = [
-      salon({ id: "1", rating: 4.0, priceFrom: 80, categories: ["hair"] }),
-      salon({ id: "2", rating: 4.9, priceFrom: 200, categories: ["hair"], member: true }),
-      salon({ id: "3", rating: 4.8, priceFrom: 60, categories: ["nails"] }),
+    const services = [
+      service({ id: "1", serviceAverageRating: 4.0, priceFrom: 80, categoryId: "hair" }),
+      service({ id: "2", serviceAverageRating: 4.9, priceFrom: 200, categoryId: "hair", memberPoints: 100 }),
+      service({ id: "3", serviceAverageRating: 4.8, priceFrom: 60, categoryId: "nails" }),
     ];
-    const out = applyDiscoveryFiltersAndSort(salons, {
+    const out = applyDiscoveryFiltersAndSort(services, {
       ...DEFAULT_FILTERS,
       category: "hair",
       sort: "price-asc",

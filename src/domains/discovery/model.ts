@@ -17,25 +17,7 @@ export type DiscoveryCategory = {
   id: DiscoveryCategoryId;
 };
 
-export type DiscoverySalonCard = {
-  id: string;
-  tenantId: string;
-  name: string;
-  city: string;
-  categories: Exclude<DiscoveryCategoryId, "all">[];
-  rating: number;
-  reviewCount: number;
-  priceFrom: number;
-  currency: string;
-  nextAvailableLabel: string;
-  featuredService: string;
-  member: boolean;
-  bookingEnabled: boolean;
-  messageEnabled: boolean;
-  /** Geographic coordinates for map pin placement. Optional until Firestore population (W22-DEBT-1). */
-  locationLat?: number;
-  locationLng?: number;
-};
+
 
 export type DiscoveryRecentBooking = {
   id: string;
@@ -45,15 +27,27 @@ export type DiscoveryRecentBooking = {
   statusLabel: string;
 };
 
+export type ReviewQuote = {
+  id: string;
+  text: string;
+  /** First name + last initial only (e.g. "Aisha K.") */
+  reviewerName: string;
+  serviceName: string;
+  salonName: string;
+};
+
 export type DiscoveryHomeFeed = {
   categories: DiscoveryCategory[];
-  featuredSalons: DiscoverySalonCard[];
+  featuredSalons: ServiceTypeCard[];
   recentBookings: DiscoveryRecentBooking[];
+  recommendedSalons: ServiceTypeCard[];
+  /** 2–3 real client review quotes shown to guest users */
+  guestReviews: ReviewQuote[];
 };
 
 export type DiscoveryExploreFeed = {
   categories: DiscoveryCategory[];
-  salons: DiscoverySalonCard[];
+  salons: ServiceTypeCard[];
 };
 
 // ---------------------------------------------------------------------------
@@ -101,4 +95,118 @@ export type SponsoredListing = {
 /** Extends DiscoveryHomeFeed with editorial cards row */
 export type DiscoveryHomeFeedWithEditorial = DiscoveryHomeFeed & {
   editorialCards: EditorialCard[];
+};
+
+// ---------------------------------------------------------------------------
+// Phase 5 — Service data model v3 discovery types
+// ---------------------------------------------------------------------------
+
+export type ServiceTypeCard = {
+  id: string;
+  tenantId: string;
+  locationId: string;
+  categoryId: string;
+  categoryName: string;
+  serviceName: string;
+  locationDisplayName: string;
+  /** City name for the "near {city}" label — e.g. "London". */
+  locationCity: string;
+  priceFrom: number;
+  variantCount: number;
+  durationFrom: number;
+  serviceAverageRating: number | null;
+  serviceReviewCount: number;
+  locationAverageRating: number | null;
+  locationReviewCount: number;
+  nextAvailableAt: string | null;
+  isFullyBooked: boolean;
+  primaryPhotoUrl: string | null;
+  primaryPhotoSource: "client" | "salon" | null;
+  isBookableOnline: boolean;
+  locationLat: number;
+  locationLng: number;
+  distanceMetres: number | null;
+  isSaved: boolean | null;
+  memberPoints: number | null;
+  /** CF-computed popularity score (normalizedBooking×0.6 + normalizedRating×0.3 + recencyFactor×0.1) */
+  popularityScore: number;
+};
+
+// ---------------------------------------------------------------------------
+// Feed post types (sponsored + editorial)
+// ---------------------------------------------------------------------------
+
+export type DiscoveryFeedPost = {
+  id: string;
+  salonId: string;
+  salonName: string;
+  caption: string;
+  imageUrl?: string;
+  likeCount: number;
+  postedAt: string;
+  /** True for FTC-compliant sponsored entries — UI should render a "Sponsored" badge */
+  isSponsored?: boolean;
+};
+
+export type ServiceVariantObject = {
+  variantId: string;
+  name: string;
+  durationMinutes: number;
+  price: number;
+  currency: string;
+  isDefault: boolean;
+};
+
+export type ServiceAddonObject = {
+  addonId: string;
+  name: string;
+  price: number;
+  currency: string;
+  durationMinutes: number;
+};
+
+export type TechnicianCardObject = {
+  staffId: string;
+  displayName: string;
+  firstName: string;
+  avatarUrl: string | null;
+  specialtyTags: string[];
+  averageRating: number | null;
+  reviewCount: number;
+  nextAvailableAt: string | null;
+};
+
+export type ReviewObject = {
+  reviewId: string;
+  reviewerName: string;
+  rating: number;
+  body: string;
+  photoUrls: string[];
+  technicianComment: string | null;
+  createdAt: string;
+};
+
+export type ReviewSummary = {
+  averageRating: number | null;
+  totalCount: number;
+  breakdown: { stars: number; count: number }[];
+  recentReviews: ReviewObject[];
+};
+
+export type ServiceDetailObject = {
+  serviceId: string;
+  tenantId: string;
+  locationId: string;
+  serviceName: string;
+  locationDisplayName: string;
+  description: string | null;
+  categoryId: string;
+  variantLabel: string | null;
+  variants: ServiceVariantObject[];
+  addons: ServiceAddonObject[];
+  photos: { url: string; source: "client" | "salon" }[];
+  technicians: TechnicianCardObject[];
+  reviewSummary: ReviewSummary;
+  isBookableOnline: boolean;
+  locationPhone: string | null;
 };

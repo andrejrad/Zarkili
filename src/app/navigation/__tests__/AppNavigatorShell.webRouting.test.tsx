@@ -22,7 +22,13 @@ jest.mock("../tenantMemberships", () => ({
 describe("AppNavigatorShell web routing", () => {
   const suspendedDiscoveryService: DiscoveryService = {
     getHomeFeed: () => new Promise<never>(() => {}),
+    getHomeFeedWithEditorial: () => new Promise<never>(() => {}),
     getExploreFeed: () => new Promise<never>(() => {}),
+    getActiveSponsoredPosts: () => new Promise<never>(() => {}),
+    getExploreFeedPage: () => new Promise<never>(() => {}),
+    getServiceDetail: () => new Promise<never>(() => {}),
+    getSearchSuggestions: () => new Promise<never>(() => {}),
+    toggleSavedService: () => new Promise<never>(() => {}),
   };
 
   const originalPlatformOs = Platform.OS;

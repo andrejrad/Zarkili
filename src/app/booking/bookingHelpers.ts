@@ -53,11 +53,13 @@ export type BookingStaffOption = {
   id: string;
   name: string;
   rating?: number;
+  reviewCount?: number;
   specialties?: string[];
   nextAvailableLabel?: string;
   /** Optional pre-fetched preview slots in 12h format. */
   previewSlots?: string[];
   onLeaveLabel?: string;
+  photoUrl?: string | null;
 };
 
 export type BookingPriceBreakdown = {
@@ -65,6 +67,8 @@ export type BookingPriceBreakdown = {
   taxRate: number;
   tax: number;
   tip: number;
+  /** Loyalty / promo discount in USD (positive value = reduction). Optional, defaults to 0. */
+  loyaltyDiscount?: number;
   total: number;
 };
 

@@ -36,7 +36,9 @@ async function buildGoogleCredential(): Promise<AuthCredential> {
     );
   }
 
-  const redirectUri = AuthSession.makeRedirectUri();
+  // makeRedirectUri without useProxy — use the app's native redirect URI.
+  // Register this URI as an authorized redirect in the Google Cloud Console OAuth client.
+  const redirectUri = AuthSession.makeRedirectUri({});
 
   const request = new AuthSession.AuthRequest({
     clientId,

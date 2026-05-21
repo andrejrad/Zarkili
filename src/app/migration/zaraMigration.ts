@@ -165,8 +165,9 @@ function tenantUserDocId(tenantId: string, userId: string): string {
   return `${tenantId}_${userId}`;
 }
 
-function loyaltyStatesCol(tenantId: string): string {
-  return `tenants/${tenantId}/loyaltyStates`;
+function loyaltyStateDocPath(tenantId: string, userId: string): string {
+  // v3 §3.10: top-level collection, composite docId = {userId}_{brandId}.
+  return `user_brand_loyalty/${userId}_${tenantId}`;
 }
 
 function loyaltyTxCol(tenantId: string): string {
@@ -306,6 +307,8 @@ export async function runZaraMigration(
         locationId: location.locationId,
         staffId: lb.staffId ?? placeholderStaffId,
         serviceId: lb.serviceId,
+        variantId: "",
+        addonIds: [],
         customerUserId: lb.customerUserId,
         date: lb.date,
         startMinutes: lb.startMinutes,
@@ -314,6 +317,13 @@ export async function runZaraMigration(
         endTime: lb.endTime,
         durationMinutes: lb.durationMinutes,
         bufferMinutes: lb.bufferMinutes,
+        priceSnapshot: 0,
+        durationSnapshot: lb.durationMinutes,
+        variantNameSnapshot: "",
+        addonsSnapshot: [],
+        serviceNameSnapshot: "",
+        locationNameSnapshot: "",
+        technicianNameSnapshot: "",
         status: lb.status,
         notes: lb.notes,
         version: 1,
@@ -336,17 +346,24 @@ export async function runZaraMigration(
     const chunk = loyaltyBalances.slice(i, i + LOYALTY_BATCH_SIZE);
     const batch = writeBatch(db);
     for (const lb of chunk) {
-      const stateRef = doc(db, loyaltyStatesCol(tenant.tenantId), lb.userId);
+      const stateRef = doc(db, loyaltyStateDocPath(tenant.tenantId, lb.userId));
       const stateData: Omit<CustomerLoyaltyState, "enrolledAt" | "updatedAt"> & {
         enrolledAt: ReturnType<typeof serverTimestamp>;
         updatedAt: ReturnType<typeof serverTimestamp>;
         migrationRunId: string;
+        brandId: string;
+        pointsBalance: number;
       } = {
         userId: lb.userId,
         tenantId: tenant.tenantId,
+        // v3 alias: brandId mirrors tenantId on the new top-level collection.
+        brandId: tenant.tenantId,
         points: lb.points,
+        // v3 spec field name used by consumer discovery reader.
+        pointsBalance: lb.points,
         lifetimePoints: lb.lifetimePoints,
         currentTierId: null,
+        locationBreakdown: {},
         enrolledAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
         migrationRunId: runId,

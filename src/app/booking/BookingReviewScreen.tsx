@@ -46,6 +46,15 @@ export type BookingReviewScreenProps = {
   onEditDateTime?: () => void;
   onPressContinue: () => void;
   onPressBack?: () => void;
+  /** BookingProgressIndicator slot rendered below the header. W50-DEBT-6 */
+  progressIndicator?: React.ReactNode;
+  /** Free cancellation deadline label e.g. "Free cancellation until Friday, 16 May at 2:00 PM". W50-DEBT-12 */
+  freeCancellationLabel?: string;
+  /** Loyalty earn preview e.g. "You'll earn 130 pts at Glam Studio". W50-DEBT-12 */
+  loyaltyEarnPreviewText?: string;
+  /** Compact one-line policy reminder shown when policies were previously
+   *  acknowledged for the current version (Review will skip Step 5). GAP-3. */
+  policySummary?: string;
   testID?: string;
 };
 
@@ -71,6 +80,10 @@ export function BookingReviewScreen({
   onEditDateTime,
   onPressContinue,
   onPressBack,
+  progressIndicator,
+  freeCancellationLabel,
+  loyaltyEarnPreviewText,
+  policySummary,
   testID,
 }: BookingReviewScreenProps) {
   const staffName = staffAnyAvailable
@@ -96,6 +109,7 @@ export function BookingReviewScreen({
         <Text style={styles.title}>Review your booking</Text>
         <View style={{ width: 44 }} />
       </View>
+      {progressIndicator}
       <ScrollView contentContainerStyle={styles.body}>
         <View style={styles.salonCard}>
           <Text style={styles.salonName}>{salon.name}</Text>
@@ -204,6 +218,21 @@ export function BookingReviewScreen({
             testID={testID ? `${testID}-row-total` : undefined}
           />
         </View>
+        {freeCancellationLabel ? (
+          <View style={styles.cancellationNote} testID={testID ? `${testID}-cancel-note` : undefined}>
+            <Text style={styles.cancellationText}>{freeCancellationLabel}</Text>
+          </View>
+        ) : null}
+        {loyaltyEarnPreviewText ? (
+          <View style={styles.loyaltyPreview} testID={testID ? `${testID}-loyalty-preview` : undefined}>
+            <Text style={styles.loyaltyPreviewText}>{loyaltyEarnPreviewText}</Text>
+          </View>
+        ) : null}
+        {policySummary ? (
+          <View style={styles.policySummary} testID={testID ? `${testID}-policy-summary` : undefined}>
+            <Text style={styles.policySummaryText}>{policySummary}</Text>
+          </View>
+        ) : null}
       </ScrollView>
       <StickyFooterCta
         primaryLabel="Continue to policies"
@@ -286,4 +315,33 @@ const styles = StyleSheet.create({
   promoAddBtn: { paddingVertical: spacing.s2 },
   promoAddText: { color: colors.primary, fontWeight: "500" },
   promoError: { color: colors.error, fontSize: 12, marginTop: spacing.s2 },
+  cancellationNote: {
+    marginHorizontal: spacing.pageHorizontal,
+    marginTop: spacing.s2,
+    marginBottom: spacing.s2,
+    padding: spacing.s3,
+    backgroundColor: colors.creamSilk,
+    borderRadius: radius.sm,
+  },
+  cancellationText: { fontSize: 13, color: colors.textMuted },
+  loyaltyPreview: {
+    marginHorizontal: spacing.pageHorizontal,
+    marginTop: spacing.s2,
+    marginBottom: spacing.s2,
+    padding: spacing.s3,
+    backgroundColor: "#E6F7F5",
+    borderRadius: radius.sm,
+  },
+  loyaltyPreviewText: { fontSize: 13, color: "#0D9488" },
+  policySummary: {
+    marginHorizontal: spacing.pageHorizontal,
+    marginTop: spacing.s2,
+    marginBottom: spacing.s2,
+    padding: spacing.s3,
+    backgroundColor: colors.surface,
+    borderRadius: radius.sm,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  policySummaryText: { fontSize: 12, color: colors.textMuted, lineHeight: 16 },
 });

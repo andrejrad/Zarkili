@@ -96,7 +96,11 @@ export type ParsedPaymentEvent = {
     | "payment_method.detached"
     | "payment_intent.succeeded"
     | "payment_intent.payment_failed"
-    | "charge.refunded";
+    | "payment_intent.amount_capturable_updated"
+    | "payment_intent.canceled"
+    | "charge.refunded"
+    | "charge.refund.updated"
+    | "setup_intent.succeeded";
   /** Present for payment_method.attached */
   methodAttached?: {
     userId: string;
@@ -115,12 +119,27 @@ export type ParsedPaymentEvent = {
     stripePaymentIntentId: string;
     failureCode: string | null;
     failureMessage: string | null;
+    /** Present for payment_intent.amount_capturable_updated — the authorized payment method. */
+    paymentMethodId?: string;
   };
   /** Present for charge.refunded events */
   chargeRefunded?: {
     tenantId: string;
     stripeRefundId: string;
     amountMinor: number;
+  };
+  /** Present for charge.refund.updated events when a refund is denied */
+  chargeRefundDenied?: {
+    tenantId: string;
+    stripeRefundId: string;
+    failureCode: string | null;
+  };
+  /** Present for setup_intent.succeeded events */
+  setupIntentSucceeded?: {
+    tenantId: string;
+    bookingId: string;
+    userId: string;
+    paymentMethodId: string;
   };
 };
 
@@ -186,7 +205,11 @@ const SUPPORTED_PAYMENT_TYPES: ReadonlySet<string> = new Set([
   "payment_method.detached",
   "payment_intent.succeeded",
   "payment_intent.payment_failed",
+  "payment_intent.amount_capturable_updated",
+  "payment_intent.canceled",
   "charge.refunded",
+  "charge.refund.updated",
+  "setup_intent.succeeded",
 ]);
 
 const PLAN_MAP: Record<string, "starter" | "professional" | "enterprise"> = {
@@ -501,6 +524,56 @@ function parsePaymentEvent(
         tenantId,
         stripeRefundId,
         amountMinor,
+      },
+    };
+  }
+
+  if (type === "charge.refund.updated") {
+    // event.data.object is the Refund object (not the Charge).
+    // tenantId is from the Refund's own metadata (set at refund creation).
+    const refundId = (obj.id as string) ?? "";
+    const refundStatus = (obj.status as string) ?? "";
+    const failureCode = (obj.failure_reason as string) ?? null;
+    return {
+      id,
+      type: "charge.refund.updated",
+      chargeRefundDenied: refundStatus === "failed"
+        ? { tenantId, stripeRefundId: refundId, failureCode }
+        : undefined,
+    };
+  }
+
+  if (type === "setup_intent.succeeded") {
+    // obj is the SetupIntent. payment_method is the confirmed pm_xxx.
+    const siMetadata = (obj.metadata as Record<string, unknown>) ?? {};
+    const bookingId = (siMetadata.bookingId as string) ?? "";
+    const siTenantId = (siMetadata.tenantId as string) ?? "";
+    const siUserId = (siMetadata.userId as string) ?? "";
+    const paymentMethodId = (obj.payment_method as string) ?? "";
+    return {
+      id,
+      type: "setup_intent.succeeded",
+      setupIntentSucceeded: {
+        tenantId: siTenantId,
+        bookingId,
+        userId: siUserId,
+        paymentMethodId,
+      },
+    };
+  }
+
+  // For payment_intent.amount_capturable_updated, also capture the payment method used.
+  if (type === "payment_intent.amount_capturable_updated") {
+    const methodId = (obj.payment_method as string) || undefined;
+    return {
+      id,
+      type: "payment_intent.amount_capturable_updated",
+      paymentIntent: {
+        tenantId,
+        stripePaymentIntentId,
+        failureCode: null,
+        failureMessage: null,
+        paymentMethodId: methodId,
       },
     };
   }

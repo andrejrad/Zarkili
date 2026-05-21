@@ -1,3 +1,8 @@
+jest.mock("expo-location", () => ({
+  getForegroundPermissionsAsync: jest.fn().mockResolvedValue({ status: "denied" }),
+  requestForegroundPermissionsAsync: jest.fn().mockResolvedValue({ status: "denied" }),
+}));
+
 import { render } from "@testing-library/react-native";
 
 import { HomeScreen } from "../HomeScreen";
@@ -9,31 +14,43 @@ import { ServiceDetailScreen } from "../ServiceDetailScreen";
 import { StaffMemberDetailScreen } from "../StaffMemberDetailScreen";
 import { ExploreMapScreen } from "../ExploreMapScreen";
 import { DEFAULT_FILTERS } from "../discoveryFilters";
-import type { DiscoveryHomeFeed, DiscoverySalonCard } from "../../../domains/discovery";
+import type { DiscoveryHomeFeed, ServiceTypeCard } from "../../../domains/discovery";
 
-function makeSalon(over: Partial<DiscoverySalonCard> = {}): DiscoverySalonCard {
+function makeServiceCard(over: Partial<ServiceTypeCard> = {}): ServiceTypeCard {
   return {
     id: "s1",
     tenantId: "t1",
-    name: "Glow Studio",
-    city: "Brooklyn, NY",
-    categories: ["nails"],
-    rating: 4.8,
-    reviewCount: 122,
-    priceFrom: 45,
-    currency: "USD",
-    nextAvailableLabel: "Today 3:00 PM",
-    featuredService: "Classic Manicure",
-    member: true,
-    bookingEnabled: true,
-    messageEnabled: true,
+    locationId: "loc1",
+    categoryId: "nails",
+    categoryName: "Nails",
+    serviceName: "Gel Manicure",
+    locationDisplayName: "Glow Studio · Shoreditch",
+    locationCity: "London",
+    variantCount: 1,
+    durationFrom: 45,
+    serviceAverageRating: 4.8,
+    serviceReviewCount: 12,
+    locationAverageRating: 4.7,
+    locationReviewCount: 80,
+    nextAvailableAt: null,
+    isFullyBooked: false,
+    primaryPhotoUrl: null,
+    primaryPhotoSource: null,
+    isBookableOnline: true,
+    locationLat: 51.5,
+    locationLng: -0.1,
+    distanceMetres: 500,
+    isSaved: null,
+    memberPoints: null,
+    popularityScore: 0,
+    priceFrom: 5000,
     ...over,
   };
 }
 
 const homeFeed: DiscoveryHomeFeed = {
   categories: [{ id: "all" }, { id: "nails" }, { id: "hair" }],
-  featuredSalons: [makeSalon(), makeSalon({ id: "s2", name: "Hair Lab" })],
+  featuredSalons: [makeServiceCard(), makeServiceCard({ id: "s2", serviceName: "Hair Cut" })],
   recentBookings: [
     {
       id: "b1",
@@ -43,6 +60,8 @@ const homeFeed: DiscoveryHomeFeed = {
       statusLabel: "Confirmed",
     },
   ],
+  recommendedSalons: [],
+  guestReviews: [],
 };
 
 describe("HomeScreen (B.1)", () => {
@@ -60,8 +79,8 @@ describe("HomeScreen (B.1)", () => {
 describe("DiscoverFeedScreen (B.2)", () => {
   it("renders salon, sponsored, and editorial items", () => {
     const items: DiscoverFeedItem[] = [
-      { kind: "salon", salon: makeSalon() },
-      { kind: "sponsored", salon: makeSalon({ id: "s2" }), sponsorName: "GlowCo" },
+      { kind: "salon", salon: makeServiceCard() },
+      { kind: "sponsored", salon: makeServiceCard({ id: "s2" }), sponsorName: "GlowCo" },
       {
         kind: "editorial",
         id: "e1",
@@ -81,29 +100,32 @@ describe("DiscoverFeedScreen (B.2)", () => {
 });
 
 describe("ExploreSearchResultsScreen (B.3)", () => {
-  it("renders summary and applies filters via helper", () => {
-    const salons = [
-      makeSalon({ id: "s1", priceFrom: 30 }),
-      makeSalon({ id: "s2", priceFrom: 200 }),
+  it("renders summary and service cards", () => {
+    const services = [
+      makeServiceCard({ id: "s1" }),
+      makeServiceCard({ id: "s2" }),
     ];
-    const { getByTestId, queryByTestId } = render(
+    const { getByTestId } = render(
       <ExploreSearchResultsScreen
-        salons={salons}
-        filters={{ ...DEFAULT_FILTERS, priceRange: [0, 100] }}
+        services={services}
+        totalCount={2}
+        filters={DEFAULT_FILTERS}
         onChangeFilters={() => {}}
         testID="explore"
       />,
     );
-    expect(getByTestId("explore-summary").props.children).toBe("1 salon");
-    expect(getByTestId("explore-salon-s1")).toBeTruthy();
-    expect(queryByTestId("explore-salon-s2")).toBeNull();
+    expect(getByTestId("explore-summary")).toBeTruthy();
+    expect(getByTestId("explore-service-s1")).toBeTruthy();
+    expect(getByTestId("explore-service-s2")).toBeTruthy();
   });
 
-  it("renders empty state when nothing matches", () => {
+  it("renders empty state when no services", () => {
     const { getByTestId } = render(
       <ExploreSearchResultsScreen
-        salons={[makeSalon({ priceFrom: 1000 })]}
-        filters={{ ...DEFAULT_FILTERS, priceRange: [0, 50] }}
+        services={[]}
+        isLoading={false}
+        totalCount={0}
+        filters={DEFAULT_FILTERS}
         onChangeFilters={() => {}}
         testID="explore"
       />,
@@ -113,26 +135,26 @@ describe("ExploreSearchResultsScreen (B.3)", () => {
 });
 
 describe("FilterSheetScreen (B.4)", () => {
-  it("computes preview count from current draft and applies", () => {
-    const onApply = jest.fn();
-    const salons = [
-      makeSalon({ id: "s1", priceFrom: 30 }),
-      makeSalon({ id: "s2", priceFrom: 60 }),
-      makeSalon({ id: "s3", priceFrom: 150 }),
+  it("renders with live filter updates and no apply button", () => {
+    const onChangeFilters = jest.fn();
+    const services = [
+      makeServiceCard({ id: "s1", priceFrom: 3000 }),
+      makeServiceCard({ id: "s2", priceFrom: 6000 }),
+      makeServiceCard({ id: "s3", priceFrom: 15000 }),
     ];
-    const { getByTestId } = render(
+    const { getByTestId, queryByTestId } = render(
       <FilterSheetScreen
         visible
-        initialFilters={{ ...DEFAULT_FILTERS, priceRange: [0, 100] }}
-        salons={salons}
+        initialFilters={{ ...DEFAULT_FILTERS, priceRange: [0, 10000] }}
+        services={services}
         onClose={() => {}}
-        onApply={onApply}
+        onChangeFilters={onChangeFilters}
         testID="fs"
       />,
     );
-    // Apply button shows current preview count
-    const applyBtn = getByTestId("fs-apply");
-    expect(applyBtn).toBeTruthy();
+    // Sheet is visible (reset button present), no apply/done button
+    expect(getByTestId("fs-reset")).toBeTruthy();
+    expect(queryByTestId("fs-apply")).toBeNull();
   });
 });
 
@@ -174,21 +196,48 @@ describe("SalonProfileScreen (B.5)", () => {
 
 describe("ServiceDetailScreen (B.6)", () => {
   it("renders service hero and toggles add-on selection", () => {
-    const onToggle = jest.fn();
     const { getByTestId } = render(
       <ServiceDetailScreen
-        service={{
-          id: "sv1",
-          name: "Classic Manicure",
-          durationLabel: "45 min",
-          priceLabel: "$45",
-          description: "Clean cuticles + polish.",
-          bookingEnabled: true,
-        }}
-        staff={[{ id: "st1", name: "Riley" }]}
-        addOns={[{ id: "a1", name: "Gel polish", priceLabel: "+$15" }]}
-        onToggleAddOn={onToggle}
         testID="svc"
+        service={{
+          serviceId: "sv1",
+          tenantId: "t1",
+          locationId: "loc1",
+          serviceName: "Classic Manicure",
+          locationDisplayName: "Glamour Nails",
+          description: "Clean cuticles + polish.",
+          categoryId: "nails",
+          variantLabel: null,
+          variants: [
+            {
+              variantId: "var1",
+              name: "Standard",
+              durationMinutes: 45,
+              price: 4500,
+              currency: "GBP",
+              isDefault: true,
+            },
+          ],
+          addons: [
+            {
+              addonId: "a1",
+              name: "Gel polish",
+              price: 1500,
+              currency: "GBP",
+              durationMinutes: 10,
+            },
+          ],
+          photos: [],
+          technicians: [],
+          reviewSummary: {
+            averageRating: null,
+            totalCount: 0,
+            breakdown: [],
+            recentReviews: [],
+          },
+          isBookableOnline: true,
+          locationPhone: null,
+        }}
       />,
     );
     expect(getByTestId("svc-choose-time")).toBeTruthy();
@@ -220,12 +269,12 @@ describe("StaffMemberDetailScreen (B.7)", () => {
 });
 
 describe("ExploreMapScreen (B.8)", () => {
-  it("renders deferred-feature placeholder + switch-to-list CTA", () => {
+  it("renders price-bubble pin per location and switch-to-list CTA", () => {
     const { getByTestId } = render(
-      <ExploreMapScreen salons={[makeSalon()]} testID="map" />,
+      <ExploreMapScreen services={[makeServiceCard()]} testID="map" />,
     );
     expect(getByTestId("map-switch-to-list")).toBeTruthy();
     expect(getByTestId("map-summary")).toBeTruthy();
-    expect(getByTestId("map-salon-s1")).toBeTruthy();
+    expect(getByTestId("map-pin-loc1")).toBeTruthy();
   });
 });

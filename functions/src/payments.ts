@@ -30,7 +30,9 @@
 import { getApps, initializeApp } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
 import { FieldValue, getFirestore, Timestamp } from "firebase-admin/firestore";
+import { logger } from "firebase-functions";
 import { defineSecret } from "firebase-functions/params";
+import { onDocumentUpdated } from "firebase-functions/v2/firestore";
 import { HttpsError, onCall } from "firebase-functions/v2/https";
 
 import {
@@ -381,15 +383,19 @@ export const paymentsChargeBooking = onCall(
 //
 // Collection paths mirror the loyalty domain (src/domains/loyalty/repository.ts):
 //   tenants/{tenantId}/loyaltyConfig/config        — TenantLoyaltyConfig singleton
-//   tenants/{tenantId}/loyaltyStates/{userId}       — CustomerLoyaltyState
+//   user_brand_loyalty/{userId}_{brandId}          — CustomerLoyaltyState (v3 §3.10)
 //   tenants/{tenantId}/loyaltyTransactions/{txId}   — LoyaltyTransaction ledger
 //   tenants/{tenantId}/loyaltyIdempotency/{key}     — idempotency markers
+//
+// Per v3 §2, tenantId === brandId. Docs are also written with `brandId` and
+// `pointsBalance` field aliases so the spec-shaped discovery reader can pick
+// them up directly.
 
 // Path helpers
 const loyaltyConfigDocPath = (tenantId: string) =>
   `tenants/${tenantId}/loyaltyConfig/config`;
 const loyaltyStateDocPath = (tenantId: string, userId: string) =>
-  `tenants/${tenantId}/loyaltyStates/${userId}`;
+  `user_brand_loyalty/${userId}_${tenantId}`;
 const loyaltyTxColPath = (tenantId: string) =>
   `tenants/${tenantId}/loyaltyTransactions`;
 const loyaltyIdempDocPath = (tenantId: string, key: string) =>
@@ -454,10 +460,20 @@ export async function handleApplyLoyaltyDiscount(
     };
   }
 
-  // 4. Conversion: 1 point = 1 minor currency unit (e.g. 1 cent)
+  // 4. Verify the booking belongs to this user
+  const bookingSnap = await db.doc(`tenants/${tenantId}/appointmentPayments/${bookingId}`).get();
+  if (!bookingSnap.exists) {
+    throw new HttpsError("not-found", "Booking not found");
+  }
+  const bookingData = bookingSnap.data() as { userId?: string };
+  if (bookingData.userId !== callerUid) {
+    throw new HttpsError("permission-denied", "Booking does not belong to this user");
+  }
+
+  // 5. Conversion: 1 point = 1 minor currency unit (e.g. 1 cent)
   const discountMinor = pointsToDebit;
 
-  // 5. Transactionally debit points — prevents double-spend under concurrency
+  // 6. Transactionally debit points — prevents double-spend under concurrency
   const txRef = db.collection(loyaltyTxColPath(tenantId)).doc();
   const txId = txRef.id;
 
@@ -483,7 +499,9 @@ export async function handleApplyLoyaltyDiscount(
       txn.set(stateRef, {
         userId,
         tenantId,
+        brandId: tenantId,
         points: currentPoints - pointsToDebit,
+        pointsBalance: currentPoints - pointsToDebit,
         lifetimePoints: (existingData?.lifetimePoints as number | undefined) ?? 0,
         currentTierId: (existingData?.currentTierId as string | null | undefined) ?? null,
         enrolledAt: existingData?.enrolledAt ?? now,
@@ -627,7 +645,11 @@ export const paymentsRefundBooking = onCall(
 
     // Issue refund via Stripe.
     const stripe = createStripePaymentsApiClient(STRIPE_API_KEY.value());
-    const refund = await stripe.createRefund(chargeData.stripePaymentIntentId);
+    const refund = await stripe.createRefund(
+      chargeData.stripePaymentIntentId,
+      undefined,
+      { metadata: { tenantId, bookingId } },
+    );
 
     // Write pending refund doc.  The charge.refunded webhook will flip status → "issued".
     const refundDoc = {
@@ -651,5 +673,148 @@ export const paymentsRefundBooking = onCall(
     await db.doc(`tenants/${tenantId}/refunds/${refund.id}`).set(refundDoc);
 
     return { refundId: refund.id };
+  },
+);
+
+// ---------------------------------------------------------------------------
+// updateLoyaltyOnBookingComplete  (Phase 2.5)
+// ---------------------------------------------------------------------------
+//
+// Triggered by any update to bookings/{bookingId}.
+// When status transitions TO "completed", credits loyalty points to the
+// customer's wallet and updates the per-location breakdown on the loyalty state.
+//
+// Points formula: floor((priceSnapshot / 100) * pointsPerCurrencyUnit)
+//   where priceSnapshot is in minor units (pence/cents) and
+//   pointsPerCurrencyUnit is the tenant-configured earning rate.
+//
+// Idempotency key: loyalty_earn_{bookingId}  (in loyaltyIdempotency collection)
+
+export const updateLoyaltyOnBookingComplete = onDocumentUpdated(
+  "bookings/{bookingId}",
+  async (event) => {
+    const before = event.data?.before?.data() as Record<string, unknown> | undefined;
+    const after = event.data?.after?.data() as Record<string, unknown> | undefined;
+
+    // Only react to transitions into "completed".
+    if (after?.status !== "completed" || before?.status === "completed") return;
+
+    const tenantId = after.tenantId as string | undefined;
+    const customerUserId = after.customerUserId as string | undefined;
+    const locationId = after.locationId as string | undefined;
+    const bookingId = after.bookingId as string | undefined;
+    const priceSnapshot = after.priceSnapshot as number | undefined;
+
+    if (!tenantId || !customerUserId || !locationId || !bookingId) {
+      logger.warn("updateLoyaltyOnBookingComplete: missing required booking fields", {
+        bookingId: event.params.bookingId,
+      });
+      return;
+    }
+
+    const db = getFirestore();
+
+    // Idempotency: skip if points were already awarded for this booking.
+    const idempKey = `loyalty_earn_${bookingId}`;
+    const idempRef = db.doc(loyaltyIdempDocPath(tenantId, idempKey));
+    const idempSnap = await idempRef.get();
+    if (idempSnap.exists) return;
+
+    // Read loyalty config — silently skip if programme is absent or disabled.
+    const configSnap = await db.doc(loyaltyConfigDocPath(tenantId)).get();
+    if (!configSnap.exists) return;
+    const configData = configSnap.data() as {
+      enabled?: boolean;
+      pointsPerCurrencyUnit?: number;
+    };
+    if (!configData?.enabled) return;
+
+    const pointsPerCurrencyUnit = configData.pointsPerCurrencyUnit ?? 0;
+    if (pointsPerCurrencyUnit <= 0) return;
+
+    // Compute earned points: floor(appointmentValue_in_major_unit × pointsPerCurrencyUnit).
+    const appointmentValue = (typeof priceSnapshot === "number" ? priceSnapshot : 0) / 100;
+    const earnedPoints = Math.floor(appointmentValue * pointsPerCurrencyUnit);
+    if (earnedPoints <= 0) return;
+
+    const txRef = db.collection(loyaltyTxColPath(tenantId)).doc();
+    const txId = txRef.id;
+
+    try {
+      await db.runTransaction(async (txn) => {
+        const stateRef = db.doc(loyaltyStateDocPath(tenantId, customerUserId));
+        const stateSnap = await txn.get(stateRef);
+
+        const now = FieldValue.serverTimestamp();
+        const existing = stateSnap.exists ? stateSnap.data() : undefined;
+
+        const currentPoints = (existing?.points as number | undefined) ?? 0;
+        const currentLifetime = (existing?.lifetimePoints as number | undefined) ?? 0;
+
+        // Merge location breakdown — preserve existing location entries.
+        const existingBreakdown =
+          (existing?.locationBreakdown as Record<string, unknown> | undefined) ?? {};
+        const existingEntry = (existingBreakdown[locationId] as
+          | { visits?: number; pointsEarned?: number }
+          | undefined) ?? {};
+
+        const updatedBreakdown = {
+          ...existingBreakdown,
+          [locationId]: {
+            visits: ((existingEntry.visits as number | undefined) ?? 0) + 1,
+            pointsEarned:
+              ((existingEntry.pointsEarned as number | undefined) ?? 0) + earnedPoints,
+            lastVisitAt: now,
+          },
+        };
+
+        txn.set(stateRef, {
+          userId: customerUserId,
+          tenantId,
+          brandId: tenantId,
+          points: currentPoints + earnedPoints,
+          pointsBalance: currentPoints + earnedPoints,
+          lifetimePoints: currentLifetime + earnedPoints,
+          currentTierId: (existing?.currentTierId as string | null | undefined) ?? null,
+          locationBreakdown: updatedBreakdown,
+          enrolledAt: existing?.enrolledAt ?? now,
+          updatedAt: now,
+        });
+
+        txn.set(txRef, {
+          txId,
+          userId: customerUserId,
+          tenantId,
+          type: "credit",
+          points: earnedPoints,
+          reason: "completed_appointment",
+          referenceId: bookingId,
+          idempotencyKey: idempKey,
+          createdAt: now,
+        });
+
+        txn.set(idempRef, {
+          txId,
+          earnedPoints,
+          idempotencyKey: idempKey,
+          createdAt: now,
+        });
+      });
+    } catch (err) {
+      logger.error("updateLoyaltyOnBookingComplete: transaction failed", {
+        bookingId,
+        tenantId,
+        customerUserId,
+        err,
+      });
+      throw err;
+    }
+
+    logger.info("updateLoyaltyOnBookingComplete: credited points", {
+      bookingId,
+      userId: customerUserId,
+      tenantId,
+      earnedPoints,
+    });
   },
 );

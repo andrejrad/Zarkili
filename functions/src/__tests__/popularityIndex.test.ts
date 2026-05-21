@@ -47,9 +47,37 @@ interface TenantSetup {
 
 function makeFirestoreMock(tenants: Record<string, TenantSetup>) {
   const setMock = vi.fn().mockResolvedValue(undefined);
+  const serviceUpdateMock = vi.fn().mockResolvedValue(undefined);
 
   const db = {
     collection: (name: string) => {
+      // Stub: brands/{brandId}/locations/{locId}/service_types/{svcId} — returns no data; .update() is a no-op.
+      if (name === "brands") {
+        return {
+          doc: (_brandId: string) => ({
+            collection: (sub: string) => {
+              if (sub === "locations") {
+                return {
+                  doc: (_locId: string) => ({
+                    collection: (sub2: string) => {
+                      if (sub2 === "service_types") {
+                        return {
+                          doc: (_svcId: string) => ({
+                            get: vi.fn().mockResolvedValue({ exists: false, data: () => undefined }),
+                            update: serviceUpdateMock,
+                          }),
+                        };
+                      }
+                      return {};
+                    },
+                  }),
+                };
+              }
+              return {};
+            },
+          }),
+        };
+      }
       if (name !== "tenants") return {};
       return {
         get: vi.fn(async () => ({
@@ -75,7 +103,7 @@ function makeFirestoreMock(tenants: Record<string, TenantSetup>) {
     },
   } as unknown as FirebaseFirestore.Firestore;
 
-  return { db, setMock };
+  return { db, setMock, serviceUpdateMock };
 }
 
 // ---------------------------------------------------------------------------
@@ -168,9 +196,9 @@ describe("computeTenantPopularity", () => {
 
   it("writes popularity docs for each service in the booking data", async () => {
     const bookings = [
-      { serviceId: "haircut", status: "completed", createdAt: "2025-07-10T10:00:00Z" },
-      { serviceId: "haircut", status: "completed", createdAt: "2025-07-11T10:00:00Z" },
-      { serviceId: "coloring", status: "completed", createdAt: "2025-07-12T10:00:00Z" },
+      { serviceId: "haircut", status: "completed", createdAt: "2025-07-10T10:00:00Z", locationId: "loc-1" },
+      { serviceId: "haircut", status: "completed", createdAt: "2025-07-11T10:00:00Z", locationId: "loc-1" },
+      { serviceId: "coloring", status: "completed", createdAt: "2025-07-12T10:00:00Z", locationId: "loc-1" },
     ];
     const { db, setMock } = makeFirestoreMock({ t1: { bookings } });
 
@@ -192,7 +220,7 @@ describe("computeTenantPopularity", () => {
 
   it("assigns score 1.0 to the only service when only one exists", async () => {
     const bookings = [
-      { serviceId: "massage", status: "completed", createdAt: "2025-07-10T09:00:00Z" },
+      { serviceId: "massage", status: "completed", createdAt: "2025-07-10T09:00:00Z", locationId: "loc-1" },
     ];
     const { db, setMock } = makeFirestoreMock({ t1: { bookings } });
 

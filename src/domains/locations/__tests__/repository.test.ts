@@ -86,6 +86,7 @@ function makeInput(overrides: Partial<CreateLocationInput> = {}): CreateLocation
   return {
     tenantId: "tenantA",
     name: "Downtown Studio",
+    displayName: "Downtown Studio",
     code: "DOWNTOWN",
     status: "active",
     timezone: "Europe/Zagreb",

@@ -46,9 +46,9 @@ function makeWriteFirestoreMock() {
     return resolved;
   }
 
-  function doc(_db: unknown, collectionPath: string, id: string) {
-    const key = `${collectionPath}/${id}`;
-    return { key, id, path: key };
+  function doc(_db: unknown, ...segments: string[]) {
+    const key = segments.join("/");
+    return { key, id: segments[segments.length - 1], path: key };
   }
 
   async function getDoc(ref: { key: string; id: string }) {
@@ -225,6 +225,8 @@ function makeBookingInput(overrides: Partial<CreateBookingInput> = {}): CreateBo
     locationId: "locA",
     staffId: "staffA",
     serviceId: "svcA",
+    variantId: "var-svcA-standard",
+    addonIds: [],
     customerUserId: "custA",
     date: "2026-04-27",
     startMinutes: 540,
@@ -233,6 +235,9 @@ function makeBookingInput(overrides: Partial<CreateBookingInput> = {}): CreateBo
     endTime: "10:00",
     durationMinutes: 60,
     bufferMinutes: 10,
+    serviceNameSnapshot: "Service",
+    locationNameSnapshot: "Location",
+    technicianNameSnapshot: "Technician",
     notes: null,
     ...overrides,
   };
@@ -270,6 +275,12 @@ function seedPendingBooking(
 describe("BookingsRepository — write operations", () => {
   beforeEach(() => {
     mock = makeWriteFirestoreMock();
+    // Seed the service variant required by createBookingAtomically
+    mock.store["brands/tenantA/locations/locA/service_types/svcA/variants/var-svcA-standard"] = {
+      name: "Standard",
+      price: 5000,
+      durationMinutes: 60,
+    };
   });
 
   // =========================================================================

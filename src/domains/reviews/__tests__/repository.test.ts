@@ -153,6 +153,8 @@ jest.mock("firebase/firestore", () => ({
   query:           (...args: unknown[]) => mock.query(...(args as Parameters<typeof mock.query>)),
   getDocs:         (...args: unknown[]) => mock.getDocs(...(args as Parameters<typeof mock.getDocs>)),
   serverTimestamp: () => mock.serverTimestamp(),
+  // Phase 8 — limit clause (query ignores it; just needs to be a recognised clause)
+  limit:           (n: number) => ({ _limit: n }),
 }));
 
 beforeEach(() => { mock = makeFirestoreMock(); });
@@ -439,5 +441,93 @@ describe("createReviewRepository — aggregate cache", () => {
     const agg = await repo.syncLocationAggregate("tenant-1", "loc-1");
     expect(agg.reviewCount).toBe(1);
     expect(agg.averageRating).toBe(5);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Phase 8 — getReviewsForService
+// ---------------------------------------------------------------------------
+
+describe("createReviewRepository — getReviewsForService (Phase 8)", () => {
+  it("returns empty array when no reviews exist for service", async () => {
+    const result = await makeRepo().getReviewsForService("tenant-1", "loc-1", "svc-1");
+    expect(result).toEqual([]);
+  });
+
+  it("returns only published reviews for the given serviceId", async () => {
+    const repo = makeRepo();
+    const r1 = await repo.createReview(
+      baseInput({ bookingId: "b1", serviceId: "svc-1", rating: 5 }),
+      COMPLETED_BOOKING,
+    );
+    const r2 = await repo.createReview(
+      baseInput({ bookingId: "b2", serviceId: "svc-2", rating: 3 }),
+      COMPLETED_BOOKING,
+    );
+    await repo.moderateReview({ reviewId: r1.reviewId, tenantId: "tenant-1", moderatorId: "admin", status: "published" });
+    await repo.moderateReview({ reviewId: r2.reviewId, tenantId: "tenant-1", moderatorId: "admin", status: "published" });
+
+    const results = await repo.getReviewsForService("tenant-1", "loc-1", "svc-1");
+    expect(results).toHaveLength(1);
+    expect(results[0]!.overallRating).toBe(5);
+    expect(results[0]!.rating).toBe(5);
+  });
+
+  it("excludes non-published reviews", async () => {
+    const repo = makeRepo();
+    await repo.createReview(
+      baseInput({ bookingId: "b1", serviceId: "svc-1", rating: 4 }),
+      COMPLETED_BOOKING,
+    );
+    // Not moderated → still pending
+    const results = await repo.getReviewsForService("tenant-1", "loc-1", "svc-1");
+    expect(results).toHaveLength(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Phase 8 — getServiceReviewBreakdown
+// ---------------------------------------------------------------------------
+
+describe("createReviewRepository — getServiceReviewBreakdown (Phase 8)", () => {
+  it("returns zero breakdown when no published reviews exist", async () => {
+    const result = await makeRepo().getServiceReviewBreakdown("tenant-1", "loc-1", "svc-x");
+    expect(result.average).toBeNull();
+    expect(result.count).toBe(0);
+    expect(result.breakdown[5]).toBe(0);
+  });
+
+  it("computes correct average and breakdown", async () => {
+    const repo = makeRepo();
+    const ratings = [5, 5, 4, 3, 5];
+    for (let i = 0; i < ratings.length; i++) {
+      const r = await repo.createReview(
+        baseInput({ bookingId: `bb${i}`, serviceId: "svc-1", rating: ratings[i]! }),
+        COMPLETED_BOOKING,
+      );
+      await repo.moderateReview({ reviewId: r.reviewId, tenantId: "tenant-1", moderatorId: "admin", status: "published" });
+    }
+
+    const breakdown = await repo.getServiceReviewBreakdown("tenant-1", "loc-1", "svc-1");
+    expect(breakdown.count).toBe(5);
+    expect(breakdown.average).toBe(4.4);
+    expect(breakdown.breakdown[5]).toBe(3);
+    expect(breakdown.breakdown[4]).toBe(1);
+    expect(breakdown.breakdown[3]).toBe(1);
+    expect(breakdown.breakdown[2]).toBe(0);
+    expect(breakdown.breakdown[1]).toBe(0);
+  });
+
+  it("ignores non-published reviews in breakdown", async () => {
+    const repo = makeRepo();
+    const r = await repo.createReview(
+      baseInput({ bookingId: "b1", serviceId: "svc-1", rating: 1 }),
+      COMPLETED_BOOKING,
+    );
+    // Leave pending — not published
+    void r;
+    const breakdown = await repo.getServiceReviewBreakdown("tenant-1", "loc-1", "svc-1");
+    expect(breakdown.average).toBeNull();
+    expect(breakdown.count).toBe(0);
   });
 });

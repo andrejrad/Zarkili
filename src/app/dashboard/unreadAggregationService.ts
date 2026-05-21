@@ -28,6 +28,8 @@ export type SalonSummary = {
   unreadMessageCount: number;
   subscriptionStatus: UserTenantAccess["subscriptionStatus"];
   accessLevel: UserTenantAccess["accessLevel"];
+  /** When the user first joined this salon (used for default salon selection fallback). */
+  subscribedAt: UserTenantAccess["subscribedAt"];
   /** Firestore Timestamp of the next upcoming confirmed appointment, or null */
   nextAppointmentAt: UserTenantAccess["nextAppointmentAt"];
   /** Display name of the service for the next appointment, or null */
@@ -45,6 +47,9 @@ export type SalonSummariesResult =
 const ACTIVE_STATUSES: UserTenantAccess["subscriptionStatus"][] = ["active", "trialing"];
 
 function isActive(access: UserTenantAccess): boolean {
+  // Treat a missing subscriptionStatus as "active" so legacy/incomplete
+  // documents (e.g. seeded without the field) still appear in the switcher.
+  if (!access.subscriptionStatus) return true;
   return ACTIVE_STATUSES.includes(access.subscriptionStatus);
 }
 
@@ -77,6 +82,7 @@ export function createUnreadAggregationService(
           unreadMessageCount: access.unreadMessageCount,
           subscriptionStatus: access.subscriptionStatus,
           accessLevel: access.accessLevel,
+          subscribedAt: access.subscribedAt,
           nextAppointmentAt: access.nextAppointmentAt ?? null,
           nextAppointmentServiceName: access.nextAppointmentServiceName ?? null,
         };

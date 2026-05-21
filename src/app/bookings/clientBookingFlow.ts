@@ -120,8 +120,8 @@ export function createClientBookingFlow({
         staffId,
         locationId,
         date,
-        serviceDurationMinutes: service.durationMinutes,
-        bufferMinutes: service.bufferMinutes,
+        serviceDurationMinutes: service.baseDurationMinutes,
+        bufferMinutes: service.baseBufferMinutes,
       });
       return { ok: true, slots };
     } catch (err) {
@@ -138,6 +138,11 @@ export function createClientBookingFlow({
       technician: StaffMember;
       date: string;
       slot: AvailableSlot;
+      variantId: string;
+      addonIds: string[];
+      serviceNameSnapshot: string;
+      locationNameSnapshot: string;
+      technicianNameSnapshot: string;
       notes?: string | null;
     },
   ): Promise<ReserveSlotResult> {
@@ -149,14 +154,19 @@ export function createClientBookingFlow({
         locationId: location.locationId,
         staffId: technician.staffId,
         serviceId: service.serviceId,
+        variantId: selection.variantId,
+        addonIds: selection.addonIds,
         customerUserId,
         date,
         startMinutes: slot.startMinutes,
         endMinutes: slot.endMinutes,
         startTime: slot.startTime,
         endTime: slot.endTime,
-        durationMinutes: service.durationMinutes,
-        bufferMinutes: service.bufferMinutes,
+        durationMinutes: service.baseDurationMinutes,
+        bufferMinutes: service.baseBufferMinutes,
+        serviceNameSnapshot: selection.serviceNameSnapshot,
+        locationNameSnapshot: selection.locationNameSnapshot,
+        technicianNameSnapshot: selection.technicianNameSnapshot,
         notes: selection.notes ?? null,
       });
 

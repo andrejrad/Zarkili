@@ -16,9 +16,9 @@ export type FilterSheetProps = {
   visible: boolean;
   onClose: () => void;
   onReset?: () => void;
-  /** Sticky footer button label (e.g., "Apply filters (24 results)"). */
-  applyLabel: string;
-  onApply: () => void;
+  /** Sticky footer button label. Omit to hide the footer entirely (live-apply mode). */
+  applyLabel?: string;
+  onApply?: () => void;
   applyDisabled?: boolean;
   title?: string;
   children: ReactNode;
@@ -75,15 +75,17 @@ export function FilterSheet({
           >
             {children}
           </ScrollView>
-          <View style={styles.footer}>
-            <Button
-              label={applyLabel}
-              onPress={onApply}
-              fullWidth
-              disabled={applyDisabled}
-              testID={testID ? `${testID}-apply` : undefined}
-            />
-          </View>
+          {onApply ? (
+            <View style={styles.footer}>
+              <Button
+                label={applyLabel ?? "Done"}
+                onPress={onApply}
+                fullWidth
+                disabled={applyDisabled}
+                testID={testID ? `${testID}-apply` : undefined}
+              />
+            </View>
+          ) : null}
         </View>
       </View>
     </Modal>

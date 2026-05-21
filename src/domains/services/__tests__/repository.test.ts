@@ -6,8 +6,9 @@ function makeFirestoreMock() {
 
   const serverTimestamp = () => ({ _type: "serverTimestamp" });
 
-  function doc(_db: unknown, collectionPath: string, id: string) {
-    const key = `${collectionPath}/${id}`;
+  function doc(_db: unknown, ...segments: string[]) {
+    const key = segments.join("/");
+    const id = segments[segments.length - 1];
     return { key, id, path: key };
   }
 
@@ -33,21 +34,56 @@ function makeFirestoreMock() {
     store[ref.key] = { ...store[ref.key], ...resolved };
   }
 
-  function collection(_db: unknown, col: string) {
-    return { _col: col };
+  function collection(_db: unknown, ...segments: string[]) {
+    return { _col: segments.join("/") };
+  }
+
+  function collectionGroup(_db: unknown, name: string) {
+    return { _cg: name };
   }
 
   function where(field: string, op: string, value: unknown) {
     return { field, op, value };
   }
 
-  function query(colRef: { _col: string }, ...filters: Array<{ field: string; op: string; value: unknown }>) {
-    return { col: colRef._col, filters };
+  function orderBy(field: string, direction?: string) {
+    return { _orderBy: field, direction: direction ?? "asc" };
   }
 
-  async function getDocs(q: { col: string; filters: Array<{ field: string; op: string; value: unknown }> }) {
+  function query(
+    ref: { _col?: string; _cg?: string },
+    ...constraints: Array<unknown>
+  ) {
+    const filters = constraints.filter(
+      (c): c is { field: string; op: string; value: unknown } =>
+        !!c && typeof c === "object" && "field" in (c as Record<string, unknown>),
+    );
+    return { col: ref._col, cg: ref._cg, filters };
+  }
+
+  async function getDocs(qIn: {
+    col?: string;
+    cg?: string;
+    _col?: string;
+    _cg?: string;
+    filters?: Array<{ field: string; op: string; value: unknown }>;
+  }) {
+    // Accept either a query() result or a raw collection/collectionGroup ref
+    const q = {
+      col: qIn.col ?? qIn._col,
+      cg: qIn.cg ?? qIn._cg,
+      filters: qIn.filters ?? [],
+    };
     const docs = Object.entries(store)
-      .filter(([key]) => key.startsWith(`${q.col}/`))
+      .filter(([key]) => {
+        if (q.col) return key.startsWith(`${q.col}/`) && key.slice(q.col.length + 1).indexOf("/") === -1;
+        if (q.cg) {
+          // Match any doc whose penultimate path segment equals the collection group name
+          const parts = key.split("/");
+          return parts.length >= 2 && parts[parts.length - 2] === q.cg;
+        }
+        return false;
+      })
       .filter(([, data]) =>
         q.filters.every(({ field, op, value }) => {
           if (op === "==") {
@@ -62,39 +98,74 @@ function makeFirestoreMock() {
           return true;
         })
       )
-      .map(([key, data]) => ({ id: key.split("/")[1], data: () => data }));
+      .map(([key, data]) => {
+        const parts = key.split("/");
+        return { id: parts[parts.length - 1], data: () => data };
+      });
 
     return { empty: docs.length === 0, docs };
   }
 
   const db = {} as unknown;
-  return { db, doc, getDoc, setDoc, updateDoc, collection, where, query, getDocs, serverTimestamp };
+  return {
+    db,
+    doc,
+    getDoc,
+    setDoc,
+    updateDoc,
+    collection,
+    collectionGroup,
+    where,
+    orderBy,
+    query,
+    getDocs,
+    serverTimestamp,
+  };
 }
 
 let mockFirestore: ReturnType<typeof makeFirestoreMock>;
 
 jest.mock("firebase/firestore", () => ({
-  doc: (...args: unknown[]) => mockFirestore.doc(...args as [unknown, string, string]),
+  doc: (...args: unknown[]) => mockFirestore.doc(...(args as [unknown, ...string[]])),
   getDoc: (...args: unknown[]) => mockFirestore.getDoc(...args as [{ key: string; id: string }]),
   setDoc: (...args: unknown[]) => mockFirestore.setDoc(...args as [{ key: string }, Record<string, unknown>]),
   updateDoc: (...args: unknown[]) => mockFirestore.updateDoc(...args as [{ key: string }, Record<string, unknown>]),
-  collection: (...args: unknown[]) => mockFirestore.collection(...args as [unknown, string]),
+  collection: (...args: unknown[]) => mockFirestore.collection(...(args as [unknown, ...string[]])),
+  collectionGroup: (...args: unknown[]) =>
+    mockFirestore.collectionGroup(...(args as [unknown, string])),
   where: (...args: unknown[]) => mockFirestore.where(...args as [string, string, unknown]),
-  query: (...args: unknown[]) => mockFirestore.query(...args as [{ _col: string }, ...Array<{ field: string; op: string; value: unknown }>]),
-  getDocs: (...args: unknown[]) => mockFirestore.getDocs(...args as [{ col: string; filters: Array<{ field: string; op: string; value: unknown }> }]),
+  orderBy: (...args: unknown[]) => mockFirestore.orderBy(...(args as [string, string?])),
+  query: (...args: unknown[]) =>
+    mockFirestore.query(
+      ...(args as [{ _col?: string; _cg?: string }, ...Array<unknown>]),
+    ),
+  getDocs: (...args: unknown[]) =>
+    mockFirestore.getDocs(
+      ...(args as [
+        {
+          col?: string;
+          cg?: string;
+          filters: Array<{ field: string; op: string; value: unknown }>;
+        },
+      ]),
+    ),
   serverTimestamp: () => mockFirestore.serverTimestamp(),
 }));
 
 function makeInput(overrides: Partial<CreateServiceInput> = {}): CreateServiceInput {
   return {
     tenantId: "tenantA",
-    locationIds: ["locA", "locB"],
+    locationId: "locA",
     name: "Gel Manicure",
-    category: "manicure",
-    durationMinutes: 60,
-    bufferMinutes: 10,
-    price: 45,
-    currency: "EUR",
+    description: null,
+    categoryId: "manicure",
+    tags: [],
+    baseDurationMinutes: 60,
+    baseBufferMinutes: 10,
+    basePrice: 45,
+    baseCurrency: "EUR",
+    technicianIds: [],
+    photoUrl: null,
     active: true,
     sortOrder: 10,
     ...overrides,
@@ -123,26 +194,26 @@ describe("ServiceRepository", () => {
     });
 
     it("rejects price outside allowed boundary", async () => {
-      await expect(repo.createService("svc1", makeInput({ price: -1 }))).rejects.toThrow(
-        "price must be between"
+      await expect(repo.createService("svc1", makeInput({ basePrice: -1 }))).rejects.toThrow(
+        "basePrice must be between"
       );
     });
 
     it("rejects duration outside allowed boundary", async () => {
       await expect(
-        repo.createService("svc1", makeInput({ durationMinutes: 3 }))
-      ).rejects.toThrow("durationMinutes must be between");
+        repo.createService("svc1", makeInput({ baseDurationMinutes: 3 }))
+      ).rejects.toThrow("baseDurationMinutes must be between");
     });
   });
 
   describe("updateService", () => {
     it("updates allowed fields", async () => {
       await repo.createService("svc1", makeInput());
-      await repo.updateService("svc1", "tenantA", { price: 49, durationMinutes: 75 });
+      await repo.updateService("svc1", "tenantA", { basePrice: 49, baseDurationMinutes: 75 });
 
       const tenantServices = await repo.listServicesByTenant("tenantA");
-      expect(tenantServices[0].price).toBe(49);
-      expect(tenantServices[0].durationMinutes).toBe(75);
+      expect(tenantServices[0].basePrice).toBe(49);
+      expect(tenantServices[0].baseDurationMinutes).toBe(75);
     });
 
     it("throws on empty payload", async () => {
@@ -154,7 +225,7 @@ describe("ServiceRepository", () => {
 
     it("blocks cross-tenant update", async () => {
       await repo.createService("svc1", makeInput({ tenantId: "tenantA" }));
-      await expect(repo.updateService("svc1", "tenantB", { price: 40 })).rejects.toThrow(
+      await expect(repo.updateService("svc1", "tenantB", { basePrice: 40 })).rejects.toThrow(
         "Cross-tenant service update is not allowed"
       );
     });
@@ -175,16 +246,16 @@ describe("ServiceRepository", () => {
 
   describe("listServicesByLocation", () => {
     it("returns only services matching tenant and location", async () => {
-      await repo.createService("svc1", makeInput({ tenantId: "tenantA", locationIds: ["locA"] }));
-      await repo.createService("svc2", makeInput({ tenantId: "tenantA", locationIds: ["locB"] }));
-      await repo.createService("svc3", makeInput({ tenantId: "tenantA", locationIds: ["locA", "locC"] }));
-      await repo.createService("svc4", makeInput({ tenantId: "tenantB", locationIds: ["locA"] }));
+      await repo.createService("svc1", makeInput({ tenantId: "tenantA", locationId: "locA" }));
+      await repo.createService("svc2", makeInput({ tenantId: "tenantA", locationId: "locB" }));
+      await repo.createService("svc3", makeInput({ tenantId: "tenantA", locationId: "locA" }));
+      await repo.createService("svc4", makeInput({ tenantId: "tenantB", locationId: "locA" }));
 
       const services = await repo.listServicesByLocation("tenantA", "locA");
 
       expect(services).toHaveLength(2);
       expect(services.every((service) => service.tenantId === "tenantA")).toBe(true);
-      expect(services.every((service) => service.locationIds.includes("locA"))).toBe(true);
+      expect(services.every((service) => service.locationId === "locA")).toBe(true);
     });
   });
 

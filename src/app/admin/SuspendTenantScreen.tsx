@@ -12,7 +12,8 @@ import {
 export type SuspendTenantScreenProps = {
   tenantId: string;
   tenantName: string;
-  submitting: boolean;
+  loading?: boolean;
+  submitting?: boolean; // legacy alias
   error: string | null;
   onConfirmSuspend: (reason: string) => void;
   onCancel: () => void;
@@ -22,6 +23,7 @@ export type SuspendTenantScreenProps = {
 export function SuspendTenantScreen({
   tenantId,
   tenantName,
+  loading,
   submitting,
   error,
   onConfirmSuspend,
@@ -30,6 +32,7 @@ export function SuspendTenantScreen({
 }: SuspendTenantScreenProps) {
   const [reason, setReason] = useState("");
   const isValid = reason.trim().length >= 10;
+  const busy = loading ?? submitting ?? false;
 
   return (
     <ScrollView style={styles.root} testID={testID}>
@@ -43,8 +46,7 @@ export function SuspendTenantScreen({
       <View style={styles.warningBanner}>
         <Text style={styles.warningIcon}>⚠️</Text>
         <Text style={styles.warningText}>
-          Suspending <Text style={styles.bold}>{tenantName}</Text> will immediately block all users at this
-          tenant from accessing the platform.
+          Suspending this tenant will immediately block all users from accessing the platform.
         </Text>
       </View>
 
@@ -63,7 +65,7 @@ export function SuspendTenantScreen({
           multiline
           numberOfLines={5}
           placeholder="Enter a reason (min. 10 characters)…"
-          testID="reason-input"
+          testID={`${testID}-reason`}
         />
         {reason.trim().length > 0 && reason.trim().length < 10 && (
           <Text style={styles.validationError}>Reason must be at least 10 characters.</Text>
@@ -78,16 +80,16 @@ export function SuspendTenantScreen({
 
       <View style={styles.actions}>
         <TouchableOpacity
-          style={[styles.confirmBtn, (!isValid || submitting) && styles.btnDisabled]}
+          style={[styles.confirmBtn, (!isValid || busy) && styles.btnDisabled]}
           onPress={() => isValid && onConfirmSuspend(reason.trim())}
-          disabled={!isValid || submitting}
-          testID="confirm-suspend-btn"
+          disabled={!isValid || busy}
+          testID={`${testID}-confirm`}
         >
           <Text style={styles.confirmBtnText}>
-            {submitting ? "Suspending…" : "Confirm Suspension"}
+            {busy ? "Suspending…" : "Confirm Suspension"}
           </Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.cancelBtnLarge} onPress={onCancel} testID="cancel-large-btn">
+        <TouchableOpacity style={styles.cancelBtnLarge} onPress={onCancel} testID={`${testID}-cancel`}>
           <Text style={styles.cancelBtnText}>Cancel</Text>
         </TouchableOpacity>
       </View>

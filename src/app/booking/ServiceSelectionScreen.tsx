@@ -45,6 +45,10 @@ export type ServiceSelectionScreenProps = {
   onPressContinue: () => void;
   onPressBack?: () => void;
   onPressRetry?: () => void;
+  /** BookingProgressIndicator slot — replaces the plain "1/5" step badge when provided. W50-DEBT-6 */
+  progressIndicator?: React.ReactNode;
+  /** Override for step 1’s header title when staff is pre-selected. W50-DEBT-8 */
+  stepHeaderTitle?: string;
   testID?: string;
 };
 
@@ -61,6 +65,8 @@ export function ServiceSelectionScreen({
   onPressContinue,
   onPressBack,
   onPressRetry,
+  progressIndicator,
+  stepHeaderTitle,
   testID,
 }: ServiceSelectionScreenProps) {
   const allServices = groups.flatMap((g) => g.services);
@@ -90,9 +96,10 @@ export function ServiceSelectionScreen({
             <Text style={styles.backText}>{"\u2190"}</Text>
           </Pressable>
         ) : null}
-        <Text style={styles.title}>Choose services</Text>
-        <Text style={styles.step}>1/5</Text>
+        <Text style={styles.title}>{stepHeaderTitle ?? "Choose services"}</Text>
+        {progressIndicator ? null : <Text style={styles.step}>1/5</Text>}
       </View>
+      {progressIndicator}
       <ScrollView contentContainerStyle={styles.body}>
         {maxReachedMessage ? (
           <View style={[styles.banner, styles.warnBanner]} testID={testID ? `${testID}-max-banner` : undefined}>

@@ -31,6 +31,8 @@ import {
   createServiceVisibilityRepository,
   createServicePriceOverrideRepository,
   createServiceMediaRepository,
+  createServiceSetupRepository,
+  normaliseVariants,
 } from "../src/app/admin/serviceCatalogAdapters";
 import { appRoutes } from "../src/app/navigation/routes";
 
@@ -707,6 +709,69 @@ describe("serviceCatalogAdapters (W42-DEBT-1)", () => {
   it("createServiceMediaRepository returns object with required methods", () => {
     const repo = createServiceMediaRepository(fakeDb);
     expect(typeof repo.listMedia).toBe("function");
+  });
+
+  it("createServiceSetupRepository returns object with all Phase 7 methods", () => {
+    const repo = createServiceSetupRepository(fakeDb);
+    expect(typeof repo.listPlatformCategories).toBe("function");
+    expect(typeof repo.getNameSuggestions).toBe("function");
+    expect(typeof repo.createServiceDraft).toBe("function");
+    expect(typeof repo.saveVariants).toBe("function");
+    expect(typeof repo.saveAddons).toBe("function");
+    expect(typeof repo.saveVariantLabel).toBe("function");
+    expect(typeof repo.addPhoto).toBe("function");
+    expect(typeof repo.deletePhoto).toBe("function");
+    expect(typeof repo.publishService).toBe("function");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// normaliseVariants — Phase 7 variant validation (pure unit tests)
+// ---------------------------------------------------------------------------
+
+describe("normaliseVariants (Phase 7)", () => {
+  it("auto-creates Standard variant when empty array provided", () => {
+    const result = normaliseVariants([]);
+    expect(result).toHaveLength(1);
+    expect(result[0]!.name).toBe("Standard");
+    expect(result[0]!.isDefault).toBe(true);
+  });
+
+  it("marks first variant as default when none is marked", () => {
+    const result = normaliseVariants([
+      { name: "Short", durationMinutes: 30, price: 2000, currency: "GBP", isDefault: false },
+      { name: "Long", durationMinutes: 60, price: 3500, currency: "GBP", isDefault: false },
+    ]);
+    expect(result[0]!.isDefault).toBe(true);
+    expect(result[1]!.isDefault).toBe(false);
+  });
+
+  it("keeps exactly one default when multiple are marked", () => {
+    const result = normaliseVariants([
+      { name: "A", durationMinutes: 30, price: 1000, currency: "GBP", isDefault: true },
+      { name: "B", durationMinutes: 45, price: 1500, currency: "GBP", isDefault: true },
+    ]);
+    const defaults = result.filter((v) => v.isDefault);
+    expect(defaults).toHaveLength(1);
+    expect(defaults[0]!.name).toBe("A");
+  });
+
+  it("passes through a valid single-variant list unchanged", () => {
+    const input = [{ name: "Standard", durationMinutes: 45, price: 4500, currency: "GBP", isDefault: true }];
+    const result = normaliseVariants(input);
+    expect(result).toHaveLength(1);
+    expect(result[0]!.isDefault).toBe(true);
+  });
+
+  it("preserves all variants in a valid multi-variant list", () => {
+    const input = [
+      { name: "Short", durationMinutes: 30, price: 2000, currency: "GBP", isDefault: true },
+      { name: "Long", durationMinutes: 60, price: 3500, currency: "GBP", isDefault: false },
+      { name: "XL", durationMinutes: 90, price: 5000, currency: "GBP", isDefault: false },
+    ];
+    const result = normaliseVariants(input);
+    expect(result).toHaveLength(3);
+    expect(result.filter((v) => v.isDefault)).toHaveLength(1);
   });
 });
 

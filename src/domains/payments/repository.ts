@@ -34,6 +34,11 @@ import {
   type DetachPaymentMethodInput,
   type LoyaltyDiscountApplied,
   type SavedPaymentMethod,
+  type PaymentSettings,
+  type CaptureBookingPaymentInput,
+  type CancelBookingPaymentInput,
+  type CreateBookingPaymentIntentInput,
+  type CreateBookingPaymentIntentResult,
 } from "./model";
 
 // ---------------------------------------------------------------------------
@@ -55,6 +60,11 @@ export type PaymentsRepository = {
   chargeBooking(input: ChargeBookingInput): Promise<Charge>;
   getCharge(tenantId: string, chargeId: string): Promise<Charge | null>;
   applyLoyaltyDiscount(input: ApplyLoyaltyDiscountInput): Promise<LoyaltyDiscountApplied>;
+  // Connect payment flow
+  getPaymentSettings(tenantId: string): Promise<PaymentSettings | null>;
+  createBookingPaymentIntent(input: CreateBookingPaymentIntentInput): Promise<CreateBookingPaymentIntentResult>;
+  captureBookingPayment(input: CaptureBookingPaymentInput): Promise<{ status: string }>;
+  cancelBookingPayment(input: CancelBookingPaymentInput): Promise<{ status: string }>;
 };
 
 // ---------------------------------------------------------------------------
@@ -160,5 +170,66 @@ export function createPaymentsRepository(db: Firestore, functions: Functions): P
     chargeBooking,
     getCharge,
     applyLoyaltyDiscount,
+
+    async getPaymentSettings(tenantId) {
+      try {
+        const fn = httpsCallable<{ tenantId: string }, PaymentSettings>(
+          functions,
+          "getPaymentSettings",
+        );
+        const result = await fn({ tenantId });
+        return result.data;
+      } catch {
+        return null;
+      }
+    },
+
+    async createBookingPaymentIntent(input) {
+      try {
+        const fn = httpsCallable<CreateBookingPaymentIntentInput, CreateBookingPaymentIntentResult>(
+          functions,
+          "createBookingPaymentIntent",
+        );
+        const result = await fn(input);
+        return result.data;
+      } catch (err) {
+        throw new PaymentsError(
+          "STRIPE_ERROR",
+          err instanceof Error ? err.message : "createBookingPaymentIntent failed",
+        );
+      }
+    },
+
+    async captureBookingPayment(input) {
+      try {
+        const fn = httpsCallable<CaptureBookingPaymentInput, { status: string }>(
+          functions,
+          "captureBookingPayment",
+        );
+        const result = await fn(input);
+        return result.data;
+      } catch (err) {
+        throw new PaymentsError(
+          "CHARGE_FAILED",
+          err instanceof Error ? err.message : "captureBookingPayment failed",
+        );
+      }
+    },
+
+    async cancelBookingPayment(input) {
+      try {
+        const fn = httpsCallable<CancelBookingPaymentInput, { status: string }>(
+          functions,
+          "cancelBookingPayment",
+        );
+        const result = await fn(input);
+        return result.data;
+      } catch (err) {
+        throw new PaymentsError(
+          "STRIPE_ERROR",
+          err instanceof Error ? err.message : "cancelBookingPayment failed",
+        );
+      }
+    },
   };
 }

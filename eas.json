@@ -11,11 +11,46 @@
       }
     },
     "preview": {
-      "distribution": "internal"
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_APP_VARIANT": "development",
+        "EXPO_PUBLIC_FIREBASE_API_KEY": "AIzaSyDAPkDVSRrIcbqtbgdD4mpV1LEPW5s-zjs",
+        "EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN": "zarkili-dev-a1b1c.firebaseapp.com",
+        "EXPO_PUBLIC_FIREBASE_PROJECT_ID": "zarkili-dev-a1b1c",
+        "EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET": "zarkili-dev-a1b1c.firebasestorage.app",
+        "EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID": "45441297139",
+        "EXPO_PUBLIC_FIREBASE_APP_ID": "1:45441297139:web:3d0ca06f137700f2516586",
+        "EXPO_PUBLIC_GOOGLE_MAPS_API_KEY": "AIzaSyCzxDBTTd4LNQIsHThHQqb7EF0mbjoRCpM"
+      },
+      "android": {
+        "buildType": "apk"
+      },
+      "ios": {
+        "simulator": false
+      }
     },
     "production": {
       "env": {
-        "EXPO_PUBLIC_APP_VARIANT": "production"
+        "EXPO_PUBLIC_APP_VARIANT": "production",
+        "EXPO_PUBLIC_FIREBASE_API_KEY": "AIzaSyCyqYgqtjpSDefr4kzWpkzvIS7TYIFRjNk",
+        "EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN": "zarkili-production.firebaseapp.com",
+        "EXPO_PUBLIC_FIREBASE_PROJECT_ID": "zarkili-production",
+        "EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET": "zarkili-production.firebasestorage.app",
+        "EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID": "391811853447",
+        "EXPO_PUBLIC_FIREBASE_APP_ID": "1:391811853447:web:d053058a3a87ec3238dc22",
+        "EXPO_PUBLIC_GOOGLE_MAPS_API_KEY": "AIzaSyCzxDBTTd4LNQIsHThHQqb7EF0mbjoRCpM"
+      },
+      "ios": {
+        "credentialsSource": "remote"
+      }
+    }
+  },
+  "submit": {
+    "production": {
+      "ios": {
+        "appleId": "developers@mogy.me",
+        "ascAppId": "6768529680",
+        "appleTeamId": "94QG3KVW4V"
       }
     }
   }

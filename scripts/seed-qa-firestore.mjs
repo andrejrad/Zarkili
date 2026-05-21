@@ -40,6 +40,11 @@ const admin = require(
   path.join(__dirname, "../functions/node_modules/firebase-admin")
 );
 
+// Load geofire-common for geohash computation
+const { geohashForLocation } = require(
+  path.join(__dirname, "../functions/node_modules/geofire-common")
+);
+
 // ─── Config ─────────────────────────────────────────────────────────────────
 
 const PROJECT_ID =
@@ -462,6 +467,16 @@ const SERVICE_TEMPLATES = {
   ],
 };
 
+// Map old template category labels to platform service_category IDs
+function toCategoryId(category) {
+  const c = category.toLowerCase();
+  if (c.includes("nail") || c.includes("manicure") || c.includes("pedicure") || c.includes("acrylic") || c.includes("gel")) return "nails";
+  if (c.includes("lash") || c.includes("brow") || c.includes("thread") || c.includes("lamination") || c.includes("tint")) return "lash_brow";
+  if (c.includes("massage") || c.includes("body") || c.includes("wrap") || c.includes("exfoliation") || c.includes("shiatsu")) return "massage";
+  if (c.includes("facial") || c.includes("skin") || c.includes("peel") || c.includes("microderm") || c.includes("dermaplaning") || c.includes("treatment") || c.includes("led") || c.includes("anti-aging")) return "skin";
+  return "hair";
+}
+
 // Map tenant specialty arrays to service templates
 function tenantServiceTemplates(t) {
   const s = t.specialty.join(" ").toLowerCase();
@@ -479,18 +494,19 @@ function tenantStaff(tenantId, ownerUid, locationIds) {
   const allLocs = locationIds;
   const firstLoc = [locationIds[0]];
   const basePeople = [
-    { suffix: "s1", displayName: "Jordan Blake",  role: "owner",      skills: ["styling", "coloring"],  locationIds: allLocs },
-    { suffix: "s2", displayName: "Morgan Lee",    role: "technician", skills: ["styling"],               locationIds: firstLoc },
-    { suffix: "s3", displayName: "Casey Kim",     role: "technician", skills: ["coloring", "treatment"], locationIds: allLocs },
-    { suffix: "s4", displayName: "Riley Monroe",  role: "assistant",  skills: ["styling"],               locationIds: firstLoc },
+    { suffix: "s1", displayName: "Jordan Blake",  role: "owner",      skills: ["styling", "coloring"],  specialtyTags: ["Color specialist", "Balayage"],       locationIds: allLocs },
+    { suffix: "s2", displayName: "Morgan Lee",    role: "technician", skills: ["styling"],               specialtyTags: ["Precision cut", "Blowout"],           locationIds: firstLoc },
+    { suffix: "s3", displayName: "Casey Kim",     role: "technician", skills: ["coloring", "treatment"], specialtyTags: ["Highlights", "Keratin"],              locationIds: allLocs },
+    { suffix: "s4", displayName: "Riley Monroe",  role: "assistant",  skills: ["styling"],               specialtyTags: ["Blowout"],                            locationIds: firstLoc },
   ];
   if (allLocs.length > 1) basePeople.push(
-    { suffix: "s5", displayName: "Alex Rivera",   role: "manager",    skills: ["styling", "management"], locationIds: allLocs },
-    { suffix: "s6", displayName: "Sam Park",      role: "technician", skills: ["coloring"],              locationIds: [locationIds[1]] },
+    { suffix: "s5", displayName: "Alex Rivera",   role: "manager",    skills: ["styling", "management"], specialtyTags: ["Color", "Extensions"],               locationIds: allLocs },
+    { suffix: "s6", displayName: "Sam Park",      role: "technician", skills: ["coloring"],              specialtyTags: ["Balayage", "Gloss"],                  locationIds: [locationIds[1]] },
   );
   return basePeople.map((p, i) => ({
     staffId: `${tenantId}-${p.suffix}`,
     userId: i === 0 ? ownerUid : `${tenantId}-user-${p.suffix}`,
+    photoUrl: null,
     ...p,
   }));
 }
@@ -575,8 +591,22 @@ async function seed() {
     updatedAt: ts(-1),
   });
 
-  // ── 3. Consumer user profiles & Stripe customers ───────────────────────────
-  log("\n═══ Step 3: Consumer profiles & payment methods");
+  // ── 3. Service categories (platform taxonomy) ─────────────────────────────
+  log("\n═══ Step 3: Service categories");
+
+  const SERVICE_CATEGORIES = [
+    { id: "nails",     name: "Nails",       displayOrder: 1, iconName: "ti-sparkles" },
+    { id: "hair",      name: "Hair",        displayOrder: 2, iconName: "ti-scissors" },
+    { id: "skin",      name: "Skin",        displayOrder: 3, iconName: "ti-plant" },
+    { id: "lash_brow", name: "Lash & Brow", displayOrder: 4, iconName: "ti-eye" },
+    { id: "massage",   name: "Massage",     displayOrder: 5, iconName: "ti-heart" },
+  ];
+  for (const cat of SERVICE_CATEGORIES) {
+    write(db.doc(`service_categories/${cat.id}`), cat);
+  }
+
+  // ── 4. Consumer user profiles & Stripe customers ───────────────────────────
+  log("\n═══ Step 4: Consumer profiles & payment methods");
 
   for (const c of CONSUMERS) {
     const [firstName, ...restParts] = c.name.split(" ");
@@ -652,8 +682,8 @@ async function seed() {
 
   await flushBatches();
 
-  // ── 4. Tenants, locations, services, staff ─────────────────────────────────
-  log("\n═══ Step 4: Tenants, locations, services, staff");
+  // ── 5. Tenants, locations, services, staff ─────────────────────────────────
+  log("\n═══ Step 5: Tenants, locations, services, staff");
 
   for (const t of TENANTS) {
     const ownerUid = `qa-owner-${t.ownerSuffix}`;
@@ -727,17 +757,36 @@ async function seed() {
       updatedAt: ts(-1),
     });
 
-    // Locations
+    // Pre-compute staff so service technicianIds can reference them
+    const staffList = tenantStaff(t.id, ownerUid, locationIds);
+
+    // Locations + Services (one service doc per service × location)
+    const templates = tenantServiceTemplates(t);
+    const serviceIds = [];
     for (const loc of t.locations) {
-      write(db.doc(`tenants/${t.id}/locations/${loc.id}`), {
+      // ── Location (flat path, v3 fields) ──
+      const displayName = t.locations.length > 1
+        ? `${t.name} · ${loc.name}`
+        : t.name;
+      const geohash = geohashForLocation([loc.lat, loc.lng], 9);
+      const locTechnicianIds = staffList
+        .filter(s => s.locationIds.includes(loc.id))
+        .map(s => s.staffId);
+
+      write(db.doc(`locations/${loc.id}`), {
         locationId: loc.id,
         tenantId: t.id,
         name: loc.name,
+        displayName,
         code: loc.id.slice(-4).toUpperCase(),
         status: "active",
         timezone: regionTimezone(t.region),
         phone: loc.phone,
         email: `${t.slug}@example.com`,
+        geohash,
+        averageRating: null,
+        reviewCount: 0,
+        ratingSum: 0,
         address: {
           line1: loc.address,
           city: loc.city,
@@ -751,50 +800,117 @@ async function seed() {
         createdAt,
         updatedAt: ts(-1),
       });
+
+      // ── Services for this location ──
+      for (const svc of templates) {
+        const svcId = `svc-${t.id}-${loc.id}-${svc.sortOrder}`;
+        serviceIds.push(svcId);
+        const catId = toCategoryId(svc.category);
+
+        write(db.doc(`services/${svcId}`), {
+          serviceId: svcId,
+          tenantId: t.id,
+          locationId: loc.id,
+          name: svc.name,
+          categoryId: catId,
+          description: "",
+          tags: [],
+          technicianIds: locTechnicianIds,
+          photoUrl: null,
+          baseDurationMinutes: svc.durationMinutes,
+          baseBufferMinutes: svc.bufferMinutes,
+          basePrice: svc.price,
+          baseCurrency: "USD",
+          active: true,
+          sortOrder: svc.sortOrder,
+          popularityScore: 0.5,
+          averageRating: null,
+          reviewCount: 0,
+          ratingSum: 0,
+          nextAvailableAt: isoStr(1),
+          isFullyBooked: false,
+          createdAt,
+          updatedAt: ts(-1),
+        });
+
+        // Default variant
+        const variantId = `var-${svcId}-standard`;
+        write(db.doc(`services/${svcId}/variants/${variantId}`), {
+          variantId,
+          serviceId: svcId,
+          tenantId: t.id,
+          locationId: loc.id,
+          name: "Standard",
+          price: svc.price,
+          durationMinutes: svc.durationMinutes,
+          bufferMinutes: svc.bufferMinutes,
+          isDefault: true,
+          displayOrder: 1,
+          active: true,
+          createdAt,
+          updatedAt: ts(-1),
+        });
+
+        // Addon (every 3rd service by sortOrder)
+        if (svc.sortOrder % 3 === 0) {
+          const addonId = `addon-${svcId}-extra`;
+          write(db.doc(`services/${svcId}/addons/${addonId}`), {
+            addonId,
+            serviceId: svcId,
+            tenantId: t.id,
+            locationId: loc.id,
+            name: "Conditioning Treatment",
+            price: 25,
+            currency: "USD",
+            durationMinutes: 15,
+            active: true,
+            createdAt,
+            updatedAt: ts(-1),
+          });
+        }
+
+        // Photo placeholder
+        const photoId = `photo-${svcId}-1`;
+        write(db.doc(`services/${svcId}/photos/${photoId}`), {
+          photoId,
+          serviceId: svcId,
+          url: null,
+          altText: svc.name,
+          sortOrder: 1,
+          createdAt,
+        });
+      }
     }
 
-    // Services
-    const templates = tenantServiceTemplates(t);
-    const serviceIds = [];
-    for (const svc of templates) {
-      const svcId = `svc-${t.id}-${svc.sortOrder}`;
-      serviceIds.push(svcId);
-      write(db.doc(`tenants/${t.id}/services/${svcId}`), {
-        serviceId: svcId,
-        tenantId: t.id,
-        locationIds,
-        name: svc.name,
-        category: svc.category,
-        durationMinutes: svc.durationMinutes,
-        bufferMinutes: svc.bufferMinutes,
-        price: svc.price,
-        currency: "USD",
-        active: true,
-        sortOrder: svc.sortOrder,
-        createdAt,
-        updatedAt: ts(-1),
-      });
-    }
-
-    // Staff
-    const staffList = tenantStaff(t.id, ownerUid, locationIds);
+    // Staff (flat path, v3 fields)
     for (const s of staffList) {
-      // Only assign first 2 services to each technician, all services to owner/manager
+      // Collect all service IDs across this staff member's locations
+      const allSvcIds = [];
+      for (const svc of templates) {
+        for (const locId of s.locationIds) {
+          allSvcIds.push(`svc-${t.id}-${locId}-${svc.sortOrder}`);
+        }
+      }
       const svcIds = (s.role === "owner" || s.role === "manager")
-        ? serviceIds
-        : serviceIds.slice(0, Math.min(5, serviceIds.length));
+        ? allSvcIds
+        : allSvcIds.slice(0, Math.min(5, allSvcIds.length));
 
-      write(db.doc(`tenants/${t.id}/staff/${s.staffId}`), {
+      write(db.doc(`staff/${s.staffId}`), {
         staffId: s.staffId,
         tenantId: t.id,
         locationIds: s.locationIds,
         userId: s.userId,
         displayName: s.displayName,
+        photoUrl: s.photoUrl,
         role: s.role,
         status: "active",
         skills: s.skills,
+        specialtyTags: s.specialtyTags,
         serviceIds: svcIds,
         constraints: [],
+        averageRating: null,
+        reviewCount: 0,
+        ratingSum: 0,
         createdAt,
         updatedAt: ts(-1),
       });
@@ -927,14 +1043,24 @@ async function seed() {
   }
 
   // ── 5. Loyalty — config, states, transactions ─────────────────────────────-
-  log("\n═══ Step 5: Loyalty configs, states, transactions");
+  log("\n═══ Step 6: Loyalty configs, states, transactions");
 
   for (const t of TENANTS) {
     const createdAt = ts(-120);
     const redemptions = [
-      { optionId: "opt-1", name: "Free Blowout", pointsCost: 500, valueDescription: "Complimentary blowout service", type: "free_service" },
-      { optionId: "opt-2", name: "$15 Off",       pointsCost: 300, valueDescription: "$15 discount on any service",  type: "discount" },
-      { optionId: "opt-3", name: "$30 Off",       pointsCost: 600, valueDescription: "$30 discount on any service",  type: "discount" },
+      // Free services
+      { optionId: "opt-1",  name: "Free Blowout",            pointsCost: 500, valueDescription: "Complimentary blowout service",             type: "free_service", imageAlt: "Blowout styling" },
+      { optionId: "opt-5",  name: "Free Gel Manicure",       pointsCost: 400, valueDescription: "Complimentary gel manicure",                type: "free_service", imageAlt: "Gel manicure" },
+      { optionId: "opt-6",  name: "Brow Wax On Us",          pointsCost: 250, valueDescription: "Complimentary eyebrow wax & tint",          type: "free_service", imageAlt: "Eyebrow wax" },
+      { optionId: "opt-7",  name: "Deep Condition Treatment", pointsCost: 300, valueDescription: "Professional deep-conditioning hair mask", type: "free_service", imageAlt: "Hair treatment" },
+      { optionId: "opt-8",  name: "Head Massage Add-on",     pointsCost: 150, valueDescription: "15-min scalp massage added to any service", type: "free_service", imageAlt: "Scalp massage" },
+      // Discounts
+      { optionId: "opt-10", name: "$5 Off Next Visit",       pointsCost:  80, valueDescription: "$5 discount on your next visit",           type: "discount",     imageAlt: "$5 reward" },
+      { optionId: "opt-2",  name: "$15 Off",                 pointsCost: 300, valueDescription: "$15 discount on any service",               type: "discount",     imageAlt: "$15 reward" },
+      { optionId: "opt-3",  name: "$30 Off",                 pointsCost: 550, valueDescription: "$30 discount on any service",               type: "discount",     imageAlt: "$30 reward" },
+      // Partner products
+      { optionId: "opt-9",  name: "Partner Skincare Kit",    pointsCost: 800, valueDescription: "Curated travel skincare kit (partner gift)", type: "product",     imageAlt: "Skincare kit" },
+      { optionId: "opt-11", name: "Olaplex No. 3 Treatment", pointsCost: 350, valueDescription: "Take-home Olaplex No. 3 repair treatment",  type: "product",     imageAlt: "Olaplex treatment" },
     ];
     write(db.doc(`tenants/${t.id}/loyaltyConfig/default`), {
       tenantId: t.id,
@@ -964,14 +1090,21 @@ async function seed() {
       // 3 loyalty transactions per enrolled user per (first 5) tenants
       const firstFive = TENANTS.slice(0, 5).map(x => x.id);
       if (!firstFive.includes(t.id)) continue;
-      for (let i = 0; i < 3; i++) {
+      const TX_SEED = [
+        { type: "credit",  points: 150, reason: "booking_completed", eventData: { serviceName: "Haircut & style", locationName: t.locations?.[0]?.name ?? "Main branch" } },
+        { type: "credit",  points: 200, reason: "referral_bonus",    eventData: {} },
+        { type: "debit",   points: 100, reason: "reward_redemption", eventData: { rewardName: "Free Blowout" } },
+      ];
+      for (let i = 0; i < TX_SEED.length; i++) {
+        const tx = TX_SEED[i];
         write(db.doc(`tenants/${t.id}/loyaltyTransactions/ltx-${t.id}-${c.uid}-${i}`), {
           txId: `ltx-${t.id}-${c.uid}-${i}`,
           userId: c.uid,
           tenantId: t.id,
-          type: i < 2 ? "credit" : "debit",
-          points: i < 2 ? [150, 200][i] : 100,
-          reason: i < 2 ? (i === 0 ? "booking_completed" : "referral_bonus") : "reward_redemption",
+          type: tx.type,
+          points: tx.points,
+          reason: tx.reason,
+          eventData: tx.eventData,
           referenceId: `booking-${c.uid}-${i}`,
           idempotencyKey: `ltx-key-${t.id}-${c.uid}-${i}`,
           createdAt: ts(-30 + i * 10),
@@ -983,7 +1116,7 @@ async function seed() {
   await flushBatches();
 
   // ── 6. Activities & Campaigns ──────────────────────────────────────────────
-  log("\n═══ Step 6: Activities & campaigns");
+  log("\n═══ Step 7: Activities & campaigns");
 
   for (const t of TENANTS.slice(0, 8)) { // First 8 tenants have activities
     const createdAt = ts(-60);
@@ -1054,40 +1187,41 @@ async function seed() {
   await flushBatches();
 
   // ── 7. Bookings ────────────────────────────────────────────────────────────
-  log("\n═══ Step 7: Bookings (all statuses)");
+  log("\n═══ Step 8: Bookings (all statuses)");
 
   // We create bookings across first 8 tenants for all consumers
   // Covering all statuses: confirmed, completed, cancelled, no_show, rescheduled, reschedule_pending, pending
   const bookingScenarios = [
     // [tenantIdx, consumerIdx, serviceOffset, staffOffset, daysFromNow, status, chargeMinor]
-    [0, 0, 0, 1,  3, "confirmed",            9500],
-    [0, 0, 1, 2, -7, "completed",            6500],
-    [0, 1, 2, 0, -14,"completed",            14500],
-    [0, 1, 0, 1, -3, "cancelled",            0],
-    [0, 2, 1, 2,  7, "confirmed",            9500],
-    [1, 0, 0, 1, -2,  "no_show",             0],
-    [1, 3, 0, 0, -10, "completed",           4000],
-    [1, 4, 1, 1,  5,  "confirmed",           5000],
-    [1, 5, 0, 0,  1,  "pending",             0],
-    [2, 0, 0, 0, -5,  "completed",          12500],
-    [2, 6, 1, 1, -2,  "completed",          11500],
-    [2, 7, 0, 2,  2,  "reschedule_pending", 9500],
-    [3, 1, 0, 1, -21, "completed",          13500],
-    [3, 2, 1, 0, -8,  "completed",          11000],
-    [3, 4, 0, 1,  4,  "confirmed",          13500],
-    [4, 0, 2, 0, -4,  "completed",          17500],
-    [4, 1, 0, 1,  6,  "confirmed",           9500],
-    [4, 9, 1, 2, -12, "completed",          22500],
-    [5, 2, 0, 0, -9,  "completed",           4000],
-    [5, 3, 1, 1, -1,  "no_show",              0],
-    [6, 0, 0, 1, -15, "completed",           9000],
-    [6, 0, 5, 0, -30, "rescheduled",        11000],
-    [6, 1, 2, 2, -6,  "completed",           5500],
-    [6, 9, 0, 1,  3,  "confirmed",           9000],
-    [7, 4, 0, 0, -20, "completed",           3000],
-    [7, 5, 1, 1, -11, "completed",           2200],
-    [7, 6, 0, 2,  2,  "confirmed",           8500],
-    [7, 2, 1, 0, -3,  "cancelled",           0],
+    // Future offsets are 30-90 days so seed data stays valid for ≥3 months after seeding.
+    [0, 0, 0, 1,  60, "confirmed",            9500],  // Alice — upcoming appointment
+    [0, 0, 1, 2,  -7, "completed",            6500],
+    [0, 1, 2, 0, -14, "completed",            14500],
+    [0, 1, 0, 1,  -3, "cancelled",            0],
+    [0, 2, 1, 2,  45, "confirmed",            9500],
+    [1, 0, 0, 1,  -2, "no_show",              0],
+    [1, 3, 0, 0, -10, "completed",            4000],
+    [1, 4, 1, 1,  30, "confirmed",            5000],
+    [1, 5, 0, 0,  35, "pending",              0],
+    [2, 0, 0, 0,  -5, "completed",           12500],
+    [2, 6, 1, 1,  -2, "completed",           11500],
+    [2, 7, 0, 2,  28, "reschedule_pending",  9500],
+    [3, 1, 0, 1, -21, "completed",           13500],
+    [3, 2, 1, 0,  -8, "completed",           11000],
+    [3, 4, 0, 1,  40, "confirmed",           13500],
+    [4, 0, 2, 0,  -4, "completed",           17500],
+    [4, 1, 0, 1,  50, "confirmed",            9500],  // Bob — upcoming appointment
+    [4, 9, 1, 2, -12, "completed",           22500],
+    [5, 2, 0, 0,  -9, "completed",            4000],
+    [5, 3, 1, 1,  -1, "no_show",               0],
+    [6, 0, 0, 1, -15, "completed",            9000],
+    [6, 0, 5, 0, -30, "rescheduled",         11000],
+    [6, 1, 2, 2,  -6, "completed",            5500],
+    [6, 9, 0, 1,  55, "confirmed",            9000],
+    [7, 4, 0, 0, -20, "completed",            3000],
+    [7, 5, 1, 1, -11, "completed",            2200],
+    [7, 6, 0, 2,  33, "confirmed",            8500],
+    [7, 2, 1, 0,  -3, "cancelled",            0],
   ];
 
   for (let bi = 0; bi < bookingScenarios.length; bi++) {
@@ -1097,7 +1231,8 @@ async function seed() {
     const loc = t.locations[0];
     const services = tenantServiceTemplates(t);
     const svc = services[svcOff % services.length];
-    const svcId = `svc-${t.id}-${(svcOff % services.length) + 1}`;
+    const svcId = `svc-${t.id}-${loc.id}-${svc.sortOrder}`;
+    const variantId = `var-${svcId}-standard`;
     const staff = tenantStaff(t.id, `qa-owner-${t.ownerSuffix}`, t.locations.map(l => l.id));
     const staffMember = staff[staffOff % staff.length];
     const bookingId = `booking-${bi}-${t.id}-${c.uid}`;
@@ -1116,12 +1251,14 @@ async function seed() {
     if (status === "reschedule_pending")  lifecycleEvents.push({ status: "reschedule_pending",  actor: "client", reason: "Need to reschedule", occurredAt: ts(dayOff - 2) });
     if (status === "rescheduled")         lifecycleEvents.push({ status: "rescheduled",         actor: "client", reason: null,              occurredAt: ts(dayOff - 5) }, { status: "completed", actor: "system", reason: null, occurredAt: ts(dayOff) });
 
-    write(db.doc(`tenants/${t.id}/bookings/${bookingId}`), {
+    write(db.doc(`bookings/${bookingId}`), {
       bookingId,
       tenantId: t.id,
       locationId: loc.id,
       staffId: staffMember.staffId,
       serviceId: svcId,
+      variantId,
+      addonIds: [],
       customerUserId: c.uid,
       customerName: c.name,
       date: dDate,
@@ -1131,6 +1268,13 @@ async function seed() {
       endTime: minsToTime(endMin),
       durationMinutes: svc.durationMinutes,
       bufferMinutes: svc.bufferMinutes,
+      priceSnapshot: svc.price,
+      durationSnapshot: svc.durationMinutes,
+      variantNameSnapshot: "Standard",
+      addonsSnapshot: [],
+      serviceNameSnapshot: svc.name,
+      locationNameSnapshot: loc.name,
+      technicianNameSnapshot: staffMember.displayName,
       status,
       version: 1,
       notes: bi % 4 === 0 ? "Client prefers light pressure for massage." : null,
@@ -1184,9 +1328,12 @@ async function seed() {
         tenantId: t.id,
         locationId: loc.id,
         staffId: staffMember.staffId,
+        serviceId: svcId,
         bookingId,
         customerId: c.uid,
         rating,
+        technicianRating: rating >= 4 ? rating : null,
+        technicianComment: null,
         comment: ["Amazing service, will come back!", null, "Good experience overall.", "Loved the atmosphere and results!"][bi % 4],
         status: reviewStatuses[bi % reviewStatuses.length],
         aspectRatings: { Service: rating, Cleanliness: 5, Value: 4, Atmosphere: 5 },
@@ -1199,7 +1346,7 @@ async function seed() {
   await flushBatches();
 
   // ── 8. Consumer tenantUser memberships (for booking + loyalty access) ──────
-  log("\n═══ Step 8: Consumer tenant memberships");
+  log("\n═══ Step 9: Consumer tenant memberships");
 
   // Add consumers as 'client' role members of tenants they've booked with
   const consumerTenantPairs = bookingScenarios.map(([tIdx, cIdx]) => [TENANTS[tIdx].id, CONSUMERS[cIdx].uid]);
@@ -1218,10 +1365,19 @@ async function seed() {
       updatedAt: ts(-1),
     });
     write(db.doc(`userTenantAccess/${userId}_${tenantId}`), {
+      accessId: `${userId}_${tenantId}`,
       userId,
       tenantId,
+      accessLevel: "client",
+      subscriptionStatus: "active",
+      subscribedAt: ts(-90),
       unreadMessageCount: 0,
-      lastVisitedAt: ts(-7),
+      lastMessageAt: null,
+      lastAccessedAt: ts(-7),
+      nextAppointmentAt: null,
+      nextAppointmentServiceName: null,
+      status: "active",
+      updatedAt: ts(-1),
     });
   }
 
@@ -1238,7 +1394,7 @@ async function seed() {
   await flushBatches();
 
   // ── 9. Messaging — threads & messages ─────────────────────────────────────-
-  log("\n═══ Step 9: Messaging threads & messages");
+  log("\n═══ Step 10: Messaging threads & messages");
 
   const threadPairs = [
     [0, 0], [0, 1],
@@ -1319,7 +1475,7 @@ async function seed() {
   await flushBatches();
 
   // ── 10. Waitlist entries ───────────────────────────────────────────────────
-  log("\n═══ Step 10: Waitlist entries");
+  log("\n═══ Step 11: Waitlist entries");
 
   // Emma and Frank are on waitlists
   const waitlistEntries = [
@@ -1354,7 +1510,7 @@ async function seed() {
   await flushBatches();
 
   // ── 11. Featured salons (discovery carousel) ───────────────────────────────
-  log("\n═══ Step 11: Discovery featured salons");
+  log("\n═══ Step 12: Discovery featured salons");
 
   const featured = TENANTS.filter(t => t.status !== "suspended").slice(0, 10);
   for (const t of featured) {
@@ -1384,7 +1540,7 @@ async function seed() {
   await flushBatches();
 
   // ── 12. Platform audit log ─────────────────────────────────────────────────
-  log("\n═══ Step 12: Platform audit log");
+  log("\n═══ Step 13: Platform audit log");
 
   const auditEvents = [
     { eventType: "tenant_suspended",  actor: PLATFORM_ADMIN_UID, details: { tenantId: "tenant-suspended-test", reason: "QA test suspension" } },
@@ -1415,7 +1571,7 @@ async function seed() {
   await flushBatches();
 
   // ── 13. Salon admin analytics seed (for SA-ANA-001 and SA-ANA-010) ─────────
-  log("\n═══ Step 13: Popularity index (analytics base)");
+  log("\n═══ Step 14: Popularity index (analytics base)");
 
   for (const t of TENANTS.slice(0, 6)) {
     const svcs = tenantServiceTemplates(t);
@@ -1434,7 +1590,7 @@ async function seed() {
   await flushBatches();
 
   // ── 14. AI budget & feature flags ─────────────────────────────────────────
-  log("\n═══ Step 14: AI toggles & feature flags");
+  log("\n═══ Step 15: AI toggles & feature flags");
 
   for (const t of TENANTS.slice(0, 4)) {
     write(db.doc(`tenants/${t.id}/aiToggles/config`), {

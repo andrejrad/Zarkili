@@ -34,6 +34,7 @@ const MOCK_STATE: CustomerLoyaltyState = {
   points: 350,
   lifetimePoints: 350,
   currentTierId: "bronze",
+  locationBreakdown: {},
   enrolledAt: { seconds: 1000, nanoseconds: 0 } as never,
   updatedAt: { seconds: 1000, nanoseconds: 0 } as never,
 };

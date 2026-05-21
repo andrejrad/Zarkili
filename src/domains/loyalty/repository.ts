@@ -1,11 +1,16 @@
 /**
  * Loyalty repository
  *
- * Collection layout (all tenant-scoped):
+ * Collection layout (post NEW-DEBT-B path migration):
  *   tenants/{tenantId}/loyaltyConfig/config      — singleton TenantLoyaltyConfig
- *   tenants/{tenantId}/loyaltyStates/{userId}    — CustomerLoyaltyState
- *   tenants/{tenantId}/loyaltyTransactions/{txId} — LoyaltyTransaction
+ *   user_brand_loyalty/{userId}_{brandId}        — CustomerLoyaltyState (v3 §3.10)
+ *   tenants/{tenantId}/loyaltyTransactions/{txId} — LoyaltyTransaction ledger
  *   tenants/{tenantId}/loyaltyIdempotency/{key}  — idempotency records
+ *
+ * Per v3, `tenantId === brandId`. The composite doc-ID encodes the brand as the
+ * second segment. Documents are also written with `brandId` (= tenantId) and
+ * `pointsBalance` (= points) field aliases so the spec-shaped discovery reader
+ * (src/domains/discovery/repository.ts) can read the badge balance directly.
  */
 
 import {
@@ -37,9 +42,17 @@ import {
 // ---------------------------------------------------------------------------
 
 const configCol = (tenantId: string) => `tenants/${tenantId}/loyaltyConfig`;
-const statesCol = (tenantId: string) => `tenants/${tenantId}/loyaltyStates`;
 const txCol = (tenantId: string) => `tenants/${tenantId}/loyaltyTransactions`;
 const idempCol = (tenantId: string) => `tenants/${tenantId}/loyaltyIdempotency`;
+
+const STATES_COL = "user_brand_loyalty";
+
+/**
+ * v3 §3.10: state docs live at the top-level `user_brand_loyalty` collection,
+ * keyed by `{userId}_{brandId}`.
+ */
+const stateDocId = (tenantId: string, userId: string) =>
+  `${userId}_${tenantId}`;
 
 // ---------------------------------------------------------------------------
 // Repository type
@@ -94,7 +107,7 @@ export function createLoyaltyRepository(db: Firestore): LoyaltyRepository {
     userId: string,
     tenantId: string,
   ): Promise<CustomerLoyaltyState | null> {
-    const ref = doc(db, statesCol(tenantId), userId);
+    const ref = doc(db, STATES_COL, stateDocId(tenantId, userId));
     const snap = await getDoc(ref);
     if (!snap.exists()) return null;
     return snap.data() as CustomerLoyaltyState;
@@ -124,7 +137,7 @@ export function createLoyaltyRepository(db: Firestore): LoyaltyRepository {
     }
 
     // Read current state
-    const stateRef = doc(db, statesCol(tenantId), userId);
+    const stateRef = doc(db, STATES_COL, stateDocId(tenantId, userId));
     const stateSnap = await getDoc(stateRef);
 
     let currentPoints = 0;
@@ -160,7 +173,11 @@ export function createLoyaltyRepository(db: Firestore): LoyaltyRepository {
     const newState: Record<string, unknown> = {
       userId,
       tenantId,
+      // v3 alias: brandId mirrors tenantId on the new top-level collection.
+      brandId: tenantId,
       points: newPoints,
+      // v3 spec field name used by consumer discovery reader.
+      pointsBalance: newPoints,
       lifetimePoints: newLifetimePoints,
       currentTierId: newTierId,
       enrolledAt: enrolledAt ?? now,
@@ -221,14 +238,24 @@ export function createLoyaltyRepository(db: Firestore): LoyaltyRepository {
     tenantId: string,
     pageLimit = 50,
   ): Promise<LoyaltyTransaction[]> {
+    // orderBy("createdAt") is intentionally omitted — combining where(userId)
+    // + orderBy requires a composite index that may not be deployed.
+    // Sort in memory instead (same pattern as other booking queries).
     const q = query(
       collection(db, txCol(tenantId)),
       where("userId", "==", userId),
-      orderBy("createdAt", "desc"),
       firestoreLimit(pageLimit),
     );
     const snap = await getDocs(q);
-    return snap.docs.map((d) => d.data() as LoyaltyTransaction);
+    const rows = snap.docs.map((d) => d.data() as LoyaltyTransaction);
+    rows.sort((a, b) => {
+      const aMs = typeof (a.createdAt as { toMillis?: () => number }).toMillis === "function"
+        ? (a.createdAt as { toMillis: () => number }).toMillis() : 0;
+      const bMs = typeof (b.createdAt as { toMillis?: () => number }).toMillis === "function"
+        ? (b.createdAt as { toMillis: () => number }).toMillis() : 0;
+      return bMs - aMs;
+    });
+    return rows;
   }
 
   return {

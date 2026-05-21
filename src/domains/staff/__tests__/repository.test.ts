@@ -93,6 +93,8 @@ function makeInput(overrides: Partial<CreateStaffInput> = {}): CreateStaffInput 
     displayName: "Ana Novak",
     role: "technician",
     status: "active",
+    photoUrl: null,
+    specialtyTags: [],
     skills: ["nail-art", "gel"],
     serviceIds: ["svc1", "svc2"],
     constraints: [

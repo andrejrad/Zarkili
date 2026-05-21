@@ -67,12 +67,21 @@ export type BookingLifecycleEvent = {
   occurredAt: Timestamp;
 };
 
+export type BookingAddonSnapshot = {
+  name: string;
+  price: number;
+  durationMinutes: number;
+};
+
 export type Booking = {
   bookingId: string;
   tenantId: string;
   locationId: string;
   staffId: string;
   serviceId: string;
+  // Variant & addon selections — set at creation, immutable thereafter
+  variantId: string;
+  addonIds: string[];
   customerUserId: string;
   date: string;         // YYYY-MM-DD
   startMinutes: number; // minutes since midnight
@@ -81,6 +90,15 @@ export type Booking = {
   endTime: string;      // HH:mm
   durationMinutes: number;
   bufferMinutes: number;
+  // Immutable price + duration snapshots captured at booking creation
+  priceSnapshot: number;
+  durationSnapshot: number;
+  variantNameSnapshot: string;
+  addonsSnapshot: BookingAddonSnapshot[];
+  // Denormalised display snapshots (immutable)
+  serviceNameSnapshot: string;
+  locationNameSnapshot: string;
+  technicianNameSnapshot: string;
   status: BookingStatus;
   version: number;      // incremented on every status transition for optimistic locking
   notes: string | null;
@@ -89,7 +107,26 @@ export type Booking = {
   updatedAt: Timestamp;
 };
 
-export type CreateBookingInput = Omit<Booking, "bookingId" | "status" | "createdAt" | "updatedAt" | "version" | "lifecycleEvents">;
+/**
+ * Fields required from the caller at booking creation.
+ * Snapshot fields that the repository computes from Firestore reads
+ * (priceSnapshot, durationSnapshot, variantNameSnapshot, addonsSnapshot)
+ * are intentionally excluded — they are derived internally.
+ * The caller must supply the display snapshots it already has from the UI.
+ */
+export type CreateBookingInput = Omit<
+  Booking,
+  | "bookingId"
+  | "status"
+  | "createdAt"
+  | "updatedAt"
+  | "version"
+  | "lifecycleEvents"
+  | "priceSnapshot"
+  | "durationSnapshot"
+  | "variantNameSnapshot"
+  | "addonsSnapshot"
+>;
 
 export type UpdateBookingStatusInput = {
   bookingId: string;

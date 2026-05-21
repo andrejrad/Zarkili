@@ -96,6 +96,7 @@ export default function App() {
           consumerNotificationService={consumerNotificationService}
           waitlistRepository={appWaitlistRepository}
           wizardService={appWizardService}
+          stripePublishableKey={stripePublishableKey || undefined}
         />
         <StatusBar style="auto" />
       </View>

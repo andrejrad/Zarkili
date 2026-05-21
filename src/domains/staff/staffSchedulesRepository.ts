@@ -1,13 +1,9 @@
 import {
-  collection,
   doc,
   getDoc,
-  getDocs,
-  query,
   serverTimestamp,
   setDoc,
   updateDoc,
-  where,
   type Firestore,
 } from "firebase/firestore";
 
@@ -161,21 +157,15 @@ export function createStaffSchedulesRepository(db: Firestore) {
     assertNonEmpty(staffId, "staffId");
     assertNonEmpty(locationId, "locationId");
 
-    const snapshot = await getDocs(
-      query(
-        collection(db, COLLECTION),
-        where("tenantId", "==", tenantId),
-        where("staffId", "==", staffId),
-        where("locationId", "==", locationId)
-      )
-    );
+    // Document ID is deterministic: tenantId_staffId_locationId
+    const scheduleId = `${tenantId}_${staffId}_${locationId}`;
+    const snap = await getDoc(doc(db, COLLECTION, scheduleId));
 
-    if (snapshot.empty) {
+    if (!snap.exists()) {
       return null;
     }
 
-    const docSnap = snapshot.docs[0];
-    return { ...(docSnap.data() as Omit<StaffScheduleTemplate, "scheduleId">), scheduleId: docSnap.id };
+    return { ...(snap.data() as Omit<StaffScheduleTemplate, "scheduleId">), scheduleId: snap.id };
   }
 
   async function addException(scheduleId: string, exception: StaffScheduleException): Promise<void> {

@@ -37,6 +37,8 @@ export type InputFieldProps = {
   rightAdornment?: ReactNode;
   maxLength?: number;
   autoFocus?: boolean;
+  keyboardType?: TextInputProps["keyboardType"];
+  autoCapitalize?: TextInputProps["autoCapitalize"];
   onSubmitEditing?: () => void;
   testID?: string;
   accessibilityLabel?: string;
@@ -75,6 +77,8 @@ export function InputField({
   rightAdornment,
   maxLength,
   autoFocus,
+  keyboardType,
+  autoCapitalize,
   onSubmitEditing,
   testID,
   accessibilityLabel,
@@ -115,9 +119,9 @@ export function InputField({
           placeholder={placeholder}
           placeholderTextColor={colors.textMuted}
           editable={!disabled && !loading}
-          keyboardType={KEYBOARD_TYPES[variant]}
+          keyboardType={keyboardType ?? KEYBOARD_TYPES[variant]}
           autoComplete={AUTO_COMPLETE[variant]}
-          autoCapitalize={variant === "email" || variant === "password" ? "none" : "sentences"}
+          autoCapitalize={autoCapitalize ?? (variant === "email" || variant === "password" ? "none" : "sentences")}
           secureTextEntry={secure}
           maxLength={maxLength}
           autoFocus={autoFocus}

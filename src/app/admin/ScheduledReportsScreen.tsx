@@ -34,7 +34,7 @@ export type ScheduledReportsScreenProps = {
   saving: boolean;
   error: string | null;
   reports: ScheduledReportConfig[];
-  onCreateReport: (config: Omit<ScheduledReportConfig, "id" | "createdAt">) => Promise<void>;
+  onCreateReport: (config: Omit<ScheduledReportConfig, "reportId" | "createdAt" | "active" | "createdBy">) => Promise<void>;
   onDeleteReport: (reportId: string) => Promise<void>;
   onBack: () => void;
   testID?: string;
@@ -144,7 +144,7 @@ export function ScheduledReportsScreen({
         {
           text: "Delete",
           style: "destructive",
-          onPress: () => onDeleteReport(report.id),
+          onPress: () => onDeleteReport(report.reportId),
         },
       ],
     );
@@ -278,7 +278,7 @@ export function ScheduledReportsScreen({
           {reports.length > 0 && (
             <View style={styles.list} testID="report-list">
               {reports.map((r) => (
-                <View key={r.id} style={styles.reportRow}>
+                <View key={r.reportId} style={styles.reportRow}>
                   <View style={styles.reportMeta}>
                     <Text style={styles.reportLabel}>{r.label}</Text>
                     <Text style={styles.reportSub}>
@@ -292,7 +292,7 @@ export function ScheduledReportsScreen({
                     style={styles.deleteBtn}
                     accessibilityRole="button"
                     accessibilityLabel={`Delete ${r.label}`}
-                    testID={`delete-${r.id}`}
+                    testID={`delete-${r.reportId}`}
                   >
                     <Text style={styles.deleteBtnText}>Delete</Text>
                   </Pressable>

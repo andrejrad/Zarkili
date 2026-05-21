@@ -22,8 +22,8 @@ export type SalonOnboardingPaymentSetupScreenProps = {
 
 const STEPS = [
   "Go to your Stripe dashboard (stripe.com) and create or log in to your account.",
-  "Under "Settings → Connect", enable the Stripe Connect platform for your account.",
-  "Return here and tap "I've connected Stripe" — our team will verify and link it within 24 hours.",
+  `Under "Settings → Connect", enable the Stripe Connect platform for your account.`,
+  `Return here and tap "I've connected Stripe" — our team will verify and link it within 24 hours.`,
 ];
 
 export function SalonOnboardingPaymentSetupScreen({

@@ -40,8 +40,8 @@ export function PlatformHealthDashboardScreen({
 }: PlatformHealthDashboardScreenProps) {
   if (loading) {
     return (
-      <View style={styles.center} testID={testID}>
-        <ActivityIndicator testID="loading-indicator" />
+      <View style={styles.center} testID={`${testID}-loading`}>
+        <ActivityIndicator />
       </View>
     );
   }
@@ -81,7 +81,7 @@ export function PlatformHealthDashboardScreen({
           <Text style={styles.emptyText}>No health signals available.</Text>
         )}
         {signals.map((s) => (
-          <View key={s.service} style={styles.signalRow} testID={`signal-${s.service}`}>
+          <View key={s.service} style={styles.signalRow} testID={`signal-status-${s.signalId ?? s.service}`}>
             <View style={styles.signalLeft}>
               <Text style={styles.serviceName}>{s.service}</Text>
               {s.note && <Text style={styles.serviceNote}>{s.note}</Text>}

@@ -1,8 +1,10 @@
 import {
   collection,
+  collectionGroup,
   doc,
   getDoc,
   getDocs,
+  orderBy,
   query,
   serverTimestamp,
   setDoc,
@@ -11,9 +13,14 @@ import {
   type Firestore,
 } from "firebase/firestore";
 
-import type { CreateServiceInput, Service, UpdateServiceInput } from "./model";
+import type { CreateServiceInput, Service, ServiceCategory, UpdateServiceInput } from "./model";
+import {
+  SERVICE_TYPES_COLLECTION,
+  serviceTypeDocSegments,
+  serviceTypesCollectionPath,
+} from "./paths";
 
-const COLLECTION = "services";
+const CATEGORIES_COLLECTION = "service_categories";
 const MIN_DURATION_MINUTES = 5;
 const MAX_DURATION_MINUTES = 480;
 const MIN_BUFFER_MINUTES = 0;
@@ -27,57 +34,47 @@ function assertNonEmpty(value: string, field: string): void {
   }
 }
 
-function assertLocationIds(locationIds: string[]): void {
-  if (!Array.isArray(locationIds)) {
-    throw new Error("locationIds must be an array");
-  }
-
-  if (locationIds.some((locationId) => typeof locationId !== "string" || locationId.trim().length === 0)) {
-    throw new Error("locationIds contains invalid value");
-  }
-}
-
 function assertDurationMinutes(durationMinutes: number): void {
   if (!Number.isInteger(durationMinutes)) {
-    throw new Error("durationMinutes must be an integer");
+    throw new Error("baseDurationMinutes must be an integer");
   }
 
   if (durationMinutes < MIN_DURATION_MINUTES || durationMinutes > MAX_DURATION_MINUTES) {
     throw new Error(
-      `durationMinutes must be between ${MIN_DURATION_MINUTES} and ${MAX_DURATION_MINUTES}`
+      `baseDurationMinutes must be between ${MIN_DURATION_MINUTES} and ${MAX_DURATION_MINUTES}`
     );
   }
 }
 
 function assertBufferMinutes(bufferMinutes: number): void {
   if (!Number.isInteger(bufferMinutes)) {
-    throw new Error("bufferMinutes must be an integer");
+    throw new Error("baseBufferMinutes must be an integer");
   }
 
   if (bufferMinutes < MIN_BUFFER_MINUTES || bufferMinutes > MAX_BUFFER_MINUTES) {
-    throw new Error(`bufferMinutes must be between ${MIN_BUFFER_MINUTES} and ${MAX_BUFFER_MINUTES}`);
+    throw new Error(`baseBufferMinutes must be between ${MIN_BUFFER_MINUTES} and ${MAX_BUFFER_MINUTES}`);
   }
 }
 
 function assertPrice(price: number): void {
   if (typeof price !== "number" || Number.isNaN(price)) {
-    throw new Error("price must be a number");
+    throw new Error("basePrice must be a number");
   }
 
   if (price < MIN_PRICE || price > MAX_PRICE) {
-    throw new Error(`price must be between ${MIN_PRICE} and ${MAX_PRICE}`);
+    throw new Error(`basePrice must be between ${MIN_PRICE} and ${MAX_PRICE}`);
   }
 }
 
 function validateCreateInput(input: CreateServiceInput): void {
   assertNonEmpty(input.tenantId, "tenantId");
-  assertLocationIds(input.locationIds);
+  assertNonEmpty(input.locationId, "locationId");
   assertNonEmpty(input.name, "name");
-  assertNonEmpty(input.category, "category");
-  assertDurationMinutes(input.durationMinutes);
-  assertBufferMinutes(input.bufferMinutes);
-  assertPrice(input.price);
-  assertNonEmpty(input.currency, "currency");
+  assertNonEmpty(input.categoryId, "categoryId");
+  assertDurationMinutes(input.baseDurationMinutes);
+  assertBufferMinutes(input.baseBufferMinutes);
+  assertPrice(input.basePrice);
+  assertNonEmpty(input.baseCurrency, "baseCurrency");
 
   if (typeof input.active !== "boolean") {
     throw new Error("active must be a boolean");
@@ -93,32 +90,28 @@ function validateUpdateInput(input: UpdateServiceInput): void {
     throw new Error("Update payload must not be empty");
   }
 
-  if ("locationIds" in input && input.locationIds) {
-    assertLocationIds(input.locationIds);
-  }
-
   if ("name" in input && input.name != null) {
     assertNonEmpty(input.name, "name");
   }
 
-  if ("category" in input && input.category != null) {
-    assertNonEmpty(input.category, "category");
+  if ("categoryId" in input && input.categoryId != null) {
+    assertNonEmpty(input.categoryId, "categoryId");
   }
 
-  if ("durationMinutes" in input && input.durationMinutes != null) {
-    assertDurationMinutes(input.durationMinutes);
+  if ("baseDurationMinutes" in input && input.baseDurationMinutes != null) {
+    assertDurationMinutes(input.baseDurationMinutes);
   }
 
-  if ("bufferMinutes" in input && input.bufferMinutes != null) {
-    assertBufferMinutes(input.bufferMinutes);
+  if ("baseBufferMinutes" in input && input.baseBufferMinutes != null) {
+    assertBufferMinutes(input.baseBufferMinutes);
   }
 
-  if ("price" in input && input.price != null) {
-    assertPrice(input.price);
+  if ("basePrice" in input && input.basePrice != null) {
+    assertPrice(input.basePrice);
   }
 
-  if ("currency" in input && input.currency != null) {
-    assertNonEmpty(input.currency, "currency");
+  if ("baseCurrency" in input && input.baseCurrency != null) {
+    assertNonEmpty(input.baseCurrency, "baseCurrency");
   }
 
   if ("active" in input && input.active != null && typeof input.active !== "boolean") {
@@ -133,11 +126,38 @@ function validateUpdateInput(input: UpdateServiceInput): void {
 }
 
 export function createServiceRepository(db: Firestore) {
+  /**
+   * Resolve a service-type document path by serviceId.
+   *
+   * B2 transitional helper: callers that hold only a `serviceId` (e.g. legacy
+   * admin flows) need to discover the `brandId` + `locationId` so we can read
+   * or write the hierarchical doc at
+   * `brands/{brandId}/locations/{locationId}/service_types/{serviceId}`.
+   *
+   * Uses a `collectionGroup` query filtered by document name. Returns null
+   * when no matching service exists in the v3 hierarchy.
+   */
+  async function resolveServiceLocation(
+    serviceId: string,
+  ): Promise<{ brandId: string; locationId: string; data: Service } | null> {
+    const cg = collectionGroup(db, SERVICE_TYPES_COLLECTION);
+    const snap = await getDocs(cg);
+    for (const docSnap of snap.docs) {
+      if (docSnap.id !== serviceId) continue;
+      const data = docSnap.data() as Service;
+      const brandId = (data.tenantId as string | undefined) ?? "";
+      const locationId = (data.locationId as string | undefined) ?? "";
+      if (!brandId || !locationId) return null;
+      return { brandId, locationId, data };
+    }
+    return null;
+  }
+
   async function createService(serviceId: string, input: CreateServiceInput): Promise<Service> {
     assertNonEmpty(serviceId, "serviceId");
     validateCreateInput(input);
 
-    const ref = doc(db, COLLECTION, serviceId);
+    const ref = doc(db, ...serviceTypeDocSegments(input.tenantId, input.locationId, serviceId));
     const existing = await getDoc(ref);
     if (existing.exists()) {
       throw new Error(`Service with id ${serviceId} already exists`);
@@ -146,6 +166,12 @@ export function createServiceRepository(db: Firestore) {
     const data = {
       ...input,
       serviceId,
+      averageRating: null,
+      reviewCount: 0,
+      ratingSum: 0,
+      popularityScore: 0,
+      nextAvailableAt: null,
+      isFullyBooked: false,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     };
@@ -164,17 +190,18 @@ export function createServiceRepository(db: Firestore) {
     assertNonEmpty(tenantId, "tenantId");
     validateUpdateInput(input);
 
-    const ref = doc(db, COLLECTION, serviceId);
-    const snapshot = await getDoc(ref);
-    if (!snapshot.exists()) {
+    const resolved = await resolveServiceLocation(serviceId);
+    if (!resolved) {
       throw new Error(`Service ${serviceId} not found`);
     }
-
-    const stored = snapshot.data() as Service;
-    if (stored.tenantId !== tenantId) {
+    if (resolved.data.tenantId !== tenantId) {
       throw new Error("Cross-tenant service update is not allowed");
     }
 
+    const ref = doc(
+      db,
+      ...serviceTypeDocSegments(resolved.brandId, resolved.locationId, serviceId),
+    );
     await updateDoc(ref, { ...input, updatedAt: serverTimestamp() });
   }
 
@@ -182,7 +209,7 @@ export function createServiceRepository(db: Firestore) {
     assertNonEmpty(tenantId, "tenantId");
 
     const q = query(
-      collection(db, COLLECTION),
+      collectionGroup(db, SERVICE_TYPES_COLLECTION),
       where("tenantId", "==", tenantId),
       where("active", "==", true)
     );
@@ -199,10 +226,8 @@ export function createServiceRepository(db: Firestore) {
     assertNonEmpty(locationId, "locationId");
 
     const q = query(
-      collection(db, COLLECTION),
-      where("tenantId", "==", tenantId),
-      where("active", "==", true),
-      where("locationIds", "array-contains", locationId)
+      collection(db, serviceTypesCollectionPath(tenantId, locationId)),
+      where("active", "==", true)
     );
     const snapshot = await getDocs(q);
 
@@ -216,21 +241,35 @@ export function createServiceRepository(db: Firestore) {
     assertNonEmpty(serviceId, "serviceId");
     assertNonEmpty(tenantId, "tenantId");
 
-    const ref = doc(db, COLLECTION, serviceId);
-    const snapshot = await getDoc(ref);
-    if (!snapshot.exists()) {
+    const resolved = await resolveServiceLocation(serviceId);
+    if (!resolved) {
       throw new Error(`Service ${serviceId} not found`);
     }
-
-    const stored = snapshot.data() as Service;
-    if (stored.tenantId !== tenantId) {
+    if (resolved.data.tenantId !== tenantId) {
       throw new Error("Cross-tenant service archive is not allowed");
     }
 
+    const ref = doc(
+      db,
+      ...serviceTypeDocSegments(resolved.brandId, resolved.locationId, serviceId),
+    );
     await updateDoc(ref, {
       active: false,
       updatedAt: serverTimestamp(),
     });
+  }
+
+  async function getActiveCategories(): Promise<ServiceCategory[]> {
+    const q = query(
+      collection(db, CATEGORIES_COLLECTION),
+      orderBy("displayOrder", "asc")
+    );
+    const snapshot = await getDocs(q);
+
+    return snapshot.docs.map((docSnap) => ({
+      ...(docSnap.data() as Omit<ServiceCategory, "id">),
+      id: docSnap.id,
+    }));
   }
 
   return {
@@ -239,7 +278,9 @@ export function createServiceRepository(db: Firestore) {
     listServicesByTenant,
     listServicesByLocation,
     archiveService,
+    getActiveCategories,
   };
 }
 
 export type ServiceRepository = ReturnType<typeof createServiceRepository>;
+

@@ -29,6 +29,8 @@ export type BookingConfirmationScreenProps = {
   date: Date;
   timeSlot: string;
   pricing: BookingPriceBreakdown;
+  /** Optional non-blocking informational note shown below the summary card. */
+  note?: string;
   onPressAddToCalendar?: () => void;
   onPressDirections?: () => void;
   onPressMessageSalon?: () => void;
@@ -46,6 +48,7 @@ export function BookingConfirmationScreen({
   date,
   timeSlot,
   pricing,
+  note,
   onPressAddToCalendar,
   onPressDirections,
   onPressMessageSalon,
@@ -73,6 +76,12 @@ export function BookingConfirmationScreen({
           <SummaryRow label="When" value={`${formatLongDateLabel(date)} · ${timeSlot}`} />
           <SummaryRow label="Total" value={formatUsd(pricing.total)} noDivider />
         </View>
+
+        {note ? (
+          <View style={styles.noteBanner} testID={testID ? `${testID}-note` : undefined}>
+            <Text style={styles.noteText}>{note}</Text>
+          </View>
+        ) : null}
 
         <View style={styles.actionRow}>
           {onPressAddToCalendar ? (
@@ -189,6 +198,16 @@ const styles = StyleSheet.create({
     width: "100%",
     justifyContent: "space-around",
   },
+  noteBanner: {
+    width: "100%",
+    backgroundColor: "rgba(255, 193, 7, 0.1)",
+    borderWidth: 1,
+    borderColor: "rgba(255, 193, 7, 0.4)",
+    borderRadius: radius.sm,
+    padding: spacing.s3,
+    marginTop: spacing.s3,
+  },
+  noteText: { fontSize: 12, color: colors.foreground },
   actionBtn: {
     alignItems: "center",
     gap: spacing.s1,

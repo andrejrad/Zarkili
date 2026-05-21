@@ -113,6 +113,10 @@ describe("tenantLocationAdminService", () => {
         locationId: "loc-a",
         createdAt: {} as never,
         updatedAt: {} as never,
+        geohash: "",
+        averageRating: null,
+        reviewCount: 0,
+        ratingSum: 0,
       })),
     });
 
@@ -124,6 +128,7 @@ describe("tenantLocationAdminService", () => {
     const result = await service.createLocationForTenant("loc-a", {
       tenantId: "tenantA",
       name: "Downtown",
+      displayName: "Downtown",
       code: "DOWNTOWN",
       status: "active",
       timezone: "Europe/Zagreb",

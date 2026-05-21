@@ -189,19 +189,22 @@ export function createStaffRepository(db: Firestore) {
     assertNonEmpty(locationId, "locationId");
     assertNonEmpty(serviceId, "serviceId");
 
+    // Firestore only allows one array-contains per query.
+    // Filter by locationIds in the query; filter serviceIds in-memory.
     const q = query(
       collection(db, COLLECTION),
       where("tenantId", "==", tenantId),
       where("status", "==", "active"),
-      where("locationIds", "array-contains", locationId),
-      where("serviceIds", "array-contains", serviceId)
+      where("locationIds", "array-contains", locationId)
     );
     const snapshot = await getDocs(q);
 
-    return snapshot.docs.map((docSnap) => ({
-      ...(docSnap.data() as Omit<StaffMember, "staffId">),
-      staffId: docSnap.id,
-    }));
+    return snapshot.docs
+      .map((docSnap) => ({
+        ...(docSnap.data() as Omit<StaffMember, "staffId">),
+        staffId: docSnap.id,
+      }))
+      .filter((s) => (s.serviceIds as string[] | undefined)?.includes(serviceId) ?? true);
   }
 
   async function deactivateStaff(staffId: string, tenantId: string): Promise<void> {

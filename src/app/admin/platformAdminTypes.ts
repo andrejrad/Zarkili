@@ -10,14 +10,15 @@ export type TenantPlan = "free_trial" | "starter" | "professional" | "enterprise
 
 export type TenantRecord = {
   tenantId: string;
-  displayName: string;
+  name: string;
+  displayName?: string; // legacy alias kept for backward compat
   ownerEmail: string;
-  plan: TenantPlan;
+  plan: TenantPlan | string; // allow arbitrary plan slugs
   status: TenantStatus;
   createdAt: string;
   locationCount: number;
   staffCount: number;
-  healthScore: number; // 0–100
+  healthScore?: number;
   supportNotes?: string;
   lastActivityAt?: string;
   suspendedAt?: string;
@@ -48,6 +49,7 @@ export type CrossTenantKpi = {
 export type HealthSignalStatus = "healthy" | "degraded" | "down";
 
 export type PlatformHealthSignal = {
+  signalId?: string;
   service: string;
   status: HealthSignalStatus;
   latencyMs?: number;
@@ -77,12 +79,12 @@ export type FeatureFlagScope = "platform" | "tenant";
 export type FeatureFlag = {
   flagKey: string;
   label: string;
-  description: string;
+  description?: string;
   scope: FeatureFlagScope;
   tenantId?: string;
   enabled: boolean;
-  updatedAt: string;
-  updatedBy: string;
+  updatedAt?: string;
+  updatedBy?: string;
 };
 
 // ---- Platform Audit Log ----
@@ -207,7 +209,8 @@ export type SecurityEvent = {
   actorId: string;
   actorEmail?: string;
   tenantId?: string;
-  detail: string;
+  detail?: string;
+  description?: string; // alias field used in some contexts
   occurredAt: string;
   resolved: boolean;
   resolvedAt?: string;
@@ -251,19 +254,20 @@ export type ConsentPolicyEntry = {
 
 // ---- Incident Response ----
 
-export type IncidentSeverity = "P1" | "P2" | "P3" | "P4";
+export type IncidentSeverity = "P1" | "P2" | "P3" | "P4" | "critical" | "high" | "medium" | "low";
 export type IncidentStatus = "open" | "investigating" | "mitigated" | "resolved";
 
 export type IncidentRecord = {
   incidentId: string;
   title: string;
-  description: string;
+  description?: string;
   severity: IncidentSeverity;
   status: IncidentStatus;
   createdAt: string;
   updatedAt: string;
   resolvedAt?: string;
-  affectedServices: string[];
+  affectedServices?: string[];
+  affectedTenants?: string[];
   mitigationNotes?: string;
   ownerEmail?: string;
 };

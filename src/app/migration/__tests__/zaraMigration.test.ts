@@ -254,7 +254,7 @@ describe("runZaraMigration — loyalty", () => {
   it("writes loyalty balance for each user", async () => {
     const result = await runZaraMigration({} as Firestore, makeInput());
     expect(result.loyalty.balancesWritten).toBe(1);
-    const state = getStore().get("tenants/tenant-zara/loyaltyStates/user-client1");
+    const state = getStore().get("user_brand_loyalty/user-client1_tenant-zara");
     expect(state?.points).toBe(120);
     expect(state?.lifetimePoints).toBe(250);
   });

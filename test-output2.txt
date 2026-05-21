@@ -1,0 +1,63 @@
+﻿  console.warn
+    expo-notifications: Android Push notifications (remote notifications) functionality provided by expo-notifications was removed from Expo Go with the release of SDK 53. Use a development build instead of Expo Go. Read more at https://docs.expo.dev/develop/development-builds/introduction/.
+
+    [0m [90m 14 |[39m
+     [90m 15 |[39m [36mimport[39m [33m*[39m [36mas[39m [33mDevice[39m [36mfrom[39m [32m"expo-device"[39m[33m;[39m
+    [31m[1m>[22m[39m[90m 16 |[39m [36mimport[39m [33m*[39m [36mas[39m [33mNotifications[39m [36mfrom[39m [32m"expo-notifications"[39m[33m;[39m
+     [90m    |[39m [31m[1m^[22m[39m
+     [90m 17 |[39m [36mimport[39m { [33mPlatform[39m } [36mfrom[39m [32m"react-native"[39m[33m;[39m
+     [90m 18 |[39m
+     [90m 19 |[39m [36mexport[39m type [33mPushTokenRecord[39m [33m=[39m {[0m
+
+      at warn (node_modules/expo-notifications/src/warnOfExpoGoPushUsage.ts:14:15)
+      at addPushTokenListener (node_modules/expo-notifications/src/TokenEmitter.ts:44:24)
+      at Object.<anonymous> (node_modules/expo-notifications/src/DevicePushTokenAutoRegistration.fx.ts:104:23)
+      at Object.require (node_modules/expo-notifications/src/getExpoPushTokenAsync.ts:5:1)
+      at Object.require (node_modules/expo-notifications/src/index.ts:16:1)
+      at Object.require (src/app/notifications/registerFcmToken.ts:16:1)
+      at Object.require (src/app/navigation/AppNavigatorShell.tsx:518:1)
+      at Object.require (src/app/navigation/__tests__/AppNavigatorShell.test.tsx:4:1)
+
+node.exe : PASS src/app/navigation/__tests__/AppNavigatorShell.test.tsx (5.028 
+s)
+At C:\nvm4w\nodejs\npx.ps1:29 char:3
++   & $NODE_EXE $NPX_CLI_JS $args
++   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (PASS src/app/na...t.tsx (5.028 s) 
+   :String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  AppNavigatorShell
+    ΓêÜ saves onboarding draft when moving to next step (863 ms)
+    ΓêÜ context switch: selecting a salon from the dashboard scopes subsequent 
+operations to that tenant (366 ms)
+    Γùï skipped shows coming soon on discover when marketplace flag is disabled
+    Γùï skipped moves to app shell after dev sign-in
+    Γùï skipped submits login through the injected auth repository and enters 
+the app shell
+    Γùï skipped submits registration, completes profile, and enters the app 
+shell
+    Γùï skipped navigates to EditProfile and saves display name changes
+    Γùï skipped shows user identity on the profile overview after sign-in
+    Γùï skipped shows repository auth errors on the login screen
+    Γùï skipped clears auth errors after navigating away from and back to login
+    Γùï skipped resumes saved onboarding step on flow entry
+    Γùï skipped blocks onboarding start without tenant context
+    Γùï skipped allows selecting tenant from multiple memberships
+    Γùï skipped shows owner AI budget settings only for platform admin user
+    Γùï skipped navigates to tenant profile placeholder when booking is enabled
+    Γùï skipped shows coming-soon notice when booking is disabled for a salon
+    Γùï skipped filters discover results by search and shows empty state when 
+nothing matches
+    Γùï skipped shows discover error state when feed loading fails
+    Γùï skipped renders tenant profile screen from app shell route entry
+    Γùï skipped submits create location with tenant-scoped payload
+    Γùï skipped renders staff list screen from app shell route entry
+    Γùï skipped submits create service with tenant-scoped payload
+
+Test Suites: 1 passed, 1 total
+Tests:       20 skipped, 2 passed, 22 total
+Snapshots:   0 total
+Time:        5.203 s, estimated 130 s
+Ran all test suites matching /AppNavigatorShell.test/i with tests matching 
+"saves onboarding draft|context switch".

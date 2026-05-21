@@ -3,11 +3,15 @@
  *
  * Unit tests for the charge.refunded branch in applyPaymentEvent.
  * Covers the dispatcher + writeRefund interaction.
+ *
+ * Also covers BUG-3 fix: updateChargeByIntentId must NOT throw when no charge
+ * doc exists (appointment PIs fire payment_intent.succeeded on connected-account
+ * webhook which shares the platform handler — no charges/ doc exists for them).
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { applyPaymentEvent, type AdminPaymentsRepository } from "../../stripe/paymentsWebhookDispatcher.js";
-import type { ParsedPaymentEvent } from "../../stripe/parseEvent.js";
+import { applyPaymentEvent, createAdminPaymentsRepository, type AdminPaymentsRepository } from "../stripe/paymentsWebhookDispatcher.js";
+import type { ParsedPaymentEvent } from "../stripe/parseEvent.js";
 
 // ---------------------------------------------------------------------------
 // Mock repository
@@ -25,10 +29,14 @@ function makeRepo(): AdminPaymentsRepository & { calls: Record<string, unknown[]
   return {
     calls,
     hasProcessedEvent: vi.fn(async () => false) as AdminPaymentsRepository["hasProcessedEvent"],
+    markPaymentMethodEventProcessed: vi.fn(async () => {}) as AdminPaymentsRepository["markPaymentMethodEventProcessed"],
+    hasProcessedTenantEvent: vi.fn(async () => false) as AdminPaymentsRepository["hasProcessedTenantEvent"],
     upsertPaymentMethod: vi.fn(async () => {}) as AdminPaymentsRepository["upsertPaymentMethod"],
     deletePaymentMethod: vi.fn(async () => {}) as AdminPaymentsRepository["deletePaymentMethod"],
     updateChargeByIntentId: vi.fn(async () => {}) as AdminPaymentsRepository["updateChargeByIntentId"],
     writeRefund: vi.fn(async () => {}) as AdminPaymentsRepository["writeRefund"],
+    updateAppointmentPaymentByIntentId: vi.fn(async () => {}) as AdminPaymentsRepository["updateAppointmentPaymentByIntentId"],
+    handleSetupIntentSucceeded: vi.fn(async () => {}) as AdminPaymentsRepository["handleSetupIntentSucceeded"],
   };
 }
 
@@ -62,7 +70,7 @@ describe("applyPaymentEvent — charge.refunded", () => {
 
     expect(result.outcome).toBe("applied");
     expect(repo.writeRefund).toHaveBeenCalledOnce();
-    expect(repo.writeRefund).toHaveBeenCalledWith("t1", "re_abc123", "issued", null);
+    expect(repo.writeRefund).toHaveBeenCalledWith("t1", "re_abc123", "issued", null, "evt_refund_001");
   });
 
   it("returns 'ignored' when chargeRefunded payload is missing", async () => {
@@ -93,10 +101,83 @@ describe("applyPaymentEvent — charge.refunded", () => {
     expect(repo.writeRefund).not.toHaveBeenCalled();
   });
 
-  it("does NOT consult hasProcessedEvent (refunds are idempotent via merge)", async () => {
+  it("returns 'duplicate' when tenant event already processed", async () => {
+    vi.mocked(repo.hasProcessedTenantEvent).mockResolvedValueOnce(true);
     const event = makeChargeRefundedEvent();
-    await applyPaymentEvent(event, { payments: repo });
+    const result = await applyPaymentEvent(event, { payments: repo });
 
-    expect(repo.hasProcessedEvent).not.toHaveBeenCalled();
+    expect(result.outcome).toBe("duplicate");
+    expect(repo.writeRefund).not.toHaveBeenCalled();
   });
 });
+
+// ---------------------------------------------------------------------------
+// BUG-3 fix: updateChargeByIntentId must not throw when charge doc is absent
+// (appointment PIs don't have charges/ docs; platform webhook receives their
+// payment_intent.succeeded events from connected accounts)
+// ---------------------------------------------------------------------------
+
+describe("createAdminPaymentsRepository — updateChargeByIntentId with missing charge doc (BUG-3 fix)", () => {
+  function makeFakeDb() {
+    const docs = new Map<string, Record<string, unknown>>();
+    const sets: Array<{ path: string; data: Record<string, unknown> }> = [];
+
+    function docRef(path: string) {
+      return {
+        get: vi.fn(async () => ({ exists: docs.has(path), data: () => docs.get(path) })),
+        set: vi.fn(async (data: Record<string, unknown>) => {
+          docs.set(path, data);
+          sets.push({ path, data });
+        }),
+        update: vi.fn(async (data: Record<string, unknown>) => {
+          docs.set(path, { ...(docs.get(path) ?? {}), ...data });
+        }),
+        ref: { update: vi.fn() },
+      };
+    }
+
+    // batch mock
+    const batchOps: Array<{ op: string; path: string; data: Record<string, unknown> }> = [];
+    const batch = {
+      update: vi.fn((ref: { path?: string }, data: Record<string, unknown>) => {
+        batchOps.push({ op: "update", path: ref?.path ?? "", data });
+      }),
+      set: vi.fn((ref: { path?: string }, data: Record<string, unknown>) => {
+        batchOps.push({ op: "set", path: ref?.path ?? "", data });
+      }),
+      commit: vi.fn(async () => undefined),
+    };
+
+    return {
+      doc: vi.fn((path: string) => ({ ...docRef(path), path })),
+      collection: vi.fn((colPath: string) => ({
+        where: vi.fn().mockReturnThis(),
+        limit: vi.fn().mockReturnThis(),
+        // Return empty snapshot by default (no charge doc)
+        get: vi.fn(async () => ({
+          empty: true,
+          docs: [],
+        })),
+      })),
+      batch: vi.fn(() => batch),
+      _sets: sets,
+      _batchOps: batchOps,
+    };
+  }
+
+  it("writes idempotency record and returns without throwing when no charge doc exists", async () => {
+    const db = makeFakeDb();
+    const repo = createAdminPaymentsRepository(db as never);
+
+    // Should not throw even though charges/ collection is empty
+    await expect(
+      repo.updateChargeByIntentId("t1", "pi_appointment_123", "captured", null, null, "evt_pi_succeeded_001"),
+    ).resolves.toBeUndefined();
+
+    // Idempotency record must be written
+    const idempCall = db._sets.find((s) => s.path.includes("paymentsWebhookIdempotency"));
+    expect(idempCall).toBeDefined();
+    expect(idempCall?.path).toContain("evt_pi_succeeded_001");
+  });
+});
+

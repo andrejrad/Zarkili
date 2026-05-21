@@ -70,10 +70,14 @@ export type PostPerformanceMetrics = {
 };
 
 export type PostBookingRow = {
+  bookingId: string;
   date: string;
+  serviceDate: string;
   clientName: string;
   serviceName: string;
   amountUsd: number;
+  revenueUsd: number;
+  rating: number | null;
 };
 
 // ---------------------------------------------------------------------------

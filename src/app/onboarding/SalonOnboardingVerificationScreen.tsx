@@ -92,7 +92,7 @@ export function SalonOnboardingVerificationScreen({
       <Text style={styles.heading} accessibilityRole="header">Verification documents</Text>
       <Text style={styles.body}>
         Zarkili requires identity or business verification before your salon can go live.
-        Choose the document type you will provide.
+        Choose which verification document you will provide.
       </Text>
 
       {error ? (
@@ -101,7 +101,7 @@ export function SalonOnboardingVerificationScreen({
         </View>
       ) : null}
 
-      <Text style={styles.sectionLabel}>Document type *</Text>
+      <Text style={styles.sectionLabel}>Verification document *</Text>
       <View style={styles.chips}>
         {DOCUMENT_TYPES.map((d) => {
           const active = docType === d.value;

@@ -31,5 +31,3 @@ export { createAuthRepository } from "./repository";
 export type { AuthRepository } from "./repository";
 export { createSocialAuthService } from "./socialAuthService";
 export type { SocialAuthService } from "./socialAuthService";
-export { createSocialAuthService } from "./socialAuthService";
-export type { SocialAuthService } from "./socialAuthService";

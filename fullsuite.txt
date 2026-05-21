@@ -1,0 +1,1027 @@
+﻿node.exe : PASS src/app/providers/__tests__/AuthProvider.test.tsx
+At C:\nvm4w\nodejs\npx.ps1:29 char:3
++   & $NODE_EXE $NPX_CLI_JS $args
++   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (PASS src/app/pr...ovider.test.tsx 
+   :String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+PASS src/app/reviews/__tests__/ReviewScreens.smoke.test.tsx
+PASS __tests__/w48AiMarketplace.test.tsx
+PASS src/app/onboarding/__tests__/SalonOnboardingWizard.smoke.test.tsx
+PASS src/app/settings/__tests__/settingsAndSupportScreens.test.tsx
+PASS src/app/discover/__tests__/discoverScreens.test.tsx
+PASS src/app/booking/__tests__/bookingEdgeScreens.test.tsx
+PASS src/app/onboarding/__tests__/SalonOnboardingStepScreens.smoke.test.tsx
+PASS src/app/auth/__tests__/SignUpScreen.test.tsx
+  ΓùÅ Console
+
+    console.error
+      An update to AuthProvider inside a test was not wrapped in act(...).
+      
+      When testing, code that causes React state updates should be wrapped 
+into act(...):
+      
+      act(() => {
+        /* fire events that update state */
+      });
+      /* assert on the output */
+      
+      This ensures that you're testing the behavior the user would see in the 
+browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+    [0m [90m 67 |[39m       } [36mfinally[39m {
+     [90m 68 |[39m         [36mif[39m ([33m![39mcancelled) {
+    [31m[1m>[22m[39m[90m 69 |[39m           
+setAuthReady([36mtrue[39m)[33m;[39m
+     [90m    |[39m           [31m[1m^[22m[39m
+     [90m 70 |[39m         }
+     [90m 71 |[39m       }
+     [90m 72 |[39m     }[0m
+
+      at node_modules/react-test-renderer/cjs/react-test-renderer.development.j
+s:11801:19
+      at runWithFiberInDEV (node_modules/react-test-renderer/cjs/react-test-ren
+derer.development.js:1574:13)
+      at warnIfUpdatesNotWrappedWithActDEV (node_modules/react-test-renderer/cj
+s/react-test-renderer.development.js:11800:9)
+      at scheduleUpdateOnFiber (node_modules/react-test-renderer/cjs/react-test
+-renderer.development.js:10326:9)
+      at dispatchSetStateInternal (node_modules/react-test-renderer/cjs/react-t
+est-renderer.development.js:4148:13)
+      at dispatchSetState (node_modules/react-test-renderer/cjs/react-test-rend
+erer.development.js:4107:7)
+      at setAuthReady (src/app/providers/AuthProvider.tsx:69:11)
+      at asyncGeneratorStep 
+(node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+    console.error
+      An update to AuthProvider inside a test was not wrapped in act(...).
+      
+      When testing, code that causes React state updates should be wrapped 
+into act(...):
+      
+      act(() => {
+        /* fire events that update state */
+      });
+      /* assert on the output */
+      
+      This ensures that you're testing the behavior the user would see in the 
+browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+    [0m [90m 67 |[39m       } [36mfinally[39m {
+     [90m 68 |[39m         [36mif[39m ([33m![39mcancelled) {
+    [31m[1m>[22m[39m[90m 69 |[39m           
+setAuthReady([36mtrue[39m)[33m;[39m
+     [90m    |[39m           [31m[1m^[22m[39m
+     [90m 70 |[39m         }
+     [90m 71 |[39m       }
+     [90m 72 |[39m     }[0m
+
+      at node_modules/react-test-renderer/cjs/react-test-renderer.development.j
+s:11801:19
+      at runWithFiberInDEV (node_modules/react-test-renderer/cjs/react-test-ren
+derer.development.js:1574:13)
+      at warnIfUpdatesNotWrappedWithActDEV (node_modules/react-test-renderer/cj
+s/react-test-renderer.development.js:11800:9)
+      at scheduleUpdateOnFiber (node_modules/react-test-renderer/cjs/react-test
+-renderer.development.js:10326:9)
+      at dispatchSetStateInternal (node_modules/react-test-renderer/cjs/react-t
+est-renderer.development.js:4148:13)
+      at dispatchSetState (node_modules/react-test-renderer/cjs/react-test-rend
+erer.development.js:4107:7)
+      at setAuthReady (src/app/providers/AuthProvider.tsx:69:11)
+      at asyncGeneratorStep 
+(node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+    console.error
+      An update to AuthProvider inside a test was not wrapped in act(...).
+      
+      When testing, code that causes React state updates should be wrapped 
+into act(...):
+      
+      act(() => {
+        /* fire events that update state */
+      });
+      /* assert on the output */
+      
+      This ensures that you're testing the behavior the user would see in the 
+browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+    [0m [90m 67 |[39m       } [36mfinally[39m {
+     [90m 68 |[39m         [36mif[39m ([33m![39mcancelled) {
+    [31m[1m>[22m[39m[90m 69 |[39m           
+setAuthReady([36mtrue[39m)[33m;[39m
+     [90m    |[39m           [31m[1m^[22m[39m
+     [90m 70 |[39m         }
+     [90m 71 |[39m       }
+     [90m 72 |[39m     }[0m
+
+      at node_modules/react-test-renderer/cjs/react-test-renderer.development.j
+s:11801:19
+      at runWithFiberInDEV (node_modules/react-test-renderer/cjs/react-test-ren
+derer.development.js:1574:13)
+      at warnIfUpdatesNotWrappedWithActDEV (node_modules/react-test-renderer/cj
+s/react-test-renderer.development.js:11800:9)
+      at scheduleUpdateOnFiber (node_modules/react-test-renderer/cjs/react-test
+-renderer.development.js:10326:9)
+      at dispatchSetStateInternal (node_modules/react-test-renderer/cjs/react-t
+est-renderer.development.js:4148:13)
+      at dispatchSetState (node_modules/react-test-renderer/cjs/react-test-rend
+erer.development.js:4107:7)
+      at setAuthReady (src/app/providers/AuthProvider.tsx:69:11)
+      at asyncGeneratorStep 
+(node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+PASS __tests__/w41StaffAdminExtras.test.tsx
+PASS __tests__/w31NotificationsLoyaltyExtras.test.tsx
+  ΓùÅ Console
+
+    console.warn
+      SafeAreaView has been deprecated and will be removed in a future 
+release. Please use 'react-native-safe-area-context' instead. See 
+https://github.com/th3rdwave/react-native-safe-area-context
+
+    [0m [90m 112 |[39m
+     [90m 113 |[39m   [36mreturn[39m (
+    [31m[1m>[22m[39m[90m 114 |[39m     [33m<[39m[33mSafeAreaView[39m 
+style[33m=[39m{styles[33m.[39msafeArea} 
+testID[33m=[39m{testID}[33m>[39m
+     [90m     |[39m      [31m[1m^[22m[39m
+     [90m 115 |[39m       [33m<[39m[33mScrollView[39m 
+contentContainerStyle[33m=[39m{styles[33m.[39mpage} 
+showsVerticalScrollIndicator[33m=[39m{[36mfalse[39m}[33m>[39m
+     [90m 116 |[39m         [33m<[39m[33mText[39m 
+style[33m=[39m{styles[33m.[39mpageTitle}[33m>[39m[33mNotification[39m 
+channels[33m<[39m[33m/[39m[33mText[39m[33m>[39m
+     [90m 117 |[39m         [33m<[39m[33mText[39m 
+style[33m=[39m{styles[33m.[39mpageSubtitle}[33m>[39m[0m
+
+      at warnOnce 
+(node_modules/react-native/Libraries/Utilities/warnOnce.js:12:11)
+      at Object.get SafeAreaView [as SafeAreaView] 
+(node_modules/react-native/index.js:48:5)
+      at SafeAreaView 
+(src/app/notifications/NotificationsExtrasScreen.tsx:114:6)
+      at Object.react-stack-bottom-frame (node_modules/react-test-renderer/cjs/
+react-test-renderer.development.js:13976:20)
+      at renderWithHooks (node_modules/react-test-renderer/cjs/react-test-rende
+rer.development.js:2866:22)
+      at updateFunctionComponent (node_modules/react-test-renderer/cjs/react-te
+st-renderer.development.js:6006:19)
+      at beginWork (node_modules/react-test-renderer/cjs/react-test-renderer.de
+velopment.js:7474:18)
+      at runWithFiberInDEV (node_modules/react-test-renderer/cjs/react-test-ren
+derer.development.js:1574:13)
+      at performUnitOfWork (node_modules/react-test-renderer/cjs/react-test-ren
+derer.development.js:10972:22)
+      at workLoopSync (node_modules/react-test-renderer/cjs/react-test-renderer
+.development.js:10816:41)
+      at renderRootSync (node_modules/react-test-renderer/cjs/react-test-render
+er.development.js:10797:11)
+      at performWorkOnRoot (node_modules/react-test-renderer/cjs/react-test-ren
+derer.development.js:10349:13)
+      at performWorkOnRootViaSchedulerTask (node_modules/react-test-renderer/cj
+s/react-test-renderer.development.js:2094:7)
+      at flushActQueue (node_modules/react/cjs/react.development.js:566:34)
+      at Object.<anonymous>.process.env.NODE_ENV.exports.act 
+(node_modules/react/cjs/react.development.js:859:10)
+      at actImplementation 
+(node_modules/@testing-library/react-native/src/act.ts:30:25)
+      at renderWithAct 
+(node_modules/@testing-library/react-native/src/render-act.ts:13:11)
+      at renderInternal 
+(node_modules/@testing-library/react-native/src/render.tsx:69:33)
+      at renderInternal 
+(node_modules/@testing-library/react-native/src/render.tsx:44:10)
+      at Object.<anonymous> 
+(__tests__/w31NotificationsLoyaltyExtras.test.tsx:38:33)
+
+PASS src/app/profile/__tests__/profileScreens.test.tsx
+PASS __tests__/w39BillingAdmin.test.tsx
+PASS src/app/marketplace/__tests__/marketplaceScreens.test.tsx
+PASS __tests__/w31StaffExtras.test.tsx
+  ΓùÅ Console
+
+    console.warn
+      SafeAreaView has been deprecated and will be removed in a future 
+release. Please use 'react-native-safe-area-context' instead. See 
+https://github.com/th3rdwave/react-native-safe-area-context
+
+    [0m [90m 229 |[39m
+     [90m 230 |[39m   [36mreturn[39m (
+    [31m[1m>[22m[39m[90m 231 |[39m     [33m<[39m[33mSafeAreaView[39m 
+style[33m=[39m{styles[33m.[39msafeArea} 
+testID[33m=[39m{testID}[33m>[39m
+     [90m     |[39m      [31m[1m^[22m[39m
+     [90m 232 |[39m       [33m<[39m[33mScrollView[39m
+     [90m 233 |[39m         
+contentContainerStyle[33m=[39m{styles[33m.[39mpage}
+     [90m 234 |[39m         
+showsVerticalScrollIndicator[33m=[39m{[36mfalse[39m}[0m
+
+      at warnOnce 
+(node_modules/react-native/Libraries/Utilities/warnOnce.js:12:11)
+      at Object.get SafeAreaView [as SafeAreaView] 
+(node_modules/react-native/index.js:48:5)
+      at SafeAreaView (src/app/staff/StaffExtrasScreen.tsx:231:6)
+      at Object.react-stack-bottom-frame (node_modules/react-test-renderer/cjs/
+react-test-renderer.development.js:13976:20)
+      at renderWithHooks (node_modules/react-test-renderer/cjs/react-test-rende
+rer.development.js:2866:22)
+      at updateFunctionComponent (node_modules/react-test-renderer/cjs/react-te
+st-renderer.development.js:6006:19)
+      at beginWork (node_modules/react-test-renderer/cjs/react-test-renderer.de
+velopment.js:7474:18)
+      at runWithFiberInDEV (node_modules/react-test-renderer/cjs/react-test-ren
+derer.development.js:1574:13)
+      at performUnitOfWork (node_modules/react-test-renderer/cjs/react-test-ren
+derer.development.js:10972:22)
+      at workLoopSync (node_modules/react-test-renderer/cjs/react-test-renderer
+.development.js:10816:41)
+      at renderRootSync (node_modules/react-test-renderer/cjs/react-test-render
+er.development.js:10797:11)
+      at performWorkOnRoot (node_modules/react-test-renderer/cjs/react-test-ren
+derer.development.js:10349:13)
+      at performWorkOnRootViaSchedulerTask (node_modules/react-test-renderer/cj
+s/react-test-renderer.development.js:2094:7)
+      at flushActQueue (node_modules/react/cjs/react.development.js:566:34)
+      at Object.<anonymous>.process.env.NODE_ENV.exports.act 
+(node_modules/react/cjs/react.development.js:859:10)
+      at actImplementation 
+(node_modules/@testing-library/react-native/src/act.ts:30:25)
+      at renderWithAct 
+(node_modules/@testing-library/react-native/src/render-act.ts:13:11)
+      at renderInternal 
+(node_modules/@testing-library/react-native/src/render.tsx:69:33)
+      at renderInternal 
+(node_modules/@testing-library/react-native/src/render.tsx:44:10)
+      at Object.<anonymous> (__tests__/w31StaffExtras.test.tsx:115:35)
+
+PASS __tests__/w45LoyaltyActivityCampaignExtras.test.tsx
+PASS src/app/reviews/__tests__/reviewsEdgeScreens.test.tsx
+PASS src/app/settings/__tests__/OwnerAiBudgetSettingsScreen.test.tsx
+PASS __tests__/w44ClientCrmExtras.test.tsx
+PASS __tests__/w32PrimitivesL.test.tsx
+PASS src/app/loyalty/__tests__/loyaltyScreens.test.tsx
+PASS src/app/reviews/__tests__/reviewScreens.test.tsx
+PASS __tests__/w42ServiceCatalogExtras.test.tsx
+PASS src/app/messaging/__tests__/AdminMessagingScreens.test.tsx
+PASS src/app/legal/__tests__/legalScreens.test.tsx
+PASS __tests__/w43BookingOpsExtras.test.tsx
+PASS src/app/auth/__tests__/authEdgeScreens.test.tsx
+PASS __tests__/w31AIEdgeScreens.test.tsx
+  ΓùÅ Console
+
+    console.warn
+      SafeAreaView has been deprecated and will be removed in a future 
+release. Please use 'react-native-safe-area-context' instead. See 
+https://github.com/th3rdwave/react-native-safe-area-context
+
+    [0m [90m 94 |[39m [36mexport[39m [36mfunction[39m 
+[33mAIConsentScreen[39m({ onOptIn[33m,[39m onOptOut[33m,[39m testID 
+}[33m:[39m [33mAIConsentScreenProps[39m) {
+     [90m 95 |[39m   [36mreturn[39m (
+    [31m[1m>[22m[39m[90m 96 |[39m     [33m<[39m[33mSafeAreaView[39m 
+style[33m=[39m{styles[33m.[39msafeArea} 
+testID[33m=[39m{testID}[33m>[39m
+     [90m    |[39m      [31m[1m^[22m[39m
+     [90m 97 |[39m       [33m<[39m[33mScrollView[39m
+     [90m 98 |[39m         
+contentContainerStyle[33m=[39m{styles[33m.[39mpage}
+     [90m 99 |[39m         
+showsVerticalScrollIndicator[33m=[39m{[36mfalse[39m}[0m
+
+      at warnOnce 
+(node_modules/react-native/Libraries/Utilities/warnOnce.js:12:11)
+      at Object.get SafeAreaView [as SafeAreaView] 
+(node_modules/react-native/index.js:48:5)
+      at SafeAreaView (src/app/ai/AIEdgeScreens.tsx:96:6)
+      at Object.react-stack-bottom-frame (node_modules/react-test-renderer/cjs/
+react-test-renderer.development.js:13976:20)
+      at renderWithHooks (node_modules/react-test-renderer/cjs/react-test-rende
+rer.development.js:2866:22)
+      at updateFunctionComponent (node_modules/react-test-renderer/cjs/react-te
+st-renderer.development.js:6006:19)
+      at beginWork (node_modules/react-test-renderer/cjs/react-test-renderer.de
+velopment.js:7474:18)
+      at runWithFiberInDEV (node_modules/react-test-renderer/cjs/react-test-ren
+derer.development.js:1574:13)
+      at performUnitOfWork (node_modules/react-test-renderer/cjs/react-test-ren
+derer.development.js:10972:22)
+      at workLoopSync (node_modules/react-test-renderer/cjs/react-test-renderer
+.development.js:10816:41)
+      at renderRootSync (node_modules/react-test-renderer/cjs/react-test-render
+er.development.js:10797:11)
+      at performWorkOnRoot (node_modules/react-test-renderer/cjs/react-test-ren
+derer.development.js:10349:13)
+      at performWorkOnRootViaSchedulerTask (node_modules/react-test-renderer/cj
+s/react-test-renderer.development.js:2094:7)
+      at flushActQueue (node_modules/react/cjs/react.development.js:566:34)
+      at Object.<anonymous>.process.env.NODE_ENV.exports.act 
+(node_modules/react/cjs/react.development.js:859:10)
+      at actImplementation 
+(node_modules/@testing-library/react-native/src/act.ts:30:25)
+      at renderWithAct 
+(node_modules/@testing-library/react-native/src/render-act.ts:13:11)
+      at renderInternal 
+(node_modules/@testing-library/react-native/src/render.tsx:69:33)
+      at renderInternal 
+(node_modules/@testing-library/react-native/src/render.tsx:44:10)
+      at Object.<anonymous> (__tests__/w31AIEdgeScreens.test.tsx:27:35)
+
+PASS __tests__/w46ReviewsMessagingWaitlistExtras.test.tsx
+PASS src/app/auth/__tests__/SocialSignInSelectorScreen.test.tsx
+PASS __tests__/w47DebtClosureExtras.test.tsx
+PASS src/app/onboarding/__tests__/ClientOnboardingScreens.steps.test.tsx
+PASS __tests__/w47Analytics.test.tsx
+  ΓùÅ Console
+
+    console.error
+      Each child in a list should have a unique "key" prop.
+      
+      Check the render method of `View`. It was passed a child from 
+ScheduledReportsScreen. See https://react.dev/link/warning-keys for more 
+information.
+
+    [0m [90m 446 |[39m
+     [90m 447 |[39m   it([32m"renders root testID"[39m[33m,[39m () 
+[33m=>[39m {
+    [31m[1m>[22m[39m[90m 448 |[39m     [36mconst[39m { getByTestId } 
+[33m=[39m render([33m<[39m[33mScheduledReportsScreen[39m 
+{[33m...[39mprops()} [33m/[39m[33m>[39m)[33m;[39m
+     [90m     |[39m                                   [31m[1m^[22m[39m
+     [90m 449 |[39m     expect(getByTestId([32m"scheduled-reports-screen"[3
+9m))[33m.[39mtoBeTruthy()[33m;[39m
+     [90m 450 |[39m   })[33m;[39m
+     [90m 451 |[39m[0m
+
+      at node_modules/react-test-renderer/cjs/react-test-renderer.development.j
+s:14140:21
+      at runWithFiberInDEV (node_modules/react-test-renderer/cjs/react-test-ren
+derer.development.js:1574:13)
+      at warnForMissingKey (node_modules/react-test-renderer/cjs/react-test-ren
+derer.development.js:14139:11)
+      at warnOnInvalidKey (node_modules/react-test-renderer/cjs/react-test-rend
+erer.development.js:4728:13)
+      at reconcileChildrenArray (node_modules/react-test-renderer/cjs/react-tes
+t-renderer.development.js:4807:31)
+      at reconcileChildFibersImpl (node_modules/react-test-renderer/cjs/react-t
+est-renderer.development.js:5122:30)
+      at 
+node_modules/react-test-renderer/cjs/react-test-renderer.development.js:5227:33
+      at reconcileChildren (node_modules/react-test-renderer/cjs/react-test-ren
+derer.development.js:5735:13)
+      at beginWork (node_modules/react-test-renderer/cjs/react-test-renderer.de
+velopment.js:7551:13)
+      at runWithFiberInDEV (node_modules/react-test-renderer/cjs/react-test-ren
+derer.development.js:1574:13)
+      at performUnitOfWork (node_modules/react-test-renderer/cjs/react-test-ren
+derer.development.js:10972:22)
+      at workLoopSync (node_modules/react-test-renderer/cjs/react-test-renderer
+.development.js:10816:41)
+      at renderRootSync (node_modules/react-test-renderer/cjs/react-test-render
+er.development.js:10797:11)
+      at performWorkOnRoot (node_modules/react-test-renderer/cjs/react-test-ren
+derer.development.js:10349:13)
+      at performWorkOnRootViaSchedulerTask (node_modules/react-test-renderer/cj
+s/react-test-renderer.development.js:2094:7)
+      at flushActQueue (node_modules/react/cjs/react.development.js:566:34)
+      at Object.<anonymous>.process.env.NODE_ENV.exports.act 
+(node_modules/react/cjs/react.development.js:859:10)
+      at actImplementation 
+(node_modules/@testing-library/react-native/src/act.ts:30:25)
+      at renderWithAct 
+(node_modules/@testing-library/react-native/src/render-act.ts:13:11)
+      at renderInternal 
+(node_modules/@testing-library/react-native/src/render.tsx:69:33)
+      at renderInternal 
+(node_modules/@testing-library/react-native/src/render.tsx:44:10)
+      at Object.<anonymous> (__tests__/w47Analytics.test.tsx:448:35)
+
+PASS __tests__/w49PlatformAdmin.test.tsx
+PASS src/app/staff/__tests__/staffScreens.test.tsx (5.409 s)
+PASS src/app/notifications/__tests__/notificationsScreens.test.tsx
+PASS src/app/messaging/__tests__/messagingScreens.test.tsx
+PASS src/app/settings/__tests__/useAiBudgetAdminSettings.test.tsx
+PASS src/app/payments/__tests__/paymentsEdgeScreens.test.tsx
+PASS src/app/analytics/__tests__/ReportingScreens.smoke.test.tsx
+PASS __tests__/w40LocationAdmin.test.tsx
+PASS src/shared/ui/__tests__/booking-primitives.test.tsx
+PASS src/app/payments/__tests__/paymentsScreens.test.tsx
+PASS __tests__/w32PlatformCrossScreens.test.tsx
+  ΓùÅ Console
+
+    console.warn
+      SafeAreaView has been deprecated and will be removed in a future 
+release. Please use 'react-native-safe-area-context' instead. See 
+https://github.com/th3rdwave/react-native-safe-area-context
+
+    [0m [90m 63 |[39m }[33m:[39m [33mMaintenanceModeScreenProps[39m) {
+     [90m 64 |[39m   [36mreturn[39m (
+    [31m[1m>[22m[39m[90m 65 |[39m     [33m<[39m[33mSafeAreaView[39m 
+style[33m=[39m{styles[33m.[39mfullPage} 
+testID[33m=[39m{testID}[33m>[39m
+     [90m    |[39m      [31m[1m^[22m[39m
+     [90m 66 |[39m       [33m<[39m[33mView[39m 
+style[33m=[39m{styles[33m.[39mcentre}[33m>[39m
+     [90m 67 |[39m         [33m<[39m[33mText[39m style[33m=[39m{styles
+[33m.[39mbigIcon}[33m>[39m≡ƒ¢á∩╕Å[33m<[39m[33m/[39m[33mText[39m[33m>
+[39m
+     [90m 68 |[39m         [33m<[39m[33mText[39m 
+style[33m=[39m{styles[33m.[39mtitle} testID[33m=[39m{testID [33m?[39m 
+[32m`${testID}-title`[39m [33m:[39m undefined}[33m>[39m[0m
+
+      at warnOnce 
+(node_modules/react-native/Libraries/Utilities/warnOnce.js:12:11)
+      at Object.get SafeAreaView [as SafeAreaView] 
+(node_modules/react-native/index.js:48:5)
+      at SafeAreaView (src/app/platform/PlatformCrossScreens.tsx:65:6)
+      at Object.react-stack-bottom-frame (node_modules/react-test-renderer/cjs/
+react-test-renderer.development.js:13976:20)
+      at renderWithHooks (node_modules/react-test-renderer/cjs/react-test-rende
+rer.development.js:2866:22)
+      at updateFunctionComponent (node_modules/react-test-renderer/cjs/react-te
+st-renderer.development.js:6006:19)
+      at beginWork (node_modules/react-test-renderer/cjs/react-test-renderer.de
+velopment.js:7474:18)
+      at runWithFiberInDEV (node_modules/react-test-renderer/cjs/react-test-ren
+derer.development.js:1574:13)
+      at performUnitOfWork (node_modules/react-test-renderer/cjs/react-test-ren
+derer.development.js:10972:22)
+      at workLoopSync (node_modules/react-test-renderer/cjs/react-test-renderer
+.development.js:10816:41)
+      at renderRootSync (node_modules/react-test-renderer/cjs/react-test-render
+er.development.js:10797:11)
+      at performWorkOnRoot (node_modules/react-test-renderer/cjs/react-test-ren
+derer.development.js:10349:13)
+      at performWorkOnRootViaSchedulerTask (node_modules/react-test-renderer/cj
+s/react-test-renderer.development.js:2094:7)
+      at flushActQueue (node_modules/react/cjs/react.development.js:566:34)
+      at Object.<anonymous>.process.env.NODE_ENV.exports.act 
+(node_modules/react/cjs/react.development.js:859:10)
+      at actImplementation 
+(node_modules/@testing-library/react-native/src/act.ts:30:25)
+      at renderWithAct 
+(node_modules/@testing-library/react-native/src/render-act.ts:13:11)
+      at renderInternal 
+(node_modules/@testing-library/react-native/src/render.tsx:69:33)
+      at renderInternal 
+(node_modules/@testing-library/react-native/src/render.tsx:44:10)
+      at Object.<anonymous> (__tests__/w32PlatformCrossScreens.test.tsx:57:33)
+
+PASS src/app/bookings/__tests__/ClientBookingScreens.test.tsx
+PASS src/app/booking/__tests__/bookingScreens.test.tsx (6.259 s)
+PASS src/shared/ui/__tests__/loyalty-primitives.test.tsx
+PASS src/app/bookings/__tests__/AdminBookingQueueScreens.test.tsx
+PASS src/app/loyalty/__tests__/LoyaltyScreens.smoke.test.tsx
+PASS __tests__/w32StoreAndLegalExtras.test.tsx
+  ΓùÅ Console
+
+    console.warn
+      SafeAreaView has been deprecated and will be removed in a future 
+release. Please use 'react-native-safe-area-context' instead. See 
+https://github.com/th3rdwave/react-native-safe-area-context
+
+    [0m [90m 57 |[39m }[33m:[39m 
+[33mPrivacyNutritionLabelScreenProps[39m) {
+     [90m 58 |[39m   [36mreturn[39m (
+    [31m[1m>[22m[39m[90m 59 |[39m     [33m<[39m[33mSafeAreaView[39m 
+style[33m=[39m{styles[33m.[39msafe} testID[33m=[39m{testID}[33m>[39m
+     [90m    |[39m      [31m[1m^[22m[39m
+     [90m 60 |[39m       [33m<[39m[33mScrollView[39m 
+contentContainerStyle[33m=[39m{styles[33m.[39mpage}[33m>[39m
+     [90m 61 |[39m         [33m<[39m[33mText[39m 
+style[33m=[39m{styles[33m.[39mpageTitle}[33m>[39m[33mPrivacy[39m 
+[33mNutrition[39m 
+[33mLabel[39m[33m<[39m[33m/[39m[33mText[39m[33m>[39m
+     [90m 62 |[39m         [33m<[39m[33mText[39m 
+style[33m=[39m{styles[33m.[39msubtitle}[33m>[39m[0m
+
+      at warnOnce 
+(node_modules/react-native/Libraries/Utilities/warnOnce.js:12:11)
+      at Object.get SafeAreaView [as SafeAreaView] 
+(node_modules/react-native/index.js:48:5)
+      at SafeAreaView (src/app/settings/StoreReadinessScreens.tsx:59:6)
+      at Object.react-stack-bottom-frame (node_modules/react-test-renderer/cjs/
+react-test-renderer.development.js:13976:20)
+      at renderWithHooks (node_modules/react-test-renderer/cjs/react-test-rende
+rer.development.js:2866:22)
+      at updateFunctionComponent (node_modules/react-test-renderer/cjs/react-te
+st-renderer.development.js:6006:19)
+      at beginWork (node_modules/react-test-renderer/cjs/react-test-renderer.de
+velopment.js:7474:18)
+      at runWithFiberInDEV (node_modules/react-test-renderer/cjs/react-test-ren
+derer.development.js:1574:13)
+      at performUnitOfWork (node_modules/react-test-renderer/cjs/react-test-ren
+derer.development.js:10972:22)
+      at workLoopSync (node_modules/react-test-renderer/cjs/react-test-renderer
+.development.js:10816:41)
+      at renderRootSync (node_modules/react-test-renderer/cjs/react-test-render
+er.development.js:10797:11)
+      at performWorkOnRoot (node_modules/react-test-renderer/cjs/react-test-ren
+derer.development.js:10349:13)
+      at performWorkOnRootViaSchedulerTask (node_modules/react-test-renderer/cj
+s/react-test-renderer.development.js:2094:7)
+      at flushActQueue (node_modules/react/cjs/react.development.js:566:34)
+      at Object.<anonymous>.process.env.NODE_ENV.exports.act 
+(node_modules/react/cjs/react.development.js:859:10)
+      at actImplementation 
+(node_modules/@testing-library/react-native/src/act.ts:30:25)
+      at renderWithAct 
+(node_modules/@testing-library/react-native/src/render-act.ts:13:11)
+      at renderInternal 
+(node_modules/@testing-library/react-native/src/render.tsx:69:33)
+      at renderInternal 
+(node_modules/@testing-library/react-native/src/render.tsx:44:10)
+      at Object.<anonymous> (__tests__/w32StoreAndLegalExtras.test.tsx:31:35)
+
+PASS __tests__/w32I18nSettings.test.tsx
+  ΓùÅ Console
+
+    console.warn
+      SafeAreaView has been deprecated and will be removed in a future 
+release. Please use 'react-native-safe-area-context' instead. See 
+https://github.com/th3rdwave/react-native-safe-area-context
+
+    [0m [90m 65 |[39m
+     [90m 66 |[39m   [36mreturn[39m (
+    [31m[1m>[22m[39m[90m 67 |[39m     [33m<[39m[33mSafeAreaView[39m 
+style[33m=[39m{styles[33m.[39msafe} testID[33m=[39m{testID}[33m>[39m
+     [90m    |[39m      [31m[1m^[22m[39m
+     [90m 68 |[39m       [33m<[39m[33mLanguagePicker[39m
+     [90m 69 |[39m         visible[33m=[39m{pickerVisible}
+     [90m 70 |[39m         
+locales[33m=[39m{[33mSUPPORTED_LOCALES[39m}[0m
+
+      at warnOnce 
+(node_modules/react-native/Libraries/Utilities/warnOnce.js:12:11)
+      at Object.get SafeAreaView [as SafeAreaView] 
+(node_modules/react-native/index.js:48:5)
+      at SafeAreaView (src/app/settings/I18nSettingsScreen.tsx:67:6)
+      at Object.react-stack-bottom-frame (node_modules/react-test-renderer/cjs/
+react-test-renderer.development.js:13976:20)
+      at renderWithHooks (node_modules/react-test-renderer/cjs/react-test-rende
+rer.development.js:2866:22)
+      at updateFunctionComponent (node_modules/react-test-renderer/cjs/react-te
+st-renderer.development.js:6006:19)
+      at beginWork (node_modules/react-test-renderer/cjs/react-test-renderer.de
+velopment.js:7474:18)
+      at runWithFiberInDEV (node_modules/react-test-renderer/cjs/react-test-ren
+derer.development.js:1574:13)
+      at performUnitOfWork (node_modules/react-test-renderer/cjs/react-test-ren
+derer.development.js:10972:22)
+      at workLoopSync (node_modules/react-test-renderer/cjs/react-test-renderer
+.development.js:10816:41)
+      at renderRootSync (node_modules/react-test-renderer/cjs/react-test-render
+er.development.js:10797:11)
+      at performWorkOnRoot (node_modules/react-test-renderer/cjs/react-test-ren
+derer.development.js:10349:13)
+      at performWorkOnRootViaSchedulerTask (node_modules/react-test-renderer/cj
+s/react-test-renderer.development.js:2094:7)
+      at flushActQueue (node_modules/react/cjs/react.development.js:566:34)
+      at Object.<anonymous>.process.env.NODE_ENV.exports.act 
+(node_modules/react/cjs/react.development.js:859:10)
+      at actImplementation 
+(node_modules/@testing-library/react-native/src/act.ts:30:25)
+      at renderWithAct 
+(node_modules/@testing-library/react-native/src/render-act.ts:13:11)
+      at renderInternal 
+(node_modules/@testing-library/react-native/src/render.tsx:69:33)
+      at renderInternal 
+(node_modules/@testing-library/react-native/src/render.tsx:44:10)
+      at Object.<anonymous> (__tests__/w32I18nSettings.test.tsx:22:35)
+
+PASS src/app/auth/__tests__/GuestBookingGateScreen.test.tsx
+PASS src/app/discover/__tests__/discoverEdgeScreens.test.tsx
+PASS __tests__/w31MarketplaceExtras.test.tsx
+  ΓùÅ Console
+
+    console.warn
+      SafeAreaView has been deprecated and will be removed in a future 
+release. Please use 'react-native-safe-area-context' instead. See 
+https://github.com/th3rdwave/react-native-safe-area-context
+
+    [0m [90m 85 |[39m }[33m:[39m [33mHashtagLandingScreenProps[39m) {
+     [90m 86 |[39m   [36mreturn[39m (
+    [31m[1m>[22m[39m[90m 87 |[39m     [33m<[39m[33mSafeAreaView[39m 
+style[33m=[39m{styles[33m.[39msafeArea} 
+testID[33m=[39m{testID}[33m>[39m
+     [90m    |[39m      [31m[1m^[22m[39m
+     [90m 88 |[39m       {[90m/* Tag header */[39m}
+     [90m 89 |[39m       [33m<[39m[33mView[39m 
+style[33m=[39m{styles[33m.[39mhashtagHeader}[33m>[39m
+     [90m 90 |[39m         [33m<[39m[33mText[39m[0m
+
+      at warnOnce 
+(node_modules/react-native/Libraries/Utilities/warnOnce.js:12:11)
+      at Object.get SafeAreaView [as SafeAreaView] 
+(node_modules/react-native/index.js:48:5)
+      at SafeAreaView (src/app/marketplace/MarketplaceExtrasScreen.tsx:87:6)
+      at Object.react-stack-bottom-frame (node_modules/react-test-renderer/cjs/
+react-test-renderer.development.js:13976:20)
+      at renderWithHooks (node_modules/react-test-renderer/cjs/react-test-rende
+rer.development.js:2866:22)
+      at updateFunctionComponent (node_modules/react-test-renderer/cjs/react-te
+st-renderer.development.js:6006:19)
+      at beginWork (node_modules/react-test-renderer/cjs/react-test-renderer.de
+velopment.js:7474:18)
+      at runWithFiberInDEV (node_modules/react-test-renderer/cjs/react-test-ren
+derer.development.js:1574:13)
+      at performUnitOfWork (node_modules/react-test-renderer/cjs/react-test-ren
+derer.development.js:10972:22)
+      at workLoopSync (node_modules/react-test-renderer/cjs/react-test-renderer
+.development.js:10816:41)
+      at renderRootSync (node_modules/react-test-renderer/cjs/react-test-render
+er.development.js:10797:11)
+      at performWorkOnRoot (node_modules/react-test-renderer/cjs/react-test-ren
+derer.development.js:10349:13)
+      at performWorkOnRootViaSchedulerTask (node_modules/react-test-renderer/cj
+s/react-test-renderer.development.js:2094:7)
+      at flushActQueue (node_modules/react/cjs/react.development.js:566:34)
+      at Object.<anonymous>.process.env.NODE_ENV.exports.act 
+(node_modules/react/cjs/react.development.js:859:10)
+      at actImplementation 
+(node_modules/@testing-library/react-native/src/act.ts:30:25)
+      at renderWithAct 
+(node_modules/@testing-library/react-native/src/render-act.ts:13:11)
+      at renderInternal 
+(node_modules/@testing-library/react-native/src/render.tsx:69:33)
+      at renderInternal 
+(node_modules/@testing-library/react-native/src/render.tsx:44:10)
+      at Object.<anonymous> (__tests__/w31MarketplaceExtras.test.tsx:41:35)
+
+PASS src/app/activities/__tests__/ActivityScreens.smoke.test.tsx
+PASS src/app/waitlist/__tests__/waitlistScreens.test.tsx
+PASS src/app/auth/__tests__/SignInScreen.test.tsx
+  ΓùÅ Console
+
+    console.error
+      An update to AuthProvider inside a test was not wrapped in act(...).
+      
+      When testing, code that causes React state updates should be wrapped 
+into act(...):
+      
+      act(() => {
+        /* fire events that update state */
+      });
+      /* assert on the output */
+      
+      This ensures that you're testing the behavior the user would see in the 
+browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+    [0m [90m 67 |[39m       } [36mfinally[39m {
+     [90m 68 |[39m         [36mif[39m ([33m![39mcancelled) {
+    [31m[1m>[22m[39m[90m 69 |[39m           
+setAuthReady([36mtrue[39m)[33m;[39m
+     [90m    |[39m           [31m[1m^[22m[39m
+     [90m 70 |[39m         }
+     [90m 71 |[39m       }
+     [90m 72 |[39m     }[0m
+
+      at node_modules/react-test-renderer/cjs/react-test-renderer.development.j
+s:11801:19
+      at runWithFiberInDEV (node_modules/react-test-renderer/cjs/react-test-ren
+derer.development.js:1574:13)
+      at warnIfUpdatesNotWrappedWithActDEV (node_modules/react-test-renderer/cj
+s/react-test-renderer.development.js:11800:9)
+      at scheduleUpdateOnFiber (node_modules/react-test-renderer/cjs/react-test
+-renderer.development.js:10326:9)
+      at dispatchSetStateInternal (node_modules/react-test-renderer/cjs/react-t
+est-renderer.development.js:4148:13)
+      at dispatchSetState (node_modules/react-test-renderer/cjs/react-test-rend
+erer.development.js:4107:7)
+      at setAuthReady (src/app/providers/AuthProvider.tsx:69:11)
+      at asyncGeneratorStep 
+(node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+PASS src/app/auth/__tests__/Verification.test.tsx
+PASS src/app/navigation/__tests__/onboardingContracts.test.ts
+PASS __tests__/w31PrimitivesK.test.tsx
+PASS src/app/activities/__tests__/activitiesScreens.test.tsx
+PASS __tests__/w31MessagingExtras.test.tsx
+  ΓùÅ Console
+
+    console.warn
+      SafeAreaView has been deprecated and will be removed in a future 
+release. Please use 'react-native-safe-area-context' instead. See 
+https://github.com/th3rdwave/react-native-safe-area-context
+
+    [0m [90m 169 |[39m
+     [90m 170 |[39m   [36mreturn[39m (
+    [31m[1m>[22m[39m[90m 171 |[39m     [33m<[39m[33mSafeAreaView[39m 
+style[33m=[39m{styles[33m.[39msafeArea} 
+testID[33m=[39m{testID}[33m>[39m
+     [90m     |[39m      [31m[1m^[22m[39m
+     [90m 172 |[39m       [33m<[39m[33mView[39m 
+style[33m=[39m{styles[33m.[39msearchHeader}[33m>[39m
+     [90m 173 |[39m         [33m<[39m[33mView[39m 
+style[33m=[39m{styles[33m.[39msearchInputWrap}[33m>[39m
+     [90m 174 |[39m           [33m<[39m[33mInputField[39m[0m
+
+      at warnOnce 
+(node_modules/react-native/Libraries/Utilities/warnOnce.js:12:11)
+      at Object.get SafeAreaView [as SafeAreaView] 
+(node_modules/react-native/index.js:48:5)
+      at SafeAreaView (src/app/messaging/MessagingExtrasScreen.tsx:171:6)
+      at Object.react-stack-bottom-frame (node_modules/react-test-renderer/cjs/
+react-test-renderer.development.js:13976:20)
+      at renderWithHooks (node_modules/react-test-renderer/cjs/react-test-rende
+rer.development.js:2866:22)
+      at updateFunctionComponent (node_modules/react-test-renderer/cjs/react-te
+st-renderer.development.js:6006:19)
+      at beginWork (node_modules/react-test-renderer/cjs/react-test-renderer.de
+velopment.js:7474:18)
+      at runWithFiberInDEV (node_modules/react-test-renderer/cjs/react-test-ren
+derer.development.js:1574:13)
+      at performUnitOfWork (node_modules/react-test-renderer/cjs/react-test-ren
+derer.development.js:10972:22)
+      at workLoopSync (node_modules/react-test-renderer/cjs/react-test-renderer
+.development.js:10816:41)
+      at renderRootSync (node_modules/react-test-renderer/cjs/react-test-render
+er.development.js:10797:11)
+      at performWorkOnRoot (node_modules/react-test-renderer/cjs/react-test-ren
+derer.development.js:10349:13)
+      at performWorkOnRootViaSchedulerTask (node_modules/react-test-renderer/cj
+s/react-test-renderer.development.js:2094:7)
+      at flushActQueue (node_modules/react/cjs/react.development.js:566:34)
+      at Object.<anonymous>.process.env.NODE_ENV.exports.act 
+(node_modules/react/cjs/react.development.js:859:10)
+      at actImplementation 
+(node_modules/@testing-library/react-native/src/act.ts:30:25)
+      at renderWithAct 
+(node_modules/@testing-library/react-native/src/render-act.ts:13:11)
+      at renderInternal 
+(node_modules/@testing-library/react-native/src/render.tsx:69:33)
+      at renderInternal 
+(node_modules/@testing-library/react-native/src/render.tsx:44:10)
+      at Object.<anonymous> (__tests__/w31MessagingExtras.test.tsx:88:35)
+
+PASS src/shared/ui/__tests__/messaging-primitives.test.tsx
+PASS src/domains/ai/__tests__/noShowFraudService.test.ts
+PASS src/shared/ui/__tests__/discovery-primitives.test.tsx
+PASS src/domains/ai/__tests__/chatAssistantService.test.ts
+PASS src/domains/ai/__tests__/budgetAdminService.test.ts
+PASS src/app/providers/__tests__/LanguageProvider.test.tsx
+PASS __tests__/w38ReceiptDataService.test.ts
+PASS src/app/auth/__tests__/PasswordReset.test.tsx
+PASS src/domains/onboarding/__tests__/model.test.ts
+PASS src/app/bookings/__tests__/CalendarScreens.test.tsx
+PASS __tests__/w32FirstRunExtras.test.tsx
+PASS src/domains/auth/__tests__/onboardingDraftContracts.test.ts
+PASS src/domains/analytics/__tests__/aiDataContracts.test.ts
+PASS src/domains/marketplace/__tests__/marketplacePostsService.test.ts
+PASS src/app/loyalty/__tests__/loyaltyRulesEngine.test.ts
+PASS src/shared/ui/__tests__/payments-primitives.test.tsx
+PASS src/domains/tax/__tests__/taxService.test.ts
+PASS src/app/dashboard/__tests__/MultiSalonDashboardScreens.test.tsx
+PASS src/app/discovery/__tests__/w34DiscoveryScreens.test.tsx
+PASS src/app/waitlist/__tests__/waitlistNotificationService.test.ts
+PASS src/shared/config/__tests__/env.test.ts
+PASS src/app/auth/__tests__/AccountMergeScreen.test.tsx
+PASS src/app/providers/__tests__/AppProviders.test.tsx
+PASS src/shared/ui/__tests__/Button.test.tsx
+PASS src/shared/ui/__tests__/FilterSheet.test.tsx
+PASS src/app/providers/__tests__/TenantProvider.test.tsx
+PASS src/app/onboarding/__tests__/clientOnboardingOrchestrator.test.ts
+PASS src/domains/onboarding/__tests__/wizardService.test.ts
+PASS __tests__/w32PermissionsExtras.test.tsx
+  ΓùÅ Console
+
+    console.warn
+      SafeAreaView has been deprecated and will be removed in a future 
+release. Please use 'react-native-safe-area-context' instead. See 
+https://github.com/th3rdwave/react-native-safe-area-context
+
+    [0m [90m 37 |[39m }[33m:[39m [33mPermissionRecoveryScreenProps[39m) 
+{
+     [90m 38 |[39m   [36mreturn[39m (
+    [31m[1m>[22m[39m[90m 39 |[39m     [33m<[39m[33mSafeAreaView[39m 
+style[33m=[39m{styles[33m.[39msafe} testID[33m=[39m{testID}[33m>[39m
+     [90m    |[39m      [31m[1m^[22m[39m
+     [90m 40 |[39m       [33m<[39m[33mPermissionsGate[39m
+     [90m 41 |[39m         permissionType[33m=[39m[32m"camera"[39m
+     [90m 42 |[39m         variant[33m=[39m[32m"screen"[39m[0m
+
+      at warnOnce 
+(node_modules/react-native/Libraries/Utilities/warnOnce.js:12:11)
+      at Object.get SafeAreaView [as SafeAreaView] 
+(node_modules/react-native/index.js:48:5)
+      at SafeAreaView (src/app/platform/PermissionsExtrasScreen.tsx:39:6)
+      at Object.react-stack-bottom-frame (node_modules/react-test-renderer/cjs/
+react-test-renderer.development.js:13976:20)
+      at renderWithHooks (node_modules/react-test-renderer/cjs/react-test-rende
+rer.development.js:2866:22)
+      at updateFunctionComponent (node_modules/react-test-renderer/cjs/react-te
+st-renderer.development.js:6006:19)
+      at beginWork (node_modules/react-test-renderer/cjs/react-test-renderer.de
+velopment.js:7474:18)
+      at runWithFiberInDEV (node_modules/react-test-renderer/cjs/react-test-ren
+derer.development.js:1574:13)
+      at performUnitOfWork (node_modules/react-test-renderer/cjs/react-test-ren
+derer.development.js:10972:22)
+      at workLoopSync (node_modules/react-test-renderer/cjs/react-test-renderer
+.development.js:10816:41)
+      at renderRootSync (node_modules/react-test-renderer/cjs/react-test-render
+er.development.js:10797:11)
+      at performWorkOnRoot (node_modules/react-test-renderer/cjs/react-test-ren
+derer.development.js:10349:13)
+      at performWorkOnRootViaSchedulerTask (node_modules/react-test-renderer/cj
+s/react-test-renderer.development.js:2094:7)
+      at flushActQueue (node_modules/react/cjs/react.development.js:566:34)
+      at Object.<anonymous>.process.env.NODE_ENV.exports.act 
+(node_modules/react/cjs/react.development.js:859:10)
+      at actImplementation 
+(node_modules/@testing-library/react-native/src/act.ts:30:25)
+      at renderWithAct 
+(node_modules/@testing-library/react-native/src/render-act.ts:13:11)
+      at renderInternal 
+(node_modules/@testing-library/react-native/src/render.tsx:69:33)
+      at renderInternal 
+(node_modules/@testing-library/react-native/src/render.tsx:44:10)
+      at Object.<anonymous> (__tests__/w32PermissionsExtras.test.tsx:28:35)
+
+PASS src/domains/ai/__tests__/marketplacePersonalizationService.test.ts
+PASS src/domains/payments/__tests__/repository.test.ts
+PASS __tests__/w22EditorialRepo.test.tsx
+PASS src/domains/reviews/__tests__/repository.test.ts
+PASS src/domains/staff/__tests__/repository.test.ts
+PASS src/app/dashboard/__tests__/unreadAggregationService.test.ts
+PASS src/domains/ai/__tests__/marketingOrchestratorService.test.ts
+PASS src/domains/auth/__tests__/onboardingDraftService.test.ts
+PASS src/app/analytics/__tests__/exportService.test.ts
+PASS src/domains/trial/__tests__/trialService.test.ts
+PASS src/domains/bookings/__tests__/bookingIntegration.test.ts
+PASS src/domains/bookings/__tests__/repository.test.ts
+PASS __tests__/w46AdminRepoAdapters.test.ts
+PASS src/app/discover/__tests__/discoveryFilters.test.ts
+PASS src/domains/segments/__tests__/repository.test.ts
+PASS src/domains/bookings/__tests__/repository.write.test.ts
+PASS src/domains/tenants/__tests__/tenantUsersRepository.test.ts
+PASS src/shared/ui/__tests__/InputField.test.tsx
+PASS src/domains/referrals/__tests__/repository.test.ts
+PASS src/domains/activities/__tests__/repository.test.ts
+PASS src/domains/campaigns/__tests__/repository.test.ts
+PASS src/domains/tenants/__tests__/repository.test.ts
+PASS src/shared/ui/__tests__/primitives.test.tsx
+PASS 
+src/domains/marketplace/__tests__/marketplaceAcquisitionsRepository.test.ts
+PASS src/domains/marketplace/__tests__/discoveryService.test.ts
+PASS src/domains/billing/__tests__/subscriptionService.test.ts
+PASS src/domains/loyalty/__tests__/repository.test.ts
+PASS src/domains/auth/__tests__/socialAuthService.test.ts
+PASS src/domains/marketplace/__tests__/repository.test.ts
+PASS src/domains/ai/__tests__/schedulingAssistantService.test.ts
+PASS src/domains/waitlist/__tests__/repository.test.ts
+PASS src/domains/gating/__tests__/gatingService.test.ts
+PASS src/domains/discovery/__tests__/discoveryService.test.ts
+PASS src/domains/ai/__tests__/budgetConfigRepository.test.ts
+PASS src/domains/staff/__tests__/staffSchedulesRepository.test.ts
+PASS src/app/activities/__tests__/activityAdminService.test.ts
+PASS src/domains/auth/__tests__/onboardingDraftRepository.test.ts
+PASS src/domains/locations/__tests__/repository.test.ts
+PASS src/domains/bookings/__tests__/stateMachine.test.ts
+PASS src/domains/notifications/__tests__/notificationEventModel.test.ts
+PASS src/domains/auth/__tests__/repository.test.ts
+PASS src/domains/messages/__tests__/repository.test.ts
+PASS src/domains/services/__tests__/repository.test.ts
+PASS src/domains/marketplace/__tests__/guardrailsService.test.ts
+PASS src/domains/onboarding/__tests__/repository.test.ts
+PASS src/domains/templates/__tests__/repository.test.ts
+PASS src/domains/ai/__tests__/riskPolicyRepository.test.ts
+PASS __tests__/w38RefundDataService.test.tsx
+PASS src/app/navigation/__tests__/routes.test.ts
+PASS src/domains/ai/__tests__/schedulingOptimizationService.test.ts
+PASS src/app/admin/__tests__/serviceAdminService.test.ts
+PASS src/domains/notifications/__tests__/templateRenderer.test.ts
+PASS src/domains/ai/__tests__/contentAssistantService.test.ts
+PASS src/domains/connect/__tests__/connectService.test.ts
+PASS src/app/bookings/__tests__/bookingService.test.ts
+PASS src/domains/onboarding/__tests__/adminService.test.ts
+PASS src/app/messaging/__tests__/messagingHelpers.test.ts
+PASS src/app/payments/__tests__/paymentsHelpers.test.ts
+PASS src/domains/trial/__tests__/repository.test.ts
+PASS src/domains/analytics/__tests__/metricsService.test.ts
+PASS src/app/analytics/__tests__/campaignAnalyticsService.test.ts
+PASS src/domains/tax/__tests__/vatValidation.test.ts
+PASS src/domains/tax/__tests__/repository.test.ts
+PASS src/domains/ai/__tests__/serviceRecommendationsService.test.ts
+PASS src/app/booking/__tests__/bookingHelpers.test.ts
+PASS src/domains/billing/__tests__/repository.test.ts
+PASS src/app/navigation/__tests__/onboardingPersistence.test.ts
+PASS 
+src/app/onboarding/__tests__/clientOnboardingOrchestrator.persistence.test.ts
+PASS src/domains/ai/__tests__/supportTriageService.test.ts
+PASS src/app/onboarding/__tests__/clientOnboardingFirestorePersistence.test.ts
+PASS src/app/migration/__tests__/zaraMigration.test.ts
+PASS src/shared/ui/__tests__/formatters.test.ts
+PASS src/domains/ai/__tests__/retentionInsightsService.test.ts
+PASS src/domains/discovery/__tests__/salonProfileService.test.ts
+PASS src/app/payments/__tests__/receiptsHelpers.test.ts
+PASS src/app/analytics/__tests__/reportingService.test.ts
+PASS src/domains/tenants/__tests__/userTenantAccessRepository.test.ts
+PASS src/shared/ai/__tests__/budgetGuard.test.ts
+PASS src/app/bookings/__tests__/adminBookingQueueService.test.ts
+PASS src/app/bookings/__tests__/clientBookingFlow.test.ts
+PASS src/shared/ai/__tests__/telemetry.test.ts
+PASS src/domains/bookings/__tests__/slotEngine.test.ts
+PASS src/app/admin/__tests__/tenantLocationAdminService.test.ts
+PASS src/domains/connect/__tests__/repository.test.ts
+PASS src/app/admin/__tests__/staffAdminService.test.ts
+PASS src/domains/tenants/__tests__/tenantAccessSyncService.test.ts
+PASS src/app/loyalty/__tests__/loyaltyHelpers.test.ts
+PASS src/domains/bookings/__tests__/conflictChecker.test.ts
+PASS src/domains/analytics/__tests__/campaignMetricsService.test.ts
+PASS src/app/navigation/__tests__/AppNavigatorShell.test.tsx (12.127 s)
+  ΓùÅ Console
+
+    console.warn
+      expo-notifications: Android Push notifications (remote notifications) 
+functionality provided by expo-notifications was removed from Expo Go with the 
+release of SDK 53. Use a development build instead of Expo Go. Read more at 
+https://docs.expo.dev/develop/development-builds/introduction/.
+
+    [0m [90m 14 |[39m
+     [90m 15 |[39m [36mimport[39m [33m*[39m [36mas[39m 
+[33mDevice[39m [36mfrom[39m [32m"expo-device"[39m[33m;[39m
+    [31m[1m>[22m[39m[90m 16 |[39m [36mimport[39m [33m*[39m 
+[36mas[39m [33mNotifications[39m [36mfrom[39m 
+[32m"expo-notifications"[39m[33m;[39m
+     [90m    |[39m [31m[1m^[22m[39m
+     [90m 17 |[39m [36mimport[39m { [33mPlatform[39m } [36mfrom[39m 
+[32m"react-native"[39m[33m;[39m
+     [90m 18 |[39m
+     [90m 19 |[39m [36mexport[39m type [33mPushTokenRecord[39m 
+[33m=[39m {[0m
+
+      at warn 
+(node_modules/expo-notifications/src/warnOfExpoGoPushUsage.ts:14:15)
+      at addPushTokenListener 
+(node_modules/expo-notifications/src/TokenEmitter.ts:44:24)
+      at Object.<anonymous> (node_modules/expo-notifications/src/DevicePushToke
+nAutoRegistration.fx.ts:104:23)
+      at Object.require 
+(node_modules/expo-notifications/src/getExpoPushTokenAsync.ts:5:1)
+      at Object.require (node_modules/expo-notifications/src/index.ts:16:1)
+      at Object.require (src/app/notifications/registerFcmToken.ts:16:1)
+      at Object.require (src/app/navigation/AppNavigatorShell.tsx:518:1)
+      at Object.require 
+(src/app/navigation/__tests__/AppNavigatorShell.test.tsx:4:1)
+
+    console.log
+      [ProfileStats] loyalty points total: 0 across 0 tenants
+
+      at log (src/app/navigation/AppNavigatorShell.tsx:2976:17)
+
+    console.log
+      [ProfileStats] loyalty points total: 0 across 0 tenants
+
+      at log (src/app/navigation/AppNavigatorShell.tsx:2976:17)
+
+PASS src/app/navigation/__tests__/AppNavigatorShell.webRouting.test.tsx (7.066 
+s)
+  ΓùÅ Console
+
+    console.warn
+      expo-notifications: Android Push notifications (remote notifications) 
+functionality provided by expo-notifications was removed from Expo Go with the 
+release of SDK 53. Use a development build instead of Expo Go. Read more at 
+https://docs.expo.dev/develop/development-builds/introduction/.
+
+    [0m [90m 14 |[39m
+     [90m 15 |[39m [36mimport[39m [33m*[39m [36mas[39m 
+[33mDevice[39m [36mfrom[39m [32m"expo-device"[39m[33m;[39m
+    [31m[1m>[22m[39m[90m 16 |[39m [36mimport[39m [33m*[39m 
+[36mas[39m [33mNotifications[39m [36mfrom[39m 
+[32m"expo-notifications"[39m[33m;[39m
+     [90m    |[39m [31m[1m^[22m[39m
+     [90m 17 |[39m [36mimport[39m { [33mPlatform[39m } [36mfrom[39m 
+[32m"react-native"[39m[33m;[39m
+     [90m 18 |[39m
+     [90m 19 |[39m [36mexport[39m type [33mPushTokenRecord[39m 
+[33m=[39m {[0m
+
+      at warn 
+(node_modules/expo-notifications/src/warnOfExpoGoPushUsage.ts:14:15)
+      at addPushTokenListener 
+(node_modules/expo-notifications/src/TokenEmitter.ts:44:24)
+      at Object.<anonymous> (node_modules/expo-notifications/src/DevicePushToke
+nAutoRegistration.fx.ts:104:23)
+      at Object.require 
+(node_modules/expo-notifications/src/getExpoPushTokenAsync.ts:5:1)
+      at Object.require (node_modules/expo-notifications/src/index.ts:16:1)
+      at Object.require (src/app/notifications/registerFcmToken.ts:16:1)
+      at Object.require (src/app/navigation/AppNavigatorShell.tsx:518:1)
+      at Object.require 
+(src/app/navigation/__tests__/AppNavigatorShell.webRouting.test.tsx:7:1)
+
+
+Test Suites: 182 passed, 182 total
+Tests:       3667 passed, 3667 total
+Snapshots:   0 total
+Time:        13.06 s
+Ran all test suites.
