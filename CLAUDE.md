@@ -4,6 +4,23 @@
 
 Multi-tenant SaaS for salons + consumer marketplace. Bookable unit is a **service** at a **location**, not a salon. One service card = one bookable service at one location. Primary market: US.
 
+## Shell environment
+
+This project runs on **Windows PowerShell 5.1**. Important constraints:
+
+- ❌ Do NOT use `&&` to chain commands — PowerShell 5.1 does not support it
+- ✅ Use `;` for command chaining: `cd X; command`
+- ✅ Or run commands separately
+- ✅ You are already in `C:\dev\Zarkili` — no need to `cd` at the start of commands
+- ✅ Pipe to `Select-String` (not `grep`): `command 2>&1 | Select-String "pattern"`
+- ✅ Paths use backslashes: `src\app\file.ts` (forward slashes also work but match the OS convention)
+- ✅ For multi-line commands, use backticks (` ` `) as line continuation, not backslashes
+- ✅ Counting matches: `... | Select-String "pattern" | Measure-Object | Select-Object -ExpandProperty Count`
+
+When suggesting commands, default to PowerShell-native syntax. Do not assume bash/Unix conventions.
+
+---
+
 ## Quality gate — non-negotiable
 
 ```powershell
