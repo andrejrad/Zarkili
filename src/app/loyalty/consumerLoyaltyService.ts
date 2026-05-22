@@ -8,6 +8,7 @@
 import type { LoyaltyRepository } from "../../domains/loyalty/repository";
 import type { LoyaltyTransaction } from "../../domains/loyalty/model";
 import type { ActivityRepository } from "../../domains/activities/repository";
+
 import type {
   Activity as UiActivity,
   ActivityStatus as UiActivityStatus,

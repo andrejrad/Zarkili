@@ -7,6 +7,9 @@
 import React, { useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 
+import { brandTypography } from "../../shared/ui/brandTypography";
+import type { TenantServiceCategory } from "../../domains/services/serviceCatalogModel";
+
 import {
   AdminDataTable,
   AdminDataTableColumn,
@@ -16,8 +19,6 @@ import {
   BulkActionBar,
   BulkConfirmModal,
 } from "./AdminPatterns";
-import { brandTypography } from "../../shared/ui/brandTypography";
-import type { TenantServiceCategory } from "../../domains/services/serviceCatalogModel";
 
 // ---------------------------------------------------------------------------
 // Types

@@ -14,13 +14,14 @@ import {
   View,
 } from "react-native";
 
-import { AdminEmptyState, AdminErrorState, AdminLoadingState } from "./AdminPatterns";
 import { brandTypography } from "../../shared/ui/brandTypography";
 import type {
   ReviewAutomationRule,
   ReviewAutomationRuleInput,
   ReviewRatingOp,
 } from "../../domains/reviews/reviewAdminModel";
+
+import { AdminEmptyState, AdminErrorState, AdminLoadingState } from "./AdminPatterns";
 
 // ---------------------------------------------------------------------------
 // Props

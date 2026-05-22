@@ -12,7 +12,6 @@ import {
   type RiskInputSignals,
   type RiskModelOutput,
 } from "../noShowFraudService";
-
 import type { AiBudgetUsageSnapshot } from "../../../shared/ai";
 
 const MONTH = "2026-04";

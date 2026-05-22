@@ -26,6 +26,7 @@ import type {
   ServiceTypeCard as ServiceTypeCardData,
 } from "../../domains/discovery";
 import { colors, radius, spacing, textStyles } from "../../shared/ui";
+
 import { CategoryChipRow } from "./CategoryChipRow";
 import {
   DEFAULT_FILTERS,

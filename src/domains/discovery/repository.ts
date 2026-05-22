@@ -11,15 +11,16 @@ import {
 } from "firebase/firestore";
 import type { Firestore } from "firebase/firestore";
 import {
+  geohashQueryBounds,
+  distanceBetween,
+} from "geofire-common";
+
+import {
   SERVICE_TYPES_COLLECTION,
   serviceAddonsCollectionSegments,
   servicePhotosCollectionSegments,
   serviceVariantsCollectionSegments,
 } from "../services/paths";
-import {
-  geohashQueryBounds,
-  distanceBetween,
-} from "geofire-common";
 
 import type {
   DiscoveryCategory,

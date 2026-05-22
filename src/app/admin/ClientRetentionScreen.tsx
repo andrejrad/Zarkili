@@ -17,7 +17,6 @@ import {
   View,
 } from "react-native";
 
-import { AdminErrorState, AdminLoadingState } from "./AdminPatterns";
 import { brandTypography } from "../../shared/ui/brandTypography";
 import type {
   AtRiskMetrics,
@@ -26,6 +25,8 @@ import type {
   RetentionMetrics,
   VisitIntervalMetrics,
 } from "../../domains/analytics/model";
+
+import { AdminErrorState, AdminLoadingState } from "./AdminPatterns";
 
 // ---------------------------------------------------------------------------
 // Props

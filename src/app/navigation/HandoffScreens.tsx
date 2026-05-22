@@ -17,8 +17,6 @@ import { brandTypography } from "../../shared/ui/brandTypography";
 import { NotificationIcon } from "../../shared/ui";
 import { formatMoney } from "../../shared/ui/money";
 import { useLanguage } from "../providers/LanguageProvider";
-
-import { CategoryIcon } from "./icons/CategoryIcon";
 import { ServiceTypeCard as ServiceTypeCardComponent } from "../discover/ServiceTypeCard";
 import { FilterSheetScreen } from "../discover/FilterSheetScreen";
 import { SortSheetScreen } from "../discover/SortSheetScreen";
@@ -29,6 +27,8 @@ import {
   countFilterBadge,
   type DiscoveryFilters,
 } from "../discover/discoveryFilters";
+
+import { CategoryIcon } from "./icons/CategoryIcon";
 
 /** Map-pin outline icon (Tabler ti-map-pin style). */
 function MapPinIcon({ color = "#6B6B6B", size = 20 }: { color?: string; size?: number }) {

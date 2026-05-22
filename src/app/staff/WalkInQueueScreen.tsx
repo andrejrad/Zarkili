@@ -15,6 +15,7 @@
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { QueueCard, colors, radius, spacing, textStyles } from "../../shared/ui";
+
 import type { StaffAppointment } from "./staffHelpers";
 
 // ─── Types ────────────────────────────────────────────────────────────────────

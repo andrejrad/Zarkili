@@ -17,7 +17,6 @@ import { ClientLookupScreen } from "../ClientLookupScreen";
 import { ClientDetailScreen } from "../ClientDetailScreen";
 import { ClientNotesHistoryScreen } from "../ClientNotesHistoryScreen";
 import { AIChatScreen } from "../AIChatScreen";
-
 import {
   deriveInitials,
   djb2AvatarColor,

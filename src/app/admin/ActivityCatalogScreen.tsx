@@ -12,9 +12,10 @@ import {
   View,
 } from "react-native";
 
-import { AdminEmptyState, AdminErrorState, AdminLoadingState } from "./AdminPatterns";
 import { brandTypography } from "../../shared/ui/brandTypography";
 import type { ActivityAdminEntry } from "../../domains/loyalty/loyaltyAdminModel";
+
+import { AdminEmptyState, AdminErrorState, AdminLoadingState } from "./AdminPatterns";
 
 // ---------------------------------------------------------------------------
 // Props

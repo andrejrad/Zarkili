@@ -7,6 +7,7 @@
 import { createLoyaltyRepository } from "../../domains/loyalty/repository";
 import { createActivityRepository } from "../../domains/activities/repository";
 import { db } from "../../shared/config/firebase";
+
 import { createConsumerLoyaltyService } from "./consumerLoyaltyService";
 
 const loyaltyRepo = createLoyaltyRepository(db);

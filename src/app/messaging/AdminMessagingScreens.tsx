@@ -25,6 +25,7 @@ import {
 
 import type { Message, MessageAttachment } from "../../domains/messages/model";
 import { ALLOWED_ATTACHMENT_TYPES, MAX_ATTACHMENT_SIZE_BYTES } from "../../domains/messages/model";
+
 import type { CustomerSummary } from "./adminMessagingService";
 
 // ---------------------------------------------------------------------------

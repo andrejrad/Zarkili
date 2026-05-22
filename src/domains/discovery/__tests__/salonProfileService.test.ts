@@ -6,6 +6,7 @@
  */
 
 import { createSalonProfileService } from "../salonProfileService";
+
 import type { Firestore } from "firebase/firestore";
 
 // ---------------------------------------------------------------------------

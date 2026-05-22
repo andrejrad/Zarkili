@@ -9,6 +9,7 @@ import {
   StyleSheet,
   ActivityIndicator,
 } from "react-native";
+
 import type { FeatureFlag } from "./platformAdminTypes";
 
 export type FeatureFlagConsoleScreenProps = {

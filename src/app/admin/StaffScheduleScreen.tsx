@@ -8,8 +8,9 @@
 import { Pressable, ScrollView, StyleSheet, Switch, Text, TextInput, View } from "react-native";
 
 import { brandTypography } from "../../shared/ui/brandTypography";
-import { AdminErrorState, AdminLoadingState } from "./AdminPatterns";
 import type { ScheduleWeekday, StaffScheduleTemplate } from "../../domains/staff";
+
+import { AdminErrorState, AdminLoadingState } from "./AdminPatterns";
 
 // ---------------------------------------------------------------------------
 // Types

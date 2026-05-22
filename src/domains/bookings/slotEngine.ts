@@ -1,4 +1,5 @@
 import type { ScheduleTimeBlock, ScheduleWeekday, StaffScheduleTemplate } from "../staff/staffSchedulesModel";
+
 import { hasConflict } from "./conflictChecker";
 import type { BookedInterval } from "./conflictChecker";
 

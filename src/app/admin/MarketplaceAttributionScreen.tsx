@@ -13,9 +13,10 @@ import {
   View,
 } from "react-native";
 
-import { AdminErrorState, AdminLoadingState } from "./AdminPatterns";
 import { brandTypography } from "../../shared/ui/brandTypography";
 import type { CampaignKpis, ChallengeKpis } from "../../domains/analytics/model";
+
+import { AdminErrorState, AdminLoadingState } from "./AdminPatterns";
 import type { MarketplaceAttributionData } from "./analyticsTypes";
 
 // ---------------------------------------------------------------------------

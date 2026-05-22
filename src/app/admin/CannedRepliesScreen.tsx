@@ -13,9 +13,10 @@ import {
   View,
 } from "react-native";
 
-import { AdminEmptyState, AdminErrorState, AdminLoadingState } from "./AdminPatterns";
 import { brandTypography } from "../../shared/ui/brandTypography";
 import type { CannedReply, CannedReplyInput } from "../../domains/messaging/messagingAdminModel";
+
+import { AdminEmptyState, AdminErrorState, AdminLoadingState } from "./AdminPatterns";
 
 // ---------------------------------------------------------------------------
 // Props

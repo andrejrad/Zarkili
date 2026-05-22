@@ -12,10 +12,12 @@
  */
 
 import { Linking, Pressable, StyleSheet, Text, View } from "react-native";
+
+import { djb2AvatarColor } from "../staffTypes";
+
 import type { TierVariant } from "./TierBadge";
 import { TierBadge } from "./TierBadge";
 import { colors, radius, spacing, textStyles } from "./tokens";
-import { djb2AvatarColor } from "../staffTypes";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

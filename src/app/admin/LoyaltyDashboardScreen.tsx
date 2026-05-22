@@ -13,13 +13,14 @@ import {
   View,
 } from "react-native";
 
-import { AdminErrorState, AdminLoadingState } from "./AdminPatterns";
 import { brandTypography } from "../../shared/ui/brandTypography";
 import type {
   LoyaltyActivitySummary,
   LoyaltyProgramStats,
   TierDistributionEntry,
 } from "../../domains/loyalty/loyaltyAdminModel";
+
+import { AdminErrorState, AdminLoadingState } from "./AdminPatterns";
 
 // ---------------------------------------------------------------------------
 // Props

@@ -9,9 +9,10 @@ import { useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { brandTypography } from "../../shared/ui/brandTypography";
+import type { Subscription } from "../../domains/billing";
+
 import { AdminErrorState, AdminLoadingState, AdminRoleDeniedState } from "./AdminPatterns";
 import type { BillingAdminService } from "./billingAdminService";
-import type { Subscription } from "../../domains/billing";
 
 // ---------------------------------------------------------------------------
 // Constants

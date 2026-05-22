@@ -14,6 +14,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import { ModalSheet } from "../../shared/ui/ModalSheet";
 import { Button } from "../../shared/ui/Button";
 import { colors, radius, spacing } from "../../shared/ui/tokens";
+
 import {
   formatPrice,
   type ServiceAddonSummary,

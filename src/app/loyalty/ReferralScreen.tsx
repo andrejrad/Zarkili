@@ -10,6 +10,7 @@
 import { Pressable, ScrollView, Share, StyleSheet, Text, View } from "react-native";
 
 import { Banner, colors, radius, spacing, textStyles } from "../../shared/ui";
+
 import { formatReferralCode, type ReferralStats } from "./loyaltyHelpers";
 
 export type ReferralScreenState = "default" | "copied" | "error";
@@ -152,7 +153,7 @@ export function ReferralScreen({
           <View style={styles.faqSection}>
             <Text style={styles.faqTitle}>Frequently asked questions</Text>
             {faqItems.map((item, i) => (
-              // eslint-disable-next-line react/no-array-index-key
+               
               <FaqRow key={i} item={item} />
             ))}
           </View>

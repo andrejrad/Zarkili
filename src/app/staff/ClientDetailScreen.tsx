@@ -17,6 +17,7 @@ import {
   spacing,
   textStyles,
 } from "../../shared/ui";
+
 import type { ClientDetail, StaffAppointment } from "./staffHelpers";
 import { formatLtv } from "./staffHelpers";
 

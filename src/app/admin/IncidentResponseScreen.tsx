@@ -8,6 +8,7 @@ import {
   StyleSheet,
   ActivityIndicator,
 } from "react-native";
+
 import type { IncidentRecord, IncidentSeverity, IncidentStatus } from "./platformAdminTypes";
 
 export type IncidentResponseScreenProps = {

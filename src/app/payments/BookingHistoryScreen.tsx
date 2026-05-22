@@ -20,6 +20,8 @@ import {
   radius,
   spacing,
 } from "../../shared/ui";
+import { formatUsDate, formatTimeOfDay } from "../booking/bookingHelpers";
+
 import {
   BOOKING_HISTORY_TAB_LABELS,
   BOOKING_HISTORY_TABS,
@@ -31,7 +33,6 @@ import {
   type BookingHistoryTab,
 } from "./receiptsHelpers";
 import { formatUsd } from "./paymentsHelpers";
-import { formatUsDate, formatTimeOfDay } from "../booking/bookingHelpers";
 
 const STATUS_LABELS: Record<BookingHistoryStatus, string> = {
   confirmed: "Confirmed",

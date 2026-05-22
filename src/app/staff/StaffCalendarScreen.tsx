@@ -21,6 +21,7 @@ import {
 } from "react-native";
 
 import { colors, radius, spacing, textStyles } from "../../shared/ui";
+
 import type { StaffAppointment } from "./staffHelpers";
 
 // ─── Layout constants ─────────────────────────────────────────────────────────

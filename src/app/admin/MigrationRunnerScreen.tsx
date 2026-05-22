@@ -7,6 +7,7 @@ import {
   StyleSheet,
   ActivityIndicator,
 } from "react-native";
+
 import type { MigrationJob, MigrationJobStatus } from "./platformAdminTypes";
 
 export type MigrationRunnerScreenProps = {

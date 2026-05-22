@@ -22,6 +22,7 @@
 
 import type { SupportedLanguage } from "../../shared/i18n";
 import { fallbackLanguage, supportedLanguages } from "../../shared/i18n";
+
 import type { NotificationEventType } from "./notificationEventModel";
 import {
   BUILT_IN_TEMPLATES,

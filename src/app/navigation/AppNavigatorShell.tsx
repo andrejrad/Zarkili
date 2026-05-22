@@ -1,9 +1,11 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ActivityIndicator, BackHandler, Linking, Platform, ScrollView, Share, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-
 import { useStripe } from "@stripe/stripe-react-native";
-import { WebStripePaymentForm } from "../booking/WebStripePaymentForm";
+import { sendEmailVerification } from "firebase/auth";
+import { httpsCallable } from "firebase/functions";
+import { collection, collectionGroup, doc, getDoc, getDocs, limit, orderBy, query, setDoc, where } from "firebase/firestore";
 
+import { WebStripePaymentForm } from "../booking/WebStripePaymentForm";
 import type { AiBudgetAdminService, UpdateAiBudgetConfigInput } from "../../domains/ai";
 import type { DiscoveryService, SignInInput } from "../../domains";
 import type { TenantMembership } from "../../domains/auth";
@@ -352,30 +354,12 @@ import { MultiSalonDashboardScreen } from "../dashboard/MultiSalonDashboardScree
 import type { SalonQuickAction } from "../dashboard/MultiSalonDashboardScreens";
 import type { UnreadAggregationService, SalonSummary } from "../dashboard/unreadAggregationService";
 import { getFriendlyFirebaseAuthMessage } from "../../domains/auth/errorMessages";
-import { sendEmailVerification } from "firebase/auth";
 import { auth, db, functions } from "../../shared/config/firebase";
-import { httpsCallable } from "firebase/functions";
-import { collection, collectionGroup, doc, getDoc, getDocs, limit, orderBy, query, setDoc, where } from "firebase/firestore";
 import { bookingsRepository as appBookingsRepository } from "../bookings/runtime";
 import type { SavedPaymentMethod as AppSavedPaymentMethod } from "../payments/paymentsHelpers";
-
-import {
-  AuthRouteScreen,
-  CompleteProfileRouteScreen,
-  ExploreRouteScreen,
-  GuestBookingsEmptyScreen,
-  GuestRewardsEmptyScreen,
-  HomeRouteScreen,
-  ProfileRouteScreen,
-  SettingsShellRouteScreen,
-  WelcomeRouteScreen,
-} from "./HandoffScreens";
-import type { HomeRebookItem } from "./HandoffScreens";
 import { EditProfileScreen } from "../profile/EditProfileScreen";
 import { LegalPageScreen } from "../legal/LegalPageScreen";
 import type { LegalPageType } from "../legal/LegalPageScreen";
-import { BottomTabBar } from "./BottomTabBar";
-import type { BottomTabName } from "./BottomTabBar";
 import { SignInScreen } from "../auth/SignInScreen";
 import { SignUpScreen } from "../auth/SignUpScreen";
 import {
@@ -514,8 +498,22 @@ import type { ConsumerMessagingService, SalonSearchResult } from "../messaging/c
 import type { ConsumerNotificationService } from "../notifications/consumerNotificationService";
 import type { WaitlistRepository } from "../../domains/waitlist/repository";
 import type { WizardService } from "../../domains/onboarding/wizardService";
-
 import { getDevicePushToken } from "../notifications/registerFcmToken";
+
+import type { BottomTabName } from "./BottomTabBar";
+import { BottomTabBar } from "./BottomTabBar";
+import type { HomeRebookItem } from "./HandoffScreens";
+import {
+  AuthRouteScreen,
+  CompleteProfileRouteScreen,
+  ExploreRouteScreen,
+  GuestBookingsEmptyScreen,
+  GuestRewardsEmptyScreen,
+  HomeRouteScreen,
+  ProfileRouteScreen,
+  SettingsShellRouteScreen,
+  WelcomeRouteScreen,
+} from "./HandoffScreens";
 import {
   appRoutes,
   canAccessRoute,
@@ -2201,7 +2199,7 @@ export function AppNavigatorShell({
         selectionChips={selectionChips}
       />
     );
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   }, [
     activeRoute.name,
     consumerSelectedServiceIds,
@@ -2429,7 +2427,7 @@ export function AppNavigatorShell({
       hasAutoNavigatedToDashboard.current = true;
       setActiveRouteName("SalonDashboard");
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   }, [membershipsLoading, availableMemberships.length, unreadAggregationService]);
 
   useEffect(() => {
@@ -6450,7 +6448,7 @@ export function AppNavigatorShell({
       // NEW-DEBT-D guard: v1 supports a single service. Warn if multiple
       // selected; reserveSlot only used the first one.
       if (consumerSelectedServiceIds.length > 1 && __DEV__) {
-        // eslint-disable-next-line no-console
+         
         console.warn(
           `[booking] Multi-service booking attempted (${consumerSelectedServiceIds.length} services); only the first was reserved. See NEW-DEBT-D.`,
         );

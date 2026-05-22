@@ -8,6 +8,7 @@ import {
   StyleSheet,
   ActivityIndicator,
 } from "react-native";
+
 import type { ConsentPolicyEntry } from "./platformAdminTypes";
 
 export type ConsentPolicyLogScreenProps = {

@@ -22,6 +22,7 @@ import {
 import type { Booking } from "../bookings/model";
 import type { Campaign } from "../campaigns/model";
 import type { Activity, ParticipationRecord } from "../activities/model";
+
 import type { AnalyticsDateRange } from "./model";
 
 // ---------------------------------------------------------------------------

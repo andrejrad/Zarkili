@@ -13,6 +13,7 @@
  */
 
 import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { useState } from "react";
 
 import {
   Button,
@@ -22,7 +23,6 @@ import {
   radius,
   spacing,
 } from "../../shared/ui";
-import { useState } from "react";
 
 export { ConflictRecoveryModal };
 

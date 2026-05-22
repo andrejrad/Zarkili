@@ -13,7 +13,9 @@ import {
   type Firestore,
   type QueryConstraint,
 } from "firebase/firestore";
+
 import type { AiFeatureKey } from "../../shared/ai";
+
 import type {
   AiFeatureToggleConfig,
   AiSuggestion,

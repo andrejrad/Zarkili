@@ -32,12 +32,13 @@ import {
   spacing,
   textStyles,
 } from "../../shared/ui";
+import type { AIChatComposerState } from "../../shared/ui/AIChatComposer";
+
 import type {
   AIBudgetState,
   AIChatMessage,
   AISuggestion,
 } from "./staffHelpers";
-import type { AIChatComposerState } from "../../shared/ui/AIChatComposer";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

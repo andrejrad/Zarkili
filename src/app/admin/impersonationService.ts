@@ -10,6 +10,7 @@ import {
   serverTimestamp,
   type Firestore,
 } from "firebase/firestore";
+
 import type { ImpersonationSession } from "./platformAdminTypes";
 
 const USER_PROFILES_COLLECTION = "userProfiles";

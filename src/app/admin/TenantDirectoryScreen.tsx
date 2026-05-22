@@ -8,6 +8,7 @@ import {
   StyleSheet,
   ActivityIndicator,
 } from "react-native";
+
 import type { TenantRecord, TenantFilter, TenantStatus } from "./platformAdminTypes";
 
 export type TenantDirectoryScreenProps = {

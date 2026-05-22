@@ -17,6 +17,7 @@ import {
   spacing,
   textStyles,
 } from "../../shared/ui";
+
 import { formatPoints } from "./loyaltyHelpers";
 
 export type RedemptionState =

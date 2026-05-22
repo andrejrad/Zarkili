@@ -9,6 +9,7 @@ import { useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { brandTypography } from "../../shared/ui/brandTypography";
+
 import { AdminErrorState, AdminLoadingState, AdminSectionRow, AdminToggleRow } from "./AdminPatterns";
 import type { Location, LocationAccessibilityFlags, HolidayEntry, UpdateLocationInput } from "./locationAdminService";
 

@@ -16,7 +16,6 @@ import {
   View,
 } from "react-native";
 
-import { AdminEmptyState, AdminErrorState, AdminLoadingState } from "./AdminPatterns";
 import { brandTypography } from "../../shared/ui/brandTypography";
 import type {
   OnboardingStep,
@@ -25,6 +24,8 @@ import type {
   SalonOnboardingState,
 } from "../../domains/onboarding/model";
 import { ONBOARDING_STEPS } from "../../domains/onboarding/model";
+
+import { AdminEmptyState, AdminErrorState, AdminLoadingState } from "./AdminPatterns";
 
 // ---------------------------------------------------------------------------
 // Constants

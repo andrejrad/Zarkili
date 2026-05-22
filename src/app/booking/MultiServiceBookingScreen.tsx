@@ -33,6 +33,7 @@ import {
   radius,
   spacing,
 } from "../../shared/ui";
+
 import type { BookingServiceCategoryGroup } from "./ServiceSelectionScreen";
 import type { BookingService } from "./bookingHelpers";
 import { computeBookingTotal, formatUsd } from "./bookingHelpers";

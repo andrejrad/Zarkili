@@ -4,6 +4,9 @@ import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-
 import type { Location } from "../../domains/locations";
 import type { StaffMember } from "../../domains/staff";
 import type { Service } from "../../domains/services";
+import { brandTypography } from "../../shared/ui/brandTypography";
+import { formatMoneyMajor } from "../../shared/ui/money";
+
 import {
   AdminDataTable,
   AdminEmptyState,
@@ -13,8 +16,6 @@ import {
   BulkConfirmModal,
   type AdminDataTableColumn,
 } from "./AdminPatterns";
-import { brandTypography } from "../../shared/ui/brandTypography";
-import { formatMoneyMajor } from "../../shared/ui/money";
 
 function PrimaryButton({ label, onPress, disabled = false, testID }: { label: string; onPress: () => void; disabled?: boolean; testID?: string }) {
   return (

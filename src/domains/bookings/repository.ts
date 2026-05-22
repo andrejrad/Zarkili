@@ -13,6 +13,12 @@ import {
 } from "firebase/firestore";
 import type { Firestore } from "firebase/firestore";
 
+import type { ServiceAddon, ServiceVariant } from "../services/model";
+import {
+  serviceAddonsCollectionSegments,
+  serviceVariantsCollectionSegments,
+} from "../services/paths";
+
 import {
   assertValidStatusTransition,
   BookingError,
@@ -23,11 +29,6 @@ import {
   type CreateBookingInput,
   type UpdateBookingStatusInput,
 } from "./model";
-import type { ServiceAddon, ServiceVariant } from "../services/model";
-import {
-  serviceAddonsCollectionSegments,
-  serviceVariantsCollectionSegments,
-} from "../services/paths";
 
 const COLLECTION = "bookings";
 const SLOT_TOKENS_COLLECTION = "bookingSlotTokens";

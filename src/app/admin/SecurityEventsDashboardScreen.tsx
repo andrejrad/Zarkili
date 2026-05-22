@@ -7,6 +7,7 @@ import {
   StyleSheet,
   ActivityIndicator,
 } from "react-native";
+
 import type { SecurityEvent, SecurityEventFilter, SecurityEventKind, SecurityEventSeverity } from "./platformAdminTypes";
 
 export type SecurityEventsDashboardScreenProps = {

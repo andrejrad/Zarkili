@@ -1,5 +1,6 @@
 import React from "react";
 import { render, fireEvent } from "@testing-library/react-native";
+
 import { ClientLoyaltyScreen } from "../ClientLoyaltyScreen";
 import { AdminLoyaltyScreen } from "../AdminLoyaltyScreen";
 import { createLoyaltyAdminService } from "../loyaltyAdminService";

@@ -14,6 +14,7 @@
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { brandTypography } from "../../shared/ui/brandTypography";
+
 import { AdminHelpAnchor } from "./AdminPatterns";
 
 // ---------------------------------------------------------------------------

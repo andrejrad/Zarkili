@@ -21,6 +21,7 @@ import {
   textStyles,
 } from "../../shared/ui";
 import type { TierVariant } from "../../shared/ui/TierBadge";
+
 import {
   DEFAULT_EARN_ACTIONS,
   TIER_THRESHOLDS,

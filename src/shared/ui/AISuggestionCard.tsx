@@ -15,8 +15,9 @@
 
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-import { colors, radius, spacing, textStyles } from "./tokens";
 import type { AISuggestion } from "../staffTypes";
+
+import { colors, radius, spacing, textStyles } from "./tokens";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

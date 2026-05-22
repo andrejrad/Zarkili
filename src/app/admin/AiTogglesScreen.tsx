@@ -1,5 +1,6 @@
 import React from "react";
 import { View, Text, Switch, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator } from "react-native";
+
 import type { AiFeatureToggleConfig } from "./aiAdminTypes";
 import { AI_FEATURE_GROUPS } from "./aiAdminTypes";
 

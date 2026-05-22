@@ -13,7 +13,6 @@ import {
   View,
 } from "react-native";
 
-import { AdminEmptyState, AdminErrorState, AdminLoadingState } from "./AdminPatterns";
 import { brandTypography } from "../../shared/ui/brandTypography";
 import type {
   PromoCode,
@@ -21,6 +20,8 @@ import type {
   PromoCodeStatus,
   PromoCodeType,
 } from "../../domains/campaigns/campaignAdminModel";
+
+import { AdminEmptyState, AdminErrorState, AdminLoadingState } from "./AdminPatterns";
 
 // ---------------------------------------------------------------------------
 // Props

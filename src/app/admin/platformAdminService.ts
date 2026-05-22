@@ -12,6 +12,7 @@ import {
   serverTimestamp,
   type Firestore,
 } from "firebase/firestore";
+
 import type {
   TenantRecord,
   TenantFilter,

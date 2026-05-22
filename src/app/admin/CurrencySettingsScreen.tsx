@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 
 import { brandTypography } from "../../shared/ui/brandTypography";
+
 import { AdminErrorState, AdminLoadingState, AdminToggleRow } from "./AdminPatterns";
 import type { TenantLocationAdminService } from "./tenantLocationAdminService";
 

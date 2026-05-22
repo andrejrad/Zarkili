@@ -24,6 +24,7 @@ import {
 
 import type { CustomerLoyaltyState, LoyaltyTransaction } from "../../domains/loyalty/model";
 import type { TenantLoyaltyConfig } from "../../domains/loyalty/model";
+
 import type { CustomerLoyaltySummary } from "./loyaltyAdminService";
 
 // ---------------------------------------------------------------------------

@@ -9,8 +9,9 @@
 import React from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
-import { AdminToggleRow } from "./AdminPatterns";
 import { brandTypography } from "../../shared/ui/brandTypography";
+
+import { AdminToggleRow } from "./AdminPatterns";
 
 // ---------------------------------------------------------------------------
 // Types

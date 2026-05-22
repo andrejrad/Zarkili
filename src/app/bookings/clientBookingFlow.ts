@@ -13,7 +13,6 @@
  * injected repository/service dependencies.
  */
 
-import type { BookingService } from "./bookingService";
 import type { Location } from "../../domains/locations/model";
 import type { LocationRepository } from "../../domains/locations/repository";
 import type { Service } from "../../domains/services/model";
@@ -23,6 +22,8 @@ import type { StaffRepository } from "../../domains/staff/repository";
 import type { AvailableSlot } from "../../domains/bookings/slotEngine";
 import type { Booking } from "../../domains/bookings/model";
 import { BookingError } from "../../domains/bookings/model";
+
+import type { BookingService } from "./bookingService";
 
 export type ClientBookingFlowDeps = {
   locationRepository: LocationRepository;

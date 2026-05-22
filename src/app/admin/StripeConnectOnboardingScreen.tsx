@@ -13,9 +13,10 @@ import { useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { brandTypography } from "../../shared/ui/brandTypography";
+import type { ConnectAccount } from "../../domains/connect";
+
 import { AdminErrorState, AdminLoadingState, AdminRoleDeniedState } from "./AdminPatterns";
 import type { BillingAdminService } from "./billingAdminService";
-import type { ConnectAccount } from "../../domains/connect";
 
 // ---------------------------------------------------------------------------
 // Types

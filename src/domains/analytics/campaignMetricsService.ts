@@ -10,6 +10,7 @@
 
 import type { Campaign } from "../campaigns/model";
 import type { Activity, ParticipationRecord } from "../activities/model";
+
 import type { CampaignKpis, ChallengeKpis } from "./model";
 
 function safeRate(numerator: number, denominator: number): number {

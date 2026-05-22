@@ -17,6 +17,7 @@ import {
 } from "react-native";
 
 import { SegmentedControl, colors, radius, spacing, textStyles } from "../../shared/ui";
+
 import type { ClientRow } from "./staffHelpers";
 
 // ─── Types ────────────────────────────────────────────────────────────────────

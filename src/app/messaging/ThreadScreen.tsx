@@ -29,6 +29,7 @@ import {
   spacing,
   textStyles,
 } from "../../shared/ui";
+
 import { formatMessageTime, type ConsumerMessage, type ThreadSummary } from "./messagingHelpers";
 
 export type ThreadScreenProps = {

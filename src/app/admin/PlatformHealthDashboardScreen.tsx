@@ -7,6 +7,7 @@ import {
   StyleSheet,
   ActivityIndicator,
 } from "react-native";
+
 import type { PlatformHealthSignal, HealthSignalStatus } from "./platformAdminTypes";
 
 export type PlatformHealthDashboardScreenProps = {
