@@ -28,3 +28,6 @@ documentation/**/*.pdf
 scratch/*
 !scratch/.gitkeep
 
+# Claude Code local settings (personal, not shared)
+.claude/settings.local.*
+
