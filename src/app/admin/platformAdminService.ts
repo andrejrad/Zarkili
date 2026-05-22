@@ -71,7 +71,7 @@ export function createPlatformAdminService(db: Firestore) {
       const q2 = filter.query.toLowerCase();
       return results.filter(
         (t) =>
-          t.displayName.toLowerCase().includes(q2) ||
+          t.displayName?.toLowerCase().includes(q2) ||
           t.ownerEmail.toLowerCase().includes(q2)
       );
     }
