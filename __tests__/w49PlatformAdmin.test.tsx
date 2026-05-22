@@ -392,8 +392,13 @@ describe("ImpersonationScreen", () => {
     );
     fireEvent.changeText(getByTestId("impersonation-screen-tenant-id-input"), "t1");
     fireEvent.changeText(getByTestId("impersonation-screen-user-id-input"), "user1");
+    fireEvent.changeText(
+      getByTestId("impersonation-screen-reason-input"),
+      "Investigating payment issue for support ticket"
+    );
+    fireEvent.press(getByTestId("impersonation-screen-acknowledge"));
     fireEvent.press(getByTestId("impersonation-screen-start-btn"));
-    expect(onStart).toHaveBeenCalledWith("t1", "user1");
+    expect(onStart).toHaveBeenCalledWith("t1", "user1", "Investigating payment issue for support ticket");
   });
 });
 
@@ -881,7 +886,7 @@ describe("impersonationService — RBAC", () => {
 
   it("startImpersonation throws for non-platform_admin role", async () => {
     await expect(
-      svc.startImpersonation("tenant_owner" as any, "admin1", "t1", "user1")
+      svc.startImpersonation("tenant_owner" as any, "admin1", "t1", "user1", "reason placeholder")
     ).rejects.toThrow("FORBIDDEN: platform_admin role required");
   });
 

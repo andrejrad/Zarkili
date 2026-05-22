@@ -15,7 +15,7 @@ export type ImpersonationScreenProps = {
   loading: boolean;
   error: string | null;
   activeSession: ImpersonationSession | null;
-  onStartImpersonation: (tenantId: string, userId: string) => void;
+  onStartImpersonation: (tenantId: string, userId: string, reason: string) => void;
   onEndImpersonation: () => void;
   onRetry?: () => void;
   onBack?: () => void;
@@ -35,6 +35,8 @@ export function ImpersonationScreen({
 }: ImpersonationScreenProps) {
   const [tenantId, setTenantId] = useState(defaultTenantId ?? "");
   const [userId, setUserId] = useState("");
+  const [reason, setReason] = useState("");
+  const [acknowledged, setAcknowledged] = useState(false);
 
   if (loading) {
     return (
@@ -65,7 +67,11 @@ export function ImpersonationScreen({
     );
   }
 
-  const isValid = tenantId.trim().length > 0 && userId.trim().length > 0;
+  const isValid =
+    tenantId.trim().length > 0 &&
+    userId.trim().length > 0 &&
+    reason.trim().length >= 10 &&
+    acknowledged;
 
   return (
     <ScrollView style={styles.root} testID={testID}>
@@ -97,7 +103,38 @@ export function ImpersonationScreen({
           autoCapitalize="none"
           testID={`${testID}-user-id-input`}
         />
+        <Text style={styles.label}>Reason for Access *</Text>
+        <TextInput
+          style={styles.reasonInput}
+          value={reason}
+          onChangeText={setReason}
+          multiline
+          numberOfLines={4}
+          placeholder="Describe why you need access (min. 10 characters)…"
+          testID={`${testID}-reason-input`}
+        />
+        {reason.trim().length > 0 && reason.trim().length < 10 && (
+          <Text style={styles.validationError} testID={`${testID}-reason-error`}>
+            Reason must be at least 10 characters.
+          </Text>
+        )}
       </View>
+
+      <TouchableOpacity
+        style={styles.acknowledgeRow}
+        onPress={() => setAcknowledged((v) => !v)}
+        testID={`${testID}-acknowledge`}
+        accessibilityRole="checkbox"
+        accessibilityLabel="I acknowledge this action will be logged and audited"
+        accessibilityState={{ checked: acknowledged }}
+      >
+        <View style={[styles.checkbox, acknowledged && styles.checkboxChecked]}>
+          {acknowledged && <Text style={styles.checkmark}>✓</Text>}
+        </View>
+        <Text style={styles.acknowledgeText}>
+          I acknowledge this action will be logged and audited
+        </Text>
+      </TouchableOpacity>
 
       {error && (
         <View style={styles.errorBanner}>
@@ -113,7 +150,7 @@ export function ImpersonationScreen({
       <View style={styles.actions}>
         <TouchableOpacity
           style={[styles.startBtn, !isValid && styles.btnDisabled]}
-          onPress={() => isValid && onStartImpersonation(tenantId.trim(), userId.trim())}
+          onPress={() => isValid && onStartImpersonation(tenantId.trim(), userId.trim(), reason.trim())}
           disabled={!isValid}
           testID={`${testID}-start-btn`}
         >
@@ -136,6 +173,13 @@ const styles = StyleSheet.create({
   section: { backgroundColor: "#ffffff", marginHorizontal: 16, marginBottom: 12, padding: 16, borderRadius: 8 },
   label: { fontSize: 12, fontWeight: "700", color: "#6b7280", textTransform: "uppercase", marginBottom: 6, marginTop: 8 },
   input: { borderWidth: 1, borderColor: "#d1d5db", borderRadius: 8, padding: 10, fontSize: 14 },
+  reasonInput: { borderWidth: 1, borderColor: "#d1d5db", borderRadius: 8, padding: 10, fontSize: 14, minHeight: 90, textAlignVertical: "top", marginTop: 2 },
+  validationError: { color: "#ef4444", fontSize: 12, marginTop: 4 },
+  acknowledgeRow: { flexDirection: "row", alignItems: "flex-start", marginHorizontal: 16, marginBottom: 12, gap: 10 },
+  checkbox: { width: 20, height: 20, borderWidth: 2, borderColor: "#7c3aed", borderRadius: 4, alignItems: "center", justifyContent: "center", marginTop: 1 },
+  checkboxChecked: { backgroundColor: "#7c3aed" },
+  checkmark: { color: "#ffffff", fontSize: 12, fontWeight: "700" },
+  acknowledgeText: { flex: 1, fontSize: 13, color: "#374151", lineHeight: 20 },
   errorBanner: { backgroundColor: "#fef2f2", margin: 16, padding: 12, borderRadius: 8 },
   errorText: { color: "#dc2626", fontSize: 14 },
   retryText: { color: "#2563eb", fontSize: 13, marginTop: 6 },

@@ -12,6 +12,8 @@ import {
 } from "firebase/firestore";
 import type { ImpersonationSession } from "./platformAdminTypes";
 
+const USER_PROFILES_COLLECTION = "userProfiles";
+
 // ---------------------------------------------------------------------------
 // Constants
 // ---------------------------------------------------------------------------
@@ -38,7 +40,6 @@ export function createImpersonationService(db: Firestore) {
     platformAdminId: string,
     targetTenantId: string,
     targetUserId: string,
-    targetUserEmail: string,
     reason: string
   ): Promise<ImpersonationSession> {
     assertPlatformAdmin(actorRole);
@@ -46,6 +47,12 @@ export function createImpersonationService(db: Firestore) {
     if (!reason || reason.trim().length < 10) {
       throw new Error("VALIDATION: reason must be at least 10 characters");
     }
+
+    const profileSnap = await getDoc(doc(db, USER_PROFILES_COLLECTION, targetUserId));
+    const targetUserEmail: string =
+      (profileSnap.exists() && typeof profileSnap.data()?.email === "string"
+        ? (profileSnap.data().email as string)
+        : "") || "";
 
     // Check for an already-active session
     const existing = await getActiveImpersonationSession(actorRole, platformAdminId);

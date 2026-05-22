@@ -11540,10 +11540,10 @@ export function AppNavigatorShell({
           loading={impersonationLoading}
           error={impersonationError}
           activeSession={activeImpersonationSession}
-          onStartImpersonation={(cbTenantId: string, cbUserId: string) => {
+          onStartImpersonation={(cbTenantId: string, cbUserId: string, cbReason: string) => {
             setImpersonationLoading(true);
             setImpersonationError(null);
-            void impersonationSvc.startImpersonation("platform_admin", userId ?? "", cbTenantId, cbUserId, "", "").then((session) => {
+            void impersonationSvc.startImpersonation("platform_admin", userId ?? "", cbTenantId, cbUserId, cbReason).then((session) => {
               setActiveImpersonationSession(session);
               setImpersonationLoading(false);
             }).catch(() => { setImpersonationLoading(false); setImpersonationError("Failed to start impersonation."); });

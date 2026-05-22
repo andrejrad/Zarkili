@@ -30,7 +30,7 @@ The spec is complete; the code is not yet started. This is the largest **product
 | 🔴 Crit | Remove salon-level subtitle ("Salon · 1.2km") from cards; cards represent services | S |
 | 🔴 Crit | Render `priceFrom` on each card (service-level minimum, not salon range) | S |
 | 🔴 Crit | Geo-detect currency on first load + cache (replace Stripe USD literal in display layer) | M |
-| 🔴 Crit | Remove notification bell from Explore screen header | XS |
+| ✅ Done | Remove notification bell from Explore screen header (closed pre-W51 — bell replaced with Map icon) | XS |
 | 🟠 High | Make "near [city]" tappable → opens city/region picker | S |
 | 🟠 High | Show client photos before stock photos when both exist | S |
 | 🟠 High | Surface service duration on the card | XS |
