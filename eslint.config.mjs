@@ -5,6 +5,7 @@ import react from "eslint-plugin-react";
 import reactHooks from "eslint-plugin-react-hooks";
 import importPlugin from "eslint-plugin-import";
 import prettier from "eslint-config-prettier";
+import globals from "globals";
 
 export default [
   {
@@ -16,10 +17,19 @@ export default [
       "babel.config.js",
       "jest.config.js",
       "jest.rules.config.js",
-      "__tests__/**"
+      "__tests__/**",
+      "design-handoff/**"
     ]
   },
   js.configs.recommended,
+  {
+    files: ["scripts/**/*.{js,mjs}", "metro.config.js", "*.config.{js,mjs}"],
+    languageOptions: {
+      globals: {
+        ...globals.node
+      }
+    }
+  },
   {
     files: ["App.tsx", "src/**/*.{ts,tsx}", "app/**/*.{ts,tsx}", "jest.setup.ts"],
     languageOptions: {
