@@ -405,3 +405,37 @@ Full spec-compliance audit of `zarkili_booking_flow_spec_v2.md` against the impl
 - [WEEKLY_LOG.md](WEEKLY_LOG.md) — week-by-week log (W11 inline debt entries)
 - [WEEK12_CLOSE_REPORT.md](WEEK12_CLOSE_REPORT.md), [WEEK13_CLOSE_REPORT.md](WEEK13_CLOSE_REPORT.md), [WEEK14_CLOSE_REPORT.md](WEEK14_CLOSE_REPORT.md), [WEEK15_CLOSE_REPORT.md](WEEK15_CLOSE_REPORT.md), [WEEK16_CLOSE_REPORT.md](WEEK16_CLOSE_REPORT.md), [WEEK17_CLOSE_REPORT.md](WEEK17_CLOSE_REPORT.md), [WEEK18_CLOSE_REPORT.md](WEEK18_CLOSE_REPORT.md), [WEEK19_CLOSE_REPORT.md](WEEK19_CLOSE_REPORT.md), [WEEK20_CLOSE_REPORT.md](WEEK20_CLOSE_REPORT.md), [WEEK20_5_CLOSE_REPORT.md](WEEK20_5_CLOSE_REPORT.md), [WEEK21_CLOSE_REPORT.md](WEEK21_CLOSE_REPORT.md), [WEEK22_CLOSE_REPORT.md](WEEK22_CLOSE_REPORT.md), [WEEK23_CLOSE_REPORT.md](WEEK23_CLOSE_REPORT.md), [WEEK24_CLOSE_REPORT.md](WEEK24_CLOSE_REPORT.md), [WEEK36_CLOSE_REPORT.md](WEEK36_CLOSE_REPORT.md), [WEEK37_CLOSE_REPORT.md](WEEK37_CLOSE_REPORT.md), [WEEK38_CLOSE_REPORT.md](WEEK38_CLOSE_REPORT.md), [WEEK39_CLOSE_REPORT.md](WEEK39_CLOSE_REPORT.md), [WEEK40_CLOSE_REPORT.md](WEEK40_CLOSE_REPORT.md), [WEEK41_CLOSE_REPORT.md](WEEK41_CLOSE_REPORT.md), [WEEK42_CLOSE_REPORT.md](WEEK42_CLOSE_REPORT.md), [WEEK43_CLOSE_REPORT.md](WEEK43_CLOSE_REPORT.md), [WEEK44_CLOSE_REPORT.md](WEEK44_CLOSE_REPORT.md), [WEEK45_CLOSE_REPORT.md](WEEK45_CLOSE_REPORT.md), [WEEK46_CLOSE_REPORT.md](WEEK46_CLOSE_REPORT.md), [WEEK47_CLOSE_REPORT.md](WEEK47_CLOSE_REPORT.md), [WEEK48_CLOSE_REPORT.md](WEEK48_CLOSE_REPORT.md), [WEEK49_CLOSE_REPORT.md](WEEK49_CLOSE_REPORT.md), [WEEK50_CLOSE_REPORT.md](WEEK50_CLOSE_REPORT.md) — week-end debt registers
 - [SECURITY_RULES_FINAL.md](SECURITY_RULES_FINAL.md) — security closure evidence (W12-HARDENING-2)
+
+---
+
+## NEW-DEBT-J — Lint baseline cleanup
+
+**Opened:** 2026-05-21
+**Severity:** medium
+**Target week:** Post-RC sprint
+**Status:** OPEN
+
+**What:** The codebase has 880 pre-existing lint problems (456 errors + 424 warnings) discovered during Claude Code environment setup. Breakdown:
+
+- ~416 auto-fixable warnings (import ordering, unused eslint-disable directives)
+- 4 parsing errors in `design-handoff/reference/` files (App.prototype.tsx, ClientDetailScreen.tsx, ClientLookupScreen.tsx, WalkInQueueScreen.tsx) — these are Figma reference files, not production code; should be added to `.eslintignore`
+- Config/script files (`metro.config.js`, `scripts/*.js`) flagged for Node globals — fix with proper `env: { node: true }` in eslint config for those paths
+- Unused imports across multiple files (e.g., `SafeAreaProvider` in `App.tsx`, `View` in `NotificationIcon.tsx`)
+- ~6 `any` types in `src/shared/ui/RangeSlider.tsx`
+- `react/no-unescaped-entities` errors (quotes/apostrophes in JSX) across `RewardCard.tsx`, `TierUpCelebration.tsx`, and others
+- Missing display names for some components in `jest.setup.ts`
+
+**Why deferred:** No functional impact. None block release. TypeScript is clean (0 errors). Tests pass (3667/3667). Pre-existed before Claude Code adoption — accumulated under prior AI workflow that did not run lint in its loop. Fixing requires touching many files and is best done in a focused sprint rather than mixed with feature work.
+
+**Why this matters now:** Until closed, `npm run check` exits red because lint runs first in the chain (`lint && typecheck && test`). The Claude Code quality gate has been split into three individual commands as a workaround. Once this debt is closed, `npm run check` becomes usable again.
+
+**Entry point:** 
+1. Capture full report: `npm run lint 2>&1 | Out-File lint-baseline.txt`
+2. Auto-fix first: `npm run lint -- --fix` — handles ~416 auto-fixable warnings
+3. Add `design-handoff/reference/**` to `.eslintignore`
+4. Update `eslint.config.mjs` to set `env.node: true` for `scripts/**`, `metro.config.js`, `*.config.{js,mjs}` overrides
+5. Walk remaining errors file by file. Commit after every ~10 files for rollback safety.
+
+**Verification:** `npm run lint 2>&1 | Select-String "problems"` returns 0 errors and 0 warnings (or a deliberately accepted small number with explicit `// eslint-disable-next-line` comments).
+
+**Also update on close:** Restore `npm run check` as the primary quality gate in `/CLAUDE.md` and `/preflight`.

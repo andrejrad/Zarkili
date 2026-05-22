@@ -6,13 +6,26 @@ Multi-tenant SaaS for salons + consumer marketplace. Bookable unit is a **servic
 
 ## Quality gate — non-negotiable
 
-```bash
-npm run check          # lint + typecheck + 3,667 tests — must stay green
-npm run test:rules     # Firestore rules — run if you touch firestore.rules
+```powershell
+npm run typecheck                                          # baseline: 0 errors — MUST stay 0
+npm test -- --watch=false                                  # baseline: 3667/3667 passing — MUST stay green
+npm run lint 2>&1 | Select-String "problems"               # baseline: 880 problems (456 errors / 424 warnings) — MUST NOT increase
+npm run test:rules                                         # only if firestore.rules was changed
 ```
 
-**Before any change:** `npm run typecheck` (current baseline: 0 errors — keep it 0).  
-**After any change:** `npm run check` and report the results verbatim.
+**Lint debt:** the codebase has 880 pre-existing lint problems (tracked as NEW-DEBT-J) that are NOT release blockers. Your job is to **never increase this count**. Fix any new lint errors your change introduces before completing the task. A dedicated lint cleanup sprint is planned separately — do not opportunistically fix pre-existing lint issues outside that sprint.
+
+**Before any change:**
+1. `npm run typecheck` — confirm 0 errors
+2. `npm run lint 2>&1 | Select-String "problems"` — capture current count
+
+**After any change:**
+1. `npm run typecheck` — must still be 0
+2. `npm test -- --watch=false` — must still be 3667/3667
+3. `npm run lint 2>&1 | Select-String "problems"` — must not exceed pre-change count
+4. Report all three results verbatim. If any regressed, fix before marking the task complete.
+
+> **Note:** `npm run check` exists in `package.json` but currently exits red due to pre-existing lint debt. Do not use it as the gate — use the three commands above individually until NEW-DEBT-J is closed.
 
 ## Architecture — three rules
 
