@@ -11,6 +11,7 @@ import {
 import type { ImpersonationSession } from "./platformAdminTypes";
 
 export type ImpersonationScreenProps = {
+  defaultTenantId?: string;
   loading: boolean;
   error: string | null;
   activeSession: ImpersonationSession | null;
@@ -22,6 +23,7 @@ export type ImpersonationScreenProps = {
 };
 
 export function ImpersonationScreen({
+  defaultTenantId,
   loading,
   error,
   activeSession,
@@ -31,7 +33,7 @@ export function ImpersonationScreen({
   onBack,
   testID = "impersonation-screen",
 }: ImpersonationScreenProps) {
-  const [tenantId, setTenantId] = useState("");
+  const [tenantId, setTenantId] = useState(defaultTenantId ?? "");
   const [userId, setUserId] = useState("");
 
   if (loading) {
