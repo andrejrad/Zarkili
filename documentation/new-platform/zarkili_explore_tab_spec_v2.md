@@ -714,7 +714,7 @@ Items from the live Explore screen that need to change before production:
 | Critical | `"Main discovery screen for salons and services."` subtitle | Remove entirely |
 | Critical | `"From EUR28"` — location-level "from" price on a salon card | Switch to service type cards with service-level `priceFrom` |
 | Critical | Currency mixing (EUR and USD on same screen) | Geo-detect currency at session start, apply consistently |
-| High | Notification bell in Explore header | Remove — Home only |
+| ✅ Done | Notification bell in Explore header | Removed pre-W51 — bell replaced with Map icon |
 | High | City chip row (Austin, Brooklyn, Chicago) | Replace with `"near [city]"` tappable label in results row |
 | High | Salon interior as primary card photo | Client result photos must be primary. Interior shots on location profile only. |
 | High | Missing service duration on cards | Add: `"Today 4:30 PM · 45 min"` |
