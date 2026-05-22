@@ -95,7 +95,7 @@ export function AddPaymentMethodScreen({
         <View style={styles.cardFieldWrap} testID={testID ? `${testID}-card` : undefined}>
           <CardField
             postalCodeEnabled={false}
-            placeholder={{ number: "Card number" }}
+            placeholders={{ number: "Card number" }}
             onCardChange={(details: CardFieldInput.Details) =>
               onChange({ ...state, cardComplete: details.complete })
             }
