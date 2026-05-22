@@ -4,6 +4,19 @@
 
 Multi-tenant SaaS for salons + consumer marketplace. Bookable unit is a **service** at a **location**, not a salon. One service card = one bookable service at one location. Primary market: US.
 
+## Project trajectory
+
+- **Phase 1** (W1–W12) ✅ — Domain model, RBAC, booking engine, analytics, pilot readiness. See `documentation/new-platform/PHASE1_COMPLETION_REPORT.md`
+- **Phase 2** (W21–W37) ✅ — Consumer UI, onboarding, permissions, i18n, Firebase integration. See `documentation/PHASE2_CONSUMER_UI_PLAN_WEEKS_21_TO_32.md` and sub-phase docs
+- **Phase 3** (W36–W49) ✅ — Tenant admin (56 screens) + platform super-admin (20 screens), compliance. See `documentation/new-platform/PHASE3_COMPLETION_REPORT.md`
+- **W50 audit** ✅ — Booking-flow spec audit + 18-item remediation closed. See `documentation/new-platform/DEBT_REGISTER.md §W50`
+- **Phase 3.5** (W51–W54) 🟡 — Release readiness: observability, pentest, AI eval harness, support surfaces, marketing site. See `documentation/PHASE3_5_RELEASE_READINESS_PLAN_WEEKS_50_TO_54.md`
+- **Phase 4** (W55–W57) ⬜ — AI Support Router + tuning, layered onto live support surfaces post-GA. See `documentation/PHASE4_AI_SUPPORT_SYSTEM_PLAN_WEEKS_55_TO_57.md`
+
+For the current active workstream, see `documentation/HANDOVER/07_ROADMAP_NEXT_STEPS.md §1`.
+
+**Cross-phase decisions:** When a task touches multiple phases or its scope is ambiguous, favour the Phase 3.5 RC gate (observability, security, go-to-market) over new product features. Phase 4 AI router work is explicitly post-GA — do not build Phase 4 items unless the user opens a Phase 4 task. If unsure whether something belongs in scope, check `documentation/HANDOVER/05_SPECS_AND_SCOPE.md §11` (explicit out-of-scope list) before proceeding.
+
 ## Shell environment
 
 This project runs on **Windows PowerShell 5.1**. Important constraints:
