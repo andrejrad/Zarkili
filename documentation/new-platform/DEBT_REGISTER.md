@@ -110,6 +110,7 @@ Weeks 1–10 did not use the `Wnn-DEBT-n` convention. Carry-over items from that
 | **W50 Phase 2 — flow state + progress indicator** | ~~W50-DEBT-6~~ ~~W50-DEBT-7~~ ~~W50-DEBT-8~~ (all closed) |
 | **W50 Phase 3 — staff/date/review/policies completeness** | W50-DEBT-9 (staff enrichment fields), W50-DEBT-10 (assignedTechnicianId), W50-DEBT-11 (date/time wiring gaps), W50-DEBT-12 (review screen completeness), W50-DEBT-13 (policyVersion logic + Firestore), W50-DEBT-14 (deposit display) |
 | **W50 Phase 4 — confirmation + discovery screens** | W50-DEBT-15 (confirmation celebration + actions), W50-DEBT-16 (photo gallery), W50-DEBT-17 (Our team filtering), W50-DEBT-18 (staff service filtering) |
+| **W52 — impersonation feature** | NEW-DEBT-L (impersonation start always throws — missing reason/email fields in screen) |
 
 **Closed:** W12-HARDENING-1, W12-HARDENING-2, KI-001 (W15), KI-002 (W16), W11-DEBT-2 (W16), W13-DEBT-1 (W18), W13-DEBT-4 (W18), W14-DEBT-2 (W18), W15-DEBT-2 (W18), W19-DEBT-1 (W19), W19-DEBT-2 (W19), W19-DEBT-3 (W19), W14-DEBT-5 (W20.5), W16-DEBT-1 (W20.5), W17-DEBT-2 (W20.5), W17-DEBT-3 (W20.5), W18-DEBT-1 (W20.5), W20-DEBT-1 (W20.5), W15-DEBT-3 (W21), W17-DEBT-1 (W22), W11-DEBT-1 (W23), W22-DEBT-2 (W23), W23-DEBT-2 (W24), W24-DEBT-2 (W37.5), W37.5-DEBT-1 (W37.5), W37.5-DEBT-2 (W37.5), W35-DEBT-1 (W37.6-pre), W36-DEBT-1 (W37.5-pre), W36-DEBT-2 (W37.6-pre), W36-DEBT-3 (W37.5-pre), W37-DEBT-1 (W37.5-pre), W37-DEBT-2 (W37.6-pre), W37-DEBT-3 (W37.5-pre), W37-DEBT-5 (W37.5-pre), W37-DEBT-6 (W37.5-pre), W23-DEBT-3 (W37.6-pre via W36-DEBT-2), W38-DEBT-6 (W37.6-pre — posts={[]} is correct), W38-DEBT-7 (W37.6-pre — inline static intended), W13-DEBT-2 (W39), W14-DEBT-3 (W39), W14-DEBT-4 (W39), W38-DEBT-8 (W39), W38-DEBT-9 (W39), W38-DEBT-10 (W40), W43-DEBT-3 (W45), **W41-DEBT-3 (W46)**, **W43-DEBT-1 (W46)**, **W44-DEBT-1 (W46)**, **W45-DEBT-1 (W46)**, **W41-DEBT-1 (W47)**, **W41-DEBT-2 (W47)**, **W41-DEBT-4 (W47)**, **W41-DEBT-5 (W47)**, **W41-DEBT-6 (W47)**, **W42-DEBT-1 (W47)**, **W42-DEBT-2 (W47)**, **W42-DEBT-3 (W47)**, **W37.5-DEBT-3 (W47)**, **W23-DEBT-1 (W47)**, **W38-DEBT-3 (W47)**, **W15-DEBT-1 (W47)**, **W22-DEBT-1 (W47)**, **W38-DEBT-1 (W47)**, **W22-DEBT-3 (W47)**.
 
@@ -405,3 +406,80 @@ Full spec-compliance audit of `zarkili_booking_flow_spec_v2.md` against the impl
 - [WEEKLY_LOG.md](WEEKLY_LOG.md) — week-by-week log (W11 inline debt entries)
 - [WEEK12_CLOSE_REPORT.md](WEEK12_CLOSE_REPORT.md), [WEEK13_CLOSE_REPORT.md](WEEK13_CLOSE_REPORT.md), [WEEK14_CLOSE_REPORT.md](WEEK14_CLOSE_REPORT.md), [WEEK15_CLOSE_REPORT.md](WEEK15_CLOSE_REPORT.md), [WEEK16_CLOSE_REPORT.md](WEEK16_CLOSE_REPORT.md), [WEEK17_CLOSE_REPORT.md](WEEK17_CLOSE_REPORT.md), [WEEK18_CLOSE_REPORT.md](WEEK18_CLOSE_REPORT.md), [WEEK19_CLOSE_REPORT.md](WEEK19_CLOSE_REPORT.md), [WEEK20_CLOSE_REPORT.md](WEEK20_CLOSE_REPORT.md), [WEEK20_5_CLOSE_REPORT.md](WEEK20_5_CLOSE_REPORT.md), [WEEK21_CLOSE_REPORT.md](WEEK21_CLOSE_REPORT.md), [WEEK22_CLOSE_REPORT.md](WEEK22_CLOSE_REPORT.md), [WEEK23_CLOSE_REPORT.md](WEEK23_CLOSE_REPORT.md), [WEEK24_CLOSE_REPORT.md](WEEK24_CLOSE_REPORT.md), [WEEK36_CLOSE_REPORT.md](WEEK36_CLOSE_REPORT.md), [WEEK37_CLOSE_REPORT.md](WEEK37_CLOSE_REPORT.md), [WEEK38_CLOSE_REPORT.md](WEEK38_CLOSE_REPORT.md), [WEEK39_CLOSE_REPORT.md](WEEK39_CLOSE_REPORT.md), [WEEK40_CLOSE_REPORT.md](WEEK40_CLOSE_REPORT.md), [WEEK41_CLOSE_REPORT.md](WEEK41_CLOSE_REPORT.md), [WEEK42_CLOSE_REPORT.md](WEEK42_CLOSE_REPORT.md), [WEEK43_CLOSE_REPORT.md](WEEK43_CLOSE_REPORT.md), [WEEK44_CLOSE_REPORT.md](WEEK44_CLOSE_REPORT.md), [WEEK45_CLOSE_REPORT.md](WEEK45_CLOSE_REPORT.md), [WEEK46_CLOSE_REPORT.md](WEEK46_CLOSE_REPORT.md), [WEEK47_CLOSE_REPORT.md](WEEK47_CLOSE_REPORT.md), [WEEK48_CLOSE_REPORT.md](WEEK48_CLOSE_REPORT.md), [WEEK49_CLOSE_REPORT.md](WEEK49_CLOSE_REPORT.md), [WEEK50_CLOSE_REPORT.md](WEEK50_CLOSE_REPORT.md) — week-end debt registers
 - [SECURITY_RULES_FINAL.md](SECURITY_RULES_FINAL.md) — security closure evidence (W12-HARDENING-2)
+
+---
+
+## NEW-DEBT-J — Lint baseline cleanup
+
+**Opened:** 2026-05-21
+**Severity:** medium
+**Target week:** Post-RC sprint
+**Status:** OPEN
+
+**What:** The codebase has 880 pre-existing lint problems (456 errors + 424 warnings) discovered during Claude Code environment setup. Breakdown:
+
+- ~416 auto-fixable warnings (import ordering, unused eslint-disable directives)
+- 4 parsing errors in `design-handoff/reference/` files (App.prototype.tsx, ClientDetailScreen.tsx, ClientLookupScreen.tsx, WalkInQueueScreen.tsx) — these are Figma reference files, not production code; should be added to `.eslintignore`
+- Config/script files (`metro.config.js`, `scripts/*.js`) flagged for Node globals — fix with proper `env: { node: true }` in eslint config for those paths
+- Unused imports across multiple files (e.g., `SafeAreaProvider` in `App.tsx`, `View` in `NotificationIcon.tsx`)
+- ~6 `any` types in `src/shared/ui/RangeSlider.tsx`
+- `react/no-unescaped-entities` errors (quotes/apostrophes in JSX) across `RewardCard.tsx`, `TierUpCelebration.tsx`, and others
+- Missing display names for some components in `jest.setup.ts`
+
+**Why deferred:** No functional impact. None block release. TypeScript is clean (0 errors). Tests pass (3667/3667). Pre-existed before Claude Code adoption — accumulated under prior AI workflow that did not run lint in its loop. Fixing requires touching many files and is best done in a focused sprint rather than mixed with feature work.
+
+**Why this matters now:** Until closed, `npm run check` exits red because lint runs first in the chain (`lint && typecheck && test`). The Claude Code quality gate has been split into three individual commands as a workaround. Once this debt is closed, `npm run check` becomes usable again.
+
+**Entry point:** 
+1. Capture full report: `npm run lint 2>&1 | Out-File lint-baseline.txt`
+2. Auto-fix first: `npm run lint -- --fix` — handles ~416 auto-fixable warnings
+3. Add `design-handoff/reference/**` to `.eslintignore`
+4. Update `eslint.config.mjs` to set `env.node: true` for `scripts/**`, `metro.config.js`, `*.config.{js,mjs}` overrides
+5. Walk remaining errors file by file. Commit after every ~10 files for rollback safety.
+
+**Verification:** `npm run lint 2>&1 | Select-String "problems"` returns 0 errors and 0 warnings (or a deliberately accepted small number with explicit `// eslint-disable-next-line` comments).
+
+**Also update on close:** Restore `npm run check` as the primary quality gate in `/CLAUDE.md` and `/preflight`.
+
+---
+
+## NEW-DEBT-K — TypeScript baseline cleanup (9 errors, 4 files)
+
+**Opened:** 2026-05-21
+**Severity:** medium (includes 3 likely real bugs)
+**Target week:** Pre-RC (first Claude Code session)
+**Status:** closed (W51 — 2026-05-21)
+
+**What:** 9 TypeScript errors in 4 files, present before the OneDrive→C:\dev move:
+
+| File | Error | Notes |
+|---|---|---|
+| `src/app/admin/platformAdminService.ts:74` | `t.displayName` possibly undefined | Missing null check |
+| `src/app/navigation/AppNavigatorShell.tsx:11468` | Comparing `string` to `TenantRecord` | **Likely bug — always false** |
+| `src/app/navigation/AppNavigatorShell.tsx:11497` | `string\|undefined` passed where `string` required | Possibly silent failure |
+| `src/app/navigation/AppNavigatorShell.tsx:11544` | Impersonation handler called with 3 args, signature expects 2 | **Likely bug — impersonation may be broken** |
+| `src/app/payments/AddPaymentMethodScreen.tsx:98` | `placeholder` typo, should be `placeholders` | **UX bug — Stripe card field uses default placeholder** |
+
+**Why deferred:** Pre-existed before Claude Code adoption. Was incorrectly documented as 0-error baseline in handover docs.
+
+**Entry point:** Run `npm run typecheck 2>&1 | Select-String "error TS"` for full list.
+
+**Closed:** All 5 fixes applied 2026-05-21. `npm run typecheck` returns 0 errors. Note: fixing the impersonation signature mismatch exposed additional prop mismatches (`submitting`→`loading`, `onCancel`→`onBack`, stale `targetTenantId`/`targetTenantName` props) that were also corrected. `ImpersonationScreen` gained `defaultTenantId?: string` prop (Option B) to pre-fill the tenant ID form field. Runtime gap in impersonation (missing reason/email fields) logged as NEW-DEBT-L.
+
+**Verification:** `npm run typecheck` returns 0 errors.
+---
+
+## NEW-DEBT-L — Impersonation feature broken at runtime (missing reason + email fields)
+
+**Opened:** 2026-05-21  
+**Severity:** high  
+**Target week:** W52  
+**Status:** OPEN
+
+**What:** `ImpersonationScreen` only collects `tenantId` and `userId` from the admin, but `impersonationSvc.startImpersonation` requires six arguments including `targetUserEmail` and `reason` (validated: min 10 chars). The shell currently passes empty strings for both. The service throws `"VALIDATION: reason must be at least 10 characters"` on every attempt, making the entire impersonation feature non-functional at runtime. This was a pre-existing design gap exposed during TypeScript cleanup of NEW-DEBT-K.
+
+**Why deferred:** Fixing requires a UX decision (add reason + email fields to `ImpersonationScreen`, or move the validation to the service layer and capture reason elsewhere) and is out of scope for the TypeScript-only cleanup task.
+
+**Entry point:** `src/app/admin/ImpersonationScreen.tsx#L34` — screen state; `src/app/admin/impersonationService.ts#L46` — reason validation; `src/app/navigation/AppNavigatorShell.tsx#L11547` — service call with `"", ""` placeholders.
+
+**Verification:** `ImpersonationScreen` renders a "Reason for access" text input (min 10 chars) and an "Email" field; the shell passes them through to `startImpersonation`; a happy-path test in `__tests__/ImpersonationScreen.test.tsx` confirms a valid reason + email enables the Start button and triggers the callback.

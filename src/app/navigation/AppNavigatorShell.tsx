@@ -11464,8 +11464,8 @@ export function AppNavigatorShell({
               setTenantDirLoading(false);
             }).catch(() => { setTenantDirLoading(false); setTenantDirError("Failed to filter tenants."); });
           }}
-          onSelectTenant={(tenantId) => {
-            setSelectedTenant(tenants.find((t) => t.tenantId === tenantId) ?? null);
+          onSelectTenant={(tenant) => {
+            setSelectedTenant(tenant);
             navigate("TenantDetail");
           }}
           onRetry={() => {
@@ -11494,7 +11494,7 @@ export function AppNavigatorShell({
           }}
           onSuspend={() => {
             setSuspendTenantId(selectedTenant.tenantId);
-            setSuspendTenantName(selectedTenant.displayName);
+            setSuspendTenantName(selectedTenant.displayName ?? selectedTenant.name);
             navigate("SuspendTenant");
           }}
           onReactivate={() => {
@@ -11536,15 +11536,14 @@ export function AppNavigatorShell({
     if (activeRoute.name === "Impersonation" && selectedTenant) {
       return (
         <ImpersonationScreen
-          targetTenantId={selectedTenant.tenantId}
-          targetTenantName={selectedTenant.displayName}
-          submitting={impersonationLoading}
+          defaultTenantId={selectedTenant.tenantId}
+          loading={impersonationLoading}
           error={impersonationError}
           activeSession={activeImpersonationSession}
-          onStartImpersonation={(targetUserId, targetUserEmail, reason) => {
+          onStartImpersonation={(cbTenantId: string, cbUserId: string) => {
             setImpersonationLoading(true);
             setImpersonationError(null);
-            void impersonationSvc.startImpersonation("platform_admin", userId ?? "", selectedTenant.tenantId, targetUserId, targetUserEmail, reason).then((session) => {
+            void impersonationSvc.startImpersonation("platform_admin", userId ?? "", cbTenantId, cbUserId, "", "").then((session) => {
               setActiveImpersonationSession(session);
               setImpersonationLoading(false);
             }).catch(() => { setImpersonationLoading(false); setImpersonationError("Failed to start impersonation."); });
@@ -11557,7 +11556,7 @@ export function AppNavigatorShell({
               setImpersonationLoading(false);
             }).catch(() => setImpersonationLoading(false));
           }}
-          onCancel={() => navigate("TenantDetail")}
+          onBack={() => navigate("TenantDetail")}
           testID="impersonation-screen"
         />
       );

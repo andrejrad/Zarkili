@@ -24,3 +24,7 @@ functions/lib/
 # Exported PDFs (regenerated from .md)
 documentation/**/*.pdf
 
+# Diagnostic / scratch captures (keep directory, ignore contents)
+scratch/*
+!scratch/.gitkeep
+

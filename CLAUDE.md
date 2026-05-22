@@ -4,15 +4,47 @@
 
 Multi-tenant SaaS for salons + consumer marketplace. Bookable unit is a **service** at a **location**, not a salon. One service card = one bookable service at one location. Primary market: US.
 
+## Shell environment
+
+This project runs on **Windows PowerShell 5.1**. Important constraints:
+
+- ❌ Do NOT use `&&` to chain commands — PowerShell 5.1 does not support it
+- ✅ Use `;` for command chaining: `cd X; command`
+- ✅ Or run commands separately
+- ✅ You are already in `C:\dev\Zarkili` — no need to `cd` at the start of commands
+- ✅ Pipe to `Select-String` (not `grep`): `command 2>&1 | Select-String "pattern"`
+- ✅ Paths use backslashes: `src\app\file.ts` (forward slashes also work but match the OS convention)
+- ✅ For multi-line commands, use backticks (` ` `) as line continuation, not backslashes
+- ✅ Counting matches: `... | Select-String "pattern" | Measure-Object | Select-Object -ExpandProperty Count`
+
+When suggesting commands, default to PowerShell-native syntax. Do not assume bash/Unix conventions.
+
+---
+
 ## Quality gate — non-negotiable
 
-```bash
-npm run check          # lint + typecheck + 3,667 tests — must stay green
-npm run test:rules     # Firestore rules — run if you touch firestore.rules
+```powershell
+npm run typecheck                                          # baseline: 0 errors — MUST stay 0
+npm test -- --watch=false                                  # baseline: 3667/3667 passing — MUST stay green
+npm run lint 2>&1 | Select-String "problems"               # baseline: 880 problems (456 errors / 424 warnings) — MUST NOT increase
+npm run test:rules                                         # only if firestore.rules was changed
 ```
 
-**Before any change:** `npm run typecheck` (current baseline: 0 errors — keep it 0).  
-**After any change:** `npm run check` and report the results verbatim.
+**Lint debt:** the codebase has 880 pre-existing lint problems (tracked as NEW-DEBT-J) that are NOT release blockers. Your job is to **never increase this count**. Fix any new lint errors your change introduces before completing the task. A dedicated lint cleanup sprint is planned separately — do not opportunistically fix pre-existing lint issues outside that sprint.
+
+**Before any change:**
+1. `npm run typecheck` — confirm 0 errors
+2. `npm run lint 2>&1 | Select-String "problems"` — capture current count (baseline: 880)
+
+**After any change:**
+1. `npm run typecheck` — must still be 0 errors
+2. `npm test -- --watch=false` — must still be 3667/3667 passing
+3. `npm run lint 2>&1 | Select-String "problems"` — must not exceed pre-change count
+4. Report all three results verbatim. If any regressed, fix before marking the task complete.
+
+> **Note:** `npm run check` (which chains `lint && typecheck && test`) currently exits red due to pre-existing lint debt (NEW-DEBT-J, 880 problems). Do not use `npm run check` as the gate — use the three commands above individually until NEW-DEBT-J is closed.
+>
+> _Retire this note when NEW-DEBT-J is closed; restore `npm run check` as the primary gate._
 
 ## Architecture — three rules
 
