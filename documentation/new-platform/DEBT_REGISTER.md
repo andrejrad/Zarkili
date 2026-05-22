@@ -110,6 +110,7 @@ Weeks 1–10 did not use the `Wnn-DEBT-n` convention. Carry-over items from that
 | **W50 Phase 2 — flow state + progress indicator** | ~~W50-DEBT-6~~ ~~W50-DEBT-7~~ ~~W50-DEBT-8~~ (all closed) |
 | **W50 Phase 3 — staff/date/review/policies completeness** | W50-DEBT-9 (staff enrichment fields), W50-DEBT-10 (assignedTechnicianId), W50-DEBT-11 (date/time wiring gaps), W50-DEBT-12 (review screen completeness), W50-DEBT-13 (policyVersion logic + Firestore), W50-DEBT-14 (deposit display) |
 | **W50 Phase 4 — confirmation + discovery screens** | W50-DEBT-15 (confirmation celebration + actions), W50-DEBT-16 (photo gallery), W50-DEBT-17 (Our team filtering), W50-DEBT-18 (staff service filtering) |
+| **W52 — impersonation feature** | NEW-DEBT-L (impersonation start always throws — missing reason/email fields in screen) |
 
 **Closed:** W12-HARDENING-1, W12-HARDENING-2, KI-001 (W15), KI-002 (W16), W11-DEBT-2 (W16), W13-DEBT-1 (W18), W13-DEBT-4 (W18), W14-DEBT-2 (W18), W15-DEBT-2 (W18), W19-DEBT-1 (W19), W19-DEBT-2 (W19), W19-DEBT-3 (W19), W14-DEBT-5 (W20.5), W16-DEBT-1 (W20.5), W17-DEBT-2 (W20.5), W17-DEBT-3 (W20.5), W18-DEBT-1 (W20.5), W20-DEBT-1 (W20.5), W15-DEBT-3 (W21), W17-DEBT-1 (W22), W11-DEBT-1 (W23), W22-DEBT-2 (W23), W23-DEBT-2 (W24), W24-DEBT-2 (W37.5), W37.5-DEBT-1 (W37.5), W37.5-DEBT-2 (W37.5), W35-DEBT-1 (W37.6-pre), W36-DEBT-1 (W37.5-pre), W36-DEBT-2 (W37.6-pre), W36-DEBT-3 (W37.5-pre), W37-DEBT-1 (W37.5-pre), W37-DEBT-2 (W37.6-pre), W37-DEBT-3 (W37.5-pre), W37-DEBT-5 (W37.5-pre), W37-DEBT-6 (W37.5-pre), W23-DEBT-3 (W37.6-pre via W36-DEBT-2), W38-DEBT-6 (W37.6-pre — posts={[]} is correct), W38-DEBT-7 (W37.6-pre — inline static intended), W13-DEBT-2 (W39), W14-DEBT-3 (W39), W14-DEBT-4 (W39), W38-DEBT-8 (W39), W38-DEBT-9 (W39), W38-DEBT-10 (W40), W43-DEBT-3 (W45), **W41-DEBT-3 (W46)**, **W43-DEBT-1 (W46)**, **W44-DEBT-1 (W46)**, **W45-DEBT-1 (W46)**, **W41-DEBT-1 (W47)**, **W41-DEBT-2 (W47)**, **W41-DEBT-4 (W47)**, **W41-DEBT-5 (W47)**, **W41-DEBT-6 (W47)**, **W42-DEBT-1 (W47)**, **W42-DEBT-2 (W47)**, **W42-DEBT-3 (W47)**, **W37.5-DEBT-3 (W47)**, **W23-DEBT-1 (W47)**, **W38-DEBT-3 (W47)**, **W15-DEBT-1 (W47)**, **W22-DEBT-1 (W47)**, **W38-DEBT-1 (W47)**, **W22-DEBT-3 (W47)**.
 
@@ -447,7 +448,7 @@ Full spec-compliance audit of `zarkili_booking_flow_spec_v2.md` against the impl
 **Opened:** 2026-05-21
 **Severity:** medium (includes 3 likely real bugs)
 **Target week:** Pre-RC (first Claude Code session)
-**Status:** OPEN
+**Status:** closed (W51 — 2026-05-21)
 
 **What:** 9 TypeScript errors in 4 files, present before the OneDrive→C:\dev move:
 
@@ -463,4 +464,22 @@ Full spec-compliance audit of `zarkili_booking_flow_spec_v2.md` against the impl
 
 **Entry point:** Run `npm run typecheck 2>&1 | Select-String "error TS"` for full list.
 
+**Closed:** All 5 fixes applied 2026-05-21. `npm run typecheck` returns 0 errors. Note: fixing the impersonation signature mismatch exposed additional prop mismatches (`submitting`→`loading`, `onCancel`→`onBack`, stale `targetTenantId`/`targetTenantName` props) that were also corrected. `ImpersonationScreen` gained `defaultTenantId?: string` prop (Option B) to pre-fill the tenant ID form field. Runtime gap in impersonation (missing reason/email fields) logged as NEW-DEBT-L.
+
 **Verification:** `npm run typecheck` returns 0 errors.
+---
+
+## NEW-DEBT-L — Impersonation feature broken at runtime (missing reason + email fields)
+
+**Opened:** 2026-05-21  
+**Severity:** high  
+**Target week:** W52  
+**Status:** OPEN
+
+**What:** `ImpersonationScreen` only collects `tenantId` and `userId` from the admin, but `impersonationSvc.startImpersonation` requires six arguments including `targetUserEmail` and `reason` (validated: min 10 chars). The shell currently passes empty strings for both. The service throws `"VALIDATION: reason must be at least 10 characters"` on every attempt, making the entire impersonation feature non-functional at runtime. This was a pre-existing design gap exposed during TypeScript cleanup of NEW-DEBT-K.
+
+**Why deferred:** Fixing requires a UX decision (add reason + email fields to `ImpersonationScreen`, or move the validation to the service layer and capture reason elsewhere) and is out of scope for the TypeScript-only cleanup task.
+
+**Entry point:** `src/app/admin/ImpersonationScreen.tsx#L34` — screen state; `src/app/admin/impersonationService.ts#L46` — reason validation; `src/app/navigation/AppNavigatorShell.tsx#L11547` — service call with `"", ""` placeholders.
+
+**Verification:** `ImpersonationScreen` renders a "Reason for access" text input (min 10 chars) and an "Email" field; the shell passes them through to `startImpersonation`; a happy-path test in `__tests__/ImpersonationScreen.test.tsx` confirms a valid reason + email enables the Start button and triggers the callback.
