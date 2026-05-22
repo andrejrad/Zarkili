@@ -16,16 +16,16 @@ npm run test:rules                                         # only if firestore.r
 **Lint debt:** the codebase has 880 pre-existing lint problems (tracked as NEW-DEBT-J) that are NOT release blockers. Your job is to **never increase this count**. Fix any new lint errors your change introduces before completing the task. A dedicated lint cleanup sprint is planned separately — do not opportunistically fix pre-existing lint issues outside that sprint.
 
 **Before any change:**
-1. `npm run typecheck` — confirm 0 errors
-2. `npm run lint 2>&1 | Select-String "problems"` — capture current count
+1. `npm run typecheck 2>&1 | Select-String "error TS"` — capture current error count (baseline: 9, target: 0)
+2. `npm run lint 2>&1 | Select-String "problems"` — capture current count (baseline: 880)
 
 **After any change:**
-1. `npm run typecheck` — must still be 0
-2. `npm test -- --watch=false` — must still be 3667/3667
-3. `npm run lint 2>&1 | Select-String "problems"` — must not exceed pre-change count
+1. `npm run typecheck 2>&1 | Select-String "error TS"` — count MUST NOT exceed pre-change baseline
+2. `npm test -- --watch=false` — must still be 3667/3667 passing
+3. `npm run lint 2>&1 | Select-String "problems"` — count MUST NOT exceed pre-change count
 4. Report all three results verbatim. If any regressed, fix before marking the task complete.
 
-> **Note:** `npm run check` exists in `package.json` but currently exits red due to pre-existing lint debt. Do not use it as the gate — use the three commands above individually until NEW-DEBT-J is closed.
+> **Note:** `npm run check` (which chains `lint && typecheck && test`) currently exits red due to pre-existing lint debt (NEW-DEBT-J, 880 problems) and TypeScript debt (NEW-DEBT-K, 9 errors). Do not use `npm run check` as the gate — use the three commands above individually until both debts are closed.
 
 ## Architecture — three rules
 

@@ -439,3 +439,28 @@ Full spec-compliance audit of `zarkili_booking_flow_spec_v2.md` against the impl
 **Verification:** `npm run lint 2>&1 | Select-String "problems"` returns 0 errors and 0 warnings (or a deliberately accepted small number with explicit `// eslint-disable-next-line` comments).
 
 **Also update on close:** Restore `npm run check` as the primary quality gate in `/CLAUDE.md` and `/preflight`.
+
+---
+
+## NEW-DEBT-K — TypeScript baseline cleanup (9 errors, 4 files)
+
+**Opened:** 2026-05-21
+**Severity:** medium (includes 3 likely real bugs)
+**Target week:** Pre-RC (first Claude Code session)
+**Status:** OPEN
+
+**What:** 9 TypeScript errors in 4 files, present before the OneDrive→C:\dev move:
+
+| File | Error | Notes |
+|---|---|---|
+| `src/app/admin/platformAdminService.ts:74` | `t.displayName` possibly undefined | Missing null check |
+| `src/app/navigation/AppNavigatorShell.tsx:11468` | Comparing `string` to `TenantRecord` | **Likely bug — always false** |
+| `src/app/navigation/AppNavigatorShell.tsx:11497` | `string\|undefined` passed where `string` required | Possibly silent failure |
+| `src/app/navigation/AppNavigatorShell.tsx:11544` | Impersonation handler called with 3 args, signature expects 2 | **Likely bug — impersonation may be broken** |
+| `src/app/payments/AddPaymentMethodScreen.tsx:98` | `placeholder` typo, should be `placeholders` | **UX bug — Stripe card field uses default placeholder** |
+
+**Why deferred:** Pre-existed before Claude Code adoption. Was incorrectly documented as 0-error baseline in handover docs.
+
+**Entry point:** Run `npm run typecheck 2>&1 | Select-String "error TS"` for full list.
+
+**Verification:** `npm run typecheck` returns 0 errors.
