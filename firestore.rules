@@ -295,6 +295,20 @@ service cloud.firestore {
     }
 
     // -------------------------------------------------------------------------
+    // Collection group query access for public service discovery.
+    // Required for collectionGroup("service_types") used by getServiceCards().
+    // Single-doc reads are covered by the brands/ hierarchy below; this entry
+    // satisfies Firestore's collection-group rule requirement so that anonymous
+    // discovery queries (listFeaturedSalons, listRecommendedSalons, getExploreFeed)
+    // are authorized for unauthenticated users.
+    // Writes are intentionally omitted — write access is governed by the concrete
+    // brands/{brandId}/locations/{locationId}/service_types rules below.
+    // -------------------------------------------------------------------------
+    match /{path=**}/service_types/{serviceTypeId} {
+      allow read: if true;
+    }
+
+    // -------------------------------------------------------------------------
     // Brand hierarchy (NEW-DEBT-B v3 path)
     //   brands/{brandId}                              — brand profile (brandId == tenantId)
     //   brands/{brandId}/locations/{locationId}       — location profile

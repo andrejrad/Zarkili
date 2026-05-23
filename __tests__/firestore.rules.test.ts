@@ -732,6 +732,35 @@ describe("Firestore multi-tenant rules", () => {
         })
       );
     });
+
+    // Collection group query tests — these cover the collectionGroup("service_types")
+    // path used by getServiceCards() / listFeaturedSalons / getExploreFeed.
+    // Without the /{path=**}/service_types/{id} rule these fail even though single-doc
+    // reads succeed, because Firestore requires a recursive-wildcard rule to authorize
+    // collection group queries.
+    it("unauthenticated user can run a collectionGroup query on service_types", async () => {
+      await testEnv.withSecurityRulesDisabled(async (ctx) => {
+        await ctx.firestore()
+          .doc("brands/tenantA/locations/loc1/service_types/svc-cg1")
+          .set({ brandId: "tenantA", locationId: "loc1", name: "Gel manicure", active: true, geohash: "gcpv" });
+      });
+      const db = testEnv.unauthenticatedContext().firestore();
+      await assertSucceeds(
+        db.collectionGroup("service_types").where("active", "==", true).get()
+      );
+    });
+
+    it("authenticated user can run a collectionGroup query on service_types", async () => {
+      await testEnv.withSecurityRulesDisabled(async (ctx) => {
+        await ctx.firestore()
+          .doc("brands/tenantA/locations/loc1/service_types/svc-cg2")
+          .set({ brandId: "tenantA", locationId: "loc1", name: "Lash lift", active: true, geohash: "gcpv" });
+      });
+      const db = testEnv.authenticatedContext("consumerUser").firestore();
+      await assertSucceeds(
+        db.collectionGroup("service_types").where("active", "==", true).get()
+      );
+    });
   });
 
   describe("services (legacy path — write-locked post NEW-DEBT-B B2e)", () => {
