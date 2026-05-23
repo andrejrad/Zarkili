@@ -58,7 +58,7 @@ export function AgeGateScreen({
         <Text style={styles.blockedTitle}>Sorry, you must be 13 or older</Text>
         <Text style={styles.blockedBody}>
           Zarkili is not directed to children under 13. In accordance with the
-          Children's Online Privacy Protection Act (COPPA), we cannot create an
+          {"Children's Online Privacy Protection Act (COPPA), we cannot create an"}
           account for you at this time.
         </Text>
         <Text style={styles.blockedCta} testID={testID ? `${testID}-blocked-msg` : undefined}>

@@ -212,7 +212,7 @@ export function StripeConnectOnboardingScreen({
       </Pressable>
 
       <Text style={styles.disclaimer}>
-        By continuing, you agree to Stripe's Connected Account Agreement. Stripe, not Zarkili, holds and processes your funds.
+        {"By continuing, you agree to Stripe's Connected Account Agreement. Stripe, not Zarkili, holds and processes your funds."}
       </Text>
     </ScrollView>
   );

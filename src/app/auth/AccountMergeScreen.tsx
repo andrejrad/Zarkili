@@ -83,7 +83,7 @@ export function AccountMergeScreen({
       >
         <Text style={styles.choiceTitle}>Sign in (existing account)</Text>
         <Text style={styles.choiceSubtitle}>
-          Best when you've used Zarkili before.
+          {"Best when you've used Zarkili before."}
         </Text>
         {submitting === "signIn" ? (
           <Text style={styles.loadingText}>Linking…</Text>

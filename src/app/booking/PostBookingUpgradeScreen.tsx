@@ -66,7 +66,7 @@ export function PostBookingUpgradeScreen({
       <View style={styles.body}>
         {email ? (
           <Text style={styles.email} testID={testID ? `${testID}-email` : undefined}>
-            We'll use {email}
+            {"We'll use "}{email}
           </Text>
         ) : null}
         <Text style={styles.lead}>

@@ -58,7 +58,7 @@ export function ForgotPasswordScreen({ onSent, onBack }: ForgotPasswordScreenPro
         Reset your password
       </Text>
       <Text style={styles.body}>
-        Enter the email associated with your account and we'll send a reset link.
+        {"Enter the email associated with your account and we'll send a reset link."}
       </Text>
 
       {sent ? (

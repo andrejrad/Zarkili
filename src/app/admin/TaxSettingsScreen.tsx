@@ -108,7 +108,7 @@ export function TaxSettingsScreen({ tenantCountry, onBack }: TaxSettingsScreenPr
           ))}
           <Text style={styles.smallNote}>
             * NYC add an additional 4.5% local surcharge for locations with a NYC ZIP code.
-            All rates are applied automatically by Stripe Tax using each location's address.
+            {"All rates are applied automatically by Stripe Tax using each location's address."}
           </Text>
         </View>
       ) : null}
@@ -131,7 +131,7 @@ export function TaxSettingsScreen({ tenantCountry, onBack }: TaxSettingsScreenPr
         <Text style={styles.sectionLabel}>Per-location overrides</Text>
         <Text style={styles.bodyText}>
           Location-level tax jurisdiction overrides will be available in W40 (Location Dashboard).
-          Stripe Tax uses each location's billing address to determine the correct rate.
+          {"Stripe Tax uses each location's billing address to determine the correct rate."}
         </Text>
       </View>
     </ScrollView>

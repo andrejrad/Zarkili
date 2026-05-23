@@ -213,7 +213,7 @@ export function AIFeedbackScreen({
             testID={testID ? `${testID}-preview` : undefined}
           >
             <Text style={styles.suggestionPreviewText} numberOfLines={3}>
-              "{suggestionPreview}"
+              {`"${suggestionPreview}"`}
             </Text>
           </View>
         )}
@@ -337,7 +337,7 @@ export function AIDegradedScreen({
           AI features temporarily unavailable
         </Text>
         <Text style={styles.degradedBody}>
-          We're experiencing a hiccup with our AI service. Basic booking and
+          {"We're experiencing a hiccup with our AI service. Basic booking and"}
           browsing still work normally.
         </Text>
         <View style={styles.ctaStack}>
@@ -387,7 +387,7 @@ export function AIOptOutScreen({
       >
         <Text style={styles.pageTitle}>Turn off Zarkili AI?</Text>
         <Text style={styles.pageSubtitle}>
-          Here's what you'll miss if you opt out:
+          {"Here's what you'll miss if you opt out:"}
         </Text>
 
         <View style={styles.consequenceList}>

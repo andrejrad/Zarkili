@@ -61,7 +61,7 @@ export function AiTogglesScreen({
       {pendingChanges && (
         <View style={styles.warningBanner} testID="pending-banner">
           <Text style={styles.warningText}>
-            You have unsaved changes. Press "Save All" to apply them.
+            {'You have unsaved changes. Press "Save All" to apply them.'}
           </Text>
         </View>
       )}
