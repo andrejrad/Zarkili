@@ -110,9 +110,7 @@ export function DisputeScreen({
       <View style={styles.rulesBox} testID={testID ? `${testID}-rules` : undefined}>
         <Text style={styles.rulesHeading}>What happens next</Text>
         <Text style={styles.rulesBody}>
-          This dispute has been filed under applicable network chargeback rules
-          (Reg E / Visa). Your bank is reviewing the transaction and may take up
-          to 10 business days. You'll be notified of the outcome by email.
+          {"This dispute has been filed under applicable network chargeback rules (Reg E / Visa). Your bank is reviewing the transaction and may take up to 10 business days. You'll be notified of the outcome by email."}
         </Text>
       </View>
 

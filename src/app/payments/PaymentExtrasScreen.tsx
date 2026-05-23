@@ -77,7 +77,7 @@ export function PreAuthDisclosureSheet({
           <Text style={styles.feeLabel}>temporary hold</Text>
         </View>
         <Text style={styles.description}>
-          We'll place a temporary authorization hold of{" "}
+          {"We'll place a temporary authorization hold of"}{" "}
           {formatUsd(holdAmountCents)} on your card. This will be released once
           your appointment is confirmed and only the final amount will be
           charged.

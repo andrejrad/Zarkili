@@ -200,7 +200,7 @@ export function MessageSearchScreen({
                 style={styles.emptyText}
                 testID={testID ? `${testID}-empty` : undefined}
               >
-                No messages found for "{query}"
+                {`No messages found for "${query}"`}
               </Text>
             </View>
           ) : null
