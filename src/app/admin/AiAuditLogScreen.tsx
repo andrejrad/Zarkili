@@ -9,8 +9,6 @@ import {
   TextInput,
 } from "react-native";
 
-import type { AiFeatureKey } from "../../shared/ai";
-import { aiFeatureKeys } from "../../shared/ai";
 
 import type { AiAuditLogEntry, AiAuditFilter, AiAuditDecision } from "./aiAdminTypes";
 

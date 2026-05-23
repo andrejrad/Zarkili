@@ -9,7 +9,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 
-import type { IncidentRecord, IncidentSeverity, IncidentStatus } from "./platformAdminTypes";
+import type { IncidentRecord, IncidentStatus } from "./platformAdminTypes";
 
 export type IncidentResponseScreenProps = {
   loading: boolean;

@@ -17,7 +17,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Platform,
   Pressable,
-  ScrollView,
   StyleSheet,
   Text,
   View,
@@ -129,7 +128,7 @@ const FALLBACK_REGION = {
 
 function PriceBubble({
   pence,
-  hasMultiple,
+  hasMultiple: _hasMultiple,
   selected,
   serviceCount,
   onReady,

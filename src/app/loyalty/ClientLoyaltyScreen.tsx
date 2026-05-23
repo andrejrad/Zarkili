@@ -80,7 +80,7 @@ function formatTxType(type: "credit" | "debit"): string {
 // Sub-components
 // ---------------------------------------------------------------------------
 
-function TierBadge({ tierId, tierName }: { tierId: string | null; tierName: string }) {
+function TierBadge({ tierId: _tierId, tierName }: { tierId: string | null; tierName: string }) {
   return (
     <View style={styles.tierBadge}>
       <Text style={styles.tierBadgeText}>{tierName || "No Tier"}</Text>

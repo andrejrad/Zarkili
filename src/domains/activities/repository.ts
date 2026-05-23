@@ -14,7 +14,6 @@ import {
   query,
   setDoc,
   serverTimestamp,
-  where,
   type Firestore,
 } from "firebase/firestore";
 
@@ -55,10 +54,6 @@ export function createActivityRepository(db: Firestore): ActivityRepository {
 
   function activityRef(tenantId: string, activityId: string) {
     return doc(db, `tenants/${tenantId}/activities`, activityId);
-  }
-
-  function participationCol(tenantId: string) {
-    return collection(db, `tenants/${tenantId}/activityParticipations`);
   }
 
   function participationRef(tenantId: string, participationId: string) {

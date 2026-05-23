@@ -20,7 +20,6 @@ import {
 
 import {
   Banner,
-  StickyCtaBar,
   colors,
   radius,
   spacing,

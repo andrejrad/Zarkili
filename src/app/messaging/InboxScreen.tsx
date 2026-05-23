@@ -10,7 +10,7 @@
 
 import { FlatList, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 
-import { Banner, SegmentedControl, colors, radius, spacing, textStyles } from "../../shared/ui";
+import { SegmentedControl, colors, radius, spacing, textStyles } from "../../shared/ui";
 
 import {
   INBOX_TAB_LABELS,

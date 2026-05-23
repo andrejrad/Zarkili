@@ -11,7 +11,6 @@
  *   AttachmentChip             — attachment thumbnail / file chip
  */
 
-import { useState } from "react";
 import {
   ActivityIndicator,
   Modal,
@@ -299,7 +298,7 @@ export function AdminMessagingScreen({
   onSend,
   bulkSelectedIds,
   onToggleBulkSelect,
-  onClearBulkSelection,
+  onClearBulkSelection: _onClearBulkSelection,
   onOpenBulkModal,
   bulkModalVisible,
   bulkMessageText,

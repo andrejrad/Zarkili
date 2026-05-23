@@ -9,7 +9,6 @@ import { FlatList, Pressable, ScrollView, StyleSheet, Text, View } from "react-n
 
 import {
   RewardCard,
-  StickyCtaBar,
   colors,
   radius,
   spacing,

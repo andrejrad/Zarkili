@@ -20,7 +20,6 @@ import {
   textStyles,
 } from "../../shared/ui";
 import {
-  EMPTY_REVIEW_DRAFT,
   MAX_REVIEW_PHOTOS,
   MAX_REVIEW_TEXT_LENGTH,
   REVIEW_ASPECTS,
@@ -262,7 +261,6 @@ type AspectChipProps = {
 };
 
 function AspectChip({ aspect, value, onChange, testID }: AspectChipProps) {
-  const rated = value > 0;
   return (
     <View style={styles.aspectChip} testID={testID}>
       <Text style={styles.aspectLabel}>{aspect}</Text>

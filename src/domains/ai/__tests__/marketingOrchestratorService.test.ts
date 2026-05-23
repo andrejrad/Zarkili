@@ -4,7 +4,6 @@ import {
   isInQuietHours,
   type CampaignDefinition,
   type DispatchContextItem,
-  type EligibilityCandidate,
   type EvaluateBatchInput,
   type PersonalizationModelInput,
   type PersonalizationModelOutput,

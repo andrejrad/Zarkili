@@ -8,7 +8,7 @@
  */
 
 import { useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { Banner, Button, InputField, colors, radius, spacing, textStyles } from "../../shared/ui";
 

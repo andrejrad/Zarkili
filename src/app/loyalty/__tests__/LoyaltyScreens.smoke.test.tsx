@@ -80,7 +80,7 @@ describe("ClientLoyaltyScreen", () => {
   };
 
   it("renders loading indicator", () => {
-    const { getByTestId } = render(
+    const { getByTestId: _getByTestId } = render(
       <ClientLoyaltyScreen {...baseProps} isLoading transactions={[]} loyaltyState={null} />,
     );
     // ActivityIndicator renders without throwing

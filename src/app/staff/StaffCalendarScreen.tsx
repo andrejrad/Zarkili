@@ -99,9 +99,6 @@ export function StaffCalendarScreen({
   testID,
 }: StaffCalendarScreenProps) {
   const hours = hourLabels();
-  const columnWidth = weekDays.length > 0
-    ? `${(100 / weekDays.length).toFixed(2)}%`
-    : "14.28%";
 
   if (isError) {
     return (

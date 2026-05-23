@@ -219,7 +219,7 @@ export type InlineReward = {
 export function filterRewards(
   rewards: readonly Reward[],
   tab: RewardFilterTab,
-  userPoints: number,
+  _userPoints: number,
 ): Reward[] {
   return rewards
     .filter((r) => tab === "All" || r.type === tab)

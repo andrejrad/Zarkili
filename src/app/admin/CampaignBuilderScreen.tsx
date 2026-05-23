@@ -39,7 +39,6 @@ export type CampaignBuilderScreenProps = {
 };
 
 const CHANNELS = ["email", "sms", "push"] as const;
-type Channel = (typeof CHANNELS)[number];
 
 // ---------------------------------------------------------------------------
 // Screen

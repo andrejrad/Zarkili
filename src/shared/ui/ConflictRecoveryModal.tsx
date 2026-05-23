@@ -12,7 +12,7 @@
 import { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-import { colors, radius, spacing } from "./tokens";
+import { colors, spacing } from "./tokens";
 import { Button } from "./Button";
 import { ModalSheet } from "./ModalSheet";
 import { TimeSlotChip } from "./TimeSlotChip";

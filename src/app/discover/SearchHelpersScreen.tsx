@@ -11,16 +11,13 @@
  * States: recents-populated, saved-populated, empty (no-results), typing.
  */
 
-import { useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import {
-  Banner,
   Button,
   ModalSheet,
   SearchSuggestionRow,
   colors,
-  radius,
   spacing,
 } from "../../shared/ui";
 

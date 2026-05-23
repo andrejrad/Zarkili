@@ -28,7 +28,6 @@ import {
   textStyles,
 } from "../../shared/ui";
 import {
-  DEFAULT_NOTIFICATION_PREFERENCES,
   NOTIFICATION_PREFERENCE_LABELS,
   NotificationChannel,
   NotificationPreferenceKey,

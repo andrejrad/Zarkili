@@ -91,7 +91,7 @@ export function MarketplacePostDetailScreen({
   onPressComment,
   onPressRelatedPost,
   onPressRelatedSave,
-  onPressBack,
+  onPressBack: _onPressBack,
   testID,
 }: MarketplacePostDetailScreenProps) {
   const [expanded, setExpanded] = useState(false);

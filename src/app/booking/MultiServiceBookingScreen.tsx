@@ -28,15 +28,13 @@ import {
   InputField,
   ModalSheet,
   StickyFooterCta,
-  TimeSlotChip,
   colors,
   radius,
   spacing,
 } from "../../shared/ui";
 
 import type { BookingServiceCategoryGroup } from "./ServiceSelectionScreen";
-import type { BookingService } from "./bookingHelpers";
-import { computeBookingTotal, formatUsd } from "./bookingHelpers";
+import { formatUsd } from "./bookingHelpers";
 
 // ---------------------------------------------------------------------------
 // J.2.1 — Multi-service booking
@@ -71,8 +69,8 @@ export function MultiServiceBookingScreen({
   errorMessage,
   onToggleService,
   onPressContinue,
-  onPressBack,
-  onPressRetry,
+  onPressBack: _onPressBack,
+  onPressRetry: _onPressRetry,
   testID,
 }: MultiServiceBookingScreenProps) {
   const allServices = groups.flatMap((g) => g.services);
@@ -289,7 +287,7 @@ export function OnBehalfBookingScreen({
   requiredFieldsError,
   loading,
   onPressContinue,
-  onPressBack,
+  onPressBack: _onPressBack,
   testID,
 }: OnBehalfBookingScreenProps) {
   return (

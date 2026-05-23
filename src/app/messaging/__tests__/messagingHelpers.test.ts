@@ -9,7 +9,6 @@ import {
   DEFAULT_NOTIFICATION_PREFERENCES,
   QUIET_HOURS_END_DEFAULT,
   QUIET_HOURS_START_DEFAULT,
-  categorizeNotificationDate,
   countUnreadThreads,
   filterNotificationsByTab,
   filterThreadsByTab,

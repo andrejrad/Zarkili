@@ -51,19 +51,6 @@ export type SalonActionsSheetProps = {
   testID?: string;
 };
 
-const US_FEDERAL_HOLIDAYS = [
-  "New Year's Day",
-  "Martin Luther King Jr. Day",
-  "Presidents' Day",
-  "Memorial Day",
-  "Juneteenth",
-  "Independence Day",
-  "Labor Day",
-  "Columbus Day",
-  "Veterans Day",
-  "Thanksgiving",
-  "Christmas Day",
-];
 
 export function SalonActionsSheet({
   visible,

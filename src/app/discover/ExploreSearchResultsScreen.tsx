@@ -11,7 +11,6 @@
 
 import { useCallback, useRef, useState } from "react";
 import {
-  ActivityIndicator,
   FlatList,
   Pressable,
   StyleSheet,

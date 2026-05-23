@@ -20,7 +20,7 @@ import {
   View,
 } from "react-native";
 
-import type { Review, ReviewStatus } from "../../domains/reviews/model";
+import type { Review } from "../../domains/reviews/model";
 
 import { StarRatingDisplay } from "./ClientReviewScreens";
 

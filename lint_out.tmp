@@ -1,0 +1,297 @@
+﻿
+> zarkili@0.1.0 lint
+> eslint .
+
+
+C:\dev\Zarkili\src\app\activities\ActivityDetailScreen.tsx
+  30:3  error  'loading' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\dev\Zarkili\src\app\admin\AdminPatterns.tsx
+  11:10  error  'useState' is defined but never used. Allowed unused vars must match /^_/u    @typescript-eslint/no-unused-vars
+  12:28  error  'ScrollView' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\dev\Zarkili\src\app\admin\AiAuditLogScreen.tsx
+  12:15  error  'AiFeatureKey' is defined but never used. Allowed unused vars must match /^_/u   @typescript-eslint/no-unused-vars
+  13:10  error  'aiFeatureKeys' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\dev\Zarkili\src\app\admin\AiBudgetConfigScreen.tsx
+   12:36  error  'AiFeatureBudgetConfig' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  115:75  error  Unexpected any. Specify a different type                                                 @typescript-eslint/no-explicit-any
+  149:47  error  Unexpected any. Specify a different type                                                 @typescript-eslint/no-explicit-any
+
+C:\dev\Zarkili\src\app\admin\AiSuggestionQueueScreen.tsx
+  267:68  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\dev\Zarkili\src\app\admin\CampaignBuilderScreen.tsx
+  42:6  error  'Channel' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\dev\Zarkili\src\app\admin\IncidentResponseScreen.tsx
+  12:31  error  'IncidentSeverity' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\dev\Zarkili\src\app\admin\MarketplacePostComposerScreen.tsx
+  8:3  error  'ActivityIndicator' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\dev\Zarkili\src\app\admin\PerPostPerformanceScreen.tsx
+  9:3  error  'FlatList' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\dev\Zarkili\src\app\admin\SecurityEventsDashboardScreen.tsx
+   1:17  error  'useState' is defined but never used. Allowed unused vars must match /^_/u           @typescript-eslint/no-unused-vars
+  11:51  error  'SecurityEventKind' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\dev\Zarkili\src\app\admin\SegmentBuilderScreen.tsx
+  26:10  error  'AdminErrorState' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\dev\Zarkili\src\app\admin\SuspendTenantScreen.tsx
+  9:3  error  'ActivityIndicator' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\dev\Zarkili\src\app\admin\clientCrmAdapters.ts
+  36:3  error  'GdprExportType' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\dev\Zarkili\src\app\admin\loyaltyAdminAdapters.ts
+  24:3  error  'updateDoc' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\dev\Zarkili\src\app\admin\marketplaceAdminService.ts
+  13:3  error  'serverTimestamp' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\dev\Zarkili\src\app\admin\platformAdminService.ts
+  152:47  error  'churned' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\dev\Zarkili\src\app\admin\reviewAdminRepository.ts
+  34:3  error  'ReviewBulkAction' is defined but never used. Allowed unused vars must match /^_/u   @typescript-eslint/no-unused-vars
+  39:3  error  'ReviewQueueFilter' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\dev\Zarkili\src\app\auth\AgeGateScreen.tsx
+  11:10  error  'Pressable' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\dev\Zarkili\src\app\booking\MultiServiceBookingScreen.tsx
+   31:3   error  'TimeSlotChip' is defined but never used. Allowed unused vars must match /^_/u         @typescript-eslint/no-unused-vars
+   38:15  error  'BookingService' is defined but never used. Allowed unused vars must match /^_/u       @typescript-eslint/no-unused-vars
+   39:10  error  'computeBookingTotal' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+   74:3   error  'onPressBack' is defined but never used. Allowed unused args must match /^_/u          @typescript-eslint/no-unused-vars
+   75:3   error  'onPressRetry' is defined but never used. Allowed unused args must match /^_/u         @typescript-eslint/no-unused-vars
+  292:3   error  'onPressBack' is defined but never used. Allowed unused args must match /^_/u          @typescript-eslint/no-unused-vars
+
+C:\dev\Zarkili\src\app\discover\ExploreMapScreen.tsx
+   20:3  error  'ScrollView' is defined but never used. Allowed unused vars must match /^_/u   @typescript-eslint/no-unused-vars
+  132:3  error  'hasMultiple' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\dev\Zarkili\src\app\discover\ExploreSearchResultsScreen.tsx
+  14:3  error  'ActivityIndicator' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\dev\Zarkili\src\app\discover\FilterSheetScreen.tsx
+  60:7  error  'DEFAULT_DISTANCE_KM' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\dev\Zarkili\src\app\discover\NearMeSalonMapScreen.tsx
+  16:21  error  'ScrollView' is defined but never used. Allowed unused vars must match /^_/u   @typescript-eslint/no-unused-vars
+  59:3   error  'onPressBack' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\dev\Zarkili\src\app\discover\SalonActionsSheet.tsx
+  54:7  error  'US_FEDERAL_HOLIDAYS' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\dev\Zarkili\src\app\discover\SearchHelpersScreen.tsx
+  14:10  error  'useState' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  18:3   error  'Banner' is defined but never used. Allowed unused vars must match /^_/u    @typescript-eslint/no-unused-vars
+  23:3   error  'radius' is defined but never used. Allowed unused vars must match /^_/u    @typescript-eslint/no-unused-vars
+
+C:\dev\Zarkili\src\app\legal\DeleteAccountScreen.tsx
+  45:3  error  'onBack' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\dev\Zarkili\src\app\legal\LegalPageScreen.tsx
+  8:29  error  'ScrollView' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\dev\Zarkili\src\app\legal\MarketingConsentScreen.tsx
+  10:40  error  'View' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\dev\Zarkili\src\app\loyalty\ClientLoyaltyScreen.tsx
+  83:22  error  'tierId' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\dev\Zarkili\src\app\loyalty\ReferralScreen.tsx
+  58:3  error  'onRetry' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\dev\Zarkili\src\app\loyalty\RewardCatalogScreen.tsx
+  12:3  error  'StickyCtaBar' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\dev\Zarkili\src\app\loyalty\__tests__\LoyaltyScreens.smoke.test.tsx
+  83:13  error  'getByTestId' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\dev\Zarkili\src\app\loyalty\loyaltyAdminService.ts
+  12:3  error  'CustomerLoyaltyState' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\dev\Zarkili\src\app\loyalty\loyaltyHelpers.ts
+  222:3  error  'userPoints' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\dev\Zarkili\src\app\marketplace\MarketplacePostDetailScreen.tsx
+  94:3  error  'onPressBack' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\dev\Zarkili\src\app\messaging\AdminMessagingScreens.tsx
+   14:10  error  'useState' is defined but never used. Allowed unused vars must match /^_/u              @typescript-eslint/no-unused-vars
+  302:3   error  'onClearBulkSelection' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\dev\Zarkili\src\app\messaging\InboxScreen.tsx
+  13:10  error  'Banner' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\dev\Zarkili\src\app\messaging\__tests__\AdminMessagingScreens.test.tsx
+  27:41  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\dev\Zarkili\src\app\messaging\__tests__\messagingHelpers.test.ts
+  12:3  error  'categorizeNotificationDate' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\dev\Zarkili\src\app\messaging\adminMessagingService.ts
+  83:16  error  'a' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\dev\Zarkili\src\app\migration\zaraMigration.ts
+  31:3  error  'collection' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  34:3  error  'getDocs' is defined but never used. Allowed unused vars must match /^_/u     @typescript-eslint/no-unused-vars
+  35:3  error  'query' is defined but never used. Allowed unused vars must match /^_/u       @typescript-eslint/no-unused-vars
+  38:3  error  'updateDoc' is defined but never used. Allowed unused vars must match /^_/u   @typescript-eslint/no-unused-vars
+  39:3  error  'where' is defined but never used. Allowed unused vars must match /^_/u       @typescript-eslint/no-unused-vars
+
+C:\dev\Zarkili\src\app\navigation\mockData.ts
+  50:3  error  'NotificationPreferences' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\dev\Zarkili\src\app\notifications\NotificationPreferencesScreen.tsx
+  31:3  error  'DEFAULT_NOTIFICATION_PREFERENCES' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\dev\Zarkili\src\app\onboarding\FirstRunExtrasScreen.tsx
+  16:3  error  'SafeAreaView' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\dev\Zarkili\src\app\onboarding\__tests__\SalonOnboardingWizard.smoke.test.tsx
+  6:10  error  'ONBOARDING_STEPS' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\dev\Zarkili\src\app\onboarding\__tests__\clientOnboardingOrchestrator.persistence.test.ts
+  8:10  error  'afterEach' is defined but never used. Allowed unused vars must match /^_/u   @typescript-eslint/no-unused-vars
+  8:21  error  'beforeEach' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\dev\Zarkili\src\app\payments\AddPaymentMethodScreen.tsx
+  16:3  error  'Button' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\dev\Zarkili\src\app\payments\DisputeScreen.tsx
+  69:3  error  'filedDateIso' is defined but never used. Allowed unused args must match /^_/u     @typescript-eslint/no-unused-vars
+  70:3  error  'resolvedDateIso' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+  75:3  error  'onPressBack' is defined but never used. Allowed unused args must match /^_/u      @typescript-eslint/no-unused-vars
+
+C:\dev\Zarkili\src\app\payments\PaymentExtrasScreen.tsx
+  15:21  error  'ScrollView' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\dev\Zarkili\src\app\profile\EditProfileScreen.tsx
+  48:3  error  'onBack' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\dev\Zarkili\src\app\reviews\AdminModerationScreens.tsx
+  23:23  error  'ReviewStatus' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\dev\Zarkili\src\app\reviews\ReviewPromptScreen.tsx
+   23:3  error  'EMPTY_REVIEW_DRAFT' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  265:9  error  'rated' is assigned a value but never used. Allowed unused vars must match /^_/u      @typescript-eslint/no-unused-vars
+
+C:\dev\Zarkili\src\app\settings\I18nSettingsScreen.tsx
+  89:6  error  'CurrencyPosition' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\dev\Zarkili\src\app\staff\StaffCalendarScreen.tsx
+  102:9  error  'columnWidth' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\dev\Zarkili\src\app\waitlist\WaitlistPositionScreen.tsx
+  23:3  error  'StickyCtaBar' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\dev\Zarkili\src\app\waitlist\__tests__\waitlistNotificationService.test.ts
+   49:18  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   50:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   51:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  133:59  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  144:59  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  156:59  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  168:49  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  170:59  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  182:59  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  199:59  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  212:59  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  230:59  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  247:59  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\dev\Zarkili\src\domains\activities\repository.ts
+  17:3   error  'where' is defined but never used. Allowed unused vars must match /^_/u             @typescript-eslint/no-unused-vars
+  60:12  error  'participationCol' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\dev\Zarkili\src\domains\ai\__tests__\marketingOrchestratorService.test.ts
+  7:8  error  'EligibilityCandidate' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\dev\Zarkili\src\domains\bookings\__tests__\bookingIntegration.test.ts
+  13:10  error  'BookingError' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\dev\Zarkili\src\domains\discovery\__tests__\salonProfileService.test.ts
+  38:10  error  'makeDb' is defined but never used. Allowed unused vars must match /^_/u                @typescript-eslint/no-unused-vars
+  48:7   error  'callCount' is assigned a value but never used. Allowed unused vars must match /^_/u    @typescript-eslint/no-unused-vars
+  80:9   error  'mockDoc' is assigned a value but never used. Allowed unused vars must match /^_/u      @typescript-eslint/no-unused-vars
+  81:9   error  'mockQuery' is assigned a value but never used. Allowed unused vars must match /^_/u    @typescript-eslint/no-unused-vars
+  82:9   error  'mockWhere' is assigned a value but never used. Allowed unused vars must match /^_/u    @typescript-eslint/no-unused-vars
+  83:9   error  'mockOrderBy' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  84:9   error  'mockLimit' is assigned a value but never used. Allowed unused vars must match /^_/u    @typescript-eslint/no-unused-vars
+
+C:\dev\Zarkili\src\domains\discovery\repository.ts
+  27:3  error  'DiscoveryCategoryId' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\dev\Zarkili\src\domains\loyalty\repository.ts
+  22:3  error  'orderBy' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\dev\Zarkili\src\domains\messages\__tests__\repository.test.ts
+  6:8  error  'Message' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\dev\Zarkili\src\domains\notifications\__tests__\templateRenderer.test.ts
+  108:9  error  'hrTemplate' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\dev\Zarkili\src\domains\waitlist\__tests__\repository.test.ts
+  141:18  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  142:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  143:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  144:24  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  145:25  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  146:20  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  147:20  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  148:22  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  199:51  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  206:51  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  217:51  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  224:51  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  231:51  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  242:51  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  251:51  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  264:51  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  272:51  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  288:51  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  294:51  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  303:51  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  313:51  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  328:51  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  336:51  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  346:51  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  355:51  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  364:51  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  373:51  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  382:51  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  391:51  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  401:51  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  417:51  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  426:51  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  442:51  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\dev\Zarkili\src\domains\waitlist\repository.ts
+  120:39  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  121:39  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  160:40  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  161:40  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\dev\Zarkili\src\shared\ui\ConflictRecoveryModal.tsx
+  15:18  error  'radius' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\dev\Zarkili\src\shared\ui\NotificationIcon.tsx
+  10:49  error  'View' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\dev\Zarkili\src\shared\ui\RangeSlider.tsx
+  120:63  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  123:53  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  239:59  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  239:84  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  244:55  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  253:55  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+✖ 152 problems (152 errors, 0 warnings)
+

@@ -23,7 +23,7 @@ import type {
   SegmentPreview,
 } from "../../domains/clients/clientCrmModel";
 
-import { AdminErrorState, AdminLoadingState } from "./AdminPatterns";
+import { AdminLoadingState } from "./AdminPatterns";
 
 // ---------------------------------------------------------------------------
 // Types

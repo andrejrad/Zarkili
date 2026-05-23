@@ -45,7 +45,7 @@ export function EditProfileScreen({
   avatarUri,
   onSave,
   onChangeAvatar,
-  onBack,
+  onBack: _onBack,
   testID,
 }: EditProfileScreenProps) {
   const [displayName, setDisplayName] = useState(initialDisplayName);

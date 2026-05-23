@@ -8,8 +8,7 @@
  *
  * W41 additions: AdminDataTable, BulkActionBar, BulkConfirmModal.
  */
-import { useState } from "react";
-import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
 
 import { brandTypography } from "../../shared/ui/brandTypography";
 

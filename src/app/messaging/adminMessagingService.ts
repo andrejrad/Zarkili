@@ -80,7 +80,7 @@ export function createAdminMessagingService(
       .filter((a) =>
         filters.subscriptionStatus ? a.subscriptionStatus === filters.subscriptionStatus : true,
       )
-      .filter((a) =>
+      .filter((_a) =>
         filters.locationId
           ? // UserTenantAccess doesn't carry locationIds — caller filters on a naming convention
             // or omits the filter; future expansion may join staff/location tables

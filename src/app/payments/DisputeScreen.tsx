@@ -66,13 +66,13 @@ export function DisputeScreen({
   state = "open",
   disputedAmount,
   reason,
-  filedDateIso,
-  resolvedDateIso,
+  filedDateIso: _filedDateIso,
+  resolvedDateIso: _resolvedDateIso,
   timeline = DEFAULT_TIMELINE,
   evidence = [],
   errorMessage,
   onContactSupport,
-  onPressBack,
+  onPressBack: _onPressBack,
   testID,
 }: DisputeScreenProps) {
   return (

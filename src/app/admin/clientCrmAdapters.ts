@@ -33,7 +33,6 @@ import type {
   GdprExportFormat,
   GdprExportInput,
   GdprExportRequest,
-  GdprExportType,
   MergeInput,
   SavedSegment,
   SegmentBuilderInput,

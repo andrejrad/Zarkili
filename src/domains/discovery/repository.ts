@@ -24,7 +24,6 @@ import {
 
 import type {
   DiscoveryCategory,
-  DiscoveryCategoryId,
   DiscoveryRecentBooking,
   ReviewObject,
   ReviewSummary,

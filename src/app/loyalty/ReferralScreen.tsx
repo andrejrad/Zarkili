@@ -55,7 +55,7 @@ export function ReferralScreen({
   errorMessage,
   onCopy,
   onPressBack,
-  onRetry,
+  onRetry: _onRetry,
   testID,
 }: ReferralScreenProps) {
   const formattedCode = formatReferralCode(rawCode);

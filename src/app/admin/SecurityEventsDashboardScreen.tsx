@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   View,
   Text,
@@ -8,7 +8,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 
-import type { SecurityEvent, SecurityEventFilter, SecurityEventKind, SecurityEventSeverity } from "./platformAdminTypes";
+import type { SecurityEvent, SecurityEventFilter, SecurityEventSeverity } from "./platformAdminTypes";
 
 export type SecurityEventsDashboardScreenProps = {
   loading: boolean;
