@@ -116,6 +116,7 @@ Weeks 1–10 did not use the `Wnn-DEBT-n` convention. Carry-over items from that
 | **Production launch W2–W3 — wiring tasks** | NEW-DEBT-P (P1 addCardReturnRoute · P2 serviceVisibility · P3 rescheduleConflicts · P4 adjustPoints client IDs · P5 ppfPost) |
 | **Post-RC type hygiene** | NEW-DEBT-O (60 `no-explicit-any` errors remaining after NEW-DEBT-J cleanup) |
 | **Discovery feed Firestore fix — stale rules tests** | NEW-DEBT-Q (2 rules tests expect tenant reads to be private; rule is now intentionally public) |
+| **W6 QA blocker — seed scripts write to wrong collection** | NEW-DEBT-R (seed scripts write to `services/{id}`; app queries `service_types` collection group — dev data is invisible to the app) |
 
 **Closed:** W12-HARDENING-1, W12-HARDENING-2, KI-001 (W15), KI-002 (W16), W11-DEBT-2 (W16), W13-DEBT-1 (W18), W13-DEBT-4 (W18), W14-DEBT-2 (W18), W15-DEBT-2 (W18), W19-DEBT-1 (W19), W19-DEBT-2 (W19), W19-DEBT-3 (W19), W14-DEBT-5 (W20.5), W16-DEBT-1 (W20.5), W17-DEBT-2 (W20.5), W17-DEBT-3 (W20.5), W18-DEBT-1 (W20.5), W20-DEBT-1 (W20.5), W15-DEBT-3 (W21), W17-DEBT-1 (W22), W11-DEBT-1 (W23), W22-DEBT-2 (W23), W23-DEBT-2 (W24), W24-DEBT-2 (W37.5), W37.5-DEBT-1 (W37.5), W37.5-DEBT-2 (W37.5), W35-DEBT-1 (W37.6-pre), W36-DEBT-1 (W37.5-pre), W36-DEBT-2 (W37.6-pre), W36-DEBT-3 (W37.5-pre), W37-DEBT-1 (W37.5-pre), W37-DEBT-2 (W37.6-pre), W37-DEBT-3 (W37.5-pre), W37-DEBT-5 (W37.5-pre), W37-DEBT-6 (W37.5-pre), W23-DEBT-3 (W37.6-pre via W36-DEBT-2), W38-DEBT-6 (W37.6-pre — posts={[]} is correct), W38-DEBT-7 (W37.6-pre — inline static intended), W13-DEBT-2 (W39), W14-DEBT-3 (W39), W14-DEBT-4 (W39), W38-DEBT-8 (W39), W38-DEBT-9 (W39), W38-DEBT-10 (W40), W43-DEBT-3 (W45), **W41-DEBT-3 (W46)**, **W43-DEBT-1 (W46)**, **W44-DEBT-1 (W46)**, **W45-DEBT-1 (W46)**, **W41-DEBT-1 (W47)**, **W41-DEBT-2 (W47)**, **W41-DEBT-4 (W47)**, **W41-DEBT-5 (W47)**, **W41-DEBT-6 (W47)**, **W42-DEBT-1 (W47)**, **W42-DEBT-2 (W47)**, **W42-DEBT-3 (W47)**, **W37.5-DEBT-3 (W47)**, **W23-DEBT-1 (W47)**, **W38-DEBT-3 (W47)**, **W15-DEBT-1 (W47)**, **W22-DEBT-1 (W47)**, **W38-DEBT-1 (W47)**, **W22-DEBT-3 (W47)**.
 
@@ -639,3 +640,22 @@ Both tests fail with "Expected request to fail, but it succeeded." The rule inte
 **Entry point:** `__tests__/firestore.rules.test.ts:49` (`blocks unauthenticated tenant reads`) and `:59` (`allows tenant member reads only within their tenant`).
 
 **Verification:** `npm run test:rules` exits 0 with all tests passing (currently 2 failing, 54 passing).
+
+---
+
+## NEW-DEBT-R — Seed scripts write to stale `services` collection; app queries `service_types` via collection group
+
+**Opened:** 2026-05-23
+**Severity:** high
+**Target week:** W6 (must be fixed before W6 QA cycle starts)
+**Status:** CLOSED 2026-05-23
+
+**What:** `getServiceCards()` in `src/domains/discovery/repository.ts:222` queries `collectionGroup(db, "service_types")`, which finds documents at the canonical path `brands/{brandId}/locations/{locationId}/service_types/{stId}`. All three seed scripts (`seed:discovery:dev`, `seed:demo:dev`, `seed:qa:dev`) write to the legacy top-level `services/{id}` collection instead. The collection segment name is `services`, not `service_types`, so the collection group query returns zero documents. Running any seed script populates data the app can never read. The discovery feed appears broken on Android Expo Go, but the actual issue is empty dev data — the query and Firestore rules are both correct.
+
+**Why deferred:** Discovered at end of day during investigation of the empty discovery feed. The fix is straightforward (rewrite seed paths to the canonical nested path and add the 14 required denorm fields), but requires time to do correctly and validate. Not touching tonight. Related to NEW-DEBT-B B3 (legacy `locations/` collection migration) — the `services/` top-level collection is part of the same stale-legacy-paths cluster.
+
+**Entry point:** `scripts/seed-demo-services.mjs:503` (writes `services/{id}`), `scripts/seed-qa-firestore.mjs:810` (writes `services/{id}`), `scripts/seed-discovery-featured-salons.mjs:178` (writes deprecated `discoveryFeaturedSalons`). Query under fix: `src/domains/discovery/repository.ts:222`.
+
+**Verification:** After running `npm run seed:demo:dev`, Home and Explore tabs show service cards on Android Expo Go without errors.
+
+**Close notes:** Fixed in branch `fix/new-debt-r-seed-scripts`. Both `seed-demo-services.mjs` and `seed-qa-firestore.mjs` now write service documents to `brands/{tenantId}/locations/{locationId}/service_types/{serviceId}`. QA seed also received 13 missing denorm fields (`geohash`, `locationLat`, `locationLng`, `locationDisplayName`, `locationCity`, `locationAverageRating`, `locationReviewCount`, `categoryName`, `variantCount`, `priceFrom`, `durationFrom`, `primaryPhotoUrl`, `primaryPhotoSource`, `isBookableOnline`). CLEAR_SEED in demo seed updated to clean both old stale path and new canonical path. `seed-discovery-featured-salons.mjs` left unchanged — it targets the featured carousel (`discoveryFeaturedSalons`), not `service_types`, and its 3 tenants are fully covered by the demo seed. Real seed ran successfully: 109 ops, 0 errors, dev project `zarkili-dev-a1b1c`. Warning comment added to top of both modified scripts.

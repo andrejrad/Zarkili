@@ -1,4 +1,10 @@
 #!/usr/bin/env node
+// IMPORTANT: This script writes service documents to the canonical Firestore path:
+//   brands/{tenantId}/locations/{locationId}/service_types/{serviceId}
+//
+// The app's discovery feed uses collectionGroup("service_types") to query these
+// documents. Do NOT change the collection segment to "services" — it will break
+// getServiceCards(). See NEW-DEBT-R close report.
 /**
  * W49.5 QA Sprint — Full Firestore Seed Script
  *
@@ -807,12 +813,13 @@ async function seed() {
         serviceIds.push(svcId);
         const catId = toCategoryId(svc.category);
 
-        write(db.doc(`services/${svcId}`), {
+        write(db.doc(`brands/${t.id}/locations/${loc.id}/service_types/${svcId}`), {
           serviceId: svcId,
           tenantId: t.id,
           locationId: loc.id,
           name: svc.name,
           categoryId: catId,
+          categoryName: svc.category,
           description: "",
           tags: [],
           technicianIds: locTechnicianIds,
@@ -829,13 +836,27 @@ async function seed() {
           ratingSum: 0,
           nextAvailableAt: isoStr(1),
           isFullyBooked: false,
+          // denorm fields required by getServiceCards()
+          geohash,
+          locationLat: loc.lat,
+          locationLng: loc.lng,
+          locationDisplayName: displayName,
+          locationCity: loc.city,
+          locationAverageRating: null,
+          locationReviewCount: 0,
+          variantCount: 1,
+          priceFrom: svc.price,
+          durationFrom: svc.durationMinutes,
+          primaryPhotoUrl: null,
+          primaryPhotoSource: null,
+          isBookableOnline: true,
           createdAt,
           updatedAt: ts(-1),
         });
 
         // Default variant
         const variantId = `var-${svcId}-standard`;
-        write(db.doc(`services/${svcId}/variants/${variantId}`), {
+        write(db.doc(`brands/${t.id}/locations/${loc.id}/service_types/${svcId}/variants/${variantId}`), {
           variantId,
           serviceId: svcId,
           tenantId: t.id,
@@ -854,7 +875,7 @@ async function seed() {
         // Addon (every 3rd service by sortOrder)
         if (svc.sortOrder % 3 === 0) {
           const addonId = `addon-${svcId}-extra`;
-          write(db.doc(`services/${svcId}/addons/${addonId}`), {
+          write(db.doc(`brands/${t.id}/locations/${loc.id}/service_types/${svcId}/addons/${addonId}`), {
             addonId,
             serviceId: svcId,
             tenantId: t.id,
@@ -871,7 +892,7 @@ async function seed() {
 
         // Photo placeholder
         const photoId = `photo-${svcId}-1`;
-        write(db.doc(`services/${svcId}/photos/${photoId}`), {
+        write(db.doc(`brands/${t.id}/locations/${loc.id}/service_types/${svcId}/photos/${photoId}`), {
           photoId,
           serviceId: svcId,
           url: null,
