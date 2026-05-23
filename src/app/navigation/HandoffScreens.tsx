@@ -383,6 +383,7 @@ export function WelcomeRouteScreen({ onGetStarted, onSignIn, onBrowseAsGuest }: 
     <View style={styles.welcomeScreen}>
       <View style={styles.heroBlock}>
         <Image
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
           source={require("../../../assets/icon.png")}
           style={styles.zarkiliIcon}
         />
@@ -1263,6 +1264,7 @@ export function GuestBookingsEmptyScreen({ onSignUp }: { onSignUp: () => void })
   return (
     <View style={styles.guestTabEmptyRoot}>
       <Image
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
         source={require("../../../assets/icon.png")}
         style={styles.guestTabEmptyIcon}
         resizeMode="contain"

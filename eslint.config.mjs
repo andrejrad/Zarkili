@@ -28,6 +28,9 @@ export default [
       globals: {
         ...globals.node
       }
+    },
+    rules: {
+      "no-unused-vars": ["error", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }]
     }
   },
   {
@@ -57,6 +60,7 @@ export default [
       ...reactHooks.configs.recommended.rules,
       "no-undef": "off",
       "react/react-in-jsx-scope": "off",
+      "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }],
       "import/order": [
         "warn",
         {

@@ -108,7 +108,7 @@ export function validateEuVatIdFormat(
 
   const expectedPrefix = COUNTRY_TO_VAT_PREFIX[iso] ?? iso;
   // Strip whitespace, dots, and dashes — these are common copy-paste artefacts.
-  const normalised = vatId.replace(/[\s.\-]/g, "").toUpperCase();
+  const normalised = vatId.replace(/[\s.-]/g, "").toUpperCase();
 
   if (!normalised.startsWith(expectedPrefix)) {
     return { valid: false, reason: "prefix_mismatch", expectedPrefix };
