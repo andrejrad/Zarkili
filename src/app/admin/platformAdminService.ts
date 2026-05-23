@@ -12,6 +12,7 @@ import {
   serverTimestamp,
   type Firestore,
 } from "firebase/firestore";
+
 import type {
   TenantRecord,
   TenantFilter,
@@ -148,7 +149,7 @@ export function createPlatformAdminService(db: Firestore) {
   async function getCrossTenantKpi(actorRole: string): Promise<CrossTenantKpi> {
     assertPlatformAdmin(actorRole);
     const snap = await getDocs(collection(db, "tenants"));
-    let active = 0, trial = 0, suspended = 0, churned = 0, totalRevenue = 0, totalHealth = 0;
+    let active = 0, trial = 0, suspended = 0, _churned = 0, totalRevenue = 0, totalHealth = 0;
     const now = new Date();
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
     let newThisMonth = 0;
@@ -158,7 +159,7 @@ export function createPlatformAdminService(db: Firestore) {
       if (data.status === "active") active++;
       else if (data.status === "trial") trial++;
       else if (data.status === "suspended") suspended++;
-      else if (data.status === "churned") churned++;
+      else if (data.status === "churned") _churned++;
       totalHealth += data.healthScore ?? 80;
       totalRevenue += (data as Record<string, number>).mtdRevenueUsd ?? 0;
       if (data.createdAt && data.createdAt >= monthStart) newThisMonth++;

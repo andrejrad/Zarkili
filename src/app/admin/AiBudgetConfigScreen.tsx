@@ -8,8 +8,10 @@ import {
   ActivityIndicator,
   TextInput,
 } from "react-native";
-import type { AiBudgetGuardConfig, AiFeatureBudgetConfig } from "../../shared/ai";
+
+import type { AiBudgetGuardConfig } from "../../shared/ai";
 import { aiFeatureKeys } from "../../shared/ai";
+
 import type { AiUsageByFeature } from "./aiAdminTypes";
 
 export type AiBudgetConfigScreenProps = {

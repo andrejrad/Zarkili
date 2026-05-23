@@ -104,7 +104,7 @@ export function PaymentFailedScreen({
         <Text style={styles.icon}>💳</Text>
       </View>
 
-      <Text style={styles.heading}>Payment didn't go through</Text>
+      <Text style={styles.heading}>{"Payment didn't go through"}</Text>
 
       <View
         style={styles.reasonBox}

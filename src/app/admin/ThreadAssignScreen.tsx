@@ -12,9 +12,10 @@ import {
   View,
 } from "react-native";
 
-import { AdminErrorState, AdminLoadingState } from "./AdminPatterns";
 import { brandTypography } from "../../shared/ui/brandTypography";
 import type { AdminThread } from "../../domains/messaging/messagingAdminModel";
+
+import { AdminErrorState, AdminLoadingState } from "./AdminPatterns";
 
 // ---------------------------------------------------------------------------
 // Props

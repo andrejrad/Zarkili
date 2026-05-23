@@ -15,6 +15,7 @@
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { QueueCard, colors, radius, spacing, textStyles } from "../../shared/ui";
+
 import type { StaffAppointment } from "./staffHelpers";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -64,7 +65,7 @@ export function WalkInQueueScreen({
   if (isError) {
     return (
       <View style={[styles.root, styles.centered]} testID={testID}>
-        <Text style={styles.errorTitle}>Couldn't load the queue</Text>
+        <Text style={styles.errorTitle}>{"Couldn't load the queue"}</Text>
         <Text style={styles.errorBody}>Check your connection and try again.</Text>
         {onPressRetry && (
           <Pressable style={styles.retryBtn} onPress={onPressRetry} accessibilityRole="button">

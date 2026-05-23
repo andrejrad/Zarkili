@@ -8,9 +8,10 @@
 import React from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
-import { AdminErrorState, AdminLoadingState } from "./AdminPatterns";
 import { brandTypography } from "../../shared/ui/brandTypography";
 import type { AdminBookingDetailView } from "../../domains/bookings/bookingOpsModel";
+
+import { AdminErrorState, AdminLoadingState } from "./AdminPatterns";
 
 // ---------------------------------------------------------------------------
 // Types

@@ -5,7 +5,7 @@
  * Cookies variant shows CCPA "Do Not Sell or Share" toggle for CA residents.
  */
 
-import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 
 import { Button, LegalPageLayout, colors, spacing, textStyles } from "../../shared/ui";
 

@@ -11,16 +11,13 @@
  * States: recents-populated, saved-populated, empty (no-results), typing.
  */
 
-import { useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import {
-  Banner,
   Button,
   ModalSheet,
   SearchSuggestionRow,
   colors,
-  radius,
   spacing,
 } from "../../shared/ui";
 
@@ -89,7 +86,7 @@ export function SearchHelpersScreen({
       {/* No-results state */}
       {state === "no-results" && (
         <View style={styles.noResults} testID={testID ? `${testID}-no-results` : undefined}>
-          <Text style={styles.noResultsText}>No results found for "{query}"</Text>
+          <Text style={styles.noResultsText}>{`No results found for "${query}"`}</Text>
           {onExpandSearch && (
             <Button
               label="Expand search"

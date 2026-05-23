@@ -13,12 +13,13 @@
 
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-import { colors, radius, spacing, textStyles } from "./tokens";
 import type { StaffQueueStatus } from "../staffTypes";
 import {
   STAFF_QUEUE_STATUS_LABELS,
   formatWaitTime,
 } from "../staffTypes";
+
+import { colors, radius, spacing, textStyles } from "./tokens";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

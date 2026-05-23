@@ -28,15 +28,10 @@
  */
 
 import {
-  collection,
   doc,
   getDoc,
-  getDocs,
-  query,
   serverTimestamp,
   setDoc,
-  updateDoc,
-  where,
   writeBatch,
   type Firestore,
 } from "firebase/firestore";

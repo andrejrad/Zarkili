@@ -74,7 +74,7 @@ export function WaitlistScreen({
         <View style={styles.emptyState}>
           <Text style={styles.emptyTitle}>No active waitlists</Text>
           <Text style={styles.emptyText}>
-            If a service you want is fully booked, join the waitlist and we'll notify you when a slot opens up.
+            {"If a service you want is fully booked, join the waitlist and we'll notify you when a slot opens up."}
           </Text>
         </View>
       ) : (

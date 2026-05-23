@@ -1,8 +1,9 @@
 import React from "react";
 import { render, fireEvent } from "@testing-library/react-native";
+
 import { SalonOnboardingWizard } from "../SalonOnboardingWizard";
 import type { SalonOnboardingState } from "../../../domains/onboarding/model";
-import { ONBOARDING_STEPS, buildInitialStepStatuses } from "../../../domains/onboarding/model";
+import { buildInitialStepStatuses } from "../../../domains/onboarding/model";
 
 // ---------------------------------------------------------------------------
 // Fixtures

@@ -7,6 +7,7 @@
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { brandTypography } from "../../shared/ui/brandTypography";
+
 import { AdminSectionRow } from "./AdminPatterns";
 
 // ---------------------------------------------------------------------------

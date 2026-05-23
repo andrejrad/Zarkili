@@ -45,7 +45,7 @@ export function EditProfileScreen({
   avatarUri,
   onSave,
   onChangeAvatar,
-  onBack,
+  onBack: _onBack,
   testID,
 }: EditProfileScreenProps) {
   const [displayName, setDisplayName] = useState(initialDisplayName);
@@ -108,7 +108,7 @@ export function EditProfileScreen({
         >
           <View style={styles.avatarWrap}>
             {avatarUri ? (
-              // eslint-disable-next-line @typescript-eslint/no-require-imports
+               
               <View style={styles.avatar} />
             ) : (
               <View style={styles.avatar}>

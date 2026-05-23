@@ -15,8 +15,9 @@
 
 import { StyleSheet, Text, TextInput, View, Pressable } from "react-native";
 
-import { colors, radius, spacing, textStyles } from "./tokens";
 import type { AIBudgetState } from "../staffTypes";
+
+import { colors, radius, spacing, textStyles } from "./tokens";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

@@ -9,7 +9,6 @@
 
 import type { LoyaltyRepository } from "../../domains/loyalty/repository";
 import type {
-  CustomerLoyaltyState,
   LoyaltyTransaction,
   TenantLoyaltyConfig,
 } from "../../domains/loyalty/model";

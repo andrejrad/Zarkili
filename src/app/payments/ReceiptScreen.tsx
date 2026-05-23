@@ -17,13 +17,14 @@ import {
   radius,
   spacing,
 } from "../../shared/ui";
+import { formatUsDate, formatTimeOfDay } from "../booking/bookingHelpers";
+
 import {
   computeReceiptTotals,
   type ReceiptLineItem as ReceiptLineItemModel,
   type ReceiptTaxLine,
 } from "./receiptsHelpers";
 import { formatUsd } from "./paymentsHelpers";
-import { formatUsDate, formatTimeOfDay } from "../booking/bookingHelpers";
 
 export type ReceiptScreenProps = {
   salonName: string;

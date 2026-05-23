@@ -38,26 +38,26 @@ When suggesting commands, default to PowerShell-native syntax. Do not assume bas
 
 ```powershell
 npm run typecheck                                          # baseline: 0 errors — MUST stay 0
-npm test -- --watch=false                                  # baseline: 3667/3667 passing — MUST stay green
-npm run lint 2>&1 | Select-String "problems"               # baseline: 880 problems (456 errors / 424 warnings) — MUST NOT increase
+npm test -- --watch=false                                  # baseline: 3685/3685 passing — MUST stay green
+npm run lint 2>&1 | Select-String "problems"               # baseline: 60 problems (NEW-DEBT-O, all no-explicit-any) — MUST NOT increase
 npm run test:rules                                         # only if firestore.rules was changed
 ```
 
-**Lint debt:** the codebase has 880 pre-existing lint problems (tracked as NEW-DEBT-J) that are NOT release blockers. Your job is to **never increase this count**. Fix any new lint errors your change introduces before completing the task. A dedicated lint cleanup sprint is planned separately — do not opportunistically fix pre-existing lint issues outside that sprint.
+**Lint debt:** the codebase has 60 pre-existing lint problems (all `@typescript-eslint/no-explicit-any`, tracked as NEW-DEBT-O) that are NOT release blockers. Your job is to **never increase this count**. Fix any new lint errors your change introduces before completing the task. Do not opportunistically fix pre-existing `no-explicit-any` errors outside a dedicated sprint.
 
 **Before any change:**
 1. `npm run typecheck` — confirm 0 errors
-2. `npm run lint 2>&1 | Select-String "problems"` — capture current count (baseline: 880)
+2. `npm run lint 2>&1 | Select-String "problems"` — capture current count (baseline: 60)
 
 **After any change:**
 1. `npm run typecheck` — must still be 0 errors
-2. `npm test -- --watch=false` — must still be 3667/3667 passing
+2. `npm test -- --watch=false` — must still be 3685/3685 passing
 3. `npm run lint 2>&1 | Select-String "problems"` — must not exceed pre-change count
 4. Report all three results verbatim. If any regressed, fix before marking the task complete.
 
-> **Note:** `npm run check` (which chains `lint && typecheck && test`) currently exits red due to pre-existing lint debt (NEW-DEBT-J, 880 problems). Do not use `npm run check` as the gate — use the three commands above individually until NEW-DEBT-J is closed.
+> **Note:** `npm run check` (which chains `lint && typecheck && test`) currently exits red due to 60 pre-existing `no-explicit-any` errors (NEW-DEBT-O). Do not use `npm run check` as the gate — use the three commands above individually until NEW-DEBT-O is closed.
 >
-> _Retire this note when NEW-DEBT-J is closed; restore `npm run check` as the primary gate._
+> _Retire this note when NEW-DEBT-O is closed; restore `npm run check` as the primary gate._
 
 ## Architecture — three rules
 

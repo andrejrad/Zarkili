@@ -17,13 +17,15 @@ import {
   updateDoc,
   type Firestore,
 } from "firebase/firestore";
-import type { PushTokenRecord } from "./registerFcmToken";
+
 
 import type {
   NotificationItem,
   NotificationPreferences,
 } from "../messaging/messagingHelpers";
 import { DEFAULT_NOTIFICATION_PREFERENCES } from "../messaging/messagingHelpers";
+
+import type { PushTokenRecord } from "./registerFcmToken";
 
 // ---------------------------------------------------------------------------
 // Service type

@@ -47,7 +47,6 @@ import type {
 import type {
   ConsumerMessage,
   NotificationItem,
-  NotificationPreferences,
   ThreadSummary,
 } from "../messaging/messagingHelpers";
 import type { SalonSearchResult } from "../messaging/ComposeScreen";

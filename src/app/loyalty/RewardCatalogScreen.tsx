@@ -9,12 +9,12 @@ import { FlatList, Pressable, ScrollView, StyleSheet, Text, View } from "react-n
 
 import {
   RewardCard,
-  StickyCtaBar,
   colors,
   radius,
   spacing,
   textStyles,
 } from "../../shared/ui";
+
 import {
   REWARD_FILTER_TABS,
   filterRewards,
@@ -125,7 +125,7 @@ export function RewardCatalogScreen({
       ) : loading ? (
         <View style={styles.grid}>
           {Array.from({ length: 6 }).map((_, i) => (
-            // eslint-disable-next-line react/no-array-index-key
+             
             <View key={i} style={styles.gridItem}>
               <View style={[styles.skeletonCard, { height: 260 }]} />
             </View>

@@ -92,7 +92,7 @@ export function LanguagePicker({
           testID={testID ? `${testID}-list` : undefined}
           ListEmptyComponent={
             <Text style={styles.emptyText} testID={testID ? `${testID}-empty` : undefined}>
-              No languages match "{query}"
+              {`No languages match "${query}"`}
             </Text>
           }
           renderItem={({ item }) => (

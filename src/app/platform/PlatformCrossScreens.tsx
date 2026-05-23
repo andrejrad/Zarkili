@@ -69,7 +69,7 @@ export function MaintenanceModeScreen({
           Down for maintenance
         </Text>
         <Text style={styles.body} testID={testID ? `${testID}-body` : undefined}>
-          We're making Zarkili even better. This should only take a little while.
+          {"We're making Zarkili even better. This should only take a little while."}
         </Text>
         {estimatedEndTime && (
           <Text style={styles.eta} testID={testID ? `${testID}-eta` : undefined}>
@@ -152,7 +152,7 @@ export function ServerErrorFallbackScreen({
           Something went wrong
         </Text>
         <Text style={styles.body}>
-          We couldn't load this page. Our team has been notified.
+          {"We couldn't load this page. Our team has been notified."}
         </Text>
         {errorCode && (
           <Text style={styles.errorCode} testID={testID ? `${testID}-code` : undefined}>
@@ -210,7 +210,7 @@ export function FeatureFlagDisabledScreen({
       <View style={styles.centre}>
         <Text style={styles.bigIcon}>🚧</Text>
         <Text style={styles.title} testID={testID ? `${testID}-title` : undefined}>
-          {featureName} isn't available
+          {`${featureName} isn't available`}
         </Text>
         <Text style={styles.body} testID={testID ? `${testID}-reason` : undefined}>
           {FLAG_REASON[reason]}
@@ -253,8 +253,7 @@ export function DeepLinkFallbackScreen({
           Link not found
         </Text>
         <Text style={styles.body}>
-          The link you followed couldn't be resolved. It may have expired or
-          been removed.
+          {"The link you followed couldn't be resolved. It may have expired or been removed."}
         </Text>
         {deepLink && (
           <Text style={styles.errorCode} testID={testID ? `${testID}-link` : undefined}>

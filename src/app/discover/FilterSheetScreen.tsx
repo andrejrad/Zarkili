@@ -23,6 +23,7 @@ import {
   spacing,
   textStyles,
 } from "../../shared/ui";
+
 import {
   DEFAULT_FILTERS,
   applyDiscoveryFilters,
@@ -56,7 +57,6 @@ const RATING_STEPS = [1, 2, 3, 4, 5] as const;
 
 const MIN_DISTANCE_KM = 1;
 const MAX_DISTANCE_KM = 25;
-const DEFAULT_DISTANCE_KM = DEFAULT_FILTERS.distanceKm;
 
 export function FilterSheetScreen({
   visible,

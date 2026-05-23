@@ -7,6 +7,7 @@ import {
   StyleSheet,
   ActivityIndicator,
 } from "react-native";
+
 import type { PricingPlan } from "./platformAdminTypes";
 
 export type PricingPlanManagementScreenProps = {

@@ -86,7 +86,6 @@ export function LanguagePickerScreen({
 
 type DateFormat = "MM/DD/YYYY" | "DD/MM/YYYY" | "YYYY-MM-DD";
 type TimeFormat = "12h" | "24h";
-type CurrencyPosition = "prefix" | "suffix";
 
 export type LocaleFormatsScreenProps = {
   currentLocale: string;

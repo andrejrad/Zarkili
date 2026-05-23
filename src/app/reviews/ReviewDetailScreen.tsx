@@ -187,7 +187,7 @@ export function ReviewDetailScreen({
           {photoCount > 0 ? (
             <View style={styles.gallery}>
               {Array.from({ length: photoCount }).map((_, i) => (
-                // eslint-disable-next-line react/no-array-index-key
+                 
                 <View key={i} style={styles.photo} accessible accessibilityLabel={`Photo ${i + 1}`}>
                   <Text style={styles.photoGlyph}>🖼</Text>
                 </View>

@@ -32,12 +32,13 @@ import {
   spacing,
   textStyles,
 } from "../../shared/ui";
+import type { AIChatComposerState } from "../../shared/ui/AIChatComposer";
+
 import type {
   AIBudgetState,
   AIChatMessage,
   AISuggestion,
 } from "./staffHelpers";
-import type { AIChatComposerState } from "../../shared/ui/AIChatComposer";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -91,7 +92,7 @@ export function AIChatScreen({
   if (isError) {
     return (
       <View style={[styles.root, styles.centered]} testID={testID}>
-        <Text style={styles.errorTitle}>Couldn't connect to AI assistant</Text>
+        <Text style={styles.errorTitle}>{"Couldn't connect to AI assistant"}</Text>
         <Text style={styles.errorBody}>Check your connection and try again.</Text>
         {onPressRetry && (
           <Pressable style={styles.retryBtn} onPress={onPressRetry} accessibilityRole="button">

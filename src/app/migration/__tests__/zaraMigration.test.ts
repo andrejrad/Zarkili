@@ -5,6 +5,7 @@
  */
 
 import type { Firestore } from "firebase/firestore";
+
 import { runZaraMigration } from "../zaraMigration";
 import type { ZaraMigrationInput } from "../zaraMigration";
 

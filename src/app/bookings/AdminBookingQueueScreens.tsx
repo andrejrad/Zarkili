@@ -15,8 +15,9 @@ import { useState } from "react";
 import { Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 
 import type { Booking, BookingStatus } from "../../domains/bookings/model";
-import type { AdminBookingQueueTab } from "./adminBookingQueueService";
 import type { Location } from "../../domains/locations/model";
+
+import type { AdminBookingQueueTab } from "./adminBookingQueueService";
 
 // ---------------------------------------------------------------------------
 // Design tokens

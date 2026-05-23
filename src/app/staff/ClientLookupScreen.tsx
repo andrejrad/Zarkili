@@ -17,6 +17,7 @@ import {
 } from "react-native";
 
 import { SegmentedControl, colors, radius, spacing, textStyles } from "../../shared/ui";
+
 import type { ClientRow } from "./staffHelpers";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -122,7 +123,7 @@ export function ClientLookupScreen({
         </View>
       ) : isError ? (
         <View style={[styles.centered, styles.listContent]}>
-          <Text style={styles.errorTitle}>Couldn't load clients</Text>
+          <Text style={styles.errorTitle}>{"Couldn't load clients"}</Text>
           <Text style={styles.errorBody}>Check your connection and try again.</Text>
           {onPressRetry && (
             <Pressable style={styles.retryBtn} onPress={onPressRetry} accessibilityRole="button">
@@ -135,7 +136,7 @@ export function ClientLookupScreen({
           <Text style={styles.emptyIcon}>🔍</Text>
           {searchQuery.length > 0 ? (
             <>
-              <Text style={styles.emptyTitle}>No results for "{searchQuery}"</Text>
+              <Text style={styles.emptyTitle}>{`No results for "${searchQuery}"`}</Text>
               <Pressable onPress={onClearSearch} accessibilityRole="button">
                 <Text style={styles.clearSearchLink}>Clear search</Text>
               </Pressable>

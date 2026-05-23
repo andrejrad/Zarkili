@@ -1,11 +1,11 @@
 import React from "react";
 import { render, fireEvent } from "@testing-library/react-native";
+import { Text } from "react-native";
 
 import { SegmentedControl } from "../SegmentedControl";
 import { Stepper } from "../Stepper";
 import { Banner } from "../Banner";
 import { FormRow } from "../FormRow";
-import { Text } from "react-native";
 
 describe("SegmentedControl", () => {
   const options = [

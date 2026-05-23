@@ -105,7 +105,7 @@ describe("resolveLocaleChain", () => {
 // ---------------------------------------------------------------------------
 
 describe("resolveTemplateBody", () => {
-  const hrTemplate = {
+  const _hrTemplate = {
     subject: "HR subject",
     body: "HR body",
   };

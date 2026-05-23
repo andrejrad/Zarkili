@@ -19,6 +19,7 @@ import {
   spacing,
   textStyles,
 } from "../../shared/ui";
+
 import type { ClientDetail, ClientNoteEntry } from "./staffHelpers";
 import { formatLtv } from "./staffHelpers";
 
@@ -50,7 +51,7 @@ export function ClientNotesHistoryScreen({
   if (isError) {
     return (
       <View style={[styles.root, styles.centered]} testID={testID}>
-        <Text style={styles.errorTitle}>Couldn't load notes</Text>
+        <Text style={styles.errorTitle}>{"Couldn't load notes"}</Text>
         <Text style={styles.errorBody}>Check your connection and try again.</Text>
         {onPressRetry && (
           <Pressable style={styles.primaryBtn} onPress={onPressRetry} accessibilityRole="button">
@@ -104,7 +105,7 @@ export function ClientNotesHistoryScreen({
         ) : notes.length === 0 ? (
           <View style={styles.emptyState}>
             <Text style={styles.emptyTitle}>No notes yet</Text>
-            <Text style={styles.emptyBody}>Tap "Add note" to record the first note for this client.</Text>
+            <Text style={styles.emptyBody}>{'Tap "Add note" to record the first note for this client.'}</Text>
           </View>
         ) : (
           notes.map((note) => (

@@ -33,7 +33,6 @@ import type {
   GdprExportFormat,
   GdprExportInput,
   GdprExportRequest,
-  GdprExportType,
   MergeInput,
   SavedSegment,
   SegmentBuilderInput,
@@ -45,6 +44,7 @@ import type {
   DeleteClientInput,
   UnblockClientInput,
 } from "../../domains/clients/clientCrmModel";
+
 import type {
   CampaignSendRepository,
   ClientDetailRepository,

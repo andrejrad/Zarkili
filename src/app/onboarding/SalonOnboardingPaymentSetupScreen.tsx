@@ -89,7 +89,7 @@ export function SalonOnboardingPaymentSetupScreen({
         <View style={[styles.checkbox, confirmed && styles.checkboxChecked]}>
           {confirmed ? <Text style={styles.checkmark}>✓</Text> : null}
         </View>
-        <Text style={styles.checkLabel}>I've connected my Stripe account</Text>
+        <Text style={styles.checkLabel}>{"I've connected my Stripe account"}</Text>
       </Pressable>
 
       <View style={styles.actions}>

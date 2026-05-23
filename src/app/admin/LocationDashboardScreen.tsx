@@ -7,6 +7,7 @@
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { brandTypography } from "../../shared/ui/brandTypography";
+
 import { AdminEmptyState, AdminErrorState, AdminKpiTile, AdminLoadingState } from "./AdminPatterns";
 import type { LocationKpi, TodayAppointment } from "./locationAdminService";
 
@@ -154,7 +155,7 @@ export function LocationDashboardScreen({
       {/* Today's appointments */}
       {!loading ? (
         <>
-          <Text style={styles.sectionLabel}>Today's appointments</Text>
+          <Text style={styles.sectionLabel}>{"Today's appointments"}</Text>
           {appointments.length === 0 ? (
             <AdminEmptyState
               title="No appointments today"

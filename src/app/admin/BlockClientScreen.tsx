@@ -13,9 +13,10 @@ import {
   View,
 } from "react-native";
 
-import { AdminErrorState } from "./AdminPatterns";
 import { brandTypography } from "../../shared/ui/brandTypography";
 import type { BlockClientReason } from "../../domains/clients/clientCrmModel";
+
+import { AdminErrorState } from "./AdminPatterns";
 
 // ---------------------------------------------------------------------------
 // Types

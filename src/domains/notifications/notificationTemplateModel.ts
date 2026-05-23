@@ -26,8 +26,9 @@
 
 import { Timestamp } from "firebase/firestore";
 
-import type { NotificationEventType } from "./notificationEventModel";
 import type { SupportedLanguage } from "../../shared/i18n";
+
+import type { NotificationEventType } from "./notificationEventModel";
 
 // ---------------------------------------------------------------------------
 // Core template types

@@ -402,8 +402,7 @@ export function AuthEdgeScreen({
           }
         >
           <Text style={styles.body}>
-            You will be signed out from all devices. You'll need to sign in again
-            everywhere.
+            {"You will be signed out from all devices. You'll need to sign in again everywhere."}
           </Text>
         </ModalSheet>
       </ScrollView>
@@ -416,8 +415,7 @@ export function AuthEdgeScreen({
       <View style={styles.centered} testID={testID}>
         <Text style={styles.title}>Sign out everywhere?</Text>
         <Text style={styles.body}>
-          You will be signed out from all devices. You'll need to sign in again
-          everywhere.
+          {"You will be signed out from all devices. You'll need to sign in again everywhere."}
         </Text>
         <Button
           label="Sign out of all devices"

@@ -18,6 +18,7 @@ import {
 import type { Firestore, Timestamp } from "firebase/firestore";
 
 import type { StaffRole } from "../../domains/staff/model";
+
 import type { StaffRoleAuditEntry } from "./StaffRoleScreen";
 
 // ---------------------------------------------------------------------------

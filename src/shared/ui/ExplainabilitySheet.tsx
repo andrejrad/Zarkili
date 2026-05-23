@@ -84,7 +84,7 @@ export function ExplainabilitySheet({
             testID={testID ? `${testID}-opt-out` : undefined}
           >
             <Text style={styles.optOutText}>
-              Don't show me content like this
+              {"Don't show me content like this"}
             </Text>
           </Pressable>
         )}

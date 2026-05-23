@@ -13,9 +13,10 @@ import { useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { brandTypography } from "../../shared/ui/brandTypography";
+import type { ConnectAccount } from "../../domains/connect";
+
 import { AdminErrorState, AdminLoadingState, AdminRoleDeniedState } from "./AdminPatterns";
 import type { BillingAdminService } from "./billingAdminService";
-import type { ConnectAccount } from "../../domains/connect";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -211,7 +212,7 @@ export function StripeConnectOnboardingScreen({
       </Pressable>
 
       <Text style={styles.disclaimer}>
-        By continuing, you agree to Stripe's Connected Account Agreement. Stripe, not Zarkili, holds and processes your funds.
+        {"By continuing, you agree to Stripe's Connected Account Agreement. Stripe, not Zarkili, holds and processes your funds."}
       </Text>
     </ScrollView>
   );

@@ -10,7 +10,8 @@
 
 import { FlatList, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 
-import { Banner, SegmentedControl, colors, radius, spacing, textStyles } from "../../shared/ui";
+import { SegmentedControl, colors, radius, spacing, textStyles } from "../../shared/ui";
+
 import {
   INBOX_TAB_LABELS,
   INBOX_TABS,
@@ -127,7 +128,7 @@ export function InboxScreen({
       ) : isLoading ? (
         <View testID={testID ? `${testID}-loading` : undefined}>
           {Array.from({ length: 5 }).map((_, i) => (
-            // eslint-disable-next-line react/no-array-index-key
+             
             <View key={i} style={styles.skeletonRow} />
           ))}
         </View>

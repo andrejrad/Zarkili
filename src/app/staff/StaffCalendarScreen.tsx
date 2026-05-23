@@ -21,6 +21,7 @@ import {
 } from "react-native";
 
 import { colors, radius, spacing, textStyles } from "../../shared/ui";
+
 import type { StaffAppointment } from "./staffHelpers";
 
 // ─── Layout constants ─────────────────────────────────────────────────────────
@@ -98,14 +99,11 @@ export function StaffCalendarScreen({
   testID,
 }: StaffCalendarScreenProps) {
   const hours = hourLabels();
-  const columnWidth = weekDays.length > 0
-    ? `${(100 / weekDays.length).toFixed(2)}%`
-    : "14.28%";
 
   if (isError) {
     return (
       <View style={[styles.root, styles.centered]} testID={testID}>
-        <Text style={styles.errorTitle}>Couldn't load the calendar</Text>
+        <Text style={styles.errorTitle}>{"Couldn't load the calendar"}</Text>
         <Text style={styles.errorBody}>Check your connection and try again.</Text>
         {onPressRetry && (
           <Pressable style={styles.retryBtn} onPress={onPressRetry} accessibilityRole="button">

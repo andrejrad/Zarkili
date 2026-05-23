@@ -8,6 +8,7 @@ import {
   StyleSheet,
   ActivityIndicator,
 } from "react-native";
+
 import type { PlatformAuditEntry, PlatformAuditFilter } from "./platformAdminTypes";
 
 export type PlatformAuditLogScreenProps = {

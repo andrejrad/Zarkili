@@ -90,7 +90,7 @@ export function SavedPostsScreen({
       {/* Error */}
       {isError && (
         <View style={styles.centered}>
-          <Text style={styles.emptyBody}>Couldn't load saved posts</Text>
+          <Text style={styles.emptyBody}>{"Couldn't load saved posts"}</Text>
           {onPressRetry && (
             <Pressable accessibilityRole="button" onPress={onPressRetry} style={styles.retryButton}>
               <Text style={styles.retryLabel}>Retry</Text>

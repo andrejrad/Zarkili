@@ -16,12 +16,13 @@ import {
   View,
 } from "react-native";
 
-import { AdminEmptyState, AdminErrorState, AdminLoadingState } from "./AdminPatterns";
 import { brandTypography } from "../../shared/ui/brandTypography";
 import type {
   ClientDetailAdmin,
   ClientDetailTab,
 } from "../../domains/clients/clientCrmModel";
+
+import { AdminEmptyState, AdminErrorState, AdminLoadingState } from "./AdminPatterns";
 
 // ---------------------------------------------------------------------------
 // Types

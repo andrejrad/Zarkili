@@ -141,7 +141,7 @@ export function RewardRedemptionConfirmScreen({
 
         {!canAfford && (
           <Text style={styles.errorText} testID={testID ? `${testID}-error` : undefined}>
-            You don't have enough points to redeem this reward.
+            {"You don't have enough points to redeem this reward."}
           </Text>
         )}
 

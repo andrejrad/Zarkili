@@ -3,6 +3,7 @@
  */
 
 import { db } from "../../shared/config/firebase";
+
 import { createConsumerNotificationService } from "./consumerNotificationService";
 
 export const consumerNotificationService = createConsumerNotificationService(db);

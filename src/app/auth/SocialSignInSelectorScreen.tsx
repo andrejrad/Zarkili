@@ -11,11 +11,10 @@ import { ScrollView, StyleSheet, Text, View } from "react-native";
 import * as WebBrowser from "expo-web-browser";
 
 import type { SocialProvider } from "../../domains/auth";
+import { Banner, Button, colors, spacing } from "../../shared/ui";
 
 // Required on Android: closes the custom tab after the OAuth redirect fires.
 WebBrowser.maybeCompleteAuthSession();
-
-import { Banner, Button, colors, spacing } from "../../shared/ui";
 
 export type { SocialProvider };
 

@@ -1,5 +1,6 @@
 import React from "react";
 import { View, Text, Switch, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator } from "react-native";
+
 import type { AiFeatureToggleConfig } from "./aiAdminTypes";
 import { AI_FEATURE_GROUPS } from "./aiAdminTypes";
 
@@ -60,7 +61,7 @@ export function AiTogglesScreen({
       {pendingChanges && (
         <View style={styles.warningBanner} testID="pending-banner">
           <Text style={styles.warningText}>
-            You have unsaved changes. Press "Save All" to apply them.
+            {'You have unsaved changes. Press "Save All" to apply them.'}
           </Text>
         </View>
       )}

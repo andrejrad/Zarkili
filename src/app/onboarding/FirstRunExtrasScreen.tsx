@@ -13,7 +13,6 @@
 import { useState } from "react";
 import {
   Pressable,
-  SafeAreaView,
   ScrollView,
   Share,
   StyleSheet,

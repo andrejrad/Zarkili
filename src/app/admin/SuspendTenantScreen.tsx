@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   TextInput,
   StyleSheet,
-  ActivityIndicator,
 } from "react-native";
 
 export type SuspendTenantScreenProps = {

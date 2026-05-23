@@ -73,12 +73,10 @@ jest.mock("@react-native-async-storage/async-storage", () =>
 jest.mock("react-native-safe-area-context", () => {
   const insets = { top: 0, bottom: 0, left: 0, right: 0 };
   const frame = { x: 0, y: 0, width: 375, height: 812 };
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const React = require("react");
   return {
-    SafeAreaProvider: ({ children }: { children: React.ReactNode }) => children,
-    SafeAreaView: ({ children }: { children: React.ReactNode }) => children,
-    SafeAreaConsumer: ({ children }: { children: (v: typeof insets) => React.ReactNode }) => children(insets),
+    SafeAreaProvider: ({ children }: { children?: unknown }) => children,
+    SafeAreaView: ({ children }: { children?: unknown }) => children,
+    SafeAreaConsumer: ({ children }: { children: (v: typeof insets) => unknown }) => children(insets),
     useSafeAreaInsets: () => insets,
     useSafeAreaFrame: () => frame,
   };
@@ -97,15 +95,14 @@ jest.mock("react-native-maps", () => {
     ({ children, testID, ...rest }: { children?: React.ReactNode; testID?: string; [k: string]: unknown }, ref: React.Ref<unknown>) =>
       React.createElement(View, { ref, testID, ...rest }, children),
   );
+  MapView.displayName = "MapView";
   const Marker = ({ testID, ...rest }: { testID?: string; [k: string]: unknown }) =>
     React.createElement(View, { testID, ...rest });
   return { __esModule: true, default: MapView, MapView, Marker, PROVIDER_GOOGLE: "google" };
 });
 
 jest.mock("@stripe/stripe-react-native", () => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const React = require("react");
-  const passthrough = ({ children }: { children?: React.ReactNode }) => children ?? null;
+  const passthrough = ({ children }: { children?: unknown }) => children ?? null;
   return {
     StripeProvider: passthrough,
     CardField: () => null,

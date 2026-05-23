@@ -1,5 +1,6 @@
 import React from "react";
 import { render, fireEvent } from "@testing-library/react-native";
+
 import { ClientLoyaltyScreen } from "../ClientLoyaltyScreen";
 import { AdminLoyaltyScreen } from "../AdminLoyaltyScreen";
 import { createLoyaltyAdminService } from "../loyaltyAdminService";
@@ -79,7 +80,7 @@ describe("ClientLoyaltyScreen", () => {
   };
 
   it("renders loading indicator", () => {
-    const { getByTestId } = render(
+    const { getByTestId: _getByTestId } = render(
       <ClientLoyaltyScreen {...baseProps} isLoading transactions={[]} loyaltyState={null} />,
     );
     // ActivityIndicator renders without throwing

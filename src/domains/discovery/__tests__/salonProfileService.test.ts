@@ -5,8 +5,9 @@
  * Uses a mock Firestore client — no emulator required.
  */
 
-import { createSalonProfileService } from "../salonProfileService";
 import type { Firestore } from "firebase/firestore";
+
+import { createSalonProfileService } from "../salonProfileService";
 
 // ---------------------------------------------------------------------------
 // Minimal Firestore mock helpers
@@ -34,58 +35,6 @@ function makeQuerySnap(docs: Array<{ id: string; data: Record<string, unknown> }
   };
 }
 
-function makeDb(options: {
-  tenantDoc?: Record<string, unknown> | null;
-  services?: Array<{ id: string; data: Record<string, unknown> }>;
-  staff?: Array<{ id: string; data: Record<string, unknown> }>;
-  reviews?: Array<{ id: string; data: Record<string, unknown> }>;
-  media?: Array<{ id: string; data: Record<string, unknown> }>;
-  getDocThrows?: boolean;
-}): Firestore {
-  const { tenantDoc = null, services = [], staff = [], reviews = [] } = options;
-
-  let callCount = 0;
-  const collections: Record<string, typeof services> = {
-    services,
-    staff,
-    reviews,
-  };
-
-  const mockGetDoc = jest.fn(async () => {
-    if (options.getDocThrows) throw new Error("Network error");
-    if (tenantDoc === null) return makeDocSnap(false);
-    return makeDocSnap(true, tenantDoc);
-  });
-
-  const mockGetDocs = jest.fn(async (q: unknown) => {
-    // Return subcollection data based on the collection path stored on the query object
-    const path: string = (q as { _path?: string })._path ?? "";
-    if (path.includes("services")) return makeQuerySnap(collections.services);
-    if (path.includes("staff")) return makeQuerySnap(collections.staff);
-    if (path.includes("reviews")) return makeQuerySnap(collections.reviews);
-    return makeQuerySnap([]);
-  });
-
-  // Fluent builder mocks so collection/doc/query/where/orderBy/limit chains work
-  const buildableQuery = (path: string) => {
-    const obj: Record<string, unknown> = { _path: path };
-    obj.where = () => obj;
-    obj.orderBy = () => obj;
-    obj.limit = () => obj;
-    return obj;
-  };
-
-  const mockCollection = jest.fn((db: unknown, path: string) => buildableQuery(path));
-  const mockDoc = jest.fn((_db: unknown, _col: string, _id: string) => ({ _isDoc: true }));
-  const mockQuery = jest.fn((col: unknown) => col);
-  const mockWhere = jest.fn((col: unknown) => col);
-  const mockOrderBy = jest.fn((col: unknown) => col);
-  const mockLimit = jest.fn((col: unknown) => col);
-
-  // Patch the firebase/firestore module functions via the service's internal calls
-  // (the service imports these at module level, so we mock the module)
-  return { _mockGetDoc: mockGetDoc, _mockGetDocs: mockGetDocs, _mockCollection: mockCollection } as unknown as Firestore;
-}
 
 // ---------------------------------------------------------------------------
 // Because the service imports firebase/firestore functions directly (not injected),
@@ -106,6 +55,7 @@ jest.mock("firebase/firestore", () => ({
   limit: jest.fn((col: unknown) => col),
 }));
 
+// eslint-disable-next-line import/order
 import { getDoc, getDocs } from "firebase/firestore";
 const mockGetDoc = getDoc as jest.MockedFunction<typeof getDoc>;
 const mockGetDocs = getDocs as jest.MockedFunction<typeof getDocs>;

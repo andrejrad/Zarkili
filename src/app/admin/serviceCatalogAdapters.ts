@@ -37,7 +37,6 @@ import {
   serviceTypeDocSegments,
   serviceVariantsCollectionSegments,
 } from "../../domains/services/paths";
-
 import type {
   TenantServiceCategory,
   CreateTenantServiceCategoryInput,

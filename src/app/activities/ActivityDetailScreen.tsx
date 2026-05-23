@@ -27,7 +27,7 @@ export type ActivityDetailScreenProps = {
 
 export function ActivityDetailScreen({
   activity,
-  loading,
+  loading: _loading,
   error,
   onCtaPress,
   onPressBack,

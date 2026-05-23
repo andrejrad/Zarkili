@@ -5,6 +5,7 @@ import react from "eslint-plugin-react";
 import reactHooks from "eslint-plugin-react-hooks";
 import importPlugin from "eslint-plugin-import";
 import prettier from "eslint-config-prettier";
+import globals from "globals";
 
 export default [
   {
@@ -16,10 +17,22 @@ export default [
       "babel.config.js",
       "jest.config.js",
       "jest.rules.config.js",
-      "__tests__/**"
+      "__tests__/**",
+      "design-handoff/**"
     ]
   },
   js.configs.recommended,
+  {
+    files: ["scripts/**/*.{js,mjs}", "metro.config.js", "*.config.{js,mjs}"],
+    languageOptions: {
+      globals: {
+        ...globals.node
+      }
+    },
+    rules: {
+      "no-unused-vars": ["error", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }]
+    }
+  },
   {
     files: ["App.tsx", "src/**/*.{ts,tsx}", "app/**/*.{ts,tsx}", "jest.setup.ts"],
     languageOptions: {
@@ -47,6 +60,7 @@ export default [
       ...reactHooks.configs.recommended.rules,
       "no-undef": "off",
       "react/react-in-jsx-scope": "off",
+      "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }],
       "import/order": [
         "warn",
         {

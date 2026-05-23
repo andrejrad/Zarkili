@@ -8,6 +8,7 @@
 import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
 
 import { colors, radius, spacing, textStyles } from "../../shared/ui";
+
 import type { DiscoverySortKey } from "./discoveryFilters";
 
 const SORT_OPTIONS: { id: DiscoverySortKey; label: string }[] = [

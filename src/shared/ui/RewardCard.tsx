@@ -95,7 +95,7 @@ export function RewardCard({
         ) : state === "error" ? (
           <View style={styles.errorBody}>
             <Text style={styles.errorGlyph}>⚠</Text>
-            <Text style={styles.errorText}>Couldn't load reward</Text>
+            <Text style={styles.errorText}>{"Couldn't load reward"}</Text>
           </View>
         ) : (
           <>

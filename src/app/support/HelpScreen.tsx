@@ -93,7 +93,7 @@ export function HelpScreen({
           </Text>
         ) : null}
         <Text style={styles.sentBody}>
-          We'll get back to you via email within 1–2 business days.
+          {"We'll get back to you via email within 1–2 business days."}
         </Text>
         <Button
           label="Back to Help"
@@ -233,7 +233,7 @@ export function HelpScreen({
             testID={testID ? `${testID}-body` : undefined}
           />
           {contactEmail ? (
-            <Text style={styles.replyTo}>We'll reply to {contactEmail}</Text>
+            <Text style={styles.replyTo}>{"We'll reply to "}{contactEmail}</Text>
           ) : null}
         </View>
       </ModalSheet>

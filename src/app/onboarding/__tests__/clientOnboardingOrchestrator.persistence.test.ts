@@ -5,7 +5,7 @@
  * is fire-and-forget. Hydration is exposed via the new async `restoreSession`.
  */
 
-import { afterEach, beforeEach, describe, expect, it, jest } from "@jest/globals";
+import { describe, expect, it, jest } from "@jest/globals";
 
 import {
   createClientOnboardingOrchestrator,

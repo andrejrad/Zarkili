@@ -112,7 +112,7 @@ export function BookThisLookScreen({
     return (
       <View style={[styles.screen, styles.centered]} testID={testID}>
         <Text style={styles.stateTitle}>Something went wrong</Text>
-        <Text style={styles.stateBody}>We couldn't load this look. Please try again.</Text>
+        <Text style={styles.stateBody}>{"We couldn't load this look. Please try again."}</Text>
         {onPressRetry && (
           <Pressable accessibilityRole="button" onPress={onPressRetry} style={styles.primaryButton}>
             <Text style={styles.primaryButtonLabel}>Retry</Text>
@@ -201,7 +201,7 @@ export function BookThisLookScreen({
         {/* Unmatched state — suggest similar */}
         {lookState === "unmatched" && (
           <View style={styles.unmatchedContainer} testID={testID ? `${testID}-unmatched` : undefined}>
-            <Text style={styles.unmatchedTitle}>We couldn't find an exact match</Text>
+            <Text style={styles.unmatchedTitle}>{"We couldn't find an exact match"}</Text>
             <Text style={styles.unmatchedBody}>
               This service may not be available in your area yet. Try exploring similar looks nearby.
             </Text>

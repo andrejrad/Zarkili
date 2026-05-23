@@ -75,7 +75,7 @@ export function ActivitiesScreen({
       ) : loading ? (
         <View style={styles.list} accessible={false}>
           {Array.from({ length: 4 }).map((_, i) => (
-            // eslint-disable-next-line react/no-array-index-key
+             
             <View key={i} style={styles.skeletonCard} />
           ))}
         </View>

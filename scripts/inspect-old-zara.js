@@ -148,7 +148,7 @@ async function inspectCollection(colName, limit = 3) {
  * For collections that may contain role/loyalty info as subcollections,
  * inspect the first subcollection found.
  */
-async function inspectSubcollections(parentCol, limit = 1) {
+async function inspectSubcollections(parentCol, _limit = 1) {
   try {
     const snap = await db.collection(parentCol).limit(1).get();
     if (snap.empty) return;

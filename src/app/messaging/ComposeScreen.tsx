@@ -144,7 +144,7 @@ export function ComposeScreen({
       {/* Not found state */}
       {!recipientName && salonSearchQuery.trim().length > 0 && salonResults.length === 0 ? (
         <View style={styles.notFound}>
-          <Text style={styles.bodyMuted}>No salons found for "{salonSearchQuery}"</Text>
+          <Text style={styles.bodyMuted}>{`No salons found for "${salonSearchQuery}"`}</Text>
         </View>
       ) : null}
 

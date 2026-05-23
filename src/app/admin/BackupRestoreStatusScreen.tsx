@@ -7,6 +7,7 @@ import {
   StyleSheet,
   ActivityIndicator,
 } from "react-native";
+
 import type { BackupJob, BackupJobStatus } from "./platformAdminTypes";
 
 export type BackupRestoreStatusScreenProps = {

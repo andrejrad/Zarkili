@@ -13,7 +13,6 @@ import { Pressable, ScrollView, StyleSheet, Switch, Text, View } from "react-nat
 import { CardField, type CardFieldInput } from "@stripe/stripe-react-native";
 
 import {
-  Button,
   InputField,
   StickyFooterCta,
   colors,

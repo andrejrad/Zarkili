@@ -10,9 +10,9 @@ import {
   where,
   orderBy,
   limit,
-  serverTimestamp,
   type Firestore,
 } from "firebase/firestore";
+
 import type {
   MarketplacePost,
   CreateMarketplacePostInput,

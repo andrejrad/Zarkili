@@ -8,6 +8,7 @@ import {
   StyleSheet,
   ActivityIndicator,
 } from "react-native";
+
 import type { TenantAiBudgetOverride } from "./platformAdminTypes";
 
 export type CrossTenantAiBudgetScreenProps = {

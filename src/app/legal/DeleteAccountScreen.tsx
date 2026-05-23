@@ -42,7 +42,7 @@ export function DeleteAccountScreen({
   isDeleting,
   onDelete,
   onCancelDeletion,
-  onBack,
+  onBack: _onBack,
   testID,
 }: DeleteAccountScreenProps) {
   const [selectedReason, setSelectedReason] = useState<string | null>(null);

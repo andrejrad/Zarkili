@@ -13,8 +13,9 @@ import {
   View,
 } from "react-native";
 
-import { AdminErrorState, AdminLoadingState } from "./AdminPatterns";
 import { brandTypography } from "../../shared/ui/brandTypography";
+
+import { AdminErrorState, AdminLoadingState } from "./AdminPatterns";
 import type { BookingFunnelData } from "./analyticsTypes";
 
 // ---------------------------------------------------------------------------

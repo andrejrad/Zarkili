@@ -14,9 +14,10 @@ import {
   View,
 } from "react-native";
 
-import { AdminErrorState, AdminLoadingState } from "./AdminPatterns";
 import { brandTypography } from "../../shared/ui/brandTypography";
 import type { MergeCandidateSummary } from "../../domains/clients/clientCrmModel";
+
+import { AdminErrorState, AdminLoadingState } from "./AdminPatterns";
 
 // ---------------------------------------------------------------------------
 // Types

@@ -14,13 +14,14 @@ import {
   View,
 } from "react-native";
 
-import { AdminErrorState, AdminLoadingState } from "./AdminPatterns";
 import { brandTypography } from "../../shared/ui/brandTypography";
 import type {
   GdprExportFormat,
   GdprExportRequest,
   GdprExportType,
 } from "../../domains/clients/clientCrmModel";
+
+import { AdminErrorState, AdminLoadingState } from "./AdminPatterns";
 
 // ---------------------------------------------------------------------------
 // Types

@@ -95,7 +95,7 @@ export function ClientOnboardingNotificationsScreen({
         Stay in the loop
       </Text>
       <Text style={styles.body}>
-        Choose what you'd like to hear from us. You can change these any time.
+        {"Choose what you'd like to hear from us. You can change these any time."}
       </Text>
 
       {error ? (

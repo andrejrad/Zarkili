@@ -13,6 +13,7 @@
  * invoice payload contains a `taxLines` array.
  */
 import { ScrollView, StyleSheet, Text, View } from "react-native";
+
 import { brandTypography } from "../../shared/ui/brandTypography";
 
 // ---------------------------------------------------------------------------

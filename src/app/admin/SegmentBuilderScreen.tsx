@@ -15,7 +15,6 @@ import {
   View,
 } from "react-native";
 
-import { AdminErrorState, AdminLoadingState } from "./AdminPatterns";
 import { brandTypography } from "../../shared/ui/brandTypography";
 import type {
   SegmentFilter,
@@ -23,6 +22,8 @@ import type {
   SegmentFilterOperator,
   SegmentPreview,
 } from "../../domains/clients/clientCrmModel";
+
+import { AdminLoadingState } from "./AdminPatterns";
 
 // ---------------------------------------------------------------------------
 // Types

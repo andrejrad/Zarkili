@@ -14,8 +14,9 @@ import {
   View,
 } from "react-native";
 
-import { AdminErrorState, AdminLoadingState } from "./AdminPatterns";
 import { brandTypography } from "../../shared/ui/brandTypography";
+
+import { AdminErrorState, AdminLoadingState } from "./AdminPatterns";
 import type { OwnerKpiSummary } from "./ownerKpiService";
 import type { RevenueBreakdown } from "./analyticsTypes";
 

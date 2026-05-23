@@ -83,8 +83,8 @@ function isoStr(offsetDays = 0) {
   d.setDate(d.getDate() + offsetDays);
   return d.toISOString();
 }
-function rand(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
-function pick(arr, n) { return [...arr].sort(() => Math.random() - .5).slice(0, n); }
+function _rand(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+function _pick(arr, n) { return [...arr].sort(() => Math.random() - .5).slice(0, n); }
 
 let totalWrites = 0;
 const batch = { ops: [] };
@@ -1225,7 +1225,7 @@ async function seed() {
   ];
 
   for (let bi = 0; bi < bookingScenarios.length; bi++) {
-    const [tIdx, cIdx, svcOff, staffOff, dayOff, status, chargeMinorUnused] = bookingScenarios[bi];
+    const [tIdx, cIdx, svcOff, staffOff, dayOff, status] = bookingScenarios[bi];
     const t = TENANTS[tIdx];
     const c = CONSUMERS[cIdx];
     const loc = t.locations[0];
@@ -1487,7 +1487,6 @@ async function seed() {
 
   for (const { t, c, svcOff, status } of waitlistEntries) {
     const templates = tenantServiceTemplates(t);
-    const svc = templates[svcOff % templates.length];
     const svcId = `svc-${t.id}-${(svcOff % templates.length) + 1}`;
     const entryId = `wl-${t.id}-${c.uid}`;
     write(db.doc(`tenants/${t.id}/waitlist/${entryId}`), {

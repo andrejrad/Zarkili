@@ -13,6 +13,7 @@
  */
 
 import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { useState } from "react";
 
 import {
   Button,
@@ -22,7 +23,6 @@ import {
   radius,
   spacing,
 } from "../../shared/ui";
-import { useState } from "react";
 
 export { ConflictRecoveryModal };
 
@@ -70,7 +70,7 @@ export function SlotConflictScreen({
       {state === "error" && (
         <View style={styles.errorBox} testID={testID ? `${testID}-error` : undefined}>
           <Text style={styles.errorText}>
-            We couldn't load alternatives. Please try again.
+            {"We couldn't load alternatives. Please try again."}
           </Text>
           {onRetry && (
             <Button

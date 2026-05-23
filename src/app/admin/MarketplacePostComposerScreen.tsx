@@ -5,10 +5,10 @@ import {
   ScrollView,
   TouchableOpacity,
   StyleSheet,
-  ActivityIndicator,
   TextInput,
   Switch,
 } from "react-native";
+
 import type {
   MarketplacePost,
   CreateMarketplacePostInput,

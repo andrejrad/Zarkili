@@ -120,7 +120,7 @@ export function ReviewPromptBanner({ existingReview, isLoading, onWriteReview }:
   if (existingReview) {
     return (
       <View style={styles.bannerContainer} testID="review-banner-submitted">
-        <Text style={styles.bannerText}>You've already reviewed this appointment.</Text>
+        <Text style={styles.bannerText}>{"You've already reviewed this appointment."}</Text>
         <StarRatingDisplay value={existingReview.rating} />
       </View>
     );

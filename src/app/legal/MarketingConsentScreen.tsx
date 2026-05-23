@@ -7,7 +7,7 @@
  */
 
 import { useEffect, useRef, useState } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text } from "react-native";
 
 import { Banner, Button, ConsentToggleList, colors, spacing, textStyles } from "../../shared/ui";
 import type { ConsentItem } from "../../shared/ui";

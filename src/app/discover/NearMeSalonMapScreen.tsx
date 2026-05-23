@@ -13,7 +13,7 @@
  */
 
 import { useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 
 import {
   Button,
@@ -56,7 +56,7 @@ export function NearMeSalonMapScreen({
   onSelectPin,
   onRequestLocation,
   onEnterZip,
-  onPressBack,
+  onPressBack: _onPressBack,
   testID,
 }: NearMeSalonMapScreenProps) {
   const [selectedPin, setSelectedPin] = useState<MapSalonPin | null>(null);

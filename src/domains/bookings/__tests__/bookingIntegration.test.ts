@@ -10,7 +10,6 @@ import { Timestamp } from "firebase/firestore";
 
 import { createBookingsRepository } from "../repository";
 import { generateSlots } from "../slotEngine";
-import { BookingError } from "../model";
 import type { CreateBookingInput } from "../model";
 import type { StaffScheduleTemplate } from "../../staff/staffSchedulesModel";
 

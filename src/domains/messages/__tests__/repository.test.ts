@@ -3,7 +3,6 @@ import {
   buildThreadId,
   MessagingError,
   MAX_ATTACHMENT_SIZE_BYTES,
-  type Message,
   type MessageAttachment,
 } from "../model";
 

@@ -8,9 +8,9 @@ import {
   ActivityIndicator,
   TextInput,
 } from "react-native";
+
+
 import type { AiAuditLogEntry, AiAuditFilter, AiAuditDecision } from "./aiAdminTypes";
-import type { AiFeatureKey } from "../../shared/ai";
-import { aiFeatureKeys } from "../../shared/ai";
 
 export type AiAuditLogScreenProps = {
   loading: boolean;

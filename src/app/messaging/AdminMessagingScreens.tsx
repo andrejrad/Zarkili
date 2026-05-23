@@ -11,7 +11,6 @@
  *   AttachmentChip             — attachment thumbnail / file chip
  */
 
-import { useState } from "react";
 import {
   ActivityIndicator,
   Modal,
@@ -25,6 +24,7 @@ import {
 
 import type { Message, MessageAttachment } from "../../domains/messages/model";
 import { ALLOWED_ATTACHMENT_TYPES, MAX_ATTACHMENT_SIZE_BYTES } from "../../domains/messages/model";
+
 import type { CustomerSummary } from "./adminMessagingService";
 
 // ---------------------------------------------------------------------------
@@ -298,7 +298,7 @@ export function AdminMessagingScreen({
   onSend,
   bulkSelectedIds,
   onToggleBulkSelect,
-  onClearBulkSelection,
+  onClearBulkSelection: _onClearBulkSelection,
   onOpenBulkModal,
   bulkModalVisible,
   bulkMessageText,

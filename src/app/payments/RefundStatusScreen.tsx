@@ -12,6 +12,8 @@
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { Banner, colors, radius, spacing } from "../../shared/ui";
+import { formatUsDate, formatTimeOfDay } from "../booking/bookingHelpers";
+
 import {
   REFUND_STATUS_LABELS,
   buildRefundTimeline,
@@ -19,7 +21,6 @@ import {
   type RefundStatus,
   type RefundTimelineStep,
 } from "./receiptsHelpers";
-import { formatUsDate, formatTimeOfDay } from "../booking/bookingHelpers";
 
 export type RefundBookingSummary = {
   salonName: string;

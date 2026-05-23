@@ -287,7 +287,7 @@ export function AuthorActionsSheet({
           <View style={styles.submittedBox} testID={testID ? `${testID}-submitted` : undefined}>
             <Text style={styles.submittedIcon}>✓</Text>
             <Text style={styles.submittedText}>
-              Thanks for letting us know. We'll review the post shortly.
+              {"Thanks for letting us know. We'll review the post shortly."}
             </Text>
             <Pressable
               onPress={handleDismiss}

@@ -3,6 +3,7 @@
  */
 
 import { db } from "../../shared/config/firebase";
+
 import { createConsumerMessagingService } from "./consumerMessagingService";
 
 export const consumerMessagingService = createConsumerMessagingService(db);

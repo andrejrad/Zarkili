@@ -10,10 +10,11 @@
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { brandTypography } from "../../shared/ui/brandTypography";
-import { AdminErrorState, AdminLoadingState, AdminSectionRow } from "./AdminPatterns";
 import type { Subscription } from "../../domains/billing";
 import type { ConnectAccount } from "../../domains/connect";
 import type { PendingBalance } from "../../domains/billing/payoutService";
+
+import { AdminErrorState, AdminLoadingState, AdminSectionRow } from "./AdminPatterns";
 
 // ---------------------------------------------------------------------------
 // Helpers
