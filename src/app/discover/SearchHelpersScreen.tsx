@@ -89,7 +89,7 @@ export function SearchHelpersScreen({
       {/* No-results state */}
       {state === "no-results" && (
         <View style={styles.noResults} testID={testID ? `${testID}-no-results` : undefined}>
-          <Text style={styles.noResultsText}>No results found for "{query}"</Text>
+          <Text style={styles.noResultsText}>{`No results found for "${query}"`}</Text>
           {onExpandSearch && (
             <Button
               label="Expand search"

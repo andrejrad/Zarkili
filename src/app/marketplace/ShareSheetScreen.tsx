@@ -199,7 +199,7 @@ export function ShareSheetScreen({
 
       {isError && (
         <View style={styles.errorBanner}>
-          <Text style={styles.errorText}>Couldn't share. Please try again.</Text>
+          <Text style={styles.errorText}>{"Couldn't share. Please try again."}</Text>
         </View>
       )}
     </View>

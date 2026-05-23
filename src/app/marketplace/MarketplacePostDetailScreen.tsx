@@ -125,7 +125,7 @@ export function MarketplacePostDetailScreen({
   if (isError || !post) {
     return (
       <View style={[styles.screen, styles.centered]} testID={testID}>
-        <Text style={styles.errorText}>Couldn't load this post</Text>
+        <Text style={styles.errorText}>{"Couldn't load this post"}</Text>
         {onPressRetry && (
           <Pressable
             accessibilityRole="button"

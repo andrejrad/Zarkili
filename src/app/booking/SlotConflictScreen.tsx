@@ -70,7 +70,7 @@ export function SlotConflictScreen({
       {state === "error" && (
         <View style={styles.errorBox} testID={testID ? `${testID}-error` : undefined}>
           <Text style={styles.errorText}>
-            We couldn't load alternatives. Please try again.
+            {"We couldn't load alternatives. Please try again."}
           </Text>
           {onRetry && (
             <Button

@@ -376,7 +376,7 @@ export function ExploreSearchResultsScreen({
               {hasActiveQuery ? (
                 <>
                   <Text style={styles.emptyTitle}>
-                    No results for "{searchQuery}"
+                    {`No results for "${searchQuery}"`}
                   </Text>
                   <Pressable
                     onPress={handleClearSearch}
