@@ -106,6 +106,7 @@ export function PaymentSettingsScreen({
 
   useEffect(() => {
     void loadSettings();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tenantId]);
 
   async function loadSettings() {

@@ -31,7 +31,6 @@ function tryPort(port) {
 
 async function findFreePort() {
   for (let p = START_PORT; p <= MAX_PORT; p++) {
-    // eslint-disable-next-line no-await-in-loop
     if (await tryPort(p)) return p;
   }
   throw new Error(`No free port in range ${START_PORT}-${MAX_PORT}`);

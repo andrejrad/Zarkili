@@ -5,9 +5,9 @@
  * Uses a mock Firestore client — no emulator required.
  */
 
-import { createSalonProfileService } from "../salonProfileService";
-
 import type { Firestore } from "firebase/firestore";
+
+import { createSalonProfileService } from "../salonProfileService";
 
 // ---------------------------------------------------------------------------
 // Minimal Firestore mock helpers
@@ -107,6 +107,7 @@ jest.mock("firebase/firestore", () => ({
   limit: jest.fn((col: unknown) => col),
 }));
 
+// eslint-disable-next-line import/order
 import { getDoc, getDocs } from "firebase/firestore";
 const mockGetDoc = getDoc as jest.MockedFunction<typeof getDoc>;
 const mockGetDocs = getDocs as jest.MockedFunction<typeof getDocs>;

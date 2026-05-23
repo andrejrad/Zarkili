@@ -2748,6 +2748,7 @@ export function AppNavigatorShell({
       .then((map) => { if (!cancelled) setBatchCAvailabilityMap(map); })
       .catch(() => { /* non-critical: calendar dots stay empty on failure */ });
     return () => { cancelled = true; };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeRoute.name, selectedSalonTenantId, tenantId, consumerBookingMonth]);
 
   // W50-DEBT-14: Load brand deposit config when BookingPayment opens.
@@ -4660,6 +4661,7 @@ export function AppNavigatorShell({
         setAntiTheftError("Failed to load anti-theft data.");
       });
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     activeRoute.name,
     loadTenantLocations, loadTenantProfile, loadStaffList, loadServicesList,
@@ -4828,6 +4830,7 @@ export function AppNavigatorShell({
         setIncidentsLoading(false);
       }).catch(() => { setIncidentsLoading(false); setIncidentsError("Failed to load incidents."); });
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeRoute.name]);
 
   function getOnboardingGuardMessage(): string {

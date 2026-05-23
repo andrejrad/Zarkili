@@ -3,8 +3,6 @@
  * Unit tests for social OAuth orchestration in socialAuthService.
  */
 
-import type { AuthSession } from "../model";
-
 // ---------------------------------------------------------------------------
 // Module mocks — factory closures only reference jest.fn() (no outer vars)
 // ---------------------------------------------------------------------------
@@ -48,11 +46,13 @@ jest.mock("firebase/auth", () => ({
 // ---------------------------------------------------------------------------
 // Get references to mock functions after mocks are applied
 // ---------------------------------------------------------------------------
-
+/* eslint-disable import/order */
 import * as ExpoAuthSession from "expo-auth-session";
 import * as ExpoApple from "expo-apple-authentication";
 import * as ExpoWebBrowser from "expo-web-browser";
 import { GoogleAuthProvider, OAuthProvider } from "firebase/auth";
+import type { AuthSession } from "../model";
+/* eslint-enable import/order */
 
 const mockAuthRequestCtor = ExpoAuthSession.AuthRequest as jest.Mock;
 const mockExchangeCodeAsync = ExpoAuthSession.exchangeCodeAsync as jest.Mock;

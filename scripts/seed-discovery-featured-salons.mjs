@@ -1,7 +1,5 @@
 #!/usr/bin/env node
 
-/* global fetch, console, process */
-
 import { execSync } from "node:child_process";
 
 const projectId = process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID ?? "zarkili-dev-a1b1c";
