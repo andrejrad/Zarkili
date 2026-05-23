@@ -107,7 +107,7 @@ export function StaffTodayScreen({
   if (isError) {
     return (
       <View style={[styles.root, styles.centered]} testID={testID}>
-        <Text style={styles.errorTitle}>Couldn't load today's schedule</Text>
+        <Text style={styles.errorTitle}>{"Couldn't load today's schedule"}</Text>
         <Text style={styles.errorBody}>Check your connection and try again.</Text>
         {onPressRetry && (
           <Pressable style={styles.retryBtn} onPress={onPressRetry} accessibilityRole="button">
@@ -121,7 +121,7 @@ export function StaffTodayScreen({
   if (isOffDay) {
     return (
       <View style={[styles.root, styles.centered]} testID={testID}>
-        <Text style={styles.emptyTitle}>You're off today ☀️</Text>
+        <Text style={styles.emptyTitle}>{"You're off today ☀️"}</Text>
         {nextShiftLabel && (
           <Text style={styles.emptyBody}>Next shift: {nextShiftLabel}</Text>
         )}

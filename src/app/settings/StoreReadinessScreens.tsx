@@ -60,7 +60,7 @@ export function PrivacyNutritionLabelScreen({
       <ScrollView contentContainerStyle={styles.page}>
         <Text style={styles.pageTitle}>Privacy Nutrition Label</Text>
         <Text style={styles.subtitle}>
-          Data {appName} may collect and how it's used.
+          {`Data ${appName} may collect and how it's used.`}
         </Text>
 
         <View style={styles.table} testID={testID ? `${testID}-table` : undefined}>

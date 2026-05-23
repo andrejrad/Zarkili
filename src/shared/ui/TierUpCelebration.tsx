@@ -73,7 +73,7 @@ export function TierUpCelebration({
             style={styles.headline}
             testID={testID ? `${testID}-headline` : undefined}
           >
-            You've reached {newTier}!
+            {`You've reached ${newTier}!`}
           </Text>
 
           {benefitHeadline ? (

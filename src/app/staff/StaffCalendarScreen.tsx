@@ -106,7 +106,7 @@ export function StaffCalendarScreen({
   if (isError) {
     return (
       <View style={[styles.root, styles.centered]} testID={testID}>
-        <Text style={styles.errorTitle}>Couldn't load the calendar</Text>
+        <Text style={styles.errorTitle}>{"Couldn't load the calendar"}</Text>
         <Text style={styles.errorBody}>Check your connection and try again.</Text>
         {onPressRetry && (
           <Pressable style={styles.retryBtn} onPress={onPressRetry} accessibilityRole="button">

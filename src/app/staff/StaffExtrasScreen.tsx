@@ -586,7 +586,7 @@ export function StaffOnboardingScreen({
             <Text style={styles.bigIcon}>👋</Text>
             <Text style={styles.pageTitle}>Welcome to Zarkili Staff</Text>
             <Text style={styles.subText}>
-              Let's get you set up in just a few steps. Tap "Next" to begin.
+              {'Let\'s get you set up in just a few steps. Tap "Next" to begin.'}
             </Text>
           </View>
         )}
