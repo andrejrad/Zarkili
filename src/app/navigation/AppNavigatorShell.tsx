@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ActivityIndicator, BackHandler, Linking, Platform, ScrollView, Share, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, BackHandler, Linking, Platform, Share, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useStripe } from "@stripe/stripe-react-native";
 import { sendEmailVerification } from "firebase/auth";
 import { httpsCallable } from "firebase/functions";
-import { collection, collectionGroup, doc, getDoc, getDocs, limit, orderBy, query, setDoc, where } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, limit, orderBy, query, setDoc, where } from "firebase/firestore";
 
 import { WebStripePaymentForm } from "../booking/WebStripePaymentForm";
 import type { AiBudgetAdminService, UpdateAiBudgetConfigInput } from "../../domains/ai";
@@ -72,7 +72,7 @@ import { ResourceManagementScreen } from "../admin/ResourceManagementScreen";
 import { AdminWalkInQueueScreen } from "../admin/AdminWalkInQueueScreen";
 import { DailyCloseScreen } from "../admin/DailyCloseScreen";
 import { AdminFirstRunTourOverlay } from "../admin/AdminFirstRunTourOverlay";
-import type { LocationAdminService, LocationKpi, TodayAppointment, ResourceType, WalkInQueueEntry, DailyCloseReport, HolidayEntry, LocationServiceOverride, LocationAccessibilityFlags } from "../admin/locationAdminService";
+import type { LocationAdminService, LocationKpi, TodayAppointment, WalkInQueueEntry, DailyCloseReport, HolidayEntry, LocationServiceOverride, LocationAccessibilityFlags } from "../admin/locationAdminService";
 // W41 — Staff admin sub-screens
 import { StaffScheduleScreen } from "../admin/StaffScheduleScreen";
 import type { EditWeekHours } from "../admin/StaffScheduleScreen";
@@ -177,9 +177,9 @@ import { MarketplacePostComposerScreen } from "../admin/MarketplacePostComposerS
 import { PerPostPerformanceScreen } from "../admin/PerPostPerformanceScreen";
 import { AntiTheftComplianceDashboardScreen } from "../admin/AntiTheftComplianceDashboardScreen";
 import { createAiAdminService } from "../admin/aiAdminService";
-import { createMarketplaceAdminService, checkPostCompliance } from "../admin/marketplaceAdminService";
+import { createMarketplaceAdminService } from "../admin/marketplaceAdminService";
 import type { AiFeatureToggleConfig, AiSuggestion, AiSuggestionFilter, AiSuggestionQueueSummary, AiUsageKpi, AiUsageByFeature, AiSafetyIncident, AiAuditLogEntry, AiAuditFilter } from "../admin/aiAdminTypes";
-import type { MarketplacePost, PostPerformanceMetrics, PostBookingRow, PostComplianceCheckResult, AntiTheftSignal, AntiTheftKpi } from "../admin/marketplaceAdminTypes";
+import type { MarketplacePost, PostPerformanceMetrics, PostBookingRow, AntiTheftSignal, AntiTheftKpi } from "../admin/marketplaceAdminTypes";
 import type { AiBudgetGuardConfig, AiFeatureKey, AiFeatureBudgetConfig } from "../../shared/ai";
 // W49 — Platform Super-Admin, Compliance, Polish & Release Candidate
 import { TenantDirectoryScreen } from "../admin/TenantDirectoryScreen";
@@ -417,7 +417,6 @@ import { ActivitiesScreen } from "../activities/ActivitiesScreen";
 import { ActivityDetailScreen } from "../activities/ActivityDetailScreen";
 import { ClaimActivityRewardScreen } from "../activities/ClaimActivityRewardScreen";
 import { ReviewPromptScreen } from "../reviews/ReviewPromptScreen";
-import { ReviewDetailScreen } from "../reviews/ReviewDetailScreen";
 import { InboxScreen } from "../messaging/InboxScreen";
 import { ThreadScreen } from "../messaging/ThreadScreen";
 import { ComposeScreen } from "../messaging/ComposeScreen";
@@ -486,7 +485,6 @@ import {
   pointsToNextTier,
   type Activity,
   type ActivityTab,
-  type EarnAction,
   type HistoryEntry,
   type Reward,
   type ReviewDraft,
@@ -832,14 +830,23 @@ export function AppNavigatorShell({
   const [authErrorMessage, setAuthErrorMessage] = useState<string | null>(null);
   const [profileCompletionSubmitting, setProfileCompletionSubmitting] = useState(false);
   const [profileCompletionErrorMessage, setProfileCompletionErrorMessage] = useState<string | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- NEW-DEBT-M: read side unused until EditProfileScreen wiring is complete
   const [profileSaveSubmitting, setProfileSaveSubmitting] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- NEW-DEBT-M
   const [profileSaveErrorMessage, setProfileSaveErrorMessage] = useState<string | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- NEW-DEBT-M
   const [profileSaveSuccessMessage, setProfileSaveSuccessMessage] = useState<string | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- NEW-DEBT-M
   const [emailSaveSubmitting, setEmailSaveSubmitting] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- NEW-DEBT-M
   const [emailSaveErrorMessage, setEmailSaveErrorMessage] = useState<string | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- NEW-DEBT-M
   const [emailSaveSuccessMessage, setEmailSaveSuccessMessage] = useState<string | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- NEW-DEBT-M
   const [passwordResetSubmitting, setPasswordResetSubmitting] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- NEW-DEBT-M
   const [passwordResetErrorMessage, setPasswordResetErrorMessage] = useState<string | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- NEW-DEBT-M
   const [passwordResetSuccessMessage, setPasswordResetSuccessMessage] = useState<string | null>(null);
   const [homeFeed, setHomeFeed] = useState<Awaited<ReturnType<DiscoveryService["getHomeFeed"]>> | null>(null);
   const [exploreFeed, setExploreFeed] = useState<Awaited<ReturnType<DiscoveryService["getExploreFeed"]>> | null>(null);
@@ -859,6 +866,7 @@ export function AppNavigatorShell({
   const [exploreDetailError, setExploreDetailError] = useState<string | null>(null);
   // W22-DEBT-3: Sponsored posts injected at the top of DiscoverFeedScreen
   const [sponsoredFeedPosts, setSponsoredFeedPosts] = useState<import("../../domains/discovery").DiscoveryFeedPost[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- NEW-DEBT-N: half-built UI awaiting triage
   const [selectedDiscoverTenantId, setSelectedDiscoverTenantId] = useState<string | null>(null);
   const [tenantProfileLoading, setTenantProfileLoading] = useState(false);
   const [tenantProfileErrorMessage, setTenantProfileErrorMessage] = useState<string | null>(null);
@@ -901,7 +909,7 @@ export function AppNavigatorShell({
   const [staffSchedule, setStaffSchedule] = useState<import("../../domains/staff").StaffScheduleTemplate | null>(null);
   const [staffPerformanceSummary] = useState<StaffPerformanceSummary | null>(null);
   const [staffCommissionConfig, setStaffCommissionConfig] = useState<StaffCommissionConfig | null>(null);
-  const [staffCommissionLoading, setStaffCommissionLoading] = useState(false);
+  const [_staffCommissionLoading, _setStaffCommissionLoading] = useState(false);
   const [staffInviteEmail, setStaffInviteEmail] = useState("");
   const [staffInviteRole, setStaffInviteRole] = useState<import("../../domains/staff/model").StaffRole>("technician");
   const [staffInviteLocationId, setStaffInviteLocationId] = useState("");
@@ -1018,6 +1026,7 @@ export function AppNavigatorShell({
   const [serviceMediaUrls, setServiceMediaUrls] = useState<string[]>([]);
   const [photosLoading, setPhotosLoading] = useState(false);
   const [photosError, setPhotosError] = useState<string | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- NEW-DEBT-N: half-built UI awaiting triage
   const [photoUploading, setPhotoUploading] = useState(false);
   const [photoUploadError, setPhotoUploadError] = useState<string | null>(null);
 
@@ -1034,6 +1043,7 @@ export function AppNavigatorShell({
   const [bookingRulesSubmitSuccess, setBookingRulesSubmitSuccess] = useState<string | null>(null);
 
   // Visibility
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- NEW-DEBT-N: half-built UI awaiting triage
   const [serviceVisibility, setServiceVisibility] = useState<ServiceVisibilityConfig | null>(null);
   const [visOnlineBooking, setVisOnlineBooking] = useState(true);
   const [visMarketplaceListed, setVisMarketplaceListed] = useState(false);
@@ -1130,6 +1140,7 @@ export function AppNavigatorShell({
   const [rescheduleAvailableSlots, setRescheduleAvailableSlots] = useState<AvailableSlot[]>([]);
   const [rescheduleSelectedStartTime, setRescheduleSelectedStartTime] = useState("");
   const [rescheduleReason, setRescheduleReason] = useState("");
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- NEW-DEBT-N: half-built UI awaiting triage
   const [rescheduleConflicts, setRescheduleConflicts] = useState<SlotConflict[]>([]);
   const [rescheduleConflictOptions, setRescheduleConflictOptions] = useState<ConflictResolutionOption[]>([]);
   const [rescheduleSlotsLoading, setRescheduleSlotsLoading] = useState(false);
@@ -1166,6 +1177,7 @@ export function AppNavigatorShell({
   // Merge clients
   const [mergeClientA, setMergeClientA] = useState<MergeCandidateSummary | null>(null);
   const [mergeClientB, setMergeClientB] = useState<MergeCandidateSummary | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- NEW-DEBT-N: half-built UI awaiting triage
   const [mergeLoading, setMergeLoading] = useState(false);
   const [mergeLoadError, setMergeLoadError] = useState<string | null>(null);
   const [mergeReason, setMergeReason] = useState("");
@@ -1243,7 +1255,9 @@ export function AppNavigatorShell({
   const [rewardSaving, setRewardSaving] = useState(false);
   const [rewardSaveError, setRewardSaveError] = useState<string | null>(null);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- NEW-DEBT-N: half-built UI awaiting triage
   const [adjustClientId, setAdjustClientId] = useState("");
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- NEW-DEBT-N
   const [adjustClientName, setAdjustClientName] = useState("");
   const [adjustDirection, setAdjustDirection] = useState<"credit" | "debit">("credit");
   const [adjustPoints, setAdjustPoints] = useState("0");
@@ -1304,6 +1318,7 @@ export function AppNavigatorShell({
   const [campaignCreateError, setCampaignCreateError] = useState<string | null>(null);
   const [campaignCreateSuccess, setCampaignCreateSuccess] = useState(false);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- NEW-DEBT-N: half-built UI awaiting triage
   const [txDefaultsLoading, setTxDefaultsLoading] = useState(false);
   const [txOverridesError, setTxOverridesError] = useState<string | null>(null);
   const [txDefaults, setTxDefaults] = useState<TransactionalTemplateDefault[]>([]);
@@ -1547,10 +1562,12 @@ export function AppNavigatorShell({
   // Marketplace Post Composer
   const [mpComposerSaving, setMpComposerSaving] = useState(false);
   const [mpComposerError, setMpComposerError] = useState<string | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- NEW-DEBT-N: half-built UI awaiting triage
   const [mpComposerInitialPost, setMpComposerInitialPost] = useState<Partial<MarketplacePost> | null>(null);
   // Per-Post Performance
   const [ppfLoading, setPpfLoading] = useState(false);
   const [ppfError, setPpfError] = useState<string | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- NEW-DEBT-N: half-built UI awaiting triage
   const [ppfPost, setPpfPost] = useState<MarketplacePost | null>(null);
   const [ppfMetrics, setPpfMetrics] = useState<PostPerformanceMetrics | null>(null);
   const [ppfBookings, setPpfBookings] = useState<PostBookingRow[]>([]);
@@ -1573,6 +1590,7 @@ export function AppNavigatorShell({
   const [tenantFilter, setTenantFilter] = useState<TenantFilter>({});
   // Tenant Detail
   const [tenantDetailLoading, setTenantDetailLoading] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- NEW-DEBT-N: half-built UI awaiting triage
   const [tenantDetailError, setTenantDetailError] = useState<string | null>(null);
   const [selectedTenant, setSelectedTenant] = useState<TenantRecord | null>(null);
   // Suspend Tenant
@@ -1679,8 +1697,8 @@ export function AppNavigatorShell({
   const [bookingSubmitting, setBookingSubmitting] = useState(false);
   const [bookingResult, setBookingResult] = useState<ReserveSlotResult | null>(null);
   const [bookingPaymentClientSecret, setBookingPaymentClientSecret] = useState<string | null>(null);
-  const [bookingPaymentEphKey, setBookingPaymentEphKey] = useState<string | null>(null);
-  const [bookingPaymentCustomerId, setBookingPaymentCustomerId] = useState<string | null>(null);
+  const [_bookingPaymentEphKey, setBookingPaymentEphKey] = useState<string | null>(null);
+  const [_bookingPaymentCustomerId, setBookingPaymentCustomerId] = useState<string | null>(null);
   const [bookingPaymentMode, setBookingPaymentMode] = useState<"deposit" | "full" | "setup" | null>(null);
   const [bookingPaymentError, setBookingPaymentError] = useState<string | null>(null);
 
@@ -1729,6 +1747,7 @@ export function AppNavigatorShell({
   });
   const [consumerCancelModalVisible, setConsumerCancelModalVisible] = useState<boolean>(false);
   const [consumerRescheduleMode, setConsumerRescheduleMode] = useState<boolean>(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- NEW-DEBT-N: half-built UI awaiting triage
   const [consumerRescheduleLoading, setConsumerRescheduleLoading] = useState<boolean>(false);
   const [consumerRescheduleError, setConsumerRescheduleError] = useState<string | null>(null);
 
@@ -1790,6 +1809,7 @@ export function AppNavigatorShell({
     cardComplete: false,
     setAsDefault: false,
   });
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- NEW-DEBT-N: half-built UI awaiting triage
   const [addCardReturnRoute, setAddCardReturnRoute] = useState<string>("SavedPaymentMethods");
   const [tippingState, setTippingState] = useState<TippingScreenState>({
     selectedPresetId: "p20",
@@ -3197,7 +3217,6 @@ export function AppNavigatorShell({
         }
 
         const now = new Date();
-        const todayStr = now.toISOString().slice(0, 10);
         const UPCOMING_STATUSES = ["confirmed", "reschedule_pending", "rescheduled"];
         let earliest: { booking: Booking; tenantId: string } | null = null;
 
@@ -3729,6 +3748,7 @@ export function AppNavigatorShell({
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- NEW-DEBT-M: not yet passed to EditProfileScreen
   async function submitAccountProfile(input: { firstName: string; lastName: string }) {
     setProfileSaveSubmitting(true);
     setProfileSaveErrorMessage(null);
@@ -3755,6 +3775,7 @@ export function AppNavigatorShell({
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- NEW-DEBT-M
   async function submitAccountEmail(input: { email: string }) {
     setEmailSaveSubmitting(true);
     setEmailSaveErrorMessage(null);
@@ -3781,6 +3802,7 @@ export function AppNavigatorShell({
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- NEW-DEBT-M
   async function sendAccountPasswordReset(input: { email: string }) {
     setPasswordResetSubmitting(true);
     setPasswordResetErrorMessage(null);
@@ -4588,7 +4610,7 @@ export function AppNavigatorShell({
         void Promise.all([
           aiAdminService.getAiUsageKpi(tenantId, role),
           aiAdminService.getAiUsageByFeature(tenantId, role),
-        ]).then(([kpi, usage]) => {
+        ]).then(([_kpi, usage]) => {
           setAiBudgetUsage(usage);
           setAiBudgetLoading(false);
         }).catch(() => {

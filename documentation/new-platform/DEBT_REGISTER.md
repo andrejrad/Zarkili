@@ -111,6 +111,8 @@ Weeks 1–10 did not use the `Wnn-DEBT-n` convention. Carry-over items from that
 | **W50 Phase 3 — staff/date/review/policies completeness** | W50-DEBT-9 (staff enrichment fields), W50-DEBT-10 (assignedTechnicianId), W50-DEBT-11 (date/time wiring gaps), W50-DEBT-12 (review screen completeness), W50-DEBT-13 (policyVersion logic + Firestore), W50-DEBT-14 (deposit display) |
 | **W50 Phase 4 — confirmation + discovery screens** | W50-DEBT-15 (confirmation celebration + actions), W50-DEBT-16 (photo gallery), W50-DEBT-17 (Our team filtering), W50-DEBT-18 (staff service filtering) |
 | **W52 — impersonation feature** | ~~NEW-DEBT-L~~ (closed 2026-05-22 — reason field + acknowledgement checkbox + email lookup added) |
+| **Phase 3.5 pre-RC — account self-service** | NEW-DEBT-M (account settings save flow not wired to EditProfileScreen) |
+| **Phase 3.5 pre-RC — half-built UI triage** | NEW-DEBT-N (13 half-built UI features in AppNavigatorShell.tsx requiring product triage) |
 
 **Closed:** W12-HARDENING-1, W12-HARDENING-2, KI-001 (W15), KI-002 (W16), W11-DEBT-2 (W16), W13-DEBT-1 (W18), W13-DEBT-4 (W18), W14-DEBT-2 (W18), W15-DEBT-2 (W18), W19-DEBT-1 (W19), W19-DEBT-2 (W19), W19-DEBT-3 (W19), W14-DEBT-5 (W20.5), W16-DEBT-1 (W20.5), W17-DEBT-2 (W20.5), W17-DEBT-3 (W20.5), W18-DEBT-1 (W20.5), W20-DEBT-1 (W20.5), W15-DEBT-3 (W21), W17-DEBT-1 (W22), W11-DEBT-1 (W23), W22-DEBT-2 (W23), W23-DEBT-2 (W24), W24-DEBT-2 (W37.5), W37.5-DEBT-1 (W37.5), W37.5-DEBT-2 (W37.5), W35-DEBT-1 (W37.6-pre), W36-DEBT-1 (W37.5-pre), W36-DEBT-2 (W37.6-pre), W36-DEBT-3 (W37.5-pre), W37-DEBT-1 (W37.5-pre), W37-DEBT-2 (W37.6-pre), W37-DEBT-3 (W37.5-pre), W37-DEBT-5 (W37.5-pre), W37-DEBT-6 (W37.5-pre), W23-DEBT-3 (W37.6-pre via W36-DEBT-2), W38-DEBT-6 (W37.6-pre — posts={[]} is correct), W38-DEBT-7 (W37.6-pre — inline static intended), W13-DEBT-2 (W39), W14-DEBT-3 (W39), W14-DEBT-4 (W39), W38-DEBT-8 (W39), W38-DEBT-9 (W39), W38-DEBT-10 (W40), W43-DEBT-3 (W45), **W41-DEBT-3 (W46)**, **W43-DEBT-1 (W46)**, **W44-DEBT-1 (W46)**, **W45-DEBT-1 (W46)**, **W41-DEBT-1 (W47)**, **W41-DEBT-2 (W47)**, **W41-DEBT-4 (W47)**, **W41-DEBT-5 (W47)**, **W41-DEBT-6 (W47)**, **W42-DEBT-1 (W47)**, **W42-DEBT-2 (W47)**, **W42-DEBT-3 (W47)**, **W37.5-DEBT-3 (W47)**, **W23-DEBT-1 (W47)**, **W38-DEBT-3 (W47)**, **W15-DEBT-1 (W47)**, **W22-DEBT-1 (W47)**, **W38-DEBT-1 (W47)**, **W22-DEBT-3 (W47)**.
 
@@ -483,3 +485,40 @@ Full spec-compliance audit of `zarkili_booking_flow_spec_v2.md` against the impl
 **Entry point:** `src/app/admin/ImpersonationScreen.tsx#L34` — screen state; `src/app/admin/impersonationService.ts#L46` — reason validation; `src/app/navigation/AppNavigatorShell.tsx#L11547` — service call with `"", ""` placeholders.
 
 **Closed:** Added "Reason for Access" multiline textarea (min 10 chars with inline validation) and an audit-acknowledgement checkbox to `ImpersonationScreen`. `onStartImpersonation` prop extended to `(tenantId, userId, reason)`. `startImpersonation` service signature drops `targetUserEmail` param — email is now looked up from `userProfiles/{targetUserId}` internally. Shell call site updated to pass reason. Tests added: `src/app/admin/__tests__/ImpersonationScreen.test.tsx` (11 cases) and `src/app/admin/__tests__/impersonationService.test.ts` (7 cases). Quality gate: 0 TS errors, 880 lint problems (unchanged), 3685/3685 tests passing.
+
+---
+
+## NEW-DEBT-M — Account settings save flow not wired to EditProfileScreen
+
+**Opened:** 2026-05-22  
+**Severity:** medium  
+**Target week:** Phase 3.5 pre-RC  
+**Status:** OPEN
+
+**What:** Three fully-implemented async handler functions — `submitAccountProfile`, `submitAccountEmail`, and `sendAccountPasswordReset` — and the 9 React state variables that back their loading/error/success UI (`profileSaveSubmitting`, `profileSaveErrorMessage`, `profileSaveSuccessMessage`, `emailSaveSubmitting`, `emailSaveErrorMessage`, `emailSaveSuccessMessage`, `passwordResetSubmitting`, `passwordResetErrorMessage`, `passwordResetSuccessMessage`) — are declared in `AppNavigatorShell.tsx` but never connected to `EditProfileScreen`. The screen's `onSave` prop is currently stubbed as `async () => { navigate("AppShell"); }`, meaning profile/email/password changes entered by the user are silently discarded. The backend logic is correct and complete; only the UI wiring is missing.
+
+**Why deferred:** The account settings UI scaffolding was built before the screen component's prop contract was finalised. Wiring it requires a product decision on the `EditProfileScreen` prop surface (add `onSaveProfile`, `onSaveEmail`, `onSendPasswordReset`, and their loading/error/success props), which is a UI design change beyond the current lint-cleanup sprint scope.
+
+**Entry point:** `src/app/navigation/AppNavigatorShell.tsx` — search `submitAccountProfile` to find the handler functions (line ~3730); search `EditProfileScreen` render case (line ~7095) to see the stubbed `onSave`. The 9 state declarations are in the same file near line 833.
+
+**Verification:** User can edit display name, change email address, and trigger a password reset from `EditProfileScreen` with correct loading spinner, inline error messages, and success confirmation — all persisted to Firebase Auth/Firestore.
+
+---
+
+## NEW-DEBT-N — Audit of half-built UI features discovered during lint cleanup
+
+**Opened:** 2026-05-22  
+**Severity:** medium  
+**Target week:** Phase 3.5 pre-RC  
+**Status:** OPEN
+
+**What:** During the NEW-DEBT-J lint cleanup sprint, static analysis revealed 13 state variables in `AppNavigatorShell.tsx` with broken wiring — either the display side exists but the load/write side was never implemented, or the setter is called but the rendered component never reads the value. Each represents a partially built admin or consumer feature that may need to be finished, deferred to v2, or removed. The two patterns found:
+
+- **Setter-called, display-missing** (NEW-DEBT-M pattern): logic updates state but no JSX reads it — `selectedDiscoverTenantId`, `serviceVisibility`, `consumerRescheduleLoading`
+- **Display-wired, setter-missing**: component reads state that is permanently stuck at initial value because the setter is never called — `setPhotoUploading` (upload spinner never fires), `setRescheduleConflicts` (conflict list always empty), `setMergeLoading`, `setAdjustClientId`, `setAdjustClientName`, `setTxDefaultsLoading`, `setMpComposerInitialPost`, `setPpfPost`, `setTenantDetailError`, `setAddCardReturnRoute`
+
+**Why deferred:** Each item requires a product decision (finish, defer to v2, or delete) that is out of scope for the lint-cleanup sprint. All 13 are suppressed with `eslint-disable` comments referencing this entry.
+
+**Entry point:** `src/app/navigation/AppNavigatorShell.tsx` — grep `NEW-DEBT-N` to locate all 13 suppression comments. Key line ranges: `selectedDiscoverTenantId` ~L869, `serviceVisibility` ~L1044, `consumerRescheduleLoading` ~L1739, setter-missing cluster ~L1028–1800.
+
+**Verification:** Follow-up planning session triages each of the 13 items. Each is either: (a) wired up with a sub-debt entry for testing, (b) deferred with its own NEW-DEBT entry, or (c) deleted with grep confirming zero remaining dead state for that feature.
