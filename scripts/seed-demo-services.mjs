@@ -1,4 +1,10 @@
 #!/usr/bin/env node
+// IMPORTANT: This script writes service documents to the canonical Firestore path:
+//   brands/{tenantId}/locations/{locationId}/service_types/{serviceId}
+//
+// The app's discovery feed uses collectionGroup("service_types") to query these
+// documents. Do NOT change the collection segment to "services" — it will break
+// getServiceCards(). See NEW-DEBT-R close report.
 /**
  * Demo service seed — 5 London locations × 2-3 services each.
  *
@@ -387,7 +393,6 @@ const SERVICE_REVIEWS = {
 // ---------------------------------------------------------------------------
 const ALL_TENANT_IDS   = DEMO_LOCATIONS.map((l) => l.tenantId);
 const ALL_LOCATION_IDS = DEMO_LOCATIONS.map((l) => l.locationId);
-const ALL_SERVICE_IDS  = DEMO_LOCATIONS.flatMap((l) => l.services.map((s) => s.id));
 const ALL_STAFF_IDS    = Object.values(DEMO_STAFF).flat().map((s) => s.id);
 const ALL_SCHEDULE_IDS = DEMO_LOCATIONS.flatMap((l) =>
   (DEMO_STAFF[l.tenantId] ?? []).map((s) => `${l.tenantId}_${s.id}_${l.locationId}`)
@@ -436,12 +441,21 @@ async function deleteRef(ref) {
 // ---------------------------------------------------------------------------
 if (CLEAR_SEED) {
   console.log("CLEAR_SEED: removing existing demo docs…");
-  for (const id of ALL_SERVICE_IDS) {
-    await deleteRef(db.doc(`services/${id}`));
-    // subcollections
-    for (const sub of ["variants", "addons", "photos"]) {
-      const snap = await db.collection(`services/${id}/${sub}`).listDocuments();
-      for (const ref of snap) await deleteRef(ref);
+  for (const loc of DEMO_LOCATIONS) {
+    for (const svc of loc.services) {
+      // Stale top-level path (clean up pre-fix docs)
+      await deleteRef(db.doc(`services/${svc.id}`));
+      for (const sub of ["variants", "addons", "photos"]) {
+        const snap = await db.collection(`services/${svc.id}/${sub}`).listDocuments();
+        for (const ref of snap) await deleteRef(ref);
+      }
+      // Canonical path
+      const stPath = `brands/${loc.tenantId}/locations/${loc.locationId}/service_types/${svc.id}`;
+      await deleteRef(db.doc(stPath));
+      for (const sub of ["variants", "addons", "photos"]) {
+        const snap = await db.collection(`${stPath}/${sub}`).listDocuments();
+        for (const ref of snap) await deleteRef(ref);
+      }
     }
   }
   for (const id of ALL_LOCATION_IDS)  await deleteRef(db.doc(`locations/${id}`));
@@ -500,7 +514,7 @@ for (const loc of DEMO_LOCATIONS) {
     const svcVariants = SERVICE_VARIANTS[svc.id] ?? [];
     const defaultVariant = svcVariants.find((v) => v.isDefault) ?? svcVariants[0];
     const baseDurationMinutes = defaultVariant?.durationMinutes ?? 60;
-    await write(db.doc(`services/${svc.id}`), {
+    await write(db.doc(`brands/${loc.tenantId}/locations/${loc.locationId}/service_types/${svc.id}`), {
       serviceId: svc.id,
       tenantId: loc.tenantId,
       locationId: loc.locationId,
@@ -553,7 +567,7 @@ for (const loc of DEMO_LOCATIONS) {
       { id: "v1", name: svc.name, durationMinutes: baseDurationMinutes, price: svc.priceFrom, isDefault: true },
     ];
     for (const v of variants) {
-      await write(db.doc(`services/${svc.id}/variants/${v.id}`), {
+      await write(db.doc(`brands/${loc.tenantId}/locations/${loc.locationId}/service_types/${svc.id}/variants/${v.id}`), {
         name: v.name,
         durationMinutes: v.durationMinutes,
         price: v.price,
@@ -567,7 +581,7 @@ for (const loc of DEMO_LOCATIONS) {
     // ── addons ──
     const addons = SERVICE_ADDONS[svc.id] ?? [];
     for (const a of addons) {
-      await write(db.doc(`services/${svc.id}/addons/${a.id}`), {
+      await write(db.doc(`brands/${loc.tenantId}/locations/${loc.locationId}/service_types/${svc.id}/addons/${a.id}`), {
         name: a.name,
         price: a.price,
         currency: "GBP",
@@ -578,7 +592,7 @@ for (const loc of DEMO_LOCATIONS) {
 
     // update variantCount on service doc to match actual variants
     if (!DRY_RUN && variants.length > 1) {
-      currentBatch.update(db.doc(`services/${svc.id}`), { variantCount: variants.length });
+      currentBatch.update(db.doc(`brands/${loc.tenantId}/locations/${loc.locationId}/service_types/${svc.id}`), { variantCount: variants.length });
       batchOps++;
     }
   }
