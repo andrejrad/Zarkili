@@ -112,7 +112,8 @@ Weeks 1–10 did not use the `Wnn-DEBT-n` convention. Carry-over items from that
 | **W50 Phase 4 — confirmation + discovery screens** | W50-DEBT-15 (confirmation celebration + actions), W50-DEBT-16 (photo gallery), W50-DEBT-17 (Our team filtering), W50-DEBT-18 (staff service filtering) |
 | **W52 — impersonation feature** | ~~NEW-DEBT-L~~ (closed 2026-05-22 — reason field + acknowledgement checkbox + email lookup added) |
 | **Phase 3.5 pre-RC — account self-service** | NEW-DEBT-M (account settings save flow not wired to EditProfileScreen) |
-| **Phase 3.5 pre-RC — half-built UI triage** | NEW-DEBT-N (13 half-built UI features in AppNavigatorShell.tsx requiring product triage) |
+| **Phase 3.5 pre-RC — half-built UI triage** | ~~NEW-DEBT-N~~ (triaged 2026-05-22: 5 SHIP → NEW-DEBT-P, 6 DEFER, 1 CUT) |
+| **Production launch W2–W3 — wiring tasks** | NEW-DEBT-P (P1 addCardReturnRoute · P2 serviceVisibility · P3 rescheduleConflicts · P4 adjustPoints client IDs · P5 ppfPost) |
 | **Post-RC type hygiene** | NEW-DEBT-O (60 `no-explicit-any` errors remaining after NEW-DEBT-J cleanup) |
 
 **Closed:** W12-HARDENING-1, W12-HARDENING-2, KI-001 (W15), KI-002 (W16), W11-DEBT-2 (W16), W13-DEBT-1 (W18), W13-DEBT-4 (W18), W14-DEBT-2 (W18), W15-DEBT-2 (W18), W19-DEBT-1 (W19), W19-DEBT-2 (W19), W19-DEBT-3 (W19), W14-DEBT-5 (W20.5), W16-DEBT-1 (W20.5), W17-DEBT-2 (W20.5), W17-DEBT-3 (W20.5), W18-DEBT-1 (W20.5), W20-DEBT-1 (W20.5), W15-DEBT-3 (W21), W17-DEBT-1 (W22), W11-DEBT-1 (W23), W22-DEBT-2 (W23), W23-DEBT-2 (W24), W24-DEBT-2 (W37.5), W37.5-DEBT-1 (W37.5), W37.5-DEBT-2 (W37.5), W35-DEBT-1 (W37.6-pre), W36-DEBT-1 (W37.5-pre), W36-DEBT-2 (W37.6-pre), W36-DEBT-3 (W37.5-pre), W37-DEBT-1 (W37.5-pre), W37-DEBT-2 (W37.6-pre), W37-DEBT-3 (W37.5-pre), W37-DEBT-5 (W37.5-pre), W37-DEBT-6 (W37.5-pre), W23-DEBT-3 (W37.6-pre via W36-DEBT-2), W38-DEBT-6 (W37.6-pre — posts={[]} is correct), W38-DEBT-7 (W37.6-pre — inline static intended), W13-DEBT-2 (W39), W14-DEBT-3 (W39), W14-DEBT-4 (W39), W38-DEBT-8 (W39), W38-DEBT-9 (W39), W38-DEBT-10 (W40), W43-DEBT-3 (W45), **W41-DEBT-3 (W46)**, **W43-DEBT-1 (W46)**, **W44-DEBT-1 (W46)**, **W45-DEBT-1 (W46)**, **W41-DEBT-1 (W47)**, **W41-DEBT-2 (W47)**, **W41-DEBT-4 (W47)**, **W41-DEBT-5 (W47)**, **W41-DEBT-6 (W47)**, **W42-DEBT-1 (W47)**, **W42-DEBT-2 (W47)**, **W42-DEBT-3 (W47)**, **W37.5-DEBT-3 (W47)**, **W23-DEBT-1 (W47)**, **W38-DEBT-3 (W47)**, **W15-DEBT-1 (W47)**, **W22-DEBT-1 (W47)**, **W38-DEBT-1 (W47)**, **W22-DEBT-3 (W47)**.
@@ -513,7 +514,7 @@ Full spec-compliance audit of `zarkili_booking_flow_spec_v2.md` against the impl
 **Opened:** 2026-05-22  
 **Severity:** medium  
 **Target week:** Phase 3.5 pre-RC  
-**Status:** OPEN
+**Status:** CLOSED — triaged 2026-05-22. 5 SHIP → NEW-DEBT-P, 6 DEFER (eslint-disable suppressions retained until v1.1), 1 CUT (`selectedDiscoverTenantId` deleted).
 
 **What:** During the NEW-DEBT-J lint cleanup sprint, static analysis revealed 13 state variables in `AppNavigatorShell.tsx` with broken wiring — either the display side exists but the load/write side was never implemented, or the setter is called but the rendered component never reads the value. Each represents a partially built admin or consumer feature that may need to be finished, deferred to v2, or removed. The two patterns found:
 
@@ -522,9 +523,83 @@ Full spec-compliance audit of `zarkili_booking_flow_spec_v2.md` against the impl
 
 **Why deferred:** Each item requires a product decision (finish, defer to v2, or delete) that is out of scope for the lint-cleanup sprint. All 13 are suppressed with `eslint-disable` comments referencing this entry.
 
-**Entry point:** `src/app/navigation/AppNavigatorShell.tsx` — grep `NEW-DEBT-N` to locate all 13 suppression comments. Key line ranges: `selectedDiscoverTenantId` ~L869, `serviceVisibility` ~L1044, `consumerRescheduleLoading` ~L1739, setter-missing cluster ~L1028–1800.
+**Entry point:** `src/app/navigation/AppNavigatorShell.tsx` — grep `NEW-DEBT-N` to locate suppression comments. Key line ranges: `selectedDiscoverTenantId` ~L869 (deleted), `serviceVisibility` ~L1044, `consumerRescheduleLoading` ~L1739, setter-missing cluster ~L1028–1800.
 
-**Verification:** Follow-up planning session triages each of the 13 items. Each is either: (a) wired up with a sub-debt entry for testing, (b) deferred with its own NEW-DEBT entry, or (c) deleted with grep confirming zero remaining dead state for that feature.
+**Verification:** ✅ Planning session held 2026-05-22. Each item resolved below.
+
+**Triage decisions (2026-05-22):**
+
+| # | State var | Decision | Notes |
+|---|-----------|----------|-------|
+| 1 | `selectedDiscoverTenantId` | **CUT** | Redundant duplicate of `selectedSalonTenantId`; both set to same value at the same call site (L3588); declaration + setter call deleted, eslint-disable comment removed |
+| 2 | `serviceVisibility` | **SHIP** | → NEW-DEBT-P2 |
+| 3 | `consumerRescheduleLoading` | **DEFER** | v1.1 — eslint-disable suppression retained |
+| 4 | `photoUploading` | **DEFER** | v1.1 — eslint-disable suppression retained |
+| 5 | `rescheduleConflicts` | **SHIP** | → NEW-DEBT-P3 |
+| 6 | `mergeLoading` | **DEFER** | v1.1 — eslint-disable suppression retained |
+| 7 | `adjustClientId` | **SHIP** | → NEW-DEBT-P4 (bundled with #8) |
+| 8 | `adjustClientName` | **SHIP** | → NEW-DEBT-P4 (bundled with #7) |
+| 9 | `txDefaultsLoading` | **DEFER** | v1.1 — eslint-disable suppression retained |
+| 10 | `mpComposerInitialPost` | **DEFER** | v1.1 — eslint-disable suppression retained |
+| 11 | `ppfPost` | **SHIP** | → NEW-DEBT-P5 |
+| 12 | `tenantDetailError` | **DEFER** | v1.1 — eslint-disable suppression retained |
+| 13 | `addCardReturnRoute` | **SHIP** | → NEW-DEBT-P1 |
+
+---
+
+## NEW-DEBT-P — Production wiring tasks (5 SHIP items from NEW-DEBT-N triage)
+
+**Opened:** 2026-05-22  
+**Severity:** medium  
+**Target week:** Production launch W2–W3  
+**Status:** OPEN
+
+**What:** Five broken state-wiring tasks from the NEW-DEBT-N triage that are release blockers. Each is a contained wiring gap — no architectural change required, no new screens needed.
+
+---
+
+### P1 — Wire `addCardReturnRoute` before opening AddCard screen
+
+**Effort:** S  
+**Entry point:** `src/app/navigation/AppNavigatorShell.tsx:6658` — `onSubmit` and `onPressBack` both navigate to `addCardReturnRoute`, which is permanently stuck at the default `"SavedPaymentMethods"` because `setAddCardReturnRoute` is never called.  
+**What to do:** Find every navigation call that opens the `AddCard` route and call `setAddCardReturnRoute(currentRoute)` before `navigate("AddCard")`, so post-add-card return goes to the originating screen (typically the booking checkout flow).  
+**Verification:** Navigate to AddCard from inside booking checkout; confirm post-submit lands on the checkout screen, not SavedPaymentMethods.
+
+---
+
+### P2 — Wire `serviceVisibility` load effect
+
+**Effort:** M  
+**Entry point:** `src/app/navigation/AppNavigatorShell.tsx:1047` — `serviceVisibility` is updated after save (`setServiceVisibility(result.data)` at L8519) but no load effect seeds `visOnlineBooking / visMarketplaceListed / visInternalOnly` from it on screen entry, so the visibility form always resets to defaults.  
+**What to do:** Add a `useEffect` (or extend the existing service-settings load effect) that reads the current `ServiceVisibilityConfig` for the selected service on mount and populates the three `vis*` booleans from the loaded config.  
+**Verification:** Save a visibility config; navigate away and back to the visibility screen; confirm the form pre-populates with the saved values.
+
+---
+
+### P3 — Wire `rescheduleConflicts` in slot selection
+
+**Effort:** M  
+**Entry point:** `src/app/navigation/AppNavigatorShell.tsx:1144` — `conflicts={rescheduleConflicts}` is passed to `RescheduleBookingScreen` (L9031) and consumed by `buildConflictResolutionOptions` (L9048), but `setRescheduleConflicts` is never called, so conflict detection always runs against an empty array.  
+**What to do:** In the slot-selection handler for the admin reschedule flow, call the conflict-check service after a slot is chosen and pipe the result into `setRescheduleConflicts`.  
+**Verification:** Attempt to reschedule a booking to a slot that double-books; confirm the conflicts list is non-empty and resolution options render correctly.
+
+---
+
+### P4 — Wire `adjustClientId` / `adjustClientName` before navigating to PointAdjustmentScreen
+
+**Effort:** M  
+**Entry point:** `src/app/navigation/AppNavigatorShell.tsx:1259` — both values are passed to `PointAdjustmentScreen` (L9665–9666) and into the `adjustPoints` Firestore write (L9682–9685), but both setters are never called so the write always targets an empty-string client ID.  
+**What to do:** Find every navigation call that opens `PointAdjustmentScreen` (from client detail or client-list actions); call `setAdjustClientId(client.id)` and `setAdjustClientName(client.displayName)` immediately before `navigate("PointAdjustmentScreen")`.  
+**Verification:** Open point adjustment from a known client; confirm the client name displays and the Firestore write targets the correct client document.
+
+---
+
+### P5 — Wire `ppfPost` before navigating to Per-Post Performance screen
+
+**Effort:** M  
+**Entry point:** `src/app/navigation/AppNavigatorShell.tsx:1571` — `post={ppfPost}` is passed to the PPF screen (L11295) and `ppfPost.postId` is used in the retry handler (L11299–11304), but `setPpfPost` is never called so the screen has no post identity and retry silently no-ops.  
+**What to do:** Find the navigation call that opens the Per-Post Performance route (from the marketplace post list); call `setPpfPost(selectedPost)` before navigating so the screen has post identity for the initial metrics load and retry.  
+**Verification:** Tap "View Performance" on a marketplace post; confirm the post title renders and metrics load (or the retry button triggers a real fetch with a valid postId).
 
 ---
 

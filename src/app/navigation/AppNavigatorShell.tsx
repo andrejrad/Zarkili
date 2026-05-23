@@ -866,8 +866,6 @@ export function AppNavigatorShell({
   const [exploreDetailError, setExploreDetailError] = useState<string | null>(null);
   // W22-DEBT-3: Sponsored posts injected at the top of DiscoverFeedScreen
   const [sponsoredFeedPosts, setSponsoredFeedPosts] = useState<import("../../domains/discovery").DiscoveryFeedPost[]>([]);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- NEW-DEBT-N: half-built UI awaiting triage
-  const [selectedDiscoverTenantId, setSelectedDiscoverTenantId] = useState<string | null>(null);
   const [tenantProfileLoading, setTenantProfileLoading] = useState(false);
   const [tenantProfileErrorMessage, setTenantProfileErrorMessage] = useState<string | null>(null);
   const [tenantProfile, setTenantProfile] = useState<TenantProfileSummary | null>(null);
@@ -3585,7 +3583,6 @@ export function AppNavigatorShell({
   }
 
   function openTenantPublicProfile(tenantProfileId: string) {
-    setSelectedDiscoverTenantId(tenantProfileId);
     setSelectedSalonTenantId(tenantProfileId);
     navigate("TenantPublicProfile");
   }
