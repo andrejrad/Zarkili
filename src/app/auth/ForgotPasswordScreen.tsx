@@ -3,7 +3,7 @@
  */
 
 import { useState } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useAuth } from "../providers/AuthProvider";
 import {
@@ -49,11 +49,12 @@ export function ForgotPasswordScreen({ onSent, onBack }: ForgotPasswordScreenPro
   }
 
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.content}
-      keyboardShouldPersistTaps="handled"
-    >
+    <KeyboardAvoidingView style={styles.kvContainer} behavior={Platform.OS === "ios" ? "padding" : "height"}>
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={styles.content}
+        keyboardShouldPersistTaps="handled"
+      >
       <Text style={styles.heading} accessibilityRole="header">
         Reset your password
       </Text>
@@ -102,10 +103,12 @@ export function ForgotPasswordScreen({ onSent, onBack }: ForgotPasswordScreenPro
         <Button variant="tertiary" size="small" label="Back to sign in" onPress={onBack} />
       </View>
     </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
+  kvContainer: { flex: 1 },
   container: { flex: 1, backgroundColor: colors.background },
   content: { padding: spacing.pageVertical, gap: spacing.s3 },
   heading: {

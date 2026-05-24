@@ -122,6 +122,7 @@ Weeks 1–10 did not use the `Wnn-DEBT-n` convention. Carry-over items from that
 | **Post-launch hardening — email change session-hijack risk** | ~~NEW-DEBT-U~~ (closed 2026-05-23 — migrated to verifyBeforeUpdateEmail during NEW-DEBT-M; promoted blocking when email enumeration protection blocked updateEmail on dev project) |
 | **Week 4–5 security hardening — email verification deliverability** | NEW-DEBT-V (verifyBeforeUpdateEmail silently accepted by Firebase but email never arrives; needs custom sender domain + SPF/DKIM + actionCodeSettings for production) |
 | **W1 Day 2 — Android keyboard covers form fields** | NEW-DEBT-W (keyboard rises over focused input, screen doesn't scroll; affects all form screens; fix: KeyboardAvoidingView + keyboardShouldPersistTaps) |
+| **W4–W6 QA cleanup — keyboard avoidance remaining screens** | NEW-DEBT-X (13 lower-traffic form screens still lack KeyboardAvoidingView; high-priority screens fixed in NEW-DEBT-W) |
 
 **Closed:** W12-HARDENING-1, W12-HARDENING-2, KI-001 (W15), KI-002 (W16), W11-DEBT-2 (W16), W13-DEBT-1 (W18), W13-DEBT-4 (W18), W14-DEBT-2 (W18), W15-DEBT-2 (W18), W19-DEBT-1 (W19), W19-DEBT-2 (W19), W19-DEBT-3 (W19), W14-DEBT-5 (W20.5), W16-DEBT-1 (W20.5), W17-DEBT-2 (W20.5), W17-DEBT-3 (W20.5), W18-DEBT-1 (W20.5), W20-DEBT-1 (W20.5), W15-DEBT-3 (W21), W17-DEBT-1 (W22), W11-DEBT-1 (W23), W22-DEBT-2 (W23), W23-DEBT-2 (W24), W24-DEBT-2 (W37.5), W37.5-DEBT-1 (W37.5), W37.5-DEBT-2 (W37.5), W35-DEBT-1 (W37.6-pre), W36-DEBT-1 (W37.5-pre), W36-DEBT-2 (W37.6-pre), W36-DEBT-3 (W37.5-pre), W37-DEBT-1 (W37.5-pre), W37-DEBT-2 (W37.6-pre), W37-DEBT-3 (W37.5-pre), W37-DEBT-5 (W37.5-pre), W37-DEBT-6 (W37.5-pre), W23-DEBT-3 (W37.6-pre via W36-DEBT-2), W38-DEBT-6 (W37.6-pre — posts={[]} is correct), W38-DEBT-7 (W37.6-pre — inline static intended), W13-DEBT-2 (W39), W14-DEBT-3 (W39), W14-DEBT-4 (W39), W38-DEBT-8 (W39), W38-DEBT-9 (W39), W38-DEBT-10 (W40), W43-DEBT-3 (W45), **W41-DEBT-3 (W46)**, **W43-DEBT-1 (W46)**, **W44-DEBT-1 (W46)**, **W45-DEBT-1 (W46)**, **W41-DEBT-1 (W47)**, **W41-DEBT-2 (W47)**, **W41-DEBT-4 (W47)**, **W41-DEBT-5 (W47)**, **W41-DEBT-6 (W47)**, **W42-DEBT-1 (W47)**, **W42-DEBT-2 (W47)**, **W42-DEBT-3 (W47)**, **W37.5-DEBT-3 (W47)**, **W23-DEBT-1 (W47)**, **W38-DEBT-3 (W47)**, **W15-DEBT-1 (W47)**, **W22-DEBT-1 (W47)**, **W38-DEBT-1 (W47)**, **W22-DEBT-3 (W47)**.
 
@@ -774,3 +775,36 @@ After exhausting JS-side levers without effect, the residual hypothesis is **Exp
 **Entry point:** `src/app/profile/EditProfileScreen.tsx` — outermost ScrollView and form layout. Audit other form screens (`SignInScreen`, `CreateAccountScreen`, onboarding steps) during the same fix pass.
 
 **Verification:** Tap the Email input on Android → keyboard rises → focused field remains fully visible above the keyboard → user can read and edit their input without dismissing the keyboard.
+
+---
+
+## NEW-DEBT-X — Keyboard avoidance: apply KeyboardAvoidingView to remaining 13 form screens
+
+**Opened:** 2026-05-23
+**Severity:** low
+**Target week:** W4 or W6 QA cleanup
+**Status:** OPEN
+
+**What:** During the NEW-DEBT-W fix pass, 13 additional form screens were audited and confirmed to lack `KeyboardAvoidingView` wrapping. These are lower-priority screens (onboarding steps, payments, support, staff) where the keyboard-covering-inputs bug exists but they are less frequently reached than the auth and profile flows fixed in NEW-DEBT-W. The fix for each is identical to the pattern established in `src/app/auth/SignInScreen.tsx`: wrap the root `ScrollView` (or root `View`) in `<KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"}>` and add `keyboardShouldPersistTaps="handled"` to the inner `ScrollView`.
+
+**Why deferred:** High-priority screens (EditProfileScreen, SignInScreen, ForgotPasswordScreen, ResetPasswordScreen, GuestContactScreen) were fixed in the NEW-DEBT-W PR. These 13 screens are internal or lower-traffic flows that do not block the RC gate.
+
+**Screens to fix:**
+- `src/app/auth/AuthEdgeScreen.tsx`
+- `src/app/auth/AgeGateScreen.tsx`
+- `src/app/onboarding/ClientOnboardingAccountGuestScreen.tsx`
+- `src/app/onboarding/ClientOnboardingPhoneVerifyScreen.tsx`
+- `src/app/onboarding/ClientOnboardingLocationScreen.tsx`
+- `src/app/onboarding/ClientOnboardingProfileScreen.tsx`
+- `src/app/onboarding/SalonOnboardingAccountScreen.tsx`
+- `src/app/onboarding/SalonOnboardingAvailabilityScreen.tsx`
+- `src/app/onboarding/SalonOnboardingServicesScreen.tsx`
+- `src/app/onboarding/SalonOnboardingStaffScreen.tsx`
+- `src/app/onboarding/SalonOnboardingBusinessProfileScreen.tsx`
+- `src/app/payments/AddPaymentMethodScreen.tsx`
+- `src/app/support/HelpScreen.tsx`
+- `src/app/staff/StaffExtrasScreen.tsx`
+
+**Entry point:** `src/app/auth/AuthEdgeScreen.tsx` — start here; model on `src/app/auth/SignInScreen.tsx` (fixed in NEW-DEBT-W).
+
+**Verification:** On each screen, tap a text input → keyboard rises → focused field remains fully visible above the keyboard without manual dismissal.
