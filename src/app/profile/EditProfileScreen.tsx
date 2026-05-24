@@ -2,6 +2,7 @@
  * EditProfileScreen.tsx — I.6 Edit Profile.
  *
  * Fields: avatar editor, display name, pronouns chip-row, bio (250 chars).
+ * Email address and password reset sections rendered when handlers are provided.
  * States: default | dirty | saving | saved | validation-error | error.
  */
 
@@ -25,6 +26,21 @@ export type EditProfileScreenProps = {
   onChangeAvatar?: () => void;
   onBack?: () => void;
   testID?: string;
+  // Profile save state (driven by shell; message props override fallback strings)
+  profileSaving?: boolean;
+  profileErrorMessage?: string | null;
+  profileSuccessMessage?: string | null;
+  // Email section — rendered only when onSaveEmail is provided
+  initialEmail?: string;
+  onSaveEmail?: (email: string) => Promise<void>;
+  emailSaving?: boolean;
+  emailErrorMessage?: string | null;
+  emailSuccessMessage?: string | null;
+  // Security section — rendered only when onSendPasswordReset is provided
+  onSendPasswordReset?: () => Promise<void>;
+  passwordResetSubmitting?: boolean;
+  passwordResetErrorMessage?: string | null;
+  passwordResetSuccessMessage?: string | null;
 };
 
 const BIO_MAX = 250;
@@ -47,6 +63,18 @@ export function EditProfileScreen({
   onChangeAvatar,
   onBack: _onBack,
   testID,
+  profileSaving,
+  profileErrorMessage,
+  profileSuccessMessage,
+  initialEmail,
+  onSaveEmail,
+  emailSaving,
+  emailErrorMessage,
+  emailSuccessMessage,
+  onSendPasswordReset,
+  passwordResetSubmitting,
+  passwordResetErrorMessage,
+  passwordResetSuccessMessage,
 }: EditProfileScreenProps) {
   const [displayName, setDisplayName] = useState(initialDisplayName);
   const [pronouns, setPronouns] = useState(initialPronouns);
@@ -54,6 +82,8 @@ export function EditProfileScreen({
   const [screenState, setScreenState] = useState<EditProfileState>("default");
   const [displayNameError, setDisplayNameError] = useState<string | null>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [emailInput, setEmailInput] = useState(initialEmail ?? "");
+  const isEmailDirty = emailInput !== (initialEmail ?? "");
 
   const isDirty =
     displayName !== initialDisplayName ||
@@ -92,6 +122,24 @@ export function EditProfileScreen({
     }
   }
 
+  async function handleEmailSave() {
+    if (!onSaveEmail) return;
+    try {
+      await onSaveEmail(emailInput.trim());
+    } catch {
+      // Error state is managed via emailErrorMessage prop
+    }
+  }
+
+  async function handlePasswordReset() {
+    if (!onSendPasswordReset) return;
+    try {
+      await onSendPasswordReset();
+    } catch {
+      // Error state is managed via passwordResetErrorMessage prop
+    }
+  }
+
   return (
     <ScrollView
       style={styles.container}
@@ -108,7 +156,7 @@ export function EditProfileScreen({
         >
           <View style={styles.avatarWrap}>
             {avatarUri ? (
-               
+
               <View style={styles.avatar} />
             ) : (
               <View style={styles.avatar}>
@@ -127,7 +175,7 @@ export function EditProfileScreen({
       {screenState === "error" ? (
         <Banner
           variant="error"
-          message="Failed to save. Please try again."
+          message={profileErrorMessage ?? "Failed to save. Please try again."}
           testID={testID ? `${testID}-error-banner` : undefined}
         />
       ) : null}
@@ -135,7 +183,7 @@ export function EditProfileScreen({
       {screenState === "saved" ? (
         <Banner
           variant="success"
-          message="Profile saved."
+          message={profileSuccessMessage ?? "Profile saved."}
           testID={testID ? `${testID}-saved-banner` : undefined}
         />
       ) : null}
@@ -198,11 +246,77 @@ export function EditProfileScreen({
       <Button
         label={screenState === "saving" ? "Saving..." : "Save"}
         variant="primary"
-        disabled={!isDirty || screenState === "saving"}
-        loading={screenState === "saving"}
+        disabled={!isDirty || screenState === "saving" || profileSaving}
+        loading={screenState === "saving" || profileSaving}
         onPress={handleSave}
         testID={testID ? `${testID}-save` : undefined}
       />
+
+      {onSaveEmail != null ? (
+        <View>
+          <Text style={styles.sectionHeading}>Email address</Text>
+          <View style={styles.formCard}>
+            <InputField
+              label="Email"
+              value={emailInput}
+              onChangeText={setEmailInput}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              testID={testID ? `${testID}-email` : undefined}
+            />
+          </View>
+          {emailErrorMessage ? (
+            <Banner
+              variant="error"
+              message={emailErrorMessage}
+              testID={testID ? `${testID}-email-error-banner` : undefined}
+            />
+          ) : null}
+          {emailSuccessMessage ? (
+            <Banner
+              variant="success"
+              message={emailSuccessMessage}
+              testID={testID ? `${testID}-email-success-banner` : undefined}
+            />
+          ) : null}
+          <Button
+            label={emailSaving ? "Saving..." : "Save email"}
+            variant="secondary"
+            disabled={!isEmailDirty || emailSaving}
+            loading={emailSaving}
+            onPress={handleEmailSave}
+            testID={testID ? `${testID}-email-save` : undefined}
+          />
+        </View>
+      ) : null}
+
+      {onSendPasswordReset != null ? (
+        <View>
+          <Text style={styles.sectionHeading}>Security</Text>
+          {passwordResetErrorMessage ? (
+            <Banner
+              variant="error"
+              message={passwordResetErrorMessage}
+              testID={testID ? `${testID}-password-reset-error-banner` : undefined}
+            />
+          ) : null}
+          {passwordResetSuccessMessage ? (
+            <Banner
+              variant="success"
+              message={passwordResetSuccessMessage}
+              testID={testID ? `${testID}-password-reset-success-banner` : undefined}
+            />
+          ) : null}
+          <Button
+            label={passwordResetSubmitting ? "Sending..." : "Send password reset email"}
+            variant="secondary"
+            disabled={passwordResetSubmitting}
+            loading={passwordResetSubmitting}
+            onPress={handlePasswordReset}
+            testID={testID ? `${testID}-password-reset` : undefined}
+          />
+        </View>
+      ) : null}
     </ScrollView>
   );
 }
@@ -253,6 +367,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   fieldLabel: {
+    ...textStyles.label,
+    color: colors.foreground,
+    marginBottom: spacing.s2,
+  },
+  sectionHeading: {
     ...textStyles.label,
     color: colors.foreground,
     marginBottom: spacing.s2,
