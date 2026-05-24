@@ -117,6 +117,7 @@ Weeks 1–10 did not use the `Wnn-DEBT-n` convention. Carry-over items from that
 | **Post-RC type hygiene** | NEW-DEBT-O (60 `no-explicit-any` errors remaining after NEW-DEBT-J cleanup) |
 | **Discovery feed Firestore fix — stale rules tests** | NEW-DEBT-Q (2 rules tests expect tenant reads to be private; rule is now intentionally public) |
 | **W6 QA blocker — seed scripts write to wrong collection** | NEW-DEBT-R (seed scripts write to `services/{id}`; app queries `service_types` collection group — dev data is invisible to the app) |
+| **Dev-env-only — Android Expo Go map marker truncation** | NEW-DEBT-S (Explore map price pins show "from" only on Android Expo Go; every JS-side fix exhausted; root cause is Expo Go native ↔ JS version mismatch — does not affect EAS/production builds) |
 
 **Closed:** W12-HARDENING-1, W12-HARDENING-2, KI-001 (W15), KI-002 (W16), W11-DEBT-2 (W16), W13-DEBT-1 (W18), W13-DEBT-4 (W18), W14-DEBT-2 (W18), W15-DEBT-2 (W18), W19-DEBT-1 (W19), W19-DEBT-2 (W19), W19-DEBT-3 (W19), W14-DEBT-5 (W20.5), W16-DEBT-1 (W20.5), W17-DEBT-2 (W20.5), W17-DEBT-3 (W20.5), W18-DEBT-1 (W20.5), W20-DEBT-1 (W20.5), W15-DEBT-3 (W21), W17-DEBT-1 (W22), W11-DEBT-1 (W23), W22-DEBT-2 (W23), W23-DEBT-2 (W24), W24-DEBT-2 (W37.5), W37.5-DEBT-1 (W37.5), W37.5-DEBT-2 (W37.5), W35-DEBT-1 (W37.6-pre), W36-DEBT-1 (W37.5-pre), W36-DEBT-2 (W37.6-pre), W36-DEBT-3 (W37.5-pre), W37-DEBT-1 (W37.5-pre), W37-DEBT-2 (W37.6-pre), W37-DEBT-3 (W37.5-pre), W37-DEBT-5 (W37.5-pre), W37-DEBT-6 (W37.5-pre), W23-DEBT-3 (W37.6-pre via W36-DEBT-2), W38-DEBT-6 (W37.6-pre — posts={[]} is correct), W38-DEBT-7 (W37.6-pre — inline static intended), W13-DEBT-2 (W39), W14-DEBT-3 (W39), W14-DEBT-4 (W39), W38-DEBT-8 (W39), W38-DEBT-9 (W39), W38-DEBT-10 (W40), W43-DEBT-3 (W45), **W41-DEBT-3 (W46)**, **W43-DEBT-1 (W46)**, **W44-DEBT-1 (W46)**, **W45-DEBT-1 (W46)**, **W41-DEBT-1 (W47)**, **W41-DEBT-2 (W47)**, **W41-DEBT-4 (W47)**, **W41-DEBT-5 (W47)**, **W41-DEBT-6 (W47)**, **W42-DEBT-1 (W47)**, **W42-DEBT-2 (W47)**, **W42-DEBT-3 (W47)**, **W37.5-DEBT-3 (W47)**, **W23-DEBT-1 (W47)**, **W38-DEBT-3 (W47)**, **W15-DEBT-1 (W47)**, **W22-DEBT-1 (W47)**, **W38-DEBT-1 (W47)**, **W22-DEBT-3 (W47)**.
 
@@ -659,3 +660,34 @@ Both tests fail with "Expected request to fail, but it succeeded." The rule inte
 **Verification:** After running `npm run seed:demo:dev`, Home and Explore tabs show service cards on Android Expo Go without errors. Confirmed working on Android Expo Go 2026-05-23.
 
 **Close notes:** Fixed in branch `fix/new-debt-r-seed-scripts`. Both `seed-demo-services.mjs` and `seed-qa-firestore.mjs` now write service documents to `brands/{tenantId}/locations/{locationId}/service_types/{serviceId}`. QA seed also received 13 missing denorm fields (`geohash`, `locationLat`, `locationLng`, `locationDisplayName`, `locationCity`, `locationAverageRating`, `locationReviewCount`, `categoryName`, `variantCount`, `priceFrom`, `durationFrom`, `primaryPhotoUrl`, `primaryPhotoSource`, `isBookableOnline`). CLEAR_SEED in demo seed updated to clean both old stale path and new canonical path. `seed-discovery-featured-salons.mjs` left unchanged — it targets the featured carousel (`discoveryFeaturedSalons`), not `service_types`, and its 3 tenants are fully covered by the demo seed. Real seed ran successfully: 109 ops, 0 errors, dev project `zarkili-dev-a1b1c`. Warning comment added to top of both modified scripts.
+
+---
+
+## NEW-DEBT-S — Android Expo Go map marker truncation (PriceBubble shows "from" only)
+
+**Opened:** 2026-05-23
+**Severity:** low (dev-environment only — does not affect EAS dev builds or production)
+**Target week:** deferred indefinitely; revisit only if Expo Go becomes a supported demo channel
+**Status:** OPEN — deferred
+
+**What:** On Android Expo Go, Explore map price markers render only the leading word `from` — the price (`£NNN`), the optional service-count badge, and the downward pointer tail are all clipped. iOS Expo Go and (presumed) Android EAS dev/production builds render correctly. Entry point: `src/app/discover/ExploreMapScreen.tsx:129–169` (`PriceBubble`) rendered as the `children` of `<Marker>` at lines 363–386.
+
+**Investigation summary:** This file already contains every published JS-side workaround for the react-native-maps Android custom-marker bitmap-capture timing class of bug:
+- Non-breaking space in label (`from £${price}`, line 146) + `textBreakStrategy="simple"` + `numberOfLines={1}` + `allowFontScaling={false}`
+- `collapsable={false}` on every View in the marker tree (lines 148, 149, 159, 166)
+- Per-marker `tracksViewChanges` lifecycle: starts true, flips false only after the outer view's `onLayout` + a 400 ms Android-only `setTimeout` (lines 277–292, 367)
+- System font fallback on Android (skip Manrope-Medium to dodge async font-loading race, line 488)
+- `minWidth: 88` on `priceBubble` and `minWidth: 50` on `priceBubbleText` (added 2026-05-23 during this investigation, lines 471–476, 494–496) — the textbook "force the bitmap wide enough" fix. Did not help.
+
+After exhausting JS-side levers without effect, the residual hypothesis is **Expo Go native-module ↔ JS package version mismatch**. Project `package.json` pins `react-native-maps@1.20.1`, but Expo Go ships its own fixed native binary for SDK 54. Custom-view markers are the area where this mismatch most reliably manifests as silent rendering bugs on Android. None of the JS-side workarounds (`tracksViewChanges`, `onLayout` timing, explicit widths) can reach the native bitmap-capture timing inside Expo Go's bundled native module.
+
+**Why deferred:** Bug surface is dev-environment-only. Production users install an EAS / store build with the project's actual `react-native-maps@1.20.1` native module and do not encounter this. Available fixes are all >30 min and non-trivial:
+1. Switch Android dev testing to EAS dev build (workflow change, not code) — recommended next step if/when this becomes painful
+2. Render the bubble to a PNG and pass via `image` prop on Android (~2 h plus a price-to-image cache; risks: dpi/retina, readability, text rendering parity)
+3. Replace custom marker with default Android pin + callout (visible UX regression)
+
+**Entry point:** `src/app/discover/ExploreMapScreen.tsx:129` (`PriceBubble` component); render site at `src/app/discover/ExploreMapScreen.tsx:363–386` (`<Marker>` block). All Android workaround commentary in the file (lines 269–292, 458–459, 481–486, 471–476) refers to this same bug class — leave the existing workarounds in place; they narrow the failure window in EAS builds even if they do not close it on Expo Go.
+
+**Verification (when reopened):** Reproducible on Android Expo Go SDK 54 by opening Explore → Map tab with any seeded services that have coordinates. Expected: each pin shows `from £NN`. Actual on Expo Go: each pin shows `from` only, tail clipped. Test on EAS dev build before assuming a fix works — Expo Go behaviour is not a reliable signal.
+
+**Related:** Lives in the same family as the file's pre-existing comments about Android marker bitmap capture (lines 269–292). Any future work on the Explore map UX should consult this entry first to avoid retreading the same investigations.

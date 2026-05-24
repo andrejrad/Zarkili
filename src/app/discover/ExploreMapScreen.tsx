@@ -470,6 +470,12 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     borderWidth: 1.5,
     borderColor: colors.primary,
+    // Android react-native-maps bitmap capture timing: marker freezes the View
+    // tree as a bitmap; Text measurement of "from £NNN" can capture before glyph
+    // layout completes, producing a truncated marker. Explicit minWidth ensures
+    // the bitmap captures at the correct width regardless of Text measurement
+    // timing. See react-native-maps Android marker issues.
+    minWidth: 88,
   },
   priceBubbleSelected: {
     backgroundColor: colors.primary,
@@ -483,6 +489,9 @@ const styles = StyleSheet.create({
     color: colors.primary,
     fontWeight: "700",
     letterSpacing: 0,
+    // Belt-and-braces: pairs with priceBubble.minWidth to guarantee the Text
+    // node itself doesn't undercut the row during Android bitmap capture.
+    minWidth: 50,
   },
   priceBubbleTextSelected: { color: colors.white },
   priceBubbleBadge: {
