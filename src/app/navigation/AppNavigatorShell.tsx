@@ -3774,7 +3774,7 @@ export function AppNavigatorShell({
       }
 
       await updateEmailAddress({ email: input.email.trim() });
-      setEmailSaveSuccessMessage("Email updated.");
+      setEmailSaveSuccessMessage("A verification link has been sent to your new address. Click the link to confirm the change.");
     } catch (error) {
       const friendlyMessage = getFriendlyFirebaseAuthMessage(error);
       if (friendlyMessage) {

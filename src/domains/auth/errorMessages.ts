@@ -46,7 +46,9 @@ export function getFriendlyFirebaseAuthMessage(error: unknown): string | null {
 export function toUserFacingAuthError(error: unknown, fallbackMessage: string): Error {
   const friendlyMessage = getFriendlyFirebaseAuthMessage(error);
   if (friendlyMessage) {
-    return new Error(friendlyMessage);
+    const wrapped = new Error(friendlyMessage);
+    (wrapped as { code?: string }).code = (error as { code?: string })?.code;
+    return wrapped;
   }
 
   if (error instanceof Error) {
