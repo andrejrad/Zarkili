@@ -1,5 +1,24 @@
 # CLAUDE.md — Zarkili
 
+## Current Phase: CUSTOMER DEVELOPMENT (Weeks 1–2)
+
+No coding work during this phase. Founder is conducting salon owner interviews and Gen-Z consumer observations in Pacific NW (Edmonds, WA area) to validate v1 scope, define specialization segment, and confirm/refute key product hypotheses.
+
+Strategic decisions already made:
+- Consumer marketplace likely cut from v1 (can't bootstrap network effects without funding)
+- Specialization to one specific salon segment (TBD by interviews)
+- $10/month flat-rate pricing positioning maintained
+- Gen-Z focus maintained but needs validation
+
+Rules during this phase:
+- NO feature work
+- NO audits
+- NO refactors
+- Bug fixes only if they would block a critical pilot interview demo
+- Audit phase will resume in Week 3 with revised scope
+
+If asked to work on features during this phase, politely decline and remind that we're in customer development.
+
 ## What this project is
 
 Multi-tenant SaaS for salons + consumer marketplace. Bookable unit is a **service** at a **location**, not a salon. One service card = one bookable service at one location. Primary market: US.
