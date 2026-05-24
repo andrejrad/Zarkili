@@ -120,6 +120,7 @@ Weeks 1–10 did not use the `Wnn-DEBT-n` convention. Carry-over items from that
 | **Dev-env-only — Android Expo Go map marker truncation** | NEW-DEBT-S (Explore map price pins show "from" only on Android Expo Go; every JS-side fix exhausted; root cause is Expo Go native ↔ JS version mismatch — does not affect EAS/production builds) |
 | **Post-launch W2 — password change flow unwired** | NEW-DEBT-T (ChangeCredentialsScreen 2-step re-auth flow exists but no route case renders it; users cannot change password while logged in) |
 | **Post-launch hardening — email change session-hijack risk** | ~~NEW-DEBT-U~~ (closed 2026-05-23 — migrated to verifyBeforeUpdateEmail during NEW-DEBT-M; promoted blocking when email enumeration protection blocked updateEmail on dev project) |
+| **Week 4–5 security hardening — email verification deliverability** | NEW-DEBT-V (verifyBeforeUpdateEmail silently accepted by Firebase but email never arrives; needs custom sender domain + SPF/DKIM + actionCodeSettings for production) |
 
 **Closed:** W12-HARDENING-1, W12-HARDENING-2, KI-001 (W15), KI-002 (W16), W11-DEBT-2 (W16), W13-DEBT-1 (W18), W13-DEBT-4 (W18), W14-DEBT-2 (W18), W15-DEBT-2 (W18), W19-DEBT-1 (W19), W19-DEBT-2 (W19), W19-DEBT-3 (W19), W14-DEBT-5 (W20.5), W16-DEBT-1 (W20.5), W17-DEBT-2 (W20.5), W17-DEBT-3 (W20.5), W18-DEBT-1 (W20.5), W20-DEBT-1 (W20.5), W15-DEBT-3 (W21), W17-DEBT-1 (W22), W11-DEBT-1 (W23), W22-DEBT-2 (W23), W23-DEBT-2 (W24), W24-DEBT-2 (W37.5), W37.5-DEBT-1 (W37.5), W37.5-DEBT-2 (W37.5), W35-DEBT-1 (W37.6-pre), W36-DEBT-1 (W37.5-pre), W36-DEBT-2 (W37.6-pre), W36-DEBT-3 (W37.5-pre), W37-DEBT-1 (W37.5-pre), W37-DEBT-2 (W37.6-pre), W37-DEBT-3 (W37.5-pre), W37-DEBT-5 (W37.5-pre), W37-DEBT-6 (W37.5-pre), W23-DEBT-3 (W37.6-pre via W36-DEBT-2), W38-DEBT-6 (W37.6-pre — posts={[]} is correct), W38-DEBT-7 (W37.6-pre — inline static intended), W13-DEBT-2 (W39), W14-DEBT-3 (W39), W14-DEBT-4 (W39), W38-DEBT-8 (W39), W38-DEBT-9 (W39), W38-DEBT-10 (W40), W43-DEBT-3 (W45), **W41-DEBT-3 (W46)**, **W43-DEBT-1 (W46)**, **W44-DEBT-1 (W46)**, **W45-DEBT-1 (W46)**, **W41-DEBT-1 (W47)**, **W41-DEBT-2 (W47)**, **W41-DEBT-4 (W47)**, **W41-DEBT-5 (W47)**, **W41-DEBT-6 (W47)**, **W42-DEBT-1 (W47)**, **W42-DEBT-2 (W47)**, **W42-DEBT-3 (W47)**, **W37.5-DEBT-3 (W47)**, **W23-DEBT-1 (W47)**, **W38-DEBT-3 (W47)**, **W15-DEBT-1 (W47)**, **W22-DEBT-1 (W47)**, **W38-DEBT-1 (W47)**, **W22-DEBT-3 (W47)**.
 
@@ -512,7 +513,7 @@ Full spec-compliance audit of `zarkili_booking_flow_spec_v2.md` against the impl
 
 **Verification:** User can edit display name, change email address, and trigger a password reset from `EditProfileScreen` with correct loading spinner, inline error messages, and success confirmation — all persisted to Firebase Auth/Firestore.
 
-**Close notes:** Closed in branch `fix/new-debt-m-account-settings-wiring` 2026-05-23. `EditProfileScreen` props expanded with 12 new optional fields (profileSaving/Error/SuccessMessage, initialEmail, onSaveEmail/emailSaving/Error/SuccessMessage, onSendPasswordReset/passwordResetSubmitting/Error/SuccessMessage). All 9 `eslint-disable` suppression comments on state vars and 3 on handler functions removed. Handler functions updated: relaxed `submitAccountProfile` to allow single-name display names; all three handlers now re-throw after setting shell error state so the screen's catch block can transition to the error state. Shell render case wired with name-splitting, `onBack` state cleanup, and friendly success messages ("Profile saved.", "Email updated.", "Password reset link sent to your email."). 16 new tests added to `profileScreens.test.tsx`. Related debt logged: NEW-DEBT-T (ChangeCredentialsScreen unwired), NEW-DEBT-U (verifyBeforeUpdateEmail migration).
+**Close notes:** Closed in branch `fix/new-debt-m-account-settings-wiring` 2026-05-23. `EditProfileScreen` props expanded with 12 new optional fields (profileSaving/Error/SuccessMessage, initialEmail, onSaveEmail/emailSaving/Error/SuccessMessage, onSendPasswordReset/passwordResetSubmitting/Error/SuccessMessage). All 9 `eslint-disable` suppression comments on state vars and 3 on handler functions removed. Handler functions updated: relaxed `submitAccountProfile` to allow single-name display names; all three handlers now re-throw after setting shell error state so the screen's catch block can transition to the error state. Shell render case wired with name-splitting, `onBack` state cleanup, and friendly success messages. 16 new tests added to `profileScreens.test.tsx`. Profile save and password reset confirmed working on Android Expo Go with real email addresses. Email change correctly initiates `verifyBeforeUpdateEmail` with Firebase accepting the call, but verification email deliverability is broken in the dev environment — Firebase silently accepts without error but no email arrives (confirmed not in spam, 20+ min wait, non-Gmail provider; tested both with and without `actionCodeSettings`). Tracked as NEW-DEBT-V for Week 4–5 security hardening sprint (likely root cause: default Firebase noreply sender is blocked by email providers; production fix requires custom sender domain + SPF/DKIM + `actionCodeSettings` pointing to a deployed continuation URL). Code-side wiring is complete; remaining work is Firebase configuration and infrastructure. Related debt logged: NEW-DEBT-T (ChangeCredentialsScreen unwired), NEW-DEBT-U (verifyBeforeUpdateEmail migration, closed in same session), NEW-DEBT-V (email deliverability).
 
 ---
 
@@ -729,3 +730,31 @@ After exhausting JS-side levers without effect, the residual hypothesis is **Exp
 **Verification:** After submitting a new email in EditProfileScreen: (1) success banner shows "A verification link has been sent to your new address."; (2) the old email remains in Firebase Auth until the user clicks the link; (3) the Firestore profile email field updates only after verification (via an auth state observer or Cloud Function trigger, not immediately on save).
 
 **Related:** Lives in the same family as the file's pre-existing comments about Android marker bitmap capture (lines 269–292). Any future work on the Explore map UX should consult this entry first to avoid retreading the same investigations.
+
+---
+
+## NEW-DEBT-V — Email verification deliverability — verifyBeforeUpdateEmail emails not arriving
+
+**Opened:** 2026-05-23
+**Severity:** medium
+**Target week:** Week 4–5 (security hardening sprint)
+**Status:** OPEN
+
+**What:** Firebase accepts the `verifyBeforeUpdateEmail` call without throwing, and the success banner renders correctly, but the verification email does not arrive at the new address. Confirmed not in spam, inbox is empty after 20+ minutes, tested with a non-Gmail provider. The bug was reproduced both without `actionCodeSettings` and with `actionCodeSettings: { url: "https://<projectId>.web.app/__/auth/action", handleCodeInApp: false }` — neither variation delivered the email. Likely root cause: the default Firebase noreply sender (`noreply@<project>.firebaseapp.com`) is being blocked or deprioritised by email providers, or the dev Firebase project has an email-sending restriction. The `sendPasswordResetEmail` call on the same project works reliably, suggesting the issue is specific to the email-change verification template or its sender configuration, not a blanket outbound block.
+
+**Why deferred:** Code-side wiring is complete and correct — `verifyBeforeUpdateEmail` is the right call, Firebase acknowledges it, and the UX handles the pending-verification state properly. The remaining work is Firebase configuration and infrastructure (custom sender domain, DNS records, `actionCodeSettings` pointing to a deployed continuation URL), which is out of scope for the current launch sprint and requires coordination with DNS/email hosting. The email change feature remains functional in the sense that no data is corrupted; users simply cannot complete the flow until delivery is resolved.
+
+**Investigation needed:**
+- (a) Check Firebase Console → Authentication → Usage for any sending restrictions or suspended-sending flags on the dev project.
+- (b) Test the same code path on a different Firebase project to isolate whether this is a project-level restriction vs a Firebase default-sender deliverability issue.
+- (c) Test with a Gmail address (Firebase noreply sender is whitelisted by Google) to confirm whether the issue is provider-specific.
+
+**Production solution requires:**
+- (a) Configure a custom sender domain (e.g. `noreply@zarkili.com`) in Firebase Auth → Templates → SMTP settings or via SendGrid.
+- (b) Set up SPF, DKIM, and DMARC records on the sender domain.
+- (c) `actionCodeSettings.url` pointing to a deployed continuation page (Firebase Hosting or a custom domain).
+- (d) For mobile UX: `handleCodeInApp: true` with deep linking config (iOS Universal Links / Android App Links) so the verification link opens the React Native app and completes the flow in-app.
+
+**Entry point:** `src/domains/auth/repository.ts` — `updateEmailAddress` function (search `verifyBeforeUpdateEmail`).
+
+**Verification:** User changes email in EditProfileScreen → verification email arrives in inbox within 60 seconds → user clicks link → Firebase Auth email field updates to the new address → app reflects the new email after re-authentication.
