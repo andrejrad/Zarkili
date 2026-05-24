@@ -7,7 +7,7 @@
  */
 
 import { useEffect, useRef, useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { Banner, Button, InputField, colors, radius, spacing, textStyles } from "../../shared/ui";
 
@@ -141,11 +141,13 @@ export function EditProfileScreen({
   }
 
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.content}
-      testID={testID}
-    >
+    <KeyboardAvoidingView style={styles.kvContainer} behavior={Platform.OS === "ios" ? "padding" : "height"}>
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={styles.content}
+        keyboardShouldPersistTaps="handled"
+        testID={testID}
+      >
       {/* Avatar */}
       <View style={styles.avatarSection}>
         <Pressable
@@ -318,10 +320,14 @@ export function EditProfileScreen({
         </View>
       ) : null}
     </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
+  kvContainer: {
+    flex: 1,
+  },
   container: {
     flex: 1,
     backgroundColor: colors.background,

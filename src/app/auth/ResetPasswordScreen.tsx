@@ -7,7 +7,7 @@
  */
 
 import { useState } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { Banner, Button, InputField, colors, radius, spacing } from "../../shared/ui";
 import { meetsPasswordPolicy, passwordStrength } from "../../shared/ui/formatters";
@@ -87,11 +87,12 @@ export function ResetPasswordScreen({
   }
 
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.content}
-      keyboardShouldPersistTaps="handled"
-    >
+    <KeyboardAvoidingView style={styles.kvContainer} behavior={Platform.OS === "ios" ? "padding" : "height"}>
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={styles.content}
+        keyboardShouldPersistTaps="handled"
+      >
       <Text style={styles.heading} accessibilityRole="header">
         Set a new password
       </Text>
@@ -143,10 +144,12 @@ export function ResetPasswordScreen({
         testID="reset-submit"
       />
     </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
+  kvContainer: { flex: 1 },
   container: { flex: 1, backgroundColor: colors.background },
   content: { padding: spacing.pageVertical, gap: spacing.s3 },
   heading: { fontSize: 24, lineHeight: 32, fontWeight: "600", color: colors.foreground },

@@ -6,7 +6,7 @@
  * format), and an SMS-reminders consent toggle that defaults to OFF per TCPA.
  */
 
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import {
   InputField,
@@ -60,7 +60,7 @@ export function GuestContactScreen({
     values.phone.replace(/\D/g, "").length !== 10;
 
   return (
-    <View style={styles.root} testID={testID}>
+    <KeyboardAvoidingView style={styles.root} behavior={Platform.OS === "ios" ? "padding" : "height"} testID={testID}>
       <View style={styles.header}>
         {onPressBack ? (
           <Pressable
@@ -76,7 +76,7 @@ export function GuestContactScreen({
         <Text style={styles.title}>Your contact info</Text>
         <View style={{ width: 44 }} />
       </View>
-      <ScrollView contentContainerStyle={styles.body}>
+      <ScrollView contentContainerStyle={styles.body} keyboardShouldPersistTaps="handled">
         {onPressSignIn ? (
           <Pressable
             onPress={onPressSignIn}
@@ -149,7 +149,7 @@ export function GuestContactScreen({
         primaryLoading={loading}
         primaryTestID={testID ? `${testID}-continue` : undefined}
       />
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 
