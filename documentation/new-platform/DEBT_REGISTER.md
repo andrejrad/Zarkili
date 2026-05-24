@@ -729,8 +729,6 @@ After exhausting JS-side levers without effect, the residual hypothesis is **Exp
 
 **Verification:** After submitting a new email in EditProfileScreen: (1) success banner shows "A verification link has been sent to your new address."; (2) the old email remains in Firebase Auth until the user clicks the link; (3) the Firestore profile email field updates only after verification (via an auth state observer or Cloud Function trigger, not immediately on save).
 
-**Related:** Lives in the same family as the file's pre-existing comments about Android marker bitmap capture (lines 269–292). Any future work on the Explore map UX should consult this entry first to avoid retreading the same investigations.
-
 ---
 
 ## NEW-DEBT-V — Email verification deliverability — verifyBeforeUpdateEmail emails not arriving
