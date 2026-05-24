@@ -4,7 +4,7 @@ import {
   signInWithEmailAndPassword,
   signInWithCredential,
   signOut,
-  updateEmail as updateAuthEmail,
+  verifyBeforeUpdateEmail,
   type Auth,
   type AuthCredential,
   type UserCredential,
@@ -153,22 +153,13 @@ export function createAuthRepository(auth: Auth, db: Firestore) {
 
     try {
       const normalizedEmail = input.email.trim();
-      await updateAuthEmail(currentUser, normalizedEmail);
-
+      await verifyBeforeUpdateEmail(currentUser, normalizedEmail);
+      // Verification email sent — auth email unchanged until user clicks link.
+      // Firestore profile is not updated here; the next sign-in refreshes it.
       const profile = await readUserProfile(userId);
-      await setDoc(
-        doc(db, USER_PROFILES_COLLECTION, userId),
-        {
-          userId,
-          email: normalizedEmail,
-          updatedAt: serverTimestamp(),
-        },
-        { merge: true }
-      );
-
       return {
         userId,
-        email: normalizedEmail,
+        email: currentUser.email ?? "",
         firstName: profile?.firstName ?? null,
         lastName: profile?.lastName ?? null,
       };

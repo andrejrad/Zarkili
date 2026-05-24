@@ -5,7 +5,7 @@ const mockSendPasswordResetEmail = jest.fn();
 const mockSignInWithEmailAndPassword = jest.fn();
 const mockSignInWithCredential = jest.fn();
 const mockSignOut = jest.fn();
-const mockUpdateEmail = jest.fn();
+const mockVerifyBeforeUpdateEmail = jest.fn();
 const mockGetDoc = jest.fn();
 const mockSetDoc = jest.fn();
 
@@ -15,7 +15,7 @@ jest.mock("firebase/auth", () => ({
   signInWithEmailAndPassword: (...args: unknown[]) => mockSignInWithEmailAndPassword(...args),
   signInWithCredential: (...args: unknown[]) => mockSignInWithCredential(...args),
   signOut: (...args: unknown[]) => mockSignOut(...args),
-  updateEmail: (...args: unknown[]) => mockUpdateEmail(...args),
+  verifyBeforeUpdateEmail: (...args: unknown[]) => mockVerifyBeforeUpdateEmail(...args),
 }));
 
 type MembershipDoc = {
@@ -64,7 +64,7 @@ describe("AuthRepository", () => {
     mockSignInWithEmailAndPassword.mockReset();
     mockSignInWithCredential.mockReset();
     mockSignOut.mockReset();
-    mockUpdateEmail.mockReset();
+    mockVerifyBeforeUpdateEmail.mockReset();
     mockGetDoc.mockReset();
     mockSetDoc.mockReset();
     auth.currentUser = null;
@@ -203,7 +203,7 @@ describe("AuthRepository", () => {
     });
   });
 
-  it("updates email for authenticated user and mirrors it to profile document", async () => {
+  it("sends verification email and returns current session without writing to Firestore", async () => {
     auth.currentUser = { uid: "user_3", email: "u3@test.dev" };
     mockUserProfiles.user_3 = {
       userId: "user_3",
@@ -215,18 +215,18 @@ describe("AuthRepository", () => {
 
     await expect(repo.updateEmailAddress("user_3", { email: "new@test.dev" })).resolves.toEqual({
       userId: "user_3",
-      email: "new@test.dev",
+      email: "u3@test.dev",
       firstName: "Ana",
       lastName: "Novak",
     });
 
-    expect(mockUpdateEmail).toHaveBeenCalledWith(auth.currentUser, "new@test.dev");
-    expect(mockSetDoc).toHaveBeenCalled();
+    expect(mockVerifyBeforeUpdateEmail).toHaveBeenCalledWith(auth.currentUser, "new@test.dev");
+    expect(mockSetDoc).not.toHaveBeenCalled();
   });
 
   it("maps Firebase update email errors to friendly messages", async () => {
     auth.currentUser = { uid: "user_3", email: "u3@test.dev" };
-    mockUpdateEmail.mockRejectedValue({ code: "auth/requires-recent-login", message: "raw firebase error" });
+    mockVerifyBeforeUpdateEmail.mockRejectedValue({ code: "auth/requires-recent-login", message: "raw firebase error" });
     const repo = createAuthRepository(auth as never, db as never);
 
     await expect(repo.updateEmailAddress("user_3", { email: "new@test.dev" })).rejects.toThrow(
