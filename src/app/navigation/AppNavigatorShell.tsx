@@ -830,23 +830,14 @@ export function AppNavigatorShell({
   const [authErrorMessage, setAuthErrorMessage] = useState<string | null>(null);
   const [profileCompletionSubmitting, setProfileCompletionSubmitting] = useState(false);
   const [profileCompletionErrorMessage, setProfileCompletionErrorMessage] = useState<string | null>(null);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- NEW-DEBT-M: read side unused until EditProfileScreen wiring is complete
   const [profileSaveSubmitting, setProfileSaveSubmitting] = useState(false);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- NEW-DEBT-M
   const [profileSaveErrorMessage, setProfileSaveErrorMessage] = useState<string | null>(null);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- NEW-DEBT-M
   const [profileSaveSuccessMessage, setProfileSaveSuccessMessage] = useState<string | null>(null);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- NEW-DEBT-M
   const [emailSaveSubmitting, setEmailSaveSubmitting] = useState(false);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- NEW-DEBT-M
   const [emailSaveErrorMessage, setEmailSaveErrorMessage] = useState<string | null>(null);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- NEW-DEBT-M
   const [emailSaveSuccessMessage, setEmailSaveSuccessMessage] = useState<string | null>(null);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- NEW-DEBT-M
   const [passwordResetSubmitting, setPasswordResetSubmitting] = useState(false);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- NEW-DEBT-M
   const [passwordResetErrorMessage, setPasswordResetErrorMessage] = useState<string | null>(null);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- NEW-DEBT-M
   const [passwordResetSuccessMessage, setPasswordResetSuccessMessage] = useState<string | null>(null);
   const [homeFeed, setHomeFeed] = useState<Awaited<ReturnType<DiscoveryService["getHomeFeed"]>> | null>(null);
   const [exploreFeed, setExploreFeed] = useState<Awaited<ReturnType<DiscoveryService["getExploreFeed"]>> | null>(null);
@@ -3745,15 +3736,14 @@ export function AppNavigatorShell({
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- NEW-DEBT-M: not yet passed to EditProfileScreen
   async function submitAccountProfile(input: { firstName: string; lastName: string }) {
     setProfileSaveSubmitting(true);
     setProfileSaveErrorMessage(null);
     setProfileSaveSuccessMessage(null);
 
     try {
-      if (input.firstName.trim().length === 0 || input.lastName.trim().length === 0) {
-        throw new Error("First and last name are required.");
+      if (input.firstName.trim().length === 0) {
+        throw new Error("Display name is required.");
       }
 
       await updateProfile({
@@ -3767,12 +3757,12 @@ export function AppNavigatorShell({
       } else {
         setProfileSaveErrorMessage("Unable to save profile.");
       }
+      throw error;
     } finally {
       setProfileSaveSubmitting(false);
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- NEW-DEBT-M
   async function submitAccountEmail(input: { email: string }) {
     setEmailSaveSubmitting(true);
     setEmailSaveErrorMessage(null);
@@ -3784,7 +3774,7 @@ export function AppNavigatorShell({
       }
 
       await updateEmailAddress({ email: input.email.trim() });
-      setEmailSaveSuccessMessage("Email saved.");
+      setEmailSaveSuccessMessage("Email updated.");
     } catch (error) {
       const friendlyMessage = getFriendlyFirebaseAuthMessage(error);
       if (friendlyMessage) {
@@ -3794,12 +3784,12 @@ export function AppNavigatorShell({
       } else {
         setEmailSaveErrorMessage("Unable to save email.");
       }
+      throw error;
     } finally {
       setEmailSaveSubmitting(false);
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- NEW-DEBT-M
   async function sendAccountPasswordReset(input: { email: string }) {
     setPasswordResetSubmitting(true);
     setPasswordResetErrorMessage(null);
@@ -3811,7 +3801,7 @@ export function AppNavigatorShell({
       }
 
       await sendPasswordReset({ email: input.email.trim() });
-      setPasswordResetSuccessMessage("Password reset email sent.");
+      setPasswordResetSuccessMessage("Password reset link sent to your email.");
     } catch (error) {
       const friendlyMessage = getFriendlyFirebaseAuthMessage(error);
       if (friendlyMessage) {
@@ -3821,6 +3811,7 @@ export function AppNavigatorShell({
       } else {
         setPasswordResetErrorMessage("Unable to send password reset email.");
       }
+      throw error;
     } finally {
       setPasswordResetSubmitting(false);
     }
@@ -7116,11 +7107,41 @@ export function AppNavigatorShell({
     if (activeRoute.name === "EditProfile") {
       return (
         <EditProfileScreen
-          initialDisplayName={[firstName, lastName].filter(Boolean).join(" ") || "Dev User"}
+          initialDisplayName={[firstName, lastName].filter(Boolean).join(" ") || ""}
           initialPronouns=""
           initialBio=""
-          onSave={async () => { navigate("AppShell"); }}
-          onBack={() => navigate("AppShell")}
+          initialEmail={email ?? ""}
+          onSave={async (fields) => {
+            const parts = fields.displayName.trim().split(/\s+/);
+            await submitAccountProfile({
+              firstName: parts[0] ?? "",
+              lastName: parts.slice(1).join(" "),
+            });
+          }}
+          profileSaving={profileSaveSubmitting}
+          profileErrorMessage={profileSaveErrorMessage}
+          profileSuccessMessage={profileSaveSuccessMessage}
+          onSaveEmail={async (newEmail) => {
+            await submitAccountEmail({ email: newEmail });
+          }}
+          emailSaving={emailSaveSubmitting}
+          emailErrorMessage={emailSaveErrorMessage}
+          emailSuccessMessage={emailSaveSuccessMessage}
+          onSendPasswordReset={async () => {
+            await sendAccountPasswordReset({ email: email ?? "" });
+          }}
+          passwordResetSubmitting={passwordResetSubmitting}
+          passwordResetErrorMessage={passwordResetErrorMessage}
+          passwordResetSuccessMessage={passwordResetSuccessMessage}
+          onBack={() => {
+            setProfileSaveErrorMessage(null);
+            setProfileSaveSuccessMessage(null);
+            setEmailSaveErrorMessage(null);
+            setEmailSaveSuccessMessage(null);
+            setPasswordResetErrorMessage(null);
+            setPasswordResetSuccessMessage(null);
+            navigate("AppShell");
+          }}
         />
       );
     }
