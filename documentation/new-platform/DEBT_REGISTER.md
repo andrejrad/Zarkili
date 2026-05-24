@@ -121,6 +121,7 @@ Weeks 1–10 did not use the `Wnn-DEBT-n` convention. Carry-over items from that
 | **Post-launch W2 — password change flow unwired** | NEW-DEBT-T (ChangeCredentialsScreen 2-step re-auth flow exists but no route case renders it; users cannot change password while logged in) |
 | **Post-launch hardening — email change session-hijack risk** | ~~NEW-DEBT-U~~ (closed 2026-05-23 — migrated to verifyBeforeUpdateEmail during NEW-DEBT-M; promoted blocking when email enumeration protection blocked updateEmail on dev project) |
 | **Week 4–5 security hardening — email verification deliverability** | NEW-DEBT-V (verifyBeforeUpdateEmail silently accepted by Firebase but email never arrives; needs custom sender domain + SPF/DKIM + actionCodeSettings for production) |
+| **W1 Day 2 — Android keyboard covers form fields** | NEW-DEBT-W (keyboard rises over focused input, screen doesn't scroll; affects all form screens; fix: KeyboardAvoidingView + keyboardShouldPersistTaps) |
 
 **Closed:** W12-HARDENING-1, W12-HARDENING-2, KI-001 (W15), KI-002 (W16), W11-DEBT-2 (W16), W13-DEBT-1 (W18), W13-DEBT-4 (W18), W14-DEBT-2 (W18), W15-DEBT-2 (W18), W19-DEBT-1 (W19), W19-DEBT-2 (W19), W19-DEBT-3 (W19), W14-DEBT-5 (W20.5), W16-DEBT-1 (W20.5), W17-DEBT-2 (W20.5), W17-DEBT-3 (W20.5), W18-DEBT-1 (W20.5), W20-DEBT-1 (W20.5), W15-DEBT-3 (W21), W17-DEBT-1 (W22), W11-DEBT-1 (W23), W22-DEBT-2 (W23), W23-DEBT-2 (W24), W24-DEBT-2 (W37.5), W37.5-DEBT-1 (W37.5), W37.5-DEBT-2 (W37.5), W35-DEBT-1 (W37.6-pre), W36-DEBT-1 (W37.5-pre), W36-DEBT-2 (W37.6-pre), W36-DEBT-3 (W37.5-pre), W37-DEBT-1 (W37.5-pre), W37-DEBT-2 (W37.6-pre), W37-DEBT-3 (W37.5-pre), W37-DEBT-5 (W37.5-pre), W37-DEBT-6 (W37.5-pre), W23-DEBT-3 (W37.6-pre via W36-DEBT-2), W38-DEBT-6 (W37.6-pre — posts={[]} is correct), W38-DEBT-7 (W37.6-pre — inline static intended), W13-DEBT-2 (W39), W14-DEBT-3 (W39), W14-DEBT-4 (W39), W38-DEBT-8 (W39), W38-DEBT-9 (W39), W38-DEBT-10 (W40), W43-DEBT-3 (W45), **W41-DEBT-3 (W46)**, **W43-DEBT-1 (W46)**, **W44-DEBT-1 (W46)**, **W45-DEBT-1 (W46)**, **W41-DEBT-1 (W47)**, **W41-DEBT-2 (W47)**, **W41-DEBT-4 (W47)**, **W41-DEBT-5 (W47)**, **W41-DEBT-6 (W47)**, **W42-DEBT-1 (W47)**, **W42-DEBT-2 (W47)**, **W42-DEBT-3 (W47)**, **W37.5-DEBT-3 (W47)**, **W23-DEBT-1 (W47)**, **W38-DEBT-3 (W47)**, **W15-DEBT-1 (W47)**, **W22-DEBT-1 (W47)**, **W38-DEBT-1 (W47)**, **W22-DEBT-3 (W47)**.
 
@@ -756,3 +757,20 @@ After exhausting JS-side levers without effect, the residual hypothesis is **Exp
 **Entry point:** `src/domains/auth/repository.ts` — `updateEmailAddress` function (search `verifyBeforeUpdateEmail`).
 
 **Verification:** User changes email in EditProfileScreen → verification email arrives in inbox within 60 seconds → user clicks link → Firebase Auth email field updates to the new address → app reflects the new email after re-authentication.
+
+---
+
+## NEW-DEBT-W — Keyboard covers form fields on Android; screen doesn't scroll to keep focused input visible
+
+**Opened:** 2026-05-23
+**Severity:** medium
+**Target week:** W1 Day 2 (production push — ~30–60 min fix)
+**Status:** OPEN
+
+**What:** On Android Expo Go, when the keyboard opens to edit the Email or Password fields in EditProfileScreen, the keyboard covers the input and the screen does not scroll up to keep the focused field visible. The user cannot see what they are typing without manually dismissing the keyboard first. The issue likely affects any form field below the fold on any screen — EditProfileScreen is the confirmed case; other form screens (e.g. sign-in, create account, onboarding) should be audited during the fix. iOS behaviour is untested. Standard React Native fix: wrap form content in `KeyboardAvoidingView` with `behavior="padding"` (iOS) / `behavior="height"` (Android), and ensure the outer `ScrollView` has `keyboardShouldPersistTaps="handled"` so taps on inputs do not dismiss the keyboard first.
+
+**Why deferred:** Discovered during Android Expo Go testing of the NEW-DEBT-M account settings wiring. Not a blocker for the PR merge (code-side wiring is correct) but is a UX regression for any user trying to change their email or password on Android. Deferred to W1 Day 2 because it is a small, contained fix with no architecture risk.
+
+**Entry point:** `src/app/profile/EditProfileScreen.tsx` — outermost ScrollView and form layout. Audit other form screens (`SignInScreen`, `CreateAccountScreen`, onboarding steps) during the same fix pass.
+
+**Verification:** Tap the Email input on Android → keyboard rises → focused field remains fully visible above the keyboard → user can read and edit their input without dismissing the keyboard.
